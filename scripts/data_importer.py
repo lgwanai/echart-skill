@@ -4,9 +4,63 @@ import pandas as pd
 import os
 import re
 import warnings
+import hashlib
+from datetime import datetime
 
 # Suppress openpyxl warnings about data validation
 warnings.filterwarnings('ignore', category=UserWarning, module='openpyxl')
+
+def calculate_md5(file_path):
+    """Calculate MD5 hash of a file."""
+    hash_md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
+def init_meta_table(conn):
+    """Initialize metadata table for tracking file imports and usage."""
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS _data_skill_meta (
+            file_name TEXT,
+            table_name TEXT PRIMARY KEY,
+            md5_hash TEXT,
+            import_time DATETIME,
+            last_used_time DATETIME
+        )
+    ''')
+    conn.commit()
+
+def check_duplicate_import(conn, file_name, md5_hash):
+    """Check if the file has already been imported with the same MD5."""
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT table_name FROM _data_skill_meta 
+        WHERE file_name = ? AND md5_hash = ?
+    ''', (file_name, md5_hash))
+    result = cursor.fetchone()
+    if result:
+        # Update last_used_time since we accessed it
+        cursor.execute('''
+            UPDATE _data_skill_meta 
+            SET last_used_time = ? 
+            WHERE table_name = ?
+        ''', (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), result[0]))
+        conn.commit()
+        return result[0]
+    return None
+
+def record_import(conn, file_name, table_name, md5_hash):
+    """Record import metadata."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT OR REPLACE INTO _data_skill_meta 
+        (file_name, table_name, md5_hash, import_time, last_used_time)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (file_name, table_name, md5_hash, now, now))
+    conn.commit()
 
 def clean_column_names(columns):
     """Clean column names to be valid SQLite identifiers."""
@@ -94,6 +148,21 @@ def import_to_sqlite(file_path, db_path, table_name=None):
         table_name = re.sub(r'\W+', '_', base_name).strip('_')
         
     conn = sqlite3.connect(db_path)
+    
+    # Initialize metadata table
+    init_meta_table(conn)
+    
+    # Calculate MD5
+    file_md5 = calculate_md5(file_path)
+    file_name = os.path.basename(file_path)
+    
+    # Check for duplicate import
+    existing_table = check_duplicate_import(conn, file_name, file_md5)
+    if existing_table:
+        print(f"File '{file_name}' with identical content already imported as table '{existing_table}'. Skipping import.")
+        conn.close()
+        return existing_table
+
     cursor = conn.cursor()
     
     # Handle existing table by appending suffix
@@ -164,6 +233,9 @@ def import_to_sqlite(file_path, db_path, table_name=None):
         
     else:
         raise ValueError(f"Unsupported file format: {ext}")
+        
+    # Record metadata
+    record_import(conn, file_name, table_name, file_md5)
         
     conn.close()
     return table_name

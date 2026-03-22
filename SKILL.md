@@ -24,7 +24,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
    ```bash
    python scripts/data_importer.py "path/to/file.xlsx" --db workspace.db
    ```
-   *Note: This script automatically handles merged cells (unmerges and forward-fills), detects the real header row, chunks large CSVs, and sanitizes column names for SQLite.*
+   *Note: This script calculates the MD5 hash of the file. If an identical file was already imported, it skips the import and returns the existing table name. It also automatically handles merged cells, detects the real header row, chunks large CSVs, and sanitizes column names for SQLite.*
 2. Once imported, run a quick check to understand the schema and data:
    ```bash
    sqlite3 workspace.db "PRAGMA table_info(table_name);"
@@ -47,7 +47,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 3. For Semantic extraction, use regex or heuristic rules in Python. If LLM analysis is strictly required, write a script that processes the column locally or prompts the user for permission to send a sample.
 
 ### Scenario 4: Chart Generation
-**Trigger**: User requests a visualization (bar, pie, line, scatter).
+**Trigger**: User requests a visualization (bar, pie, line, scatter, map).
 **Action**:
 1. Do NOT write custom Python scripts from scratch.
 2. Use the built-in universal `scripts/chart_generator.py` script.
@@ -57,20 +57,22 @@ This skill transforms the agent into a powerful local data analysis assistant, s
    {
        "db_path": "workspace.db",
        "query": "SELECT category, SUM(value) as val FROM table GROUP BY category",
-       "chart_type": "bar", // Can be "bar", "pie", "line", "scatter"
+       "chart_type": "bar", // Can be "bar", "pie", "line", "scatter", "map"
        "x_col": "category",
        "y_col": "val",
        "title": "Chart Title",
        "xlabel": "X Axis Label",
        "ylabel": "Y Axis Label",
-       "output_path": "tmp/output_chart.png",
+       "output_path": "tmp/output_chart.html", // Must be .html
        "show_labels": true
    }
    ```
+   *Note: If the user requests a map chart (`"chart_type": "map"`), it will utilize the local ECharts and `bmap` extension. The script will check `config.txt` for `BAIDU_AK`. If not found, it will warn the user but fallback to a standard geojson map.*
 5. Execute the command:
    ```bash
    python scripts/chart_generator.py --config '{"db_path": "workspace.db", "query": "...", ...}'
    ```
+6. The script will automatically start a local HTTP server and return an access URL. Provide this URL to the user to view the interactive chart.
 
 ### Scenario 5: File Merging & Splitting
 **Trigger**: User needs to combine multiple identical reports or split a master sheet by department.
@@ -90,3 +92,11 @@ This skill transforms the agent into a powerful local data analysis assistant, s
    df.to_excel('final_output.xlsx', index=False)
    ```
 2. **Report Generation**: Write a Markdown file summarizing the analysis steps, key metrics (retrieved via SQL), and referencing any generated charts. Provide the user with the path to the report.
+
+### Scenario 7: Data Cleanup
+**Trigger**: Routine maintenance or user request to clean up old data.
+**Action**:
+1. Run the cleaner script to remove tables and metadata not accessed in the last 30 days:
+   ```bash
+   python scripts/data_cleaner.py --db workspace.db --days 30
+   ```
