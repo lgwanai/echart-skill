@@ -1,4 +1,4 @@
-# Release Note - Data Skill
+# Release Note - Echart Skill
 
 ## 🚀 新功能 (New Features)
 
@@ -20,7 +20,7 @@
 
 * **图表坐标系崩溃修复**：修复了在 ECharts 中尝试将饼图 (`pie`) 直接挂载到地理坐标系 (`geo`) 导致图表渲染崩溃白屏的问题，并在工作流中明确了必须使用 `scatter` 或 `effectScatter` 的规范。
 * **百度 AK 类型错误规避**：针对百度地图服务报错状态码 `240` (APP 服务被禁用) 的问题，在规范中明确区分了“浏览器端 AK”与“服务端 AK”的使用场景，并提供了代码级的静态坐标 fallback 建议。
-* **图表预览服务器资源泄漏修复**：重构了本地 HTTP Server 的启动检测机制。废弃了不可靠的本地临时状态文件，改为无状态的端口探测与专属健康检查接口 (`/__data_skill_health`)。彻底解决了每次生成新图表时可能重复启动 Python 进程从而导致系统资源耗尽的严重 Bug，确保全局只复用一个轻量级 Server 实例。
+* **图表预览服务器资源泄漏修复**：重构了本地 HTTP Server 的启动检测机制。废弃了不可靠的本地临时状态文件，改为无状态的端口探测与专属健康检查接口 (`/__echart_skill_health`)。彻底解决了每次生成新图表时可能重复启动 Python 进程从而导致系统资源耗尽的严重 Bug，确保全局只复用一个轻量级 Server 实例。
 * **图表生成引擎重构**：完全剥离了原有的冗余 ECharts Python 模板依赖（删除了 `echarts_templates` 目录），转为更加灵活和强大的纯 Prompt + 纯 JSON 参数生成模式，彻底解决了下钻图表返回时因对象绑定引发的报错（`TypeError: Cannot read properties of undefined`）。
 * **隔离工作区输出**：更新了 `.gitignore` 和打包配置脚本 `package.sh`，强制隔离 `outputs/` 目录，防止测试数据或临时文件被错误地提交到 Git 仓库或打包到发布产物中。
 * **文档完善**：全面更新了 `skill.md` 工作流指南与 `README.md`。新增了百度地图 API Key 的申请官方链接，并补充了未来功能迭代规划。

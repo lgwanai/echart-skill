@@ -1,5 +1,5 @@
 ---
-name: data-skill
+name: echart-skill
 description: 专门处理日常办公场景下的高频、复杂数据分析与处理的助手。使用本地代码执行模式（SQL 或 Python + SQLite）来处理数据导入、清洗、查询、提取、合并拆分及报告生成，支持大数据量且保障数据隐私安全。当用户需要处理 Excel/CSV 文件、跨表查询、生成图表或输出数据分析报告时使用此 Skill。
 ---
 
@@ -60,7 +60,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
        "db_path": "workspace.db",
        "query": "SELECT category, SUM(value) as val FROM table GROUP BY category",
        "title": "Chart Title",
-       "output_path": "/Users/wuliang/workspace/data-skill/outputs/html/output_chart.html",
+       "output_path": "/Users/wuliang/workspace/echart-skill/outputs/html/output_chart.html",
        "echarts_option": { ... }, // Generated option from prompt
        "custom_js": "..." // Optional JS logic for complex data binding
    }
