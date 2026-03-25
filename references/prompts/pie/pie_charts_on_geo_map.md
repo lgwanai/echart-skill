@@ -54,7 +54,8 @@ $.get(ROOT_PATH + '/data/asset/geo/iceland.geo.json', function (geoJSON) {
     });
     return {
       type: 'pie',
-      coordinateSystem: 'geo',
+      // CRITICAL WARNING: 'coordinateSystem: "geo"' is NOT SUPPORTED for 'pie' series in ECharts.
+      // Do NOT use 'coordinateSystem: "geo"'. Instead, rely on 'center' with geo coordinates (requires ECharts v5.4.0+).
       tooltip: {
         formatter: '{b}: {c} ({d}%)'
       },

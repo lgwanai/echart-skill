@@ -102,18 +102,46 @@ def generate_echarts_html(df, config, output_path):
     dataset_source_json = json.dumps([df.columns.tolist()] + df.values.tolist(), ensure_ascii=False)
     custom_js = f"var rawData = {raw_data_json};\nvar datasetSource = {dataset_source_json};\n" + custom_js
 
+    # Get server base url first to construct absolute paths for local assets
+    base_url = ensure_server_running()
+
     # 2. BMap script injection check
     if ("bmap" in json.dumps(option) or "bmap" in custom_js) and baidu_ak:
         bmap_script = f"""
         <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak={baidu_ak}"></script>
-        <script src="/assets/echarts/bmap.min.js"></script>
+        <script src="{base_url}/assets/echarts/bmap.min.js"></script>
         """
     option_json = json.dumps(option, ensure_ascii=False)
     
     # 自动检测是否使用了 'china' 地图并注入 china.js
     china_map_script = ""
-    if "china" in option_json or "china" in custom_js:
-        china_map_script = '<script src="/assets/echarts/china.js"></script>'
+    if "china" in option_json or "china" in custom_js or "中国" in option_json or "中国" in custom_js:
+        china_map_script = f'<script src="{base_url}/assets/echarts/china.js"></script>'
+        
+    # 自动检测是否使用了 'world' 地图并注入 world.js
+    world_map_script = ""
+    if "world" in option_json or "world" in custom_js or "世界" in option_json or "世界" in custom_js:
+        world_map_script = f'<script src="{base_url}/assets/echarts/world.js"></script>'
+    
+    # 自动检测是否使用了各省市地图并注入对应的 js (如果有)
+    province_map_scripts = []
+    province_pinyin_map = {
+        "安徽": "anhui", "澳门": "aomen", "北京": "beijing", "重庆": "chongqing",
+        "福建": "fujian", "甘肃": "gansu", "广东": "guangdong", "广西": "guangxi",
+        "贵州": "guizhou", "海南": "hainan", "河北": "hebei", "黑龙江": "heilongjiang",
+        "河南": "henan", "湖北": "hubei", "湖南": "hunan", "江苏": "jiangsu",
+        "江西": "jiangxi", "吉林": "jilin", "辽宁": "liaoning", "内蒙古": "neimenggu",
+        "宁夏": "ningxia", "青海": "qinghai", "山东": "shandong", "上海": "shanghai",
+        "山西": "shanxi", "陕西": "shanxi1", "四川": "sichuan", "台湾": "taiwan",
+        "天津": "tianjin", "香港": "xianggang", "新疆": "xinjiang", "西藏": "xizang",
+        "云南": "yunnan", "浙江": "zhejiang"
+    }
+    
+    for cn_name, pinyin in province_pinyin_map.items():
+        if cn_name in option_json or cn_name in custom_js or pinyin in custom_js:
+            province_map_scripts.append(f'<script src="{base_url}/assets/echarts/{pinyin}.js"></script>')
+            
+    province_scripts_html = "\n        ".join(province_map_scripts)
     
     html_template = f"""
     <!DOCTYPE html>
@@ -121,9 +149,11 @@ def generate_echarts_html(df, config, output_path):
     <head>
         <meta charset="utf-8">
         <title>{title}</title>
-        <script src="/assets/echarts/echarts.min.js"></script>
+        <script src="{base_url}/assets/echarts/echarts.min.js"></script>
         {bmap_script}
         {china_map_script}
+        {world_map_script}
+        {province_scripts_html}
     </head>
     <body>
         <div id="main" style="width: 100%; height: 800px;"></div>
@@ -146,7 +176,6 @@ def generate_echarts_html(df, config, output_path):
     with io.open(output_path, 'w', encoding='utf-8') as f:
         f.write(html_template)
     
-    base_url = ensure_server_running()
     rel_path = os.path.relpath(output_path, base_dir).replace(os.sep, '/')
     access_url = f"{base_url}/{rel_path}"
     
