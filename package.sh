@@ -17,7 +17,6 @@ echo "开始打包 Data Skill..."
 zip -r -q "$DIST_DIR/$PACKAGE_NAME" . \
     -x "idea.md" \
     -x "package.sh" \
-    -x "RELEASE_NOTE.md" \
     -x "workspace.db" \
     -x "dist/*" \
     -x "tmp/*" \
