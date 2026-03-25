@@ -2,13 +2,13 @@
 
 # 获取当前时间戳，格式：YYYYMMDD_HHMMSS
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-PACKAGE_NAME="data-skill_${TIMESTAMP}.zip"
+PACKAGE_NAME="echart-skill_${TIMESTAMP}.zip"
 DIST_DIR="dist"
 
 # 确保 dist 目录存在
 mkdir -p "$DIST_DIR"
 
-echo "开始打包 Data Skill..."
+echo "开始打包 Echart Skill..."
 
 # 执行打包命令
 # -r 递归
