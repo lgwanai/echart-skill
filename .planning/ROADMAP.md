@@ -13,7 +13,7 @@ This roadmap transforms echart-skill from a functional MVP into a production-rea
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Security & Quality Foundation** - Fix critical vulnerabilities and establish test coverage
-- [ ] **Phase 2: Performance Optimization** - Optimize for large files and concurrent operations (2/4 complete)
+- [x] **Phase 2: Performance Optimization** - Optimize for large files and concurrent operations
 - [ ] **Phase 3: Dashboard Layouts** - Multi-chart dashboard generation with grid layout
 - [ ] **Phase 4: URL/API Data Source** - Import data from HTTP endpoints with authentication
 - [ ] **Phase 5: Gantt Chart API** - Simplified Gantt chart wrapper
@@ -54,8 +54,8 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md - DatabaseRepository with connection pooling and WAL mode (PERF-01, PERF-05)
 - [x] 02-02-PLAN.md - Streaming Excel import for large files (PERF-02)
-- [ ] 02-03-PLAN.md - Async geocoding with httpx and retry logic (PERF-03)
-- [ ] 02-04-PLAN.md - Server process lifecycle with PID tracking (PERF-04)
+- [x] 02-03-PLAN.md - Async geocoding with httpx and retry logic (PERF-03)
+- [x] 02-04-PLAN.md - Server process lifecycle with PID tracking (PERF-04)
 
 ### Phase 3: Dashboard Layouts
 **Goal**: Users can create multi-chart dashboards with flexible grid layouts in a single HTML file
@@ -96,7 +96,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Security & Quality Foundation | 5/5 | Complete | 01-01, 01-02, 01-03, 01-04, 01-05 |
-| 2. Performance Optimization | 2/4 | In Progress|  |
+| 2. Performance Optimization | 4/4 | Complete | 02-01, 02-02, 02-03, 02-04 |
 | 3. Dashboard Layouts | 0/TBD | Not started | - |
 | 4. URL/API Data Source | 0/TBD | Not started | - |
 | 5. Gantt Chart API | 0/TBD | Not started | - |
