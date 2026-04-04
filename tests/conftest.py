@@ -5,6 +5,15 @@ import os
 from pathlib import Path
 
 
+@pytest.fixture(autouse=True)
+def reset_database_singleton():
+    """Reset database singleton before and after each test."""
+    import database
+    database._repo = None
+    yield
+    database._repo = None
+
+
 @pytest.fixture
 def temp_db():
     """Create a temporary SQLite database for testing."""

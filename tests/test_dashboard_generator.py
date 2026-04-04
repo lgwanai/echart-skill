@@ -10,9 +10,17 @@ This module tests the dashboard generation functionality:
 """
 import json
 import os
+import sys
 import tempfile
 import sqlite3
 import pytest
+
+# Mock the server and chart_generator modules before importing dashboard_generator
+import unittest.mock as mock
+sys.modules['server'] = mock.MagicMock()
+sys.modules['server'].ensure_server_running = mock.MagicMock(return_value='http://localhost:8080')
+sys.modules['chart_generator'] = mock.MagicMock()
+sys.modules['chart_generator'].get_baidu_ak = mock.MagicMock(return_value='test_ak')
 
 
 @pytest.fixture
@@ -298,8 +306,10 @@ class TestHTMLGeneration:
         with open(output_path, 'r', encoding='utf-8') as f:
             html = f.read()
 
-        assert "echarts.init(document.getElementById('chart_chart1'))" in html
-        assert "echarts.init(document.getElementById('chart_chart2'))" in html
+        # The chart ID is passed as argument to IIFE, check for the pattern
+        assert "echarts.init(document.getElementById(chartId))" in html
+        assert "'chart_chart1'" in html
+        assert "'chart_chart2'" in html
 
     def test_resize_handler_present(self, sample_dashboard_config, temp_output_dir):
         """HTML should contain window resize handler."""
