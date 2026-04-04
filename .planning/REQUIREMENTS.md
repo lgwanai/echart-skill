@@ -11,8 +11,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 - [x] **SEC-01**: SQL injection vulnerabilities fixed in data_exporter.py and data_cleaner.py using table name whitelist validation
 - [x] **SEC-02**: Input validation added for file paths, table names, and SQL queries using pydantic
-- [ ] **SEC-03**: Baidu API key removed from config.txt, replaced with environment variable
-- [ ] **SEC-04**: Path traversal protection added to server.py file serving
+- [x] **SEC-03**: Baidu API key removed from config.txt, replaced with environment variable
+- [x] **SEC-04**: Path traversal protection added to server.py file serving
 
 ### Quality
 
@@ -87,8 +87,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | SEC-01 | Phase 1 | Complete |
 | SEC-02 | Phase 1 | Complete |
-| SEC-03 | Phase 1 | Pending |
-| SEC-04 | Phase 1 | Pending |
+| SEC-03 | Phase 1 | Complete |
+| SEC-04 | Phase 1 | Complete |
 | QUAL-01 | Phase 1 | Complete |
 | QUAL-02 | Phase 1 | Complete |
 | QUAL-03 | Phase 1 | Complete |
