@@ -20,8 +20,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [x] **QUAL-02**: Silent exception handling eliminated - all exceptions logged
 - [x] **QUAL-03**: pytest test framework set up with conftest.py fixtures
 - [x] **QUAL-04**: Unit tests for core modules (chart_generator, data_importer, server)
-- [ ] **QUAL-05**: Integration tests for end-to-end workflows
-- [ ] **QUAL-06**: Test coverage reaches 80%+ for core modules
+- [x] **QUAL-05**: Integration tests for end-to-end workflows
+- [x] **QUAL-06**: Test coverage reaches 80%+ for core modules
 
 ### Performance
 
@@ -93,8 +93,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-02 | Phase 1 | Complete |
 | QUAL-03 | Phase 1 | Complete |
 | QUAL-04 | Phase 1 | Complete |
-| QUAL-05 | Phase 1 | Pending |
-| QUAL-06 | Phase 1 | Pending |
+| QUAL-05 | Phase 1 | Complete |
+| QUAL-06 | Phase 1 | Complete |
 | PERF-01 | Phase 2 | Pending |
 | PERF-02 | Phase 2 | Pending |
 | PERF-03 | Phase 2 | Pending |

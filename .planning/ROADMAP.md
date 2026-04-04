@@ -12,7 +12,7 @@ This roadmap transforms echart-skill from a functional MVP into a production-rea
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Security & Quality Foundation** - Fix critical vulnerabilities and establish test coverage
+- [x] **Phase 1: Security & Quality Foundation** - Fix critical vulnerabilities and establish test coverage
 - [ ] **Phase 2: Performance Optimization** - Optimize for large files and concurrent operations
 - [ ] **Phase 3: Dashboard Layouts** - Multi-chart dashboard generation with grid layout
 - [ ] **Phase 4: URL/API Data Source** - Import data from HTTP endpoints with authentication
@@ -35,9 +35,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md - Test framework setup + SQL injection fixes (QUAL-03, SEC-01, SEC-02)
 - [x] 01-02-PLAN.md - Structured logging infrastructure (QUAL-01, QUAL-02)
-- [ ] 01-03-PLAN.md - API key migration + Path traversal protection (SEC-03, SEC-04)
-- [ ] 01-04-PLAN.md - Core module unit tests (QUAL-04)
-- [ ] 01-05-PLAN.md - Integration tests + Coverage verification (QUAL-05, QUAL-06)
+- [x] 01-03-PLAN.md - API key migration + Path traversal protection (SEC-03, SEC-04)
+- [x] 01-04-PLAN.md - Core module unit tests (QUAL-04)
+- [x] 01-05-PLAN.md - Integration tests + Coverage verification (QUAL-05, QUAL-06)
 
 ### Phase 2: Performance Optimization
 **Goal**: Users can import and process large datasets (100MB+ Excel files) without memory issues or blocking operations
@@ -89,7 +89,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Security & Quality Foundation | 2/5 | In progress | 01-01, 01-02 |
+| 1. Security & Quality Foundation | 5/5 | Complete | 01-01, 01-02, 01-03, 01-04, 01-05 |
 | 2. Performance Optimization | 0/TBD | Not started | - |
 | 3. Dashboard Layouts | 0/TBD | Not started | - |
 | 4. URL/API Data Source | 0/TBD | Not started | - |
