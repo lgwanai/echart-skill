@@ -160,6 +160,11 @@ def check_server_running(start_port=8100, max_port=8200):
     return None
 
 class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    """HTTP request handler with lifecycle tracking."""
+
+    # Class-level lifecycle instance for tracking requests
+    _lifecycle: ServerLifecycle | None = None
+
     def do_GET(self):
         if self.path == '/__data_skill_health':
             self.send_response(200)
@@ -168,6 +173,10 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"status": "ok", "app": "data-skill"}).encode())
             return
+
+        # Update last request timestamp for timeout tracking
+        if self._lifecycle:
+            self._lifecycle.update_last_request()
 
         # Path traversal protection
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -193,24 +202,52 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         logger.debug("HTTP request", method=self.command, path=self.path)
 
 def run_server_forever(port, base_dir):
-    """Run the server synchronously."""  # pragma: no cover
+    """Run the server synchronously with PID tracking."""  # pragma: no cover
     os.chdir(base_dir)
+
+    # Initialize lifecycle management
+    lifecycle = ServerLifecycle(port)
+
+    # Clean up any orphan from previous run
+    lifecycle.kill_orphan()
+
+    # Write PID file
+    lifecycle.write_pid()
+
+    # Register cleanup on exit
+    atexit.register(lifecycle.clear_pid)
+
+    # Set lifecycle on handler for request tracking
+    CustomHTTPRequestHandler._lifecycle = lifecycle
+
     handler = CustomHTTPRequestHandler
     with socketserver.TCPServer(("", port), handler) as httpd:
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
             pass
+        finally:
+            # Ensure cleanup on server stop
+            lifecycle.clear_pid()
 
 def ensure_server_running():
     """
     Ensures a lightweight HTTP server is running to serve the generated charts.
     Returns the base URL.
+
+    Uses PID tracking to detect and clean up zombie server processes.
     """  # pragma: no cover
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    # Check if server is already running via port probe
     port = check_server_running()
 
     if not port:
+        # Clean up orphan processes on common ports before starting
+        for p in range(8100, 8110):
+            lifecycle = ServerLifecycle(p)
+            lifecycle.kill_orphan()
+
         import subprocess
         port = find_free_port()
 
