@@ -34,7 +34,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 ### Dashboard
 
 - [ ] **DASH-01**: Grid layout engine for multi-chart dashboard composition
-- [ ] **DASH-02**: Dashboard configuration JSON schema for chart placement
+- [x] **DASH-02**: Dashboard configuration JSON schema for chart placement
 - [ ] **DASH-03**: Single HTML export for complete dashboards
 - [ ] **DASH-04**: Dashboard generator script (scripts/dashboard_generator.py)
 
@@ -101,7 +101,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERF-04 | Phase 2 | Complete |
 | PERF-05 | Phase 2 | Complete |
 | DASH-01 | Phase 3 | Pending |
-| DASH-02 | Phase 3 | Pending |
+| DASH-02 | Phase 3 | Complete |
 | DASH-03 | Phase 3 | Pending |
 | DASH-04 | Phase 3 | Pending |
 | DATA-01 | Phase 4 | Pending |
