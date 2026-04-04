@@ -28,7 +28,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [x] **PERF-01**: DatabaseRepository with connection pooling replaces scattered sqlite3.connect() calls
 - [x] **PERF-02**: Streaming import for Excel files with file size validation
 - [ ] **PERF-03**: Async geocoding API calls using httpx with retry logic
-- [ ] **PERF-04**: Server process cleanup mechanism with PID tracking
+- [x] **PERF-04**: Server process cleanup mechanism with PID tracking
 - [x] **PERF-05**: SQLite WAL mode enabled for better concurrent access
 
 ### Dashboard
@@ -98,7 +98,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERF-01 | Phase 2 | Complete |
 | PERF-02 | Phase 2 | Complete |
 | PERF-03 | Phase 2 | Pending |
-| PERF-04 | Phase 2 | Pending |
+| PERF-04 | Phase 2 | Complete |
 | PERF-05 | Phase 2 | Complete |
 | DASH-01 | Phase 3 | Pending |
 | DASH-02 | Phase 3 | Pending |
