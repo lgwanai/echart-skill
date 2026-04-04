@@ -19,24 +19,43 @@ configure_logging()
 logger = get_logger(__name__)
 
 def get_baidu_ak():
-    """Retrieve Baidu AK from config file or prompt user."""
+    """
+    Retrieve Baidu AK from environment variable.
+    config.txt support is DEPRECATED and will be removed.
+
+    Priority:
+    1. BAIDU_AK environment variable
+    2. config.txt (deprecated, shows warning)
+    """
+    import warnings
+
+    # Primary: environment variable
+    ak = os.environ.get('BAIDU_AK')
+    if ak:
+        return ak
+
+    # Fallback: config.txt (DEPRECATED)
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     config_path = os.path.join(base_dir, 'config.txt')
-    
+
     if os.path.exists(config_path):
         with open(config_path, 'r', encoding='utf-8') as f:
             for line in f:
                 if line.startswith('BAIDU_AK='):
                     ak = line.strip().split('=', 1)[1]
                     if ak:
+                        warnings.warn(
+                            "从 config.txt 读取 BAIDU_AK 已弃用，请设置环境变量 BAIDU_AK",
+                            DeprecationWarning,
+                            stacklevel=2
+                        )
                         return ak
-                        
+
     # If not found or empty
     logger.warning(
         "使用 ECharts 地图功能需要百度地图 AK",
-        action="请在 config.txt 中添加 BAIDU_AK=你的AK",
-        url="https://lbsyun.baidu.com/apiconsole/key",
-        config_path=config_path
+        action="请设置环境变量 BAIDU_AK",
+        url="https://lbsyun.baidu.com/apiconsole/key"
     )
     return None
 
