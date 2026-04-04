@@ -368,8 +368,17 @@ python scripts/data_importer.py refresh api_data --db workspace.db
    - **Claude Code / OpenClaw / WorkBuddy**: 查阅对应平台关于"如何安装自定义 Skill/Tool"的官方文档，将本目录挂载或配置入其上下文中。
 3. **地图配置（可选）**：如果需要生成中国地图相关的图表，请设置环境变量 `BAIDU_AK`。你可以前往 [百度地图开放平台](https://lbsyun.baidu.com/index.php?title=jspopularGL/guide/getkey) 免费申请 AK。
    ```bash
-   # 设置环境变量（推荐）
+   # 临时设置（当前终端会话有效）
    export BAIDU_AK=你的百度地图AK
+   
+   # 永久设置（推荐）- 根据你的 Shell 选择对应方式：
+   # Zsh (macOS 默认)
+   echo 'export BAIDU_AK=你的百度地图AK' >> ~/.zshrc
+   source ~/.zshrc
+   
+   # Bash (Linux 常见)
+   echo 'export BAIDU_AK=你的百度地图AK' >> ~/.bashrc
+   source ~/.bashrc
    
    # 或安装依赖
    pip install -r requirements.txt
