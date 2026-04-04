@@ -7,6 +7,11 @@ from datetime import datetime, timedelta
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from validators import validate_table_name
+from logging_config import get_logger, configure_logging
+
+# Initialize logging
+configure_logging()
+logger = get_logger(__name__)
 
 def clean_old_data(db_path, days=30):
     """
@@ -18,7 +23,7 @@ def clean_old_data(db_path, days=30):
     # Check if metadata table exists
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='_data_skill_meta'")
     if not cursor.fetchone():
-        print("No metadata table found. Nothing to clean.")
+        logger.info("未找到元数据表，无需清理")
         conn.close()
         return
 
@@ -35,21 +40,21 @@ def clean_old_data(db_path, days=30):
     stale_records = cursor.fetchall()
     
     if not stale_records:
-        print(f"No data older than {days} days found. Clean up complete.")
+        logger.info("未找到过期数据", days=days)
         conn.close()
         return
-        
-    print(f"Found {len(stale_records)} tables older than {days} days. Starting cleanup...")
+
+    logger.info("开始清理过期数据", count=len(stale_records), days=days)
     
     for record in stale_records:
         table_name, file_name, last_used = record
-        print(f"Dropping table '{table_name}' (imported from '{file_name}', last used: {last_used})")
+        logger.info("删除过期表", table_name=table_name, file_name=file_name, last_used=last_used)
 
         # Validate table name before using in SQL to prevent injection
         try:
             validated_name = validate_table_name(table_name)
         except ValueError as e:
-            print(f"跳过无效表名 '{table_name}': {e}")
+            logger.warning("跳过无效表名", table_name=table_name, reason=str(e))
             continue
 
         # Drop the actual table
@@ -64,7 +69,7 @@ def clean_old_data(db_path, days=30):
         
     conn.commit()
     conn.close()
-    print("Cleanup completed successfully.")
+    logger.info("清理完成", deleted_count=len(stale_records))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Clean up old unused data from SQLite")
@@ -76,4 +81,4 @@ if __name__ == "__main__":
     try:
         clean_old_data(args.db, args.days)
     except Exception as e:
-        print(f"ERROR: {e}")
+        logger.error("清理失败", error=str(e))

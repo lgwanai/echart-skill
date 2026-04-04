@@ -7,6 +7,11 @@ import sys
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from validators import validate_table_name
+from logging_config import get_logger, configure_logging
+
+# Initialize logging
+configure_logging()
+logger = get_logger(__name__)
 
 def export_data(db_path, output_path, table_name=None, query=None):
     """
@@ -23,12 +28,12 @@ def export_data(db_path, output_path, table_name=None, query=None):
 
     try:
         if query:
-            print(f"Executing query: {query}")
+            logger.info("执行查询", query_summary=query[:100] if query else None)
             df = pd.read_sql_query(query, conn)
         else:
             # Validate table name to prevent SQL injection
             table_name = validate_table_name(table_name)
-            print(f"Reading table: {table_name}")
+            logger.info("读取表", table_name=table_name)
             df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
 
         # Determine export format based on file extension
@@ -41,10 +46,10 @@ def export_data(db_path, output_path, table_name=None, query=None):
 
         if ext == '.csv':
             df.to_csv(output_path, index=False, encoding='utf-8-sig')
-            print(f"Successfully exported {len(df)} rows to CSV: {output_path}")
+            logger.info("导出完成", rows=len(df), output_path=output_path, format="csv")
         elif ext in ['.xlsx', '.xls']:
             df.to_excel(output_path, index=False)
-            print(f"Successfully exported {len(df)} rows to Excel: {output_path}")
+            logger.info("导出完成", rows=len(df), output_path=output_path, format="excel")
         else:
             raise ValueError(f"Unsupported output format: {ext}. Please use .csv or .xlsx")
 
@@ -52,7 +57,7 @@ def export_data(db_path, output_path, table_name=None, query=None):
         # Re-raise validation errors (e.g., invalid table name)
         raise
     except Exception as e:
-        print(f"Error during export: {e}")
+        logger.error("导出失败", error=str(e), output_path=output_path)
         sys.exit(1)
     finally:
         conn.close()
