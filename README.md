@@ -362,26 +362,84 @@ python scripts/data_importer.py refresh api_data --db workspace.db
 
 将本 Skill 包导入到你的 Agent 平台的技能（Skills）库中即可：
 
+### 通用安装步骤
+
 1. 下载最新版本的 `echart-skill_*.zip` 压缩包并解压。
-2. 根据你所使用的 Agent 平台：
-   - **Trae**: 将解压后的文件夹放入 `~/.trae/skills/` 目录下。
-   - **Claude Code / OpenClaw / WorkBuddy**: 查阅对应平台关于"如何安装自定义 Skill/Tool"的官方文档，将本目录挂载或配置入其上下文中。
-3. **地图配置（可选）**：如果需要生成中国地图相关的图表，请设置环境变量 `BAIDU_AK`。你可以前往 [百度地图开放平台](https://lbsyun.baidu.com/index.php?title=jspopularGL/guide/getkey) 免费申请 AK。
-   ```bash
-   # 临时设置（当前终端会话有效）
-   export BAIDU_AK=你的百度地图AK
-   
-   # 永久设置（推荐）- 根据你的 Shell 选择对应方式：
-   # Zsh (macOS 默认)
-   echo 'export BAIDU_AK=你的百度地图AK' >> ~/.zshrc
-   source ~/.zshrc
-   
-   # Bash (Linux 常见)
-   echo 'export BAIDU_AK=你的百度地图AK' >> ~/.bashrc
-   source ~/.bashrc
-   
-   # 或安装依赖
-   pip install -r requirements.txt
+2. 根据你所使用的 Agent 平台，选择对应的安装方式：
+
+### 各平台安装方法
+
+#### Claude Code
+
+Claude Code 通过 `~/.claude/skills/` 目录加载自定义 Skill：
+
+```bash
+# 方法1：创建符号链接（推荐，方便更新）
+ln -s /path/to/echart-skill ~/.claude/skills/echart-skill
+
+# 方法2：直接复制
+cp -r /path/to/echart-skill ~/.claude/skills/
+```
+
+安装后，在项目目录下启动 Claude Code，Skill 会自动加载。你也可以在项目根目录创建 `CLAUDE.md` 文件来引用 Skill：
+
+```markdown
+# 项目说明
+
+@~/.claude/skills/echart-skill/SKILL.md
+```
+
+#### Trae
+
+```bash
+# 将 Skill 放入 Trae 的 skills 目录
+cp -r /path/to/echart-skill ~/.trae/skills/
+```
+
+#### OpenClaw
+
+OpenClaw 支持 CLAUDE.md 格式的 Skill，安装方式与 Claude Code 类似：
+
+```bash
+# 创建符号链接
+ln -s /path/to/echart-skill ~/.openclaw/skills/echart-skill
+```
+
+#### WorkBuddy
+
+WorkBuddy 通过配置文件加载 Skill：
+
+```bash
+# 将 Skill 复制到 WorkBuddy 的 skills 目录
+cp -r /path/to/echart-skill ~/.workbuddy/skills/
+```
+
+或在 WorkBuddy 配置文件中添加：
+
+```yaml
+skills:
+  - path: /path/to/echart-skill
+```
+
+### 地图配置（可选）
+
+如果需要生成中国地图相关的图表，请设置环境变量 `BAIDU_AK`。你可以前往 [百度地图开放平台](https://lbsyun.baidu.com/index.php?title=jspopularGL/guide/getkey) 免费申请 AK。
+
+```bash
+# 临时设置（当前终端会话有效）
+export BAIDU_AK=你的百度地图AK
+
+# 永久设置（推荐）- 根据你的 Shell 选择对应方式：
+# Zsh (macOS 默认)
+echo 'export BAIDU_AK=你的百度地图AK' >> ~/.zshrc
+source ~/.zshrc
+
+# Bash (Linux 常见)
+echo 'export BAIDU_AK=你的百度地图AK' >> ~/.bashrc
+source ~/.bashrc
+
+# 或安装依赖
+pip install -r requirements.txt
    ```
 
 ## 常见问题 (FAQ)
