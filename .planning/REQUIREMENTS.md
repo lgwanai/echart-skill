@@ -50,6 +50,13 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [x] **CHART-01**: Gantt chart simplified API wrapper over existing template
 - [x] **CHART-02**: Gantt chart documentation and examples added to SKILL.md
 
+### Data Merge
+
+- [ ] **MERGE-01**: Merge multiple SQLite tables into one
+- [ ] **MERGE-02**: Export merged data to CSV/Excel
+- [ ] **MERGE-03**: Import merged data to SQLite as new table
+- [ ] **MERGE-04**: CLI command for merge operation
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
