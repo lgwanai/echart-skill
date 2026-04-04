@@ -24,7 +24,7 @@ from typing import Literal, Optional, Union
 
 from pydantic import BaseModel, Field, SecretStr, field_validator
 import httpx
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -32,6 +32,11 @@ logger = structlog.get_logger(__name__)
 # Constants
 MAX_RETRIES = 3
 MAX_RESPONSE_SIZE = 100 * 1024 * 1024  # 100MB
+
+
+class ServerError(Exception):
+    """Exception for 5xx server errors that should trigger retry."""
+    pass
 
 
 class BasicAuthConfig(BaseModel):
@@ -160,16 +165,20 @@ class URLDataSource:
     @retry(
         stop=stop_after_attempt(MAX_RETRIES),
         wait=wait_exponential(multiplier=1, min=1, max=4),
+        retry=retry_if_exception_type(ServerError),
         reraise=True
     )
     async def fetch(self) -> str:
         """Fetch data from URL with retry logic.
 
+        Retries only on 5xx server errors. 4xx client errors are not retried.
+
         Returns:
             Raw response content as string
 
         Raises:
-            httpx.HTTPStatusError: On HTTP errors (triggers retry on 5xx)
+            httpx.HTTPStatusError: On 4xx HTTP errors (no retry)
+            ServerError: On 5xx HTTP errors (triggers retry)
             httpx.TimeoutException: On timeout
             ValueError: If response too large
         """
@@ -182,7 +191,13 @@ class URLDataSource:
                 headers=self._build_headers()
             )
 
-            # Raise on HTTP errors to trigger retry on 5xx
+            # Handle 5xx errors separately for retry
+            if response.status_code >= 500:
+                raise ServerError(
+                    f"Server error {response.status_code}: {response.text[:200]}"
+                )
+
+            # Raise on 4xx errors (no retry)
             response.raise_for_status()
 
             # Check content length
