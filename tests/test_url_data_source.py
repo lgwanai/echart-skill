@@ -492,3 +492,273 @@ class TestURLDataSourceFetch:
 
             with pytest.raises(httpx.TimeoutException):
                 await source.fetch()
+
+
+class TestURLDataSourceParse:
+    """Tests for URLDataSource JSON and CSV parsing."""
+
+    @pytest.mark.asyncio
+    async def test_parse_flat_json_array(self):
+        """
+        Test parsing flat JSON array into list of dicts.
+
+        Expected behavior:
+        - JSON array should be parsed into list of dicts
+        - Each dict represents a row with column names as keys
+        """
+        import httpx
+        import respx
+
+        from scripts.url_data_source import URLDataSource, URLDataSourceConfig
+
+        config = URLDataSourceConfig(
+            url="https://api.example.com/data",
+            format="json",
+            table_name="test_table"
+        )
+
+        with respx.mock:
+            respx.get("https://api.example.com/data").mock(
+                return_value=httpx.Response(200, json=[
+                    {"id": 1, "name": "Alice", "age": 30},
+                    {"id": 2, "name": "Bob", "age": 25}
+                ])
+            )
+
+            source = URLDataSource(config)
+            records = await source.fetch_and_parse()
+
+        assert len(records) == 2
+        assert records[0]["id"] == 1
+        assert records[0]["name"] == "Alice"
+        assert records[1]["age"] == 25
+
+    @pytest.mark.asyncio
+    async def test_parse_nested_json_flattens_to_underscore_notation(self):
+        """
+        Test parsing JSON with nested objects flattens to underscore notation.
+
+        Expected behavior:
+        - Nested object {user: {name: "Alice"}} becomes user_name
+        - Dot notation in nested structures should use underscore
+        """
+        import httpx
+        import respx
+
+        from scripts.url_data_source import URLDataSource, URLDataSourceConfig
+
+        config = URLDataSourceConfig(
+            url="https://api.example.com/nested",
+            format="json",
+            table_name="test_table"
+        )
+
+        with respx.mock:
+            respx.get("https://api.example.com/nested").mock(
+                return_value=httpx.Response(200, json={
+                    "data": [
+                        {"id": 1, "user": {"name": "Alice", "age": 30}}
+                    ]
+                })
+            )
+
+            source = URLDataSource(config)
+            records = await source.fetch_and_parse()
+
+        assert len(records) == 1
+        # Nested fields should be flattened with underscore
+        assert "user_name" in records[0]
+        assert "user_age" in records[0]
+        assert records[0]["user_name"] == "Alice"
+        assert records[0]["user_age"] == 30
+
+    @pytest.mark.asyncio
+    async def test_auto_detect_data_array_from_wrapper_keys(self):
+        """
+        Test auto-detect data array from common wrapper keys.
+
+        Expected behavior:
+        - Should detect 'data', 'results', 'items', 'records', 'rows' keys
+        - Extract array from wrapper object
+        """
+        import httpx
+        import respx
+
+        from scripts.url_data_source import URLDataSource, URLDataSourceConfig
+
+        # Test 'results' wrapper
+        config = URLDataSourceConfig(
+            url="https://api.example.com/results",
+            format="json",
+            table_name="test_table"
+        )
+
+        with respx.mock:
+            respx.get("https://api.example.com/results").mock(
+                return_value=httpx.Response(200, json={
+                    "results": [{"id": 1, "value": "test"}],
+                    "total": 1,
+                    "page": 1
+                })
+            )
+
+            source = URLDataSource(config)
+            records = await source.fetch_and_parse()
+
+        assert len(records) == 1
+        assert records[0]["id"] == 1
+        assert "total" not in records[0]  # Metadata not included
+
+    @pytest.mark.asyncio
+    async def test_parse_csv_content(self):
+        """
+        Test parsing CSV content into list of dicts.
+
+        Expected behavior:
+        - CSV should be parsed into list of dicts
+        - Column names should be cleaned
+        """
+        import httpx
+        import respx
+
+        from scripts.url_data_source import URLDataSource, URLDataSourceConfig
+
+        config = URLDataSourceConfig(
+            url="https://example.com/data.csv",
+            format="csv",
+            table_name="test_table"
+        )
+
+        csv_content = "name,age,city\nAlice,30,Beijing\nBob,25,Shanghai"
+
+        with respx.mock:
+            respx.get("https://example.com/data.csv").mock(
+                return_value=httpx.Response(200, text=csv_content)
+            )
+
+            source = URLDataSource(config)
+            records = await source.fetch_and_parse()
+
+        assert len(records) == 2
+        assert records[0]["name"] == "Alice"
+        assert records[0]["age"] == 30
+        assert records[1]["city"] == "Shanghai"
+
+    def test_infer_schema_returns_sqlite_types(self):
+        """
+        Test that infer_schema_from_json returns SQLite types.
+
+        Expected behavior:
+        - int64 -> INTEGER
+        - float64 -> REAL
+        - bool -> INTEGER
+        - object/string -> TEXT
+        """
+        from scripts.url_data_source import infer_schema_from_json
+
+        data = [
+            {"id": 1, "name": "Alice", "score": 95.5, "active": True},
+            {"id": 2, "name": "Bob", "score": 87.3, "active": False}
+        ]
+
+        schema = infer_schema_from_json(data)
+
+        assert schema["id"] == "INTEGER"
+        assert schema["name"] == "TEXT"
+        assert schema["score"] == "REAL"
+        assert schema["active"] == "INTEGER"
+
+    @pytest.mark.asyncio
+    async def test_empty_json_array_returns_empty_list(self):
+        """
+        Test that empty JSON array returns empty list.
+
+        Expected behavior:
+        - Empty array should return []
+        - No error should be raised
+        """
+        import httpx
+        import respx
+
+        from scripts.url_data_source import URLDataSource, URLDataSourceConfig
+
+        config = URLDataSourceConfig(
+            url="https://api.example.com/empty",
+            format="json",
+            table_name="test_table"
+        )
+
+        with respx.mock:
+            respx.get("https://api.example.com/empty").mock(
+                return_value=httpx.Response(200, json=[])
+            )
+
+            source = URLDataSource(config)
+            records = await source.fetch_and_parse()
+
+        assert records == []
+
+    @pytest.mark.asyncio
+    async def test_single_json_object_wraps_to_list(self):
+        """
+        Test that single JSON object wraps to single-element list.
+
+        Expected behavior:
+        - Single object should be wrapped in list
+        - Should work without array wrapper
+        """
+        import httpx
+        import respx
+
+        from scripts.url_data_source import URLDataSource, URLDataSourceConfig
+
+        config = URLDataSourceConfig(
+            url="https://api.example.com/single",
+            format="json",
+            table_name="test_table"
+        )
+
+        with respx.mock:
+            respx.get("https://api.example.com/single").mock(
+                return_value=httpx.Response(200, json={
+                    "id": 1,
+                    "name": "Single Record",
+                    "value": 100
+                })
+            )
+
+            source = URLDataSource(config)
+            records = await source.fetch_and_parse()
+
+        assert len(records) == 1
+        assert records[0]["id"] == 1
+        assert records[0]["name"] == "Single Record"
+
+    def test_infer_schema_handles_nested_structures(self):
+        """
+        Test that infer_schema_from_json handles nested structures.
+
+        Expected behavior:
+        - Nested objects should be flattened
+        - Schema should include flattened column names
+        """
+        from scripts.url_data_source import infer_schema_from_json
+
+        data = [
+            {
+                "id": 1,
+                "user": {
+                    "name": "Alice",
+                    "profile": {
+                        "age": 30
+                    }
+                }
+            }
+        ]
+
+        schema = infer_schema_from_json(data)
+
+        # Should have flattened columns
+        assert "id" in schema
+        assert "user_name" in schema
+        assert "user_profile_age" in schema
