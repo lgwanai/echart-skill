@@ -156,7 +156,8 @@ def import_excel_streaming(
     file_path: str,
     db_path: str,
     table_name: str,
-    conn: sqlite3.Connection
+    conn: sqlite3.Connection,
+    drop_null_columns: bool = True
 ) -> Iterator[int]:
     """Import Excel using streaming (read_only mode).
 
@@ -167,6 +168,7 @@ def import_excel_streaming(
         db_path: Path to the SQLite database
         table_name: Name of the target table
         conn: SQLite connection object
+        drop_null_columns: If True, remove columns with all NULL values
 
     Yields:
         int: Number of rows processed after each chunk
@@ -190,6 +192,7 @@ def import_excel_streaming(
     row_buffer: List[tuple] = []
     rows_processed = 0
     first_chunk = True
+    null_column_indices: set = set()  # Track columns with only NULL values
 
     try:
         for row in sheet.iter_rows(values_only=True):
@@ -199,11 +202,17 @@ def import_excel_streaming(
                     continue
                 # First non-empty row is the header
                 header = clean_column_names(list(row))
+                null_column_indices = set(range(len(header)))  # All columns potentially null
                 continue
 
             # Skip completely empty data rows
             if all(cell is None for cell in row):
                 continue
+
+            # Track non-null values for column analysis
+            for i, cell in enumerate(row):
+                if cell is not None:
+                    null_column_indices.discard(i)
 
             # Add row to buffer
             row_buffer.append(tuple(row))
@@ -221,10 +230,54 @@ def import_excel_streaming(
             _insert_chunk(cursor, table_name, header, row_buffer, first_chunk)
             yield rows_processed
 
+        # Drop all-null columns if requested
+        if drop_null_columns and null_column_indices and header:
+            _drop_null_columns(cursor, table_name, header, null_column_indices)
+
         conn.commit()
 
     finally:
         wb.close()
+
+
+def _drop_null_columns(
+    cursor: sqlite3.Cursor,
+    table_name: str,
+    columns: List[str],
+    null_indices: set
+) -> None:
+    """Remove columns that contain only NULL values.
+
+    Args:
+        cursor: SQLite cursor
+        table_name: Table name
+        columns: Column names
+        null_indices: Set of column indices that are all NULL
+    """
+    if not null_indices:
+        return
+
+    # Get columns to keep
+    keep_columns = [col for i, col in enumerate(columns) if i not in null_indices]
+
+    if len(keep_columns) == len(columns):
+        return  # Nothing to drop
+
+    if not keep_columns:
+        return  # Don't drop all columns
+
+    # Create new table without null columns
+    temp_table = f"{table_name}_clean"
+    col_defs = ", ".join([f'"{col}" TEXT' for col in keep_columns])
+    cursor.execute(f"CREATE TABLE {temp_table} ({col_defs})")
+
+    # Copy data
+    cols_str = ", ".join([f'"{col}"' for col in keep_columns])
+    cursor.execute(f"INSERT INTO {temp_table} SELECT {cols_str} FROM {table_name}")
+
+    # Replace original table
+    cursor.execute(f"DROP TABLE {table_name}")
+    cursor.execute(f"ALTER TABLE {temp_table} RENAME TO {table_name}")
 
 
 def _insert_chunk(
@@ -284,142 +337,172 @@ def import_to_sqlite(file_path, db_path, table_name=None):
             return existing_tables
 
         cursor = conn.cursor()
-    
-    def get_unique_table_name(base_name):
-        t_name = base_name
-        counter = 1
-        while True:
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (t_name,))
-            if not cursor.fetchone():
-                return t_name
-            t_name = f"{base_name}_v{counter}"
-            counter += 1
 
-    imported_tables = []
-    
-    if ext == '.csv':
-        target_table = get_unique_table_name(table_name)
-        print(f"Importing {file_path} to table '{target_table}' in {db_path}...")
-        
-        chunk_size = 50000
-        first_chunk = True
-        sample_df = pd.read_csv(file_path, nrows=20, header=None)
-        header_idx = find_header_row(sample_df)
-        
-        for chunk in pd.read_csv(file_path, skiprows=header_idx, chunksize=chunk_size):
-            if first_chunk:
-                chunk.columns = clean_column_names(chunk.columns)
-                final_cols = chunk.columns
-                chunk.to_sql(target_table, conn, index=False, if_exists='replace')
-                first_chunk = False
+        def get_unique_table_name(base_name):
+            t_name = base_name
+            counter = 1
+            while True:
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (t_name,))
+                if not cursor.fetchone():
+                    return t_name
+                t_name = f"{base_name}_v{counter}"
+                counter += 1
+
+        imported_tables = []
+
+        if ext == '.csv':
+            target_table = get_unique_table_name(table_name)
+            print(f"Importing {file_path} to table '{target_table}' in {db_path}...")
+
+            chunk_size = 50000
+            first_chunk = True
+            sample_df = pd.read_csv(file_path, nrows=20, header=None)
+            header_idx = find_header_row(sample_df)
+
+            for chunk in pd.read_csv(file_path, skiprows=header_idx, chunksize=chunk_size):
+                if first_chunk:
+                    chunk.columns = clean_column_names(chunk.columns)
+                    final_cols = chunk.columns
+                    chunk.to_sql(target_table, conn, index=False, if_exists='replace')
+                    first_chunk = False
+                else:
+                    chunk.columns = final_cols
+                    chunk.to_sql(target_table, conn, index=False, if_exists='append')
+
+            print(f"CSV import completed successfully.")
+            record_import(conn, file_name, target_table, file_md5)
+            imported_tables.append(target_table)
+
+        elif ext in ['.xlsx', '.xls', '.et']:
+            # Validate file size (user-facing limit)
+            file_size = os.path.getsize(file_path)
+            if file_size > MAX_EXCEL_SIZE:  # 100MB
+                raise ValueError(f"Excel 文件过大，最大支持 100MB: {file_path}")
+
+            # .et files (WPS) are not supported by openpyxl, use pandas fallback
+            if ext == '.et':
+                print(f"Using pandas import for WPS .et file ({file_size / 1024 / 1024:.2f} MB)")
+                try:
+                    xl = pd.ExcelFile(file_path)
+                    sheet_names = xl.sheet_names
+                except Exception:
+                    sheet_names = [0]
+
+                for sheet_name in sheet_names:
+                    if len(sheet_names) > 1:
+                        safe_sheet_name = str(sheet_name).strip()
+                        safe_sheet_name = re.sub(r'\W+', '_', safe_sheet_name).strip('_')
+                        base_sheet_table = f"{table_name}_{safe_sheet_name}"
+                    else:
+                        base_sheet_table = table_name
+
+                    target_table = get_unique_table_name(base_sheet_table)
+                    print(f"Processing Excel sheet '{sheet_name}' to table '{target_table}'...")
+
+                    # Use pandas for .et files
+                    sample_df = pd.read_excel(file_path, sheet_name=sheet_name, nrows=20, header=None)
+                    header_idx = find_header_row(sample_df)
+                    df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=header_idx)
+
+                    df.dropna(how='all', inplace=True)
+                    df.dropna(axis=1, how='all', inplace=True)
+                    df.columns = clean_column_names(df.columns)
+                    df.to_sql(target_table, conn, index=False, if_exists='replace')
+                    print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
+
+                    sheet_file_name = f"{file_name}::{sheet_name}" if len(sheet_names) > 1 else file_name
+                    record_import(conn, sheet_file_name, target_table, file_md5)
+                    imported_tables.append(target_table)
             else:
-                chunk.columns = final_cols
-                chunk.to_sql(target_table, conn, index=False, if_exists='append')
-                
-        print(f"CSV import completed successfully.")
-        record_import(conn, file_name, target_table, file_md5)
-        imported_tables.append(target_table)
-        
-    elif ext in ['.xlsx', '.xls', '.et']:
-        try:
-            xl = pd.ExcelFile(file_path)
-            sheet_names = xl.sheet_names
-        except Exception:
-            sheet_names = [0]
-            
-        for sheet_name in sheet_names:
-            if len(sheet_names) > 1:
-                safe_sheet_name = str(sheet_name).strip()
-                safe_sheet_name = re.sub(r'\W+', '_', safe_sheet_name).strip('_')
-                base_sheet_table = f"{table_name}_{safe_sheet_name}"
-            else:
-                base_sheet_table = table_name
-                
-            target_table = get_unique_table_name(base_sheet_table)
-            print(f"Processing Excel sheet '{sheet_name}' to table '{target_table}'...")
-            
+                # ALWAYS use streaming per locked decision "始终使用流式导入"
+                print(f"Using streaming import for Excel file ({file_size / 1024 / 1024:.2f} MB)")
+
+                try:
+                    xl = pd.ExcelFile(file_path)
+                    sheet_names = xl.sheet_names
+                except Exception:
+                    sheet_names = [0]
+
+                for sheet_name in sheet_names:
+                    if len(sheet_names) > 1:
+                        safe_sheet_name = str(sheet_name).strip()
+                        safe_sheet_name = re.sub(r'\W+', '_', safe_sheet_name).strip('_')
+                        base_sheet_table = f"{table_name}_{safe_sheet_name}"
+                    else:
+                        base_sheet_table = table_name
+
+                    target_table = get_unique_table_name(base_sheet_table)
+                    print(f"Processing Excel sheet '{sheet_name}' to table '{target_table}'...")
+
+                    # Use streaming import for ALL Excel files
+                    total_rows = 0
+                    for progress in import_excel_streaming(file_path, db_path, target_table, conn):
+                        total_rows = progress
+                        if progress % 50000 == 0:  # Log every 50k rows
+                            print(f"  Progress: {progress} rows processed...")
+
+                    print(f"Sheet '{sheet_name}' import completed. Loaded {total_rows} rows.")
+
+                    sheet_file_name = f"{file_name}::{sheet_name}" if len(sheet_names) > 1 else file_name
+                    record_import(conn, sheet_file_name, target_table, file_md5)
+                    imported_tables.append(target_table)
+
+        elif ext == '.numbers':  # pragma: no cover - requires optional dependency
             try:
-                if ext == '.et':
-                    raise ValueError("Skip unmerge for .et, fallback to pandas directly")
-                df = unmerge_and_fill_excel(file_path, sheet_name=sheet_name if isinstance(sheet_name, str) else None)
+                from numbers_parser import Document
+            except ImportError:
+                raise ImportError("Please install 'numbers-parser' package to read .numbers files: pip install numbers-parser")
+
+            print("Processing Mac Numbers file...")
+            doc = Document(file_path)
+            sheets = doc.sheets
+            if not sheets:
+                raise ValueError("No sheets found in the .numbers file.")
+
+            for sheet in sheets:
+                sheet_name = sheet.name
+                if len(sheets) > 1:
+                    safe_sheet_name = str(sheet_name).strip()
+                    safe_sheet_name = re.sub(r'\W+', '_', safe_sheet_name).strip('_')
+                    base_sheet_table = f"{table_name}_{safe_sheet_name}"
+                else:
+                    base_sheet_table = table_name
+
+                target_table = get_unique_table_name(base_sheet_table)
+                print(f"Processing Numbers sheet '{sheet_name}' to table '{target_table}'...")
+
+                tables = sheet.tables
+                if not tables:
+                    print(f"No tables found in sheet '{sheet_name}', skipping.")
+                    continue
+
+                data = tables[0].rows(values_only=True)
+                df = pd.DataFrame(data)
+
+                df.dropna(how='all', inplace=True)
+                df.dropna(axis=1, how='all', inplace=True)
+
                 header_idx = find_header_row(df)
                 if header_idx > 0:
                     new_header = df.iloc[header_idx]
                     df = df[header_idx+1:]
                     df.columns = new_header
-            except Exception as e:
-                print(f"Fallback to standard pandas read due to: {e}")
-                sample_df = pd.read_excel(file_path, sheet_name=sheet_name, nrows=20, header=None)
-                header_idx = find_header_row(sample_df)
-                df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=header_idx)
-                
-            df.dropna(how='all', inplace=True)
-            df.dropna(axis=1, how='all', inplace=True)
-            df.columns = clean_column_names(df.columns)
-            df.to_sql(target_table, conn, index=False, if_exists='replace')
-            print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
-            
-            sheet_file_name = f"{file_name}::{sheet_name}" if len(sheet_names) > 1 else file_name
-            record_import(conn, sheet_file_name, target_table, file_md5)
-            imported_tables.append(target_table)
+                elif len(df) > 0:
+                    df.columns = df.iloc[0]
+                    df = df[1:]
 
-    elif ext == '.numbers':  # pragma: no cover - requires optional dependency
-        try:
-            from numbers_parser import Document
-        except ImportError:
-            raise ImportError("Please install 'numbers-parser' package to read .numbers files: pip install numbers-parser")
+                df.columns = clean_column_names(df.columns)
+                df.to_sql(target_table, conn, index=False, if_exists='replace')
+                print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
 
-        print("Processing Mac Numbers file...")
-        doc = Document(file_path)
-        sheets = doc.sheets
-        if not sheets:
-            raise ValueError("No sheets found in the .numbers file.")
+                sheet_file_name = f"{file_name}::{sheet_name}" if len(sheets) > 1 else file_name
+                record_import(conn, sheet_file_name, target_table, file_md5)
+                imported_tables.append(target_table)
 
-        for sheet in sheets:
-            sheet_name = sheet.name
-            if len(sheets) > 1:
-                safe_sheet_name = str(sheet_name).strip()
-                safe_sheet_name = re.sub(r'\W+', '_', safe_sheet_name).strip('_')
-                base_sheet_table = f"{table_name}_{safe_sheet_name}"
-            else:
-                base_sheet_table = table_name
+        else:
+            raise ValueError(f"Unsupported file format: {ext}")
 
-            target_table = get_unique_table_name(base_sheet_table)
-            print(f"Processing Numbers sheet '{sheet_name}' to table '{target_table}'...")
-
-            tables = sheet.tables
-            if not tables:
-                print(f"No tables found in sheet '{sheet_name}', skipping.")
-                continue
-
-            data = tables[0].rows(values_only=True)
-            df = pd.DataFrame(data)
-
-            df.dropna(how='all', inplace=True)
-            df.dropna(axis=1, how='all', inplace=True)
-
-            header_idx = find_header_row(df)
-            if header_idx > 0:
-                new_header = df.iloc[header_idx]
-                df = df[header_idx+1:]
-                df.columns = new_header
-            elif len(df) > 0:
-                df.columns = df.iloc[0]
-                df = df[1:]
-
-            df.columns = clean_column_names(df.columns)
-            df.to_sql(target_table, conn, index=False, if_exists='replace')
-            print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
-
-            sheet_file_name = f"{file_name}::{sheet_name}" if len(sheets) > 1 else file_name
-            record_import(conn, sheet_file_name, target_table, file_md5)
-            imported_tables.append(target_table)
-
-    else:
-        raise ValueError(f"Unsupported file format: {ext}")
-
-    conn.close()
-    return imported_tables
+        return imported_tables
 
 if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Import Excel/CSV to SQLite")
