@@ -66,7 +66,11 @@ Plans:
   2. Dashboard configuration is validated against JSON schema before rendering
   3. All charts in dashboard render in a single HTML file that opens in any browser
   4. Dashboard generator script produces valid output from configuration file
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md - Dashboard configuration schema with pydantic validation (DASH-02)
+- [ ] 03-02-PLAN.md - Dashboard generator with CSS Grid layout (DASH-01, DASH-03, DASH-04)
 
 ### Phase 4: URL/API Data Source
 **Goal**: Users can import data from HTTP endpoints (JSON/CSV) with authentication support
@@ -94,9 +98,10 @@ Plans:
 Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
+| Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Security & Quality Foundation | 5/5 | Complete | 01-01, 01-02, 01-03, 01-04, 01-05 |
 | 2. Performance Optimization | 4/4 | Complete | 02-01, 02-02, 02-03, 02-04 |
-| 3. Dashboard Layouts | 0/TBD | Not started | - |
+| 3. Dashboard Layouts | 0/2 | Not started | - |
 | 4. URL/API Data Source | 0/TBD | Not started | - |
 | 5. Gantt Chart API | 0/TBD | Not started | - |
