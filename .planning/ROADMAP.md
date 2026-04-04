@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Performance Optimization** - Optimize for large files and concurrent operations
 - [x] **Phase 3: Dashboard Layouts** - Multi-chart dashboard generation with grid layout
 - [ ] **Phase 4: URL/API Data Source** - Import data from HTTP endpoints with authentication
-- [ ] **Phase 5: Gantt Chart API** - Simplified Gantt chart wrapper
+- [x] **Phase 5: Gantt Chart API** - Simplified Gantt chart wrapper
 
 ## Phase Details
 
@@ -98,7 +98,7 @@ Plans:
 
 Plans:
 - [x] 05-01-PLAN.md - Gantt chart API implementation (CHART-01)
-- [ ] 05-02-PLAN.md - SKILL.md documentation update (CHART-02)
+- [x] 05-02-PLAN.md - SKILL.md documentation update (CHART-02)
 
 ## Progress
 
@@ -111,4 +111,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Performance Optimization | 4/4 | Complete | 02-01, 02-02, 02-03, 02-04 |
 | 3. Dashboard Layouts | 2/2 | Complete | 03-01, 03-02 |
 | 4. URL/API Data Source | 1/2 | In progress | 04-01 |
-| 5. Gantt Chart API | 1/2 | In progress | 05-01 |
+| 5. Gantt Chart API | 2/2 | Complete | 05-01, 05-02 |
