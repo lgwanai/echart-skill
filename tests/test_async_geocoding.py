@@ -11,6 +11,7 @@ This module tests the AsyncGeocoder class which provides:
 import asyncio
 import json
 import os
+import sys
 import tempfile
 from unittest.mock import AsyncMock, patch
 
@@ -18,11 +19,13 @@ import httpx
 import pytest
 import respx
 
-# Import will fail until implementation exists - this is expected in TDD RED phase
-try:
-    from scripts.chart_generator import AsyncGeocoder
-except ImportError:
-    AsyncGeocoder = None  # type: ignore
+# Mock the server module before importing chart_generator
+import unittest.mock as mock
+sys.modules['server'] = mock.MagicMock()
+sys.modules['server'].ensure_server_running = mock.MagicMock(return_value='http://localhost:8080')
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from scripts.chart_generator import AsyncGeocoder
 
 
 class TestAsyncGeocoder:
@@ -38,9 +41,6 @@ class TestAsyncGeocoder:
         - geocode_batch should return cached results
         - No HTTP calls should be made
         """
-        if AsyncGeocoder is None:
-            pytest.fail("AsyncGeocoder class not implemented yet")
-
         # Setup: create pre-populated cache
         cache_path = tmp_path / "geo_cache.json"
         cached_address = "北京市海淀区"
@@ -70,15 +70,12 @@ class TestAsyncGeocoder:
         - Verify retry happens with tenacity
         - Exponential backoff: 1s, 2s, 4s
         """
-        if AsyncGeocoder is None:
-            pytest.fail("AsyncGeocoder class not implemented yet")
-
         cache_path = tmp_path / "geo_cache.json"
         address = "上海市浦东新区"
 
-        with respx.mock as mock:
+        with respx.mock as respx_mock:
             # First call returns 500, second returns success
-            route = mock.get("https://api.map.baidu.com/geocoding/v3/").mock(
+            route = respx_mock.get("https://api.map.baidu.com/geocoding/v3/").mock(
                 side_effect=[
                     httpx.Response(500, json={"status": -1}),
                     httpx.Response(200, json={
@@ -106,9 +103,6 @@ class TestAsyncGeocoder:
         - Verify max 5 concurrent requests using semaphore tracking
         - Additional requests wait for semaphore release
         """
-        if AsyncGeocoder is None:
-            pytest.fail("AsyncGeocoder class not implemented yet")
-
         cache_path = tmp_path / "geo_cache.json"
         addresses = [f"地址{i}" for i in range(10)]
 
@@ -130,8 +124,8 @@ class TestAsyncGeocoder:
                 "result": {"location": {"lng": 116.0 + hash(request.url) % 10, "lat": 39.0 + hash(request.url) % 10}}
             })
 
-        with respx.mock as mock:
-            mock.get("https://api.map.baidu.com/geocoding/v3/").mock(
+        with respx.mock as respx_mock:
+            respx_mock.get("https://api.map.baidu.com/geocoding/v3/").mock(
                 side_effect=track_concurrency
             )
 
@@ -151,15 +145,16 @@ class TestAsyncGeocoder:
         - Verify all processed correctly
         - Cache should be updated with results
         """
-        if AsyncGeocoder is None:
-            pytest.fail("AsyncGeocoder class not implemented yet")
-
         cache_path = tmp_path / "geo_cache.json"
         addresses = ["成功地址", "失败地址", "另一个成功地址"]
 
         def mock_response(request):
-            url = str(request.url)
-            if "成功地址" in url or "另一个成功地址" in url:
+            # Decode URL to check address
+            import urllib.parse
+            url_str = str(request.url)
+            decoded_url = urllib.parse.unquote(url_str)
+
+            if "成功地址" in decoded_url or "另一个成功地址" in decoded_url:
                 return httpx.Response(200, json={
                     "status": 0,
                     "result": {"location": {"lng": 116.0, "lat": 39.0}}
@@ -167,8 +162,8 @@ class TestAsyncGeocoder:
             else:
                 return httpx.Response(200, json={"status": 1, "message": "Invalid address"})
 
-        with respx.mock as mock:
-            mock.get("https://api.map.baidu.com/geocoding/v3/").mock(
+        with respx.mock as respx_mock:
+            respx_mock.get("https://api.map.baidu.com/geocoding/v3/").mock(
                 side_effect=mock_response
             )
 

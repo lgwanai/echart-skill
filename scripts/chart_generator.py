@@ -1,5 +1,5 @@
 import argparse
-import pandas as pd
+import asyncio
 import json
 import os
 import io
@@ -7,6 +7,11 @@ import urllib.request
 import urllib.parse
 import copy
 import sys
+from typing import Optional
+
+import httpx
+import pandas as pd
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -17,6 +22,10 @@ from server import ensure_server_running
 # Initialize logging
 configure_logging()
 logger = get_logger(__name__)
+
+# Async geocoding configuration
+MAX_CONCURRENT_GEOCODING = 5
+GEOCODING_TIMEOUT = 10.0
 
 def get_baidu_ak():
     """
@@ -92,6 +101,165 @@ def get_geo_coord(address, ak):
         logger.error("地理编码失败", address=address, error=str(e))
 
     return None
+
+
+class AsyncGeocoder:
+    """Async geocoding client with caching and retry logic.
+
+    Provides concurrent batch geocoding with:
+    - Semaphore-based concurrency control (max 5 concurrent)
+    - Automatic retry with exponential backoff (3 attempts)
+    - Cache integration for deduplication
+    """
+
+    def __init__(self, ak: str, cache_path: str):
+        """Initialize the async geocoder.
+
+        Args:
+            ak: Baidu API key
+            cache_path: Path to the cache JSON file
+        """
+        self._ak = ak
+        self._cache_path = cache_path
+        self._cache = self._load_cache()
+
+    def _load_cache(self) -> dict:
+        """Load geocoding cache from file."""
+        if os.path.exists(self._cache_path):
+            try:
+                with open(self._cache_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
+
+    def _save_cache(self) -> None:
+        """Save geocoding cache to file."""
+        os.makedirs(os.path.dirname(self._cache_path), exist_ok=True)
+        with open(self._cache_path, 'w', encoding='utf-8') as f:
+            json.dump(self._cache, f, ensure_ascii=False, indent=4)
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=1, max=4),
+        reraise=True
+    )
+    async def _geocode_single(
+        self,
+        client: httpx.AsyncClient,
+        address: str
+    ) -> Optional[list[float]]:
+        """Geocode a single address with retry logic.
+
+        Args:
+            client: Async HTTP client
+            address: Address to geocode
+
+        Returns:
+            [lng, lat] coordinates or None if geocoding failed
+
+        Raises:
+            httpx.HTTPStatusError: On HTTP errors (triggers retry)
+        """
+        url = (
+            f"https://api.map.baidu.com/geocoding/v3/"
+            f"?address={urllib.parse.quote(address)}"
+            f"&output=json&ak={self._ak}"
+        )
+
+        response = await client.get(url)
+
+        # Raise on HTTP errors to trigger retry
+        response.raise_for_status()
+
+        res = response.json()
+
+        if res.get('status') == 0 and 'result' in res and 'location' in res['result']:
+            location = res['result']['location']
+            return [location['lng'], location['lat']]
+
+        return None
+
+    async def geocode_batch(
+        self,
+        addresses: list[str]
+    ) -> dict[str, Optional[list[float]]]:
+        """Geocode multiple addresses concurrently.
+
+        Args:
+            addresses: List of addresses to geocode
+
+        Returns:
+            Dict mapping addresses to coordinates (or None for failures)
+        """
+        results: dict[str, Optional[list[float]]] = {}
+        addresses_to_fetch = []
+
+        # Check cache first
+        for address in addresses:
+            if address in self._cache:
+                results[address] = self._cache[address]
+            else:
+                addresses_to_fetch.append(address)
+
+        if not addresses_to_fetch:
+            return results
+
+        # Fetch uncached addresses concurrently
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT_GEOCODING)
+
+        async def fetch_with_semaphore(
+            client: httpx.AsyncClient,
+            address: str
+        ) -> tuple[str, Optional[list[float]]]:
+            async with semaphore:
+                try:
+                    coord = await self._geocode_single(client, address)
+                    return (address, coord)
+                except Exception as e:
+                    logger.error("地理编码失败", address=address, error=str(e))
+                    return (address, None)
+
+        async with httpx.AsyncClient(timeout=GEOCODING_TIMEOUT) as client:
+            tasks = [
+                fetch_with_semaphore(client, addr)
+                for addr in addresses_to_fetch
+            ]
+            fetch_results = await asyncio.gather(*tasks)
+
+        # Process results and update cache
+        for address, coord in fetch_results:
+            results[address] = coord
+            if coord is not None:
+                self._cache[address] = coord
+
+        # Save updated cache
+        self._save_cache()
+
+        return results
+
+
+def get_geo_coord_batch(
+    addresses: list[str],
+    ak: str,
+    cache_path: Optional[str] = None
+) -> dict[str, Optional[list[float]]]:
+    """Synchronous wrapper for batch geocoding.
+
+    Args:
+        addresses: List of addresses to geocode
+        ak: Baidu API key
+        cache_path: Path to cache file (defaults to references/geo_cache.json)
+
+    Returns:
+        Dict mapping addresses to coordinates (or None for failures)
+    """
+    if cache_path is None:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        cache_path = os.path.join(base_dir, 'references', 'geo_cache.json')
+
+    geocoder = AsyncGeocoder(ak, cache_path)
+    return asyncio.run(geocoder.geocode_batch(addresses))
 
 def replace_placeholders(obj, replacements):
     """Recursively replace placeholders like {title} in the option dictionary."""
