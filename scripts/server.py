@@ -9,6 +9,10 @@ import argparse
 import urllib.request
 import urllib.error
 import urllib.parse
+import signal
+import atexit
+from datetime import datetime, timedelta
+from pathlib import Path
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,6 +22,110 @@ from validators import validate_file_path
 # Initialize logging
 configure_logging()
 logger = get_logger(__name__)
+
+# Server lifecycle configuration
+PID_DIR = Path("outputs/pids")
+SERVER_TIMEOUT_MINUTES = 5
+
+
+class ServerLifecycle:
+    """Manage server process lifecycle with PID tracking.
+
+    Provides:
+    - PID file creation and cleanup
+    - Orphan process detection
+    - Inactivity timeout tracking
+    """
+
+    def __init__(self, port: int, pid_dir: Path | None = None):
+        """Initialize lifecycle manager for a server port.
+
+        Args:
+            port: The port number this server runs on
+            pid_dir: Directory for PID files (defaults to outputs/pids)
+        """
+        self.port = port
+        self._pid_dir = pid_dir if pid_dir is not None else PID_DIR
+        self.pid_file = self._pid_dir / f"server_{port}.pid"
+        self.last_request_file = self._pid_dir / f"server_{port}_last_request"
+        self._pid_dir.mkdir(parents=True, exist_ok=True)
+
+    def write_pid(self) -> None:
+        """Write current process ID to PID file."""
+        self.pid_file.write_text(str(os.getpid()))
+
+    def read_pid(self) -> int | None:
+        """Read PID from file, or None if file doesn't exist."""
+        if not self.pid_file.exists():
+            return None
+        try:
+            return int(self.pid_file.read_text().strip())
+        except (ValueError, OSError):
+            return None
+
+    def clear_pid(self) -> None:
+        """Remove PID and last_request files."""
+        if self.pid_file.exists():
+            self.pid_file.unlink()
+        if self.last_request_file.exists():
+            self.last_request_file.unlink()
+
+    def update_last_request(self) -> None:
+        """Update last request timestamp to current time."""
+        self.last_request_file.write_text(datetime.now().isoformat())
+
+    def is_server_active(self, pid: int) -> bool:
+        """Check if a process with given PID is running.
+
+        Args:
+            pid: Process ID to check
+
+        Returns:
+            True if process is running, False otherwise
+        """
+        try:
+            # Signal 0 doesn't kill the process, just checks if it exists
+            os.kill(pid, 0)
+            return True
+        except (OSError, ProcessLookupError):
+            return False
+
+    def kill_orphan(self) -> bool:
+        """Check for orphan process and clean up if found.
+
+        An orphan is a PID file without a running process.
+
+        Returns:
+            True if orphan was cleaned up, False otherwise
+        """
+        pid = self.read_pid()
+        if pid is None:
+            return False
+
+        if not self.is_server_active(pid):
+            # Process is dead, clean up PID file
+            self.clear_pid()
+            return True
+
+        return False
+
+    def should_shutdown(self) -> bool:
+        """Check if server should shut down due to inactivity.
+
+        Returns:
+            True if last request was more than SERVER_TIMEOUT_MINUTES ago
+        """
+        if not self.last_request_file.exists():
+            return False
+
+        try:
+            last_request = datetime.fromisoformat(
+                self.last_request_file.read_text().strip()
+            )
+            timeout = timedelta(minutes=SERVER_TIMEOUT_MINUTES)
+            return datetime.now() - last_request > timeout
+        except (ValueError, OSError):
+            return False
 
 def find_free_port(start_port=8100, max_port=8200):
     for port in range(start_port, max_port):
