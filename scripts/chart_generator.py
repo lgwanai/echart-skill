@@ -255,19 +255,19 @@ def generate_chart(config):
         
     return generate_echarts_html(df, config, output_path)
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Universal Chart Generator from SQLite")
     parser.add_argument("--config", required=True, help="JSON string or path to JSON file containing chart configuration")
-    
+
     args = parser.parse_args()
-    
+
     try:
         if os.path.isfile(args.config):
             with open(args.config, 'r', encoding='utf-8') as f:
                 config = json.load(f)
         else:
             config = json.loads(args.config)
-            
+
         generate_chart(config)
     except Exception as e:
         logger.error("图表生成失败", error=str(e), config=config if 'config' in dir() else None)

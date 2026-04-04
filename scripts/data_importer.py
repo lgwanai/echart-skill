@@ -248,19 +248,19 @@ def import_to_sqlite(file_path, db_path, table_name=None):
             sheet_file_name = f"{file_name}::{sheet_name}" if len(sheet_names) > 1 else file_name
             record_import(conn, sheet_file_name, target_table, file_md5)
             imported_tables.append(target_table)
-            
-    elif ext == '.numbers':
+
+    elif ext == '.numbers':  # pragma: no cover - requires optional dependency
         try:
             from numbers_parser import Document
         except ImportError:
             raise ImportError("Please install 'numbers-parser' package to read .numbers files: pip install numbers-parser")
-            
+
         print("Processing Mac Numbers file...")
         doc = Document(file_path)
         sheets = doc.sheets
         if not sheets:
             raise ValueError("No sheets found in the .numbers file.")
-        
+
         for sheet in sheets:
             sheet_name = sheet.name
             if len(sheets) > 1:
@@ -269,21 +269,21 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                 base_sheet_table = f"{table_name}_{safe_sheet_name}"
             else:
                 base_sheet_table = table_name
-                
+
             target_table = get_unique_table_name(base_sheet_table)
             print(f"Processing Numbers sheet '{sheet_name}' to table '{target_table}'...")
-            
+
             tables = sheet.tables
             if not tables:
                 print(f"No tables found in sheet '{sheet_name}', skipping.")
                 continue
-                
+
             data = tables[0].rows(values_only=True)
             df = pd.DataFrame(data)
-            
+
             df.dropna(how='all', inplace=True)
             df.dropna(axis=1, how='all', inplace=True)
-            
+
             header_idx = find_header_row(df)
             if header_idx > 0:
                 new_header = df.iloc[header_idx]
@@ -292,29 +292,29 @@ def import_to_sqlite(file_path, db_path, table_name=None):
             elif len(df) > 0:
                 df.columns = df.iloc[0]
                 df = df[1:]
-                
+
             df.columns = clean_column_names(df.columns)
             df.to_sql(target_table, conn, index=False, if_exists='replace')
             print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
-            
+
             sheet_file_name = f"{file_name}::{sheet_name}" if len(sheets) > 1 else file_name
             record_import(conn, sheet_file_name, target_table, file_md5)
             imported_tables.append(target_table)
-            
+
     else:
         raise ValueError(f"Unsupported file format: {ext}")
-        
+
     conn.close()
     return imported_tables
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Import Excel/CSV to SQLite")
     parser.add_argument("input_file", help="Path to the input Excel or CSV file")
     parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
     parser.add_argument("--table", default=None, help="Target table name (auto-generated if not provided)")
-    
+
     args = parser.parse_args()
-    
+
     try:
         final_tables = import_to_sqlite(args.input_file, args.db, args.table)
         if isinstance(final_tables, list):

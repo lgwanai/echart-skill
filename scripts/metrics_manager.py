@@ -39,5 +39,5 @@ def main():
     
     add_metric(args.name, args.desc, args.file)
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

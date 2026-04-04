@@ -62,7 +62,7 @@ def export_data(db_path, output_path, table_name=None, query=None):
     finally:
         conn.close()
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Export data from SQLite to CSV or Excel")
     parser.add_argument("output_path", help="Path to save the output file (.csv or .xlsx)")
     parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")

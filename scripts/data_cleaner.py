@@ -71,13 +71,13 @@ def clean_old_data(db_path, days=30):
     conn.close()
     logger.info("清理完成", deleted_count=len(stale_records))
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Clean up old unused data from SQLite")
     parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
     parser.add_argument("--days", type=int, default=30, help="Number of days of inactivity before cleaning")
-    
+
     args = parser.parse_args()
-    
+
     try:
         clean_old_data(args.db, args.days)
     except Exception as e:

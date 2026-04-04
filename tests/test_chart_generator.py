@@ -14,6 +14,8 @@ from scripts.chart_generator import (
     generate_chart,
     generate_echarts_html,
     replace_placeholders,
+    get_baidu_ak,
+    get_geo_coord,
 )
 
 
@@ -291,3 +293,110 @@ class TestGenerateChart:
             result = generate_chart(config)
 
         assert result.endswith(".html")
+
+
+class TestGetBaiduAK:
+    """Test Baidu AK retrieval."""
+
+    def test_get_baidu_ak_from_env(self, monkeypatch):
+        """Should get AK from environment variable."""
+        monkeypatch.setenv('BAIDU_AK', 'test_ak_from_env')
+        result = get_baidu_ak()
+        assert result == 'test_ak_from_env'
+
+    def test_get_baidu_ak_missing(self, monkeypatch):
+        """Should return None when no AK available."""
+        monkeypatch.delenv('BAIDU_AK', raising=False)
+        with mock.patch('scripts.chart_generator.os.path.exists', return_value=False):
+            result = get_baidu_ak()
+            assert result is None
+
+
+class TestGetGeoCoord:
+    """Test geocoding functionality."""
+
+    def test_get_geo_coord_from_cache(self, tmp_path, monkeypatch):
+        """Should return cached coordinates."""
+        import json
+
+        # Setup cache file with existing data
+        references_dir = tmp_path / "references"
+        references_dir.mkdir(parents=True, exist_ok=True)
+        cache_file = references_dir / "geo_cache.json"
+        cache_data = {"Beijing": [116.4074, 39.9042]}
+        cache_file.write_text(json.dumps(cache_data))
+
+        # Patch the base_dir calculation in get_geo_coord
+        with mock.patch('scripts.chart_generator.os.path.dirname', return_value=str(tmp_path)):
+            with mock.patch('scripts.chart_generator.os.path.exists', return_value=True):
+                with mock.patch('scripts.chart_generator.os.makedirs'):
+                    result = get_geo_coord("Beijing", "any_ak")
+
+        assert result == [116.4074, 39.9042]
+
+
+class TestHTMLWithMapScripts:
+    """Test HTML generation with map scripts."""
+
+    def test_html_with_china_map(self, temp_output_dir):
+        """HTML should include china.js when china map is used."""
+        import pandas as pd
+
+        df = pd.DataFrame({"name": ["Beijing"], "value": [100]})
+        config = {
+            "title": "China Map",
+            "echarts_option": {
+                "geo": {"map": "china"}
+            }
+        }
+        output_path = os.path.join(temp_output_dir, "china.html")
+
+        with mock.patch('scripts.chart_generator.get_baidu_ak', return_value=None):
+            generate_echarts_html(df, config, output_path)
+
+        with open(output_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        assert "china.js" in content
+
+    def test_html_with_world_map(self, temp_output_dir):
+        """HTML should include world.js when world map is used."""
+        import pandas as pd
+
+        df = pd.DataFrame({"name": ["USA"], "value": [100]})
+        config = {
+            "title": "World Map",
+            "echarts_option": {
+                "geo": {"map": "world"}
+            }
+        }
+        output_path = os.path.join(temp_output_dir, "world.html")
+
+        with mock.patch('scripts.chart_generator.get_baidu_ak', return_value=None):
+            generate_echarts_html(df, config, output_path)
+
+        with open(output_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        assert "world.js" in content
+
+    def test_html_with_bmap(self, temp_output_dir):
+        """HTML should include bmap script when bmap is used."""
+        import pandas as pd
+
+        df = pd.DataFrame({"name": ["Beijing"], "value": [100]})
+        config = {
+            "title": "BMap Chart",
+            "echarts_option": {
+                "bmap": {"center": [116.4074, 39.9042]}
+            }
+        }
+        output_path = os.path.join(temp_output_dir, "bmap.html")
+
+        with mock.patch('scripts.chart_generator.get_baidu_ak', return_value='test_ak'):
+            generate_echarts_html(df, config, output_path)
+
+        with open(output_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        assert "bmap.min.js" in content

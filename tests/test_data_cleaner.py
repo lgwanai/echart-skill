@@ -31,8 +31,11 @@ def test_clean_with_valid_tables(temp_db):
     # Should complete without error
 
 
-def test_clean_blocks_sql_injection(temp_db, capsys):
+def test_clean_blocks_sql_injection(temp_db, caplog):
     """SQL injection in table name from metadata should be skipped gracefully."""
+    import logging
+    caplog.set_level(logging.WARNING)
+
     conn = sqlite3.connect(temp_db)
     conn.execute('''
         CREATE TABLE IF NOT EXISTS _data_skill_meta (
@@ -61,6 +64,5 @@ def test_clean_blocks_sql_injection(temp_db, capsys):
     assert cursor.fetchone() is not None, "test_data table should still exist (injection blocked)"
     conn.close()
 
-    # Verify output shows the skip
-    captured = capsys.readouterr()
-    assert "跳过无效表名" in captured.out
+    # Verify output shows the skip in logs
+    assert any("跳过无效表名" in record.message for record in caplog.records)

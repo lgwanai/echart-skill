@@ -49,3 +49,23 @@ class TestMetricsManager:
         assert "Metric 2" in content
         assert "Desc 1" in content
         assert "Desc 2" in content
+
+    def test_main_function(self, tmp_path, monkeypatch, capsys):
+        """main function should work with CLI args."""
+        from scripts.metrics_manager import main
+
+        metric_file = tmp_path / "cli_metrics.md"
+
+        # Mock sys.argv
+        monkeypatch.setattr(sys, 'argv', [
+            'metrics_manager.py',
+            '--name', 'CLI Metric',
+            '--desc', 'CLI Description',
+            '--file', str(metric_file)
+        ])
+
+        main()
+
+        captured = capsys.readouterr()
+        assert "成功追加统计口径" in captured.out
+        assert metric_file.exists()

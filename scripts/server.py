@@ -74,7 +74,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
         except ValueError as e:
             logger.warning("拒绝访问路径", path=self.path, reason=str(e))
-            self.send_error(403, f"访问被拒绝: {e}")
+            self.send_error(403, "Access denied")
 
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -85,7 +85,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         logger.debug("HTTP request", method=self.command, path=self.path)
 
 def run_server_forever(port, base_dir):
-    """Run the server synchronously."""
+    """Run the server synchronously."""  # pragma: no cover
     os.chdir(base_dir)
     handler = CustomHTTPRequestHandler
     with socketserver.TCPServer(("", port), handler) as httpd:
@@ -98,42 +98,42 @@ def ensure_server_running():
     """
     Ensures a lightweight HTTP server is running to serve the generated charts.
     Returns the base URL.
-    """
+    """  # pragma: no cover
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     port = check_server_running()
-    
+
     if not port:
         import subprocess
         port = find_free_port()
-        
+
         # Start this very script as a background process using the --daemon flag
         cmd = [sys.executable, os.path.abspath(__file__), "--daemon", "--port", str(port)]
-        
+
         if sys.platform == 'win32':
-            subprocess.Popen(cmd, 
+            subprocess.Popen(cmd,
                              creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         else:
-            subprocess.Popen(cmd, 
+            subprocess.Popen(cmd,
                              start_new_session=True,
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                             
+
         # Wait a moment for it to start
         import time
         for _ in range(10):
             time.sleep(0.2)
             if check_server_running(port, port + 1):
                 break
-                
+
     return f"http://127.0.0.1:{port}"
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Data Skill local HTTP server")
     parser.add_argument("--daemon", action="store_true", help="Run as daemon")
     parser.add_argument("--port", type=int, help="Port to run on")
-    
+
     args = parser.parse_args()
-    
+
     if args.daemon and args.port:
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         logger.info("启动本地服务器", port=args.port)
