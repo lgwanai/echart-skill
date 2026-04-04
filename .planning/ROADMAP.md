@@ -81,7 +81,11 @@ Plans:
   2. API endpoints with Basic Auth or Bearer token authentication are supported
   3. JSON response schema is automatically inferred for nested structures
   4. User can manually refresh URL data sources to get updated data
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 04-01-PLAN.md - URLDataSource class with authentication support (DATA-01, DATA-02, DATA-03)
+- [ ] 04-02-PLAN.md - CLI commands and metadata tracking for refresh (DATA-04)
 
 ### Phase 5: Gantt Chart API
 **Goal**: Users can generate Gantt charts with a simple API without learning ECharts configuration details
@@ -103,5 +107,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Security & Quality Foundation | 5/5 | Complete | 01-01, 01-02, 01-03, 01-04, 01-05 |
 | 2. Performance Optimization | 4/4 | Complete | 02-01, 02-02, 02-03, 02-04 |
 | 3. Dashboard Layouts | 0/2 | Not started | - |
-| 4. URL/API Data Source | 0/TBD | Not started | - |
+| 4. URL/API Data Source | 0/2 | Not started | - |
 | 5. Gantt Chart API | 0/TBD | Not started | - |
