@@ -7,8 +7,16 @@ import io
 import urllib.request
 import urllib.parse
 import copy
+import sys
 
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from logging_config import get_logger, configure_logging
 from server import ensure_server_running
+
+# Initialize logging
+configure_logging()
+logger = get_logger(__name__)
 
 def get_baidu_ak():
     """Retrieve Baidu AK from config file or prompt user."""
@@ -24,12 +32,12 @@ def get_baidu_ak():
                         return ak
                         
     # If not found or empty
-    print("\n" + "="*60)
-    print("⚠️ 警告：使用 ECharts 地图功能需要百度地图 AK！")
-    print("检测到 config.txt 中未配置 BAIDU_AK。")
-    print("请前往申请：https://lbsyun.baidu.com/apiconsole/key")
-    print(f"并在 {config_path} 中添加一行：BAIDU_AK=你的AK")
-    print("="*60 + "\n")
+    logger.warning(
+        "使用 ECharts 地图功能需要百度地图 AK",
+        action="请在 config.txt 中添加 BAIDU_AK=你的AK",
+        url="https://lbsyun.baidu.com/apiconsole/key",
+        config_path=config_path
+    )
     return None
 
 def get_geo_coord(address, ak):
@@ -62,8 +70,8 @@ def get_geo_coord(address, ak):
                     json.dump(cache, f, ensure_ascii=False, indent=4)
                 return coord
     except Exception as e:
-        print(f"Geocoding failed for {address}: {e}")
-        
+        logger.error("地理编码失败", address=address, error=str(e))
+
     return None
 
 def replace_placeholders(obj, replacements):
@@ -178,9 +186,13 @@ def generate_echarts_html(df, config, output_path):
     
     rel_path = os.path.relpath(output_path, base_dir).replace(os.sep, '/')
     access_url = f"{base_url}/{rel_path}"
-    
-    print(f"✅ 交互式 ECharts 图表已生成！")
-    print(f"🌐 请点击或在浏览器打开以下链接访问: \n{access_url}")
+
+    logger.info(
+        "ECharts 图表已生成",
+        output_path=output_path,
+        access_url=access_url,
+        rows=len(df)
+    )
     return output_path
 
 def generate_chart(config):
@@ -211,10 +223,10 @@ def generate_chart(config):
     conn.close()
     
     if df.empty:
-        print("Warning: The query returned no data.")
+        logger.warning("查询返回空数据", query=query)
         return None
-        
-    print(f"Data fetched successfully: {len(df)} rows.")
+
+    logger.info("数据查询成功", rows=len(df))
     
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     default_output = os.path.join(base_dir, "outputs", "html", "chart.html")
@@ -239,4 +251,4 @@ if __name__ == "__main__":
             
         generate_chart(config)
     except Exception as e:
-        print(f"ERROR generating chart: {e}")
+        logger.error("图表生成失败", error=str(e), config=config if 'config' in dir() else None)
