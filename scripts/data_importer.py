@@ -692,6 +692,116 @@ def import_from_url_sync(
     ))
 
 
+async def refresh_url_source(db_path: str, table_name: str) -> bool:
+    """Refresh a URL data source.
+
+    Re-fetches data from the original URL and replaces the table content.
+    Note: Authentication is not persisted. Users must re-authenticate
+    for protected endpoints.
+
+    Args:
+        db_path: Path to SQLite database
+        table_name: Name of table to refresh
+
+    Returns:
+        True if refresh successful
+
+    Raises:
+        ValueError: If table is not a URL data source
+    """
+    from scripts.url_data_source import URLDataSource, URLDataSourceConfig
+
+    repo = DatabaseRepository(db_path)
+
+    with repo.connection() as conn:
+        cursor = conn.cursor()
+
+        # Check if this is a URL source
+        cursor.execute('''
+            SELECT source_url, source_format
+            FROM _data_skill_meta
+            WHERE table_name = ? AND source_url IS NOT NULL
+        ''', (table_name,))
+        row = cursor.fetchone()
+
+        if not row:
+            raise ValueError(f"Table '{table_name}' is not a URL data source")
+
+        source_url = row[0]
+        source_format = row[1]
+
+        logger.info(
+            "开始刷新 URL 数据源",
+            table=table_name,
+            url=source_url
+        )
+
+        # Create config (no auth - user must re-authenticate)
+        config = URLDataSourceConfig(
+            url=source_url,
+            format=source_format,
+            table_name=table_name
+        )
+
+        source = URLDataSource(config)
+        records = await source.fetch_and_parse()
+
+        if not records:
+            logger.warning("刷新返回空数据", table=table_name)
+            raise ValueError("Refresh returned empty data")
+
+        # Clear table and re-insert
+        df = pd.DataFrame(records)
+        df.columns = clean_column_names(df.columns.tolist())
+        df.to_sql(table_name, conn, index=False, if_exists='replace')
+
+        # Update last_refresh_time
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cursor.execute('''
+            UPDATE _data_skill_meta
+            SET last_refresh_time = ?, last_used_time = ?
+            WHERE table_name = ?
+        ''', (now, now, table_name))
+        conn.commit()
+
+        logger.info(
+            "URL 数据源刷新完成",
+            table=table_name,
+            rows=len(records)
+        )
+
+        return True
+
+
+def refresh_url_source_sync(db_path: str, table_name: str) -> bool:
+    """Synchronous wrapper for refresh_url_source.
+
+    Args:
+        db_path: Path to SQLite database
+        table_name: Name of table to refresh
+
+    Returns:
+        True if refresh successful
+    """
+    return asyncio.run(refresh_url_source(db_path, table_name))
+
+
+def list_url_sources(db_path: str) -> List[dict]:
+    """List all URL data sources.
+
+    Args:
+        db_path: Path to SQLite database
+
+    Returns:
+        List of dicts with table_name, source_url, source_format, auth_type
+    """
+    repo = DatabaseRepository(db_path)
+
+    with repo.connection() as conn:
+        init_meta_table(conn)
+        return get_url_sources(conn)
+
+
 if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Import Excel/CSV to SQLite")
     parser.add_argument("input_file", help="Path to the input Excel or CSV file")

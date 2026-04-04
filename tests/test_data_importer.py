@@ -709,3 +709,201 @@ class TestRecordUrlImport:
         assert sources[0]["source_url"] == "https://api.example.com/data"
         assert sources[0]["source_format"] == "json"
         assert sources[0]["auth_type"] == "bearer"
+
+
+class TestRefreshUrlSource:
+    """Test refresh_url_source functionality."""
+
+    @pytest.mark.asyncio
+    async def test_refresh_url_source_updates_data(self, temp_db):
+        """Refresh should re-fetch data and update table."""
+        import httpx
+        import respx
+        from scripts.data_importer import import_from_url, refresh_url_source
+
+        # Initial import
+        with respx.mock:
+            respx.get("https://api.example.com/data").mock(
+                return_value=httpx.Response(200, json=[
+                    {"id": 1, "name": "Alice"},
+                    {"id": 2, "name": "Bob"}
+                ])
+            )
+
+            await import_from_url(
+                url="https://api.example.com/data",
+                db_path=temp_db,
+                table_name="refresh_test",
+                source_format="json"
+            )
+
+        # Verify initial data
+        conn = sqlite3.connect(temp_db)
+        df = pd.read_sql_query("SELECT COUNT(*) as cnt FROM refresh_test", conn)
+        assert df["cnt"][0] == 2
+        conn.close()
+
+        # Refresh with new data
+        with respx.mock:
+            respx.get("https://api.example.com/data").mock(
+                return_value=httpx.Response(200, json=[
+                    {"id": 1, "name": "Alice Updated"},
+                    {"id": 2, "name": "Bob Updated"},
+                    {"id": 3, "name": "Charlie"}
+                ])
+            )
+
+            result = await refresh_url_source(temp_db, "refresh_test")
+
+        assert result is True
+
+        # Verify data was replaced
+        conn = sqlite3.connect(temp_db)
+        df = pd.read_sql_query("SELECT * FROM refresh_test ORDER BY id", conn)
+        conn.close()
+
+        assert len(df) == 3
+        assert df.iloc[0]["name"] == "Alice Updated"
+
+    @pytest.mark.asyncio
+    async def test_refresh_url_source_updates_metadata(self, temp_db):
+        """Refresh should update last_refresh_time."""
+        import httpx
+        import respx
+        import time
+        from scripts.data_importer import import_from_url, refresh_url_source
+
+        # Initial import
+        with respx.mock:
+            respx.get("https://api.example.com/refresh").mock(
+                return_value=httpx.Response(200, json=[{"id": 1}])
+            )
+
+            await import_from_url(
+                url="https://api.example.com/refresh",
+                db_path=temp_db,
+                table_name="refresh_meta",
+                source_format="json"
+            )
+
+        # Wait a moment
+        time.sleep(0.1)
+
+        # Refresh
+        with respx.mock:
+            respx.get("https://api.example.com/refresh").mock(
+                return_value=httpx.Response(200, json=[{"id": 1}])
+            )
+
+            await refresh_url_source(temp_db, "refresh_meta")
+
+        # Verify last_refresh_time was updated
+        conn = sqlite3.connect(temp_db)
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT import_time, last_refresh_time
+            FROM _data_skill_meta
+            WHERE table_name = ?
+        ''', ("refresh_meta",))
+        row = cursor.fetchone()
+        conn.close()
+
+        assert row is not None
+        # last_refresh_time should be different from import_time
+        assert row[0] is not None
+        assert row[1] is not None
+
+    @pytest.mark.asyncio
+    async def test_refresh_url_source_raises_for_non_url_table(self, temp_db):
+        """Refresh should raise ValueError for non-URL table."""
+        import httpx
+        import respx
+        from scripts.data_importer import import_to_sqlite, refresh_url_source
+        import tempfile
+
+        # Create a CSV file import (not URL)
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+            f.write("name,value\ntest,1\n")
+            csv_path = f.name
+
+        try:
+            import_to_sqlite(csv_path, temp_db, table_name="file_table")
+
+            with pytest.raises(ValueError, match="not a URL data source"):
+                await refresh_url_source(temp_db, "file_table")
+        finally:
+            os.unlink(csv_path)
+
+    def test_refresh_url_source_sync_wrapper(self, temp_db):
+        """Synchronous wrapper for refresh should work."""
+        import httpx
+        import respx
+        from scripts.data_importer import import_from_url_sync, refresh_url_source_sync
+
+        # Initial import
+        with respx.mock:
+            respx.get("https://api.example.com/sync_refresh").mock(
+                return_value=httpx.Response(200, json=[{"id": 1}])
+            )
+
+            import_from_url_sync(
+                url="https://api.example.com/sync_refresh",
+                db_path=temp_db,
+                table_name="sync_refresh",
+                source_format="json"
+            )
+
+        # Refresh
+        with respx.mock:
+            respx.get("https://api.example.com/sync_refresh").mock(
+                return_value=httpx.Response(200, json=[{"id": 2}])
+            )
+
+            result = refresh_url_source_sync(temp_db, "sync_refresh")
+
+        assert result is True
+
+
+class TestListUrlSources:
+    """Test list_url_sources functionality."""
+
+    def test_list_url_sources_returns_all(self, temp_db):
+        """list_url_sources should return all URL sources."""
+        import httpx
+        import respx
+        from scripts.data_importer import import_from_url_sync, list_url_sources
+
+        with respx.mock:
+            respx.get("https://api.example.com/source1").mock(
+                return_value=httpx.Response(200, json=[{"id": 1}])
+            )
+            respx.get("https://api.example.com/source2").mock(
+                return_value=httpx.Response(200, json=[{"id": 2}])
+            )
+
+            import_from_url_sync(
+                url="https://api.example.com/source1",
+                db_path=temp_db,
+                table_name="source1_table",
+                source_format="json"
+            )
+            import_from_url_sync(
+                url="https://api.example.com/source2",
+                db_path=temp_db,
+                table_name="source2_table",
+                source_format="json"
+            )
+
+        sources = list_url_sources(temp_db)
+
+        assert len(sources) == 2
+        table_names = [s["table_name"] for s in sources]
+        assert "source1_table" in table_names
+        assert "source2_table" in table_names
+
+    def test_list_url_sources_empty(self, temp_db):
+        """list_url_sources should return empty list when no URL sources."""
+        from scripts.data_importer import list_url_sources
+
+        sources = list_url_sources(temp_db)
+        assert sources == []
