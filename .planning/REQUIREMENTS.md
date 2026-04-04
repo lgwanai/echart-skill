@@ -19,7 +19,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [x] **QUAL-01**: Logging framework (structlog) replaces all print() statements
 - [x] **QUAL-02**: Silent exception handling eliminated - all exceptions logged
 - [x] **QUAL-03**: pytest test framework set up with conftest.py fixtures
-- [ ] **QUAL-04**: Unit tests for core modules (chart_generator, data_importer, server)
+- [x] **QUAL-04**: Unit tests for core modules (chart_generator, data_importer, server)
 - [ ] **QUAL-05**: Integration tests for end-to-end workflows
 - [ ] **QUAL-06**: Test coverage reaches 80%+ for core modules
 
@@ -92,7 +92,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-01 | Phase 1 | Complete |
 | QUAL-02 | Phase 1 | Complete |
 | QUAL-03 | Phase 1 | Complete |
-| QUAL-04 | Phase 1 | Pending |
+| QUAL-04 | Phase 1 | Complete |
 | QUAL-05 | Phase 1 | Pending |
 | QUAL-06 | Phase 1 | Pending |
 | PERF-01 | Phase 2 | Pending |
