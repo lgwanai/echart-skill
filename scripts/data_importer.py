@@ -6,12 +6,16 @@ import re
 import warnings
 import hashlib
 import sys
+import asyncio
 from datetime import datetime
 from typing import Iterator, List, Any, Optional
 
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import DatabaseRepository
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 # Suppress openpyxl warnings about data validation
 warnings.filterwarnings('ignore', category=UserWarning, module='openpyxl')
@@ -29,17 +33,48 @@ def calculate_md5(file_path):
     return hash_md5.hexdigest()
 
 def init_meta_table(conn):
-    """Initialize metadata table for tracking file imports and usage."""
+    """Initialize metadata table for tracking file imports and usage.
+
+    Creates _data_skill_meta table if it doesn't exist, and adds URL source
+    columns if they don't exist (for backward compatibility).
+    """
     cursor = conn.cursor()
+
+    # Create table if it doesn't exist
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS _data_skill_meta (
             file_name TEXT,
             table_name TEXT PRIMARY KEY,
             md5_hash TEXT,
             import_time DATETIME,
-            last_used_time DATETIME
+            last_used_time DATETIME,
+            source_url TEXT,
+            source_format TEXT,
+            auth_type TEXT,
+            last_refresh_time DATETIME
         )
     ''')
+
+    # Check if URL columns exist (for backward compatibility)
+    cursor.execute("PRAGMA table_info(_data_skill_meta)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+
+    # Add URL columns if missing
+    url_columns = [
+        ('source_url', 'TEXT'),
+        ('source_format', 'TEXT'),
+        ('auth_type', 'TEXT'),
+        ('last_refresh_time', 'DATETIME'),
+    ]
+
+    for col_name, col_type in url_columns:
+        if col_name not in existing_columns:
+            try:
+                cursor.execute(f'ALTER TABLE _data_skill_meta ADD COLUMN {col_name} {col_type}')
+            except sqlite3.OperationalError:
+                # Column might already exist from concurrent operation
+                pass
+
     conn.commit()
 
 def check_duplicate_import(conn, md5_hash):
@@ -69,11 +104,51 @@ def record_import(conn, file_name, table_name, md5_hash):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT OR REPLACE INTO _data_skill_meta 
+        INSERT OR REPLACE INTO _data_skill_meta
         (file_name, table_name, md5_hash, import_time, last_used_time)
         VALUES (?, ?, ?, ?, ?)
     ''', (file_name, table_name, md5_hash, now, now))
     conn.commit()
+
+
+def record_url_import(conn, url: str, table_name: str, source_format: str, auth_type: Optional[str] = None):
+    """Record URL data source import metadata.
+
+    Args:
+        conn: SQLite connection
+        url: Source URL
+        table_name: Target table name
+        source_format: 'json' or 'csv'
+        auth_type: 'basic' or 'bearer' or None
+    """
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT OR REPLACE INTO _data_skill_meta
+        (file_name, table_name, import_time, last_used_time,
+         source_url, source_format, auth_type, last_refresh_time)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (url, table_name, now, now, url, source_format, auth_type, now))
+    conn.commit()
+
+
+def get_url_sources(conn) -> List[dict]:
+    """Get all URL data sources from metadata.
+
+    Args:
+        conn: SQLite connection
+
+    Returns:
+        List of dicts with table_name, source_url, source_format, auth_type
+    """
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT table_name, source_url, source_format, auth_type
+        FROM _data_skill_meta
+        WHERE source_url IS NOT NULL
+    ''')
+    columns = ['table_name', 'source_url', 'source_format', 'auth_type']
+    return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 def clean_column_names(columns):
     """Clean column names to be valid SQLite identifiers."""
@@ -503,6 +578,119 @@ def import_to_sqlite(file_path, db_path, table_name=None):
             raise ValueError(f"Unsupported file format: {ext}")
 
         return imported_tables
+
+
+async def import_from_url(
+    url: str,
+    db_path: str,
+    table_name: str,
+    source_format: str,
+    auth_config=None
+) -> str:
+    """Import data from URL into SQLite.
+
+    Args:
+        url: HTTP/HTTPS URL to fetch
+        db_path: Path to SQLite database
+        table_name: Target table name
+        source_format: 'json' or 'csv'
+        auth_config: Optional authentication configuration (BasicAuthConfig or BearerAuthConfig)
+
+    Returns:
+        Name of created table
+
+    Raises:
+        ValueError: Invalid URL or format
+        httpx.HTTPStatusError: HTTP errors
+        httpx.TimeoutException: Request timeout
+    """
+    from scripts.url_data_source import URLDataSource, URLDataSourceConfig, AuthConfig
+
+    config = URLDataSourceConfig(
+        url=url,
+        format=source_format,
+        table_name=table_name,
+        auth=auth_config
+    )
+
+    source = URLDataSource(config)
+
+    logger.info(
+        "开始从 URL 导入数据",
+        url=url,
+        format=source_format,
+        table=table_name
+    )
+
+    try:
+        records = await source.fetch_and_parse()
+
+        if not records:
+            logger.warning("URL 返回空数据", url=url)
+            raise ValueError("URL returned empty data")
+
+        # Import to SQLite
+        repo = DatabaseRepository(db_path)
+        with repo.connection() as conn:
+            # Initialize metadata table
+            init_meta_table(conn)
+
+            # Create DataFrame and clean column names
+            df = pd.DataFrame(records)
+            df.columns = clean_column_names(df.columns.tolist())
+            df.to_sql(table_name, conn, index=False, if_exists='replace')
+
+            # Record import metadata
+            auth_type = None
+            if auth_config is not None:
+                auth_type = auth_config.type
+            record_url_import(conn, url, table_name, source_format, auth_type)
+
+        logger.info(
+            "URL 数据导入完成",
+            table=table_name,
+            rows=len(records)
+        )
+
+        return table_name
+
+    except Exception as e:
+        logger.error(
+            "URL 数据导入失败",
+            url=url,
+            error=str(e),
+            error_type=type(e).__name__
+        )
+        raise
+
+
+def import_from_url_sync(
+    url: str,
+    db_path: str = "workspace.db",
+    table_name: Optional[str] = None,
+    source_format: str = "json",
+    auth_config=None
+) -> str:
+    """Synchronous wrapper for URL import.
+
+    Args:
+        url: HTTP/HTTPS URL to fetch
+        db_path: Path to SQLite database
+        table_name: Target table name
+        source_format: 'json' or 'csv'
+        auth_config: Optional authentication configuration
+
+    Returns:
+        Name of created table
+    """
+    return asyncio.run(import_from_url(
+        url=url,
+        db_path=db_path,
+        table_name=table_name,
+        source_format=source_format,
+        auth_config=auth_config
+    ))
+
 
 if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Import Excel/CSV to SQLite")

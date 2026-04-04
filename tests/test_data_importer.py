@@ -442,3 +442,270 @@ class TestETFileImport:
 
         tables = import_to_sqlite(str(et_file), temp_db)
         assert len(tables) == 1
+
+
+class TestInitMetaTableUrlColumns:
+    """Test metadata table extension for URL sources."""
+
+    def test_init_meta_table_creates_url_columns(self, temp_db):
+        """Meta table should include URL source columns."""
+        from scripts.data_importer import init_meta_table
+
+        conn = sqlite3.connect(temp_db)
+        init_meta_table(conn)
+
+        # Check table structure
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(_data_skill_meta)")
+        columns = {row[1] for row in cursor.fetchall()}
+        conn.close()
+
+        # Should have new URL columns
+        assert "source_url" in columns
+        assert "source_format" in columns
+        assert "auth_type" in columns
+        assert "last_refresh_time" in columns
+
+    def test_init_meta_table_adds_columns_to_existing(self, temp_db):
+        """Should add URL columns if table exists without them."""
+        from scripts.data_importer import init_meta_table
+
+        conn = sqlite3.connect(temp_db)
+        # Create old-style table without URL columns
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE _data_skill_meta (
+                file_name TEXT,
+                table_name TEXT PRIMARY KEY,
+                md5_hash TEXT,
+                import_time DATETIME,
+                last_used_time DATETIME
+            )
+        ''')
+        conn.commit()
+
+        # Run init_meta_table which should add columns
+        init_meta_table(conn)
+
+        # Verify columns were added
+        cursor.execute("PRAGMA table_info(_data_skill_meta)")
+        columns = {row[1] for row in cursor.fetchall()}
+        conn.close()
+
+        assert "source_url" in columns
+        assert "source_format" in columns
+        assert "auth_type" in columns
+        assert "last_refresh_time" in columns
+
+
+class TestImportFromUrl:
+    """Test URL import functionality."""
+
+    @pytest.mark.asyncio
+    async def test_import_from_url_json(self, temp_db):
+        """Import JSON data from URL to SQLite table."""
+        import httpx
+        import respx
+        from scripts.data_importer import import_from_url
+
+        with respx.mock:
+            respx.get("https://api.example.com/data").mock(
+                return_value=httpx.Response(200, json={
+                    "data": [
+                        {"id": 1, "name": "Alice"},
+                        {"id": 2, "name": "Bob"}
+                    ]
+                })
+            )
+
+            table_name = await import_from_url(
+                url="https://api.example.com/data",
+                db_path=temp_db,
+                table_name="users",
+                source_format="json"
+            )
+
+        assert table_name == "users"
+
+        # Verify data was imported
+        conn = sqlite3.connect(temp_db)
+        df = pd.read_sql_query("SELECT * FROM users ORDER BY id", conn)
+        conn.close()
+
+        assert len(df) == 2
+        assert df.iloc[0]["name"] == "Alice"
+        assert df.iloc[1]["name"] == "Bob"
+
+    @pytest.mark.asyncio
+    async def test_import_from_url_csv(self, temp_db):
+        """Import CSV data from URL to SQLite table."""
+        import httpx
+        import respx
+        from scripts.data_importer import import_from_url
+
+        csv_content = "id,name\n1,Alice\n2,Bob"
+
+        with respx.mock:
+            respx.get("https://example.com/data.csv").mock(
+                return_value=httpx.Response(200, text=csv_content)
+            )
+
+            table_name = await import_from_url(
+                url="https://example.com/data.csv",
+                db_path=temp_db,
+                table_name="users_csv",
+                source_format="csv"
+            )
+
+        assert table_name == "users_csv"
+
+        # Verify data was imported
+        conn = sqlite3.connect(temp_db)
+        df = pd.read_sql_query("SELECT * FROM users_csv ORDER BY id", conn)
+        conn.close()
+
+        assert len(df) == 2
+        assert df.iloc[0]["name"] == "Alice"
+
+    @pytest.mark.asyncio
+    async def test_record_url_import_metadata(self, temp_db):
+        """URL import metadata should be stored correctly."""
+        import httpx
+        import respx
+        from scripts.data_importer import import_from_url, get_url_sources
+
+        with respx.mock:
+            respx.get("https://api.example.com/users").mock(
+                return_value=httpx.Response(200, json=[{"id": 1}])
+            )
+
+            await import_from_url(
+                url="https://api.example.com/users",
+                db_path=temp_db,
+                table_name="api_users",
+                source_format="json"
+            )
+
+        # Verify metadata
+        conn = sqlite3.connect(temp_db)
+        sources = get_url_sources(conn)
+        conn.close()
+
+        assert len(sources) == 1
+        assert sources[0]["table_name"] == "api_users"
+        assert sources[0]["source_url"] == "https://api.example.com/users"
+        assert sources[0]["source_format"] == "json"
+
+    @pytest.mark.asyncio
+    async def test_import_from_url_with_auth(self, temp_db):
+        """URL import with authentication should work."""
+        import httpx
+        import respx
+        from scripts.data_importer import import_from_url
+        from scripts.url_data_source import BearerAuthConfig
+
+        with respx.mock as mock:
+            def check_auth(request):
+                assert "Authorization" in request.headers
+                return httpx.Response(200, json=[{"id": 1}])
+
+            mock.get("https://api.example.com/protected").mock(side_effect=check_auth)
+
+            await import_from_url(
+                url="https://api.example.com/protected",
+                db_path=temp_db,
+                table_name="protected_data",
+                source_format="json",
+                auth_config=BearerAuthConfig(token="test-token")
+            )
+
+        # Verify data imported
+        conn = sqlite3.connect(temp_db)
+        df = pd.read_sql_query("SELECT COUNT(*) as cnt FROM protected_data", conn)
+        conn.close()
+
+        assert df["cnt"][0] == 1
+
+    def test_import_from_url_sync_wrapper(self, temp_db):
+        """Synchronous wrapper for URL import should work."""
+        import httpx
+        import respx
+        from scripts.data_importer import import_from_url_sync
+
+        with respx.mock:
+            respx.get("https://api.example.com/sync").mock(
+                return_value=httpx.Response(200, json=[{"id": 1, "name": "test"}])
+            )
+
+            table_name = import_from_url_sync(
+                url="https://api.example.com/sync",
+                db_path=temp_db,
+                table_name="sync_table",
+                source_format="json"
+            )
+
+        assert table_name == "sync_table"
+
+
+class TestGetUrlSources:
+    """Test get_url_sources function."""
+
+    def test_get_url_sources_returns_only_url_sources(self, temp_db):
+        """Should return only URL sources, not file imports."""
+        from scripts.data_importer import init_meta_table, record_import, record_url_import, get_url_sources
+        from datetime import datetime
+
+        conn = sqlite3.connect(temp_db)
+        init_meta_table(conn)
+
+        # Add a file import
+        record_import(conn, "test.csv", "file_table", "abc123")
+
+        # Add a URL import
+        record_url_import(conn, "https://api.example.com/data", "url_table", "json")
+
+        sources = get_url_sources(conn)
+        conn.close()
+
+        # Should only return URL sources
+        assert len(sources) == 1
+        assert sources[0]["table_name"] == "url_table"
+
+    def test_get_url_sources_empty_when_none(self, temp_db):
+        """Should return empty list when no URL sources exist."""
+        from scripts.data_importer import init_meta_table, get_url_sources
+
+        conn = sqlite3.connect(temp_db)
+        init_meta_table(conn)
+
+        sources = get_url_sources(conn)
+        conn.close()
+
+        assert sources == []
+
+
+class TestRecordUrlImport:
+    """Test record_url_import function."""
+
+    def test_record_url_import_stores_metadata(self, temp_db):
+        """record_url_import should store URL metadata correctly."""
+        from scripts.data_importer import init_meta_table, record_url_import, get_url_sources
+
+        conn = sqlite3.connect(temp_db)
+        init_meta_table(conn)
+
+        record_url_import(
+            conn,
+            url="https://api.example.com/data",
+            table_name="api_data",
+            source_format="json",
+            auth_type="bearer"
+        )
+
+        sources = get_url_sources(conn)
+        conn.close()
+
+        assert len(sources) == 1
+        assert sources[0]["source_url"] == "https://api.example.com/data"
+        assert sources[0]["source_format"] == "json"
+        assert sources[0]["auth_type"] == "bearer"
