@@ -49,7 +49,13 @@ Plans:
   3. Geocoding API calls run concurrently with retry logic, not blocking the main thread
   4. Server processes are tracked via PID files and cleaned up on exit
   5. Multiple agents can read the database concurrently without locking
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md - DatabaseRepository with connection pooling and WAL mode (PERF-01, PERF-05)
+- [ ] 02-02-PLAN.md - Streaming Excel import for large files (PERF-02)
+- [ ] 02-03-PLAN.md - Async geocoding with httpx and retry logic (PERF-03)
+- [ ] 02-04-PLAN.md - Server process lifecycle with PID tracking (PERF-04)
 
 ### Phase 3: Dashboard Layouts
 **Goal**: Users can create multi-chart dashboards with flexible grid layouts in a single HTML file
@@ -90,7 +96,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Security & Quality Foundation | 5/5 | Complete | 01-01, 01-02, 01-03, 01-04, 01-05 |
-| 2. Performance Optimization | 0/TBD | Not started | - |
+| 2. Performance Optimization | 0/4 | Not started | - |
 | 3. Dashboard Layouts | 0/TBD | Not started | - |
 | 4. URL/API Data Source | 0/TBD | Not started | - |
 | 5. Gantt Chart API | 0/TBD | Not started | - |
