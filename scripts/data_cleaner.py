@@ -1,6 +1,12 @@
 import sqlite3
 import argparse
+import sys
+import os
 from datetime import datetime, timedelta
+
+# Add project root to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from validators import validate_table_name
 
 def clean_old_data(db_path, days=30):
     """
@@ -38,14 +44,21 @@ def clean_old_data(db_path, days=30):
     for record in stale_records:
         table_name, file_name, last_used = record
         print(f"Dropping table '{table_name}' (imported from '{file_name}', last used: {last_used})")
-        
+
+        # Validate table name before using in SQL to prevent injection
+        try:
+            validated_name = validate_table_name(table_name)
+        except ValueError as e:
+            print(f"跳过无效表名 '{table_name}': {e}")
+            continue
+
         # Drop the actual table
-        cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
-        
-        # We should also try to drop any derived tables (views or _vX tables) 
+        cursor.execute(f"DROP TABLE IF EXISTS {validated_name}")
+
+        # We should also try to drop any derived tables (views or _vX tables)
         # that might have been created from this, but this requires parsing the name
         # For safety, we only drop the original imported table for now
-        
+
         # Remove from metadata
         cursor.execute("DELETE FROM _data_skill_meta WHERE table_name = ?", (table_name,))
         
