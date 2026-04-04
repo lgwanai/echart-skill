@@ -47,7 +47,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 3. For Semantic extraction, use regex or heuristic rules in Python. If LLM analysis is strictly required, write a script that processes the column locally or prompts the user for permission to send a sample.
 
 ### Scenario 4: Chart Generation
-**Trigger**: User requests a visualization (bar, pie, line, scatter, map, funnel, 3D charts, etc.).
+**Trigger**: User requests a visualization (bar, pie, line, scatter, map, funnel, 3D charts, Gantt, etc.).
 **Action**:
 1. Do NOT write custom Python scripts from scratch.
 2. We have a powerful template-based rendering engine. Use the built-in `scripts/chart_generator.py` script.
@@ -69,6 +69,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
    *CRITICAL ECHARTS RULE: The ECharts `pie` series DOES NOT support `coordinateSystem: 'geo'`. If the user asks to display data on a map, you MUST use `scatter` or `effectScatter` series with bubble sizes representing the values. NEVER attempt to put a pie chart on a geo map directly.*
    *MAP FALLBACK RULE: For map-based charts, prioritize using local static maps (`china`, `world`, or specific province names). If the user needs to visualize data at a granularity not supported by local static JS (e.g., city-level dimensions without a corresponding local map, street-level data, or specific foreign countries not fully detailed in the world map), you MUST fallback to using ECharts `bmap` mode (Baidu Map API). This requires an AK (`ak` mode).*
    *BAIDU AK RULE: If the user provides a Baidu Map AK, remember that there are two types of APIs: 1) JavaScript API (Frontend) and 2) Geocoding API (Backend Python). If the backend Python geocoding fails with "status 240", it means the AK is a Browser-type AK and lacks Backend Geocoding permissions. In this case, you should either fallback to hardcoded coordinates in JS or ask the user to provide a "Server-side" AK.*
+   *GANTT CHART RULE: Gantt charts use a dedicated simplified API (see Scenario 9) rather than the template-based approach. Use `scripts/gantt_chart.py` with `generate_gantt_chart()` for timeline visualizations.*
 7. Execute the command:
    ```bash
    python scripts/chart_generator.py --config outputs/configs/your_config.json
@@ -111,3 +112,27 @@ This skill transforms the agent into a powerful local data analysis assistant, s
    python scripts/metrics_manager.py --name "Metric Name" --desc "Metric calculation logic or business description"
    ```
 3. When generating SQL queries later, ALWAYS read `references/metrics.md` to ensure the generated SQL aligns with the saved business definitions.
+
+### Scenario 9: Gantt Chart Generation
+**Trigger**: User requests project timeline or task schedule visualization.
+**Action**:
+1. Use the built-in Gantt chart wrapper for simplified API:
+   ```python
+   from scripts.gantt_chart import generate_gantt_chart
+
+   config = {
+       "title": "Project Timeline",
+       "tasks": [
+           {"name": "Design", "start": "2024-01-01", "end": "2024-01-15"},
+           {"name": "Development", "start": "2024-01-10", "end": "2024-02-01"},
+           {"name": "Testing", "start": "2024-01-25", "end": "2024-02-10"}
+       ]
+   }
+   output_path = generate_gantt_chart(config)
+   ```
+2. The generated HTML will open in browser with interactive Gantt chart.
+3. Tasks support optional fields:
+   - `category`: For grouping tasks in rows
+   - `color`: Custom bar color (hex code)
+
+**Note**: Dates can be ISO strings or datetime objects. End date must be after start date.
