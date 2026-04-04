@@ -30,7 +30,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Baidu API key is loaded from environment variable, not hardcoded
   4. File serving rejects path traversal attempts (e.g., ../../../etc/passwd)
   5. Test suite runs with 80%+ coverage on core modules
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 01-01-PLAN.md - Test framework setup + SQL injection fixes (QUAL-03, SEC-01, SEC-02)
+- [ ] 01-02-PLAN.md - Structured logging infrastructure (QUAL-01, QUAL-02)
+- [ ] 01-03-PLAN.md - API key migration + Path traversal protection (SEC-03, SEC-04)
+- [ ] 01-04-PLAN.md - Core module unit tests (QUAL-04)
+- [ ] 01-05-PLAN.md - Integration tests + Coverage verification (QUAL-05, QUAL-06)
 
 ### Phase 2: Performance Optimization
 **Goal**: Users can import and process large datasets (100MB+ Excel files) without memory issues or blocking operations
@@ -82,7 +89,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Security & Quality Foundation | 0/TBD | Not started | - |
+| 1. Security & Quality Foundation | 0/5 | Planned | - |
 | 2. Performance Optimization | 0/TBD | Not started | - |
 | 3. Dashboard Layouts | 0/TBD | Not started | - |
 | 4. URL/API Data Source | 0/TBD | Not started | - |
