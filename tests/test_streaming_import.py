@@ -58,7 +58,7 @@ class TestStreamingReadsInChunks:
 
     def test_streaming_reads_in_chunks(self, tmp_path):
         """Streaming import should read rows in chunks of 10,000."""
-        from scripts.data_importer import import_excel_streaming, STREAMING_CHUNK_SIZE
+        from scripts.data_importer import import_excel_streaming
 
         # Create an Excel file with 25 rows
         excel_file = tmp_path / "test_chunks.xlsx"
@@ -72,26 +72,28 @@ class TestStreamingReadsInChunks:
         db_file = tmp_path / "test_chunks.db"
         conn = sqlite3.connect(str(db_file))
 
-        # Track chunk insertions
-        chunk_sizes = []
+        # Temporarily set chunk size to 10 for testing via module patch
+        import scripts.data_importer as importer_module
+        original_chunk_size = importer_module.STREAMING_CHUNK_SIZE
+        importer_module.STREAMING_CHUNK_SIZE = 10
 
-        def track_insert(table, data, conn):
-            chunk_sizes.append(len(data))
+        try:
+            rows_processed = list(import_excel_streaming(
+                str(excel_file), str(db_file), "test_table", conn
+            ))
 
-        with patch('scripts.data_importer.insert_chunk', side_effect=track_insert):
-            # Temporarily set chunk size to 10 for testing
-            with patch('scripts.data_importer.STREAMING_CHUNK_SIZE', 10):
-                try:
-                    rows_processed = list(import_excel_streaming(
-                        str(excel_file), str(db_file), "test_table", conn
-                    ))
-                except Exception:
-                    # Function may not exist yet - expected in RED phase
-                    pytest.fail("import_excel_streaming not implemented yet")
+            # Verify 3 chunks were processed (25 rows / 10 per chunk = 3 chunks)
+            # Note: Last chunk may have fewer rows
+            assert len(rows_processed) >= 2  # At least 2 progress yields for 25 rows with chunk=10
 
-        # Verify 3 chunks were processed (25 rows / 10 per chunk = 3 chunks)
-        # Note: Last chunk may have fewer rows
-        assert len(rows_processed) >= 1  # At least one progress yield
+            # Verify all rows were inserted
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM test_table")
+            count = cursor.fetchone()[0]
+            assert count == 25, f"Expected 25 rows, got {count}"
+        finally:
+            importer_module.STREAMING_CHUNK_SIZE = original_chunk_size
+            conn.close()
 
     def test_chunk_size_constant_exists(self):
         """STREAMING_CHUNK_SIZE constant should be defined."""
@@ -150,7 +152,7 @@ class TestLargeFileSizeValidation:
 
     def test_large_file_size_validation(self, tmp_path):
         """Files > 100MB should raise ValueError with Chinese error message."""
-        from scripts.data_importer import import_excel_streaming, MAX_EXCEL_SIZE
+        from scripts.data_importer import import_excel_streaming
 
         # Create a small Excel file for testing
         excel_file = tmp_path / "large.xlsx"
@@ -160,20 +162,26 @@ class TestLargeFileSizeValidation:
         db_file = tmp_path / "test.db"
         conn = sqlite3.connect(str(db_file))
 
-        # Mock getsize to return > 100MB
+        # Mock getsize to return > 100MB - patch at module level
+        import scripts.data_importer as importer_module
         large_size = 101 * 1024 * 1024  # 101MB
-        with patch('os.path.getsize', return_value=large_size):
+
+        original_getsize = importer_module.os.path.getsize
+        importer_module.os.path.getsize = lambda x: large_size
+
+        try:
             with pytest.raises(ValueError) as exc_info:
-                import_excel_streaming(
+                list(import_excel_streaming(
                     str(excel_file), str(db_file), "test_table", conn
-                )
+                ))
 
             # Verify Chinese error message
             error_msg = str(exc_info.value)
             assert "过大" in error_msg or "100MB" in error_msg, \
                 f"Expected Chinese error message about file size, got: {error_msg}"
-
-        conn.close()
+        finally:
+            importer_module.os.path.getsize = original_getsize
+            conn.close()
 
     def test_max_excel_size_constant_exists(self):
         """MAX_EXCEL_SIZE constant should be defined."""

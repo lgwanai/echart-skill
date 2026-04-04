@@ -5,10 +5,20 @@ import os
 import re
 import warnings
 import hashlib
+import sys
 from datetime import datetime
+from typing import Iterator, List, Any, Optional
+
+# Add project root to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from database import DatabaseRepository
 
 # Suppress openpyxl warnings about data validation
 warnings.filterwarnings('ignore', category=UserWarning, module='openpyxl')
+
+# Streaming import constants
+MAX_EXCEL_SIZE = 100 * 1024 * 1024  # 100MB
+STREAMING_CHUNK_SIZE = 10_000
 
 def calculate_md5(file_path):
     """Calculate MD5 hash of a file."""
@@ -118,58 +128,162 @@ def unmerge_and_fill_excel(file_path, sheet_name=None):
         sheet = wb[sheet_name]
     else:
         sheet = wb.active
-    
+
     # Extract merged cells ranges
     merged_ranges = list(sheet.merged_cells.ranges)
-    
+
     # Iterate over merged cells and fill them with the top-left value
     for merged_cell in merged_ranges:
         min_col, min_row, max_col, max_row = merged_cell.bounds
         top_left_cell_value = sheet.cell(row=min_row, column=min_col).value
-        
+
         # Unmerge the cells (optional, but good for clean structure)
         sheet.unmerge_cells(str(merged_cell))
-        
+
         # Fill the unmerged cells with the top-left value
         for row in range(min_row, max_row + 1):
             for col in range(min_col, max_col + 1):
                 sheet.cell(row=row, column=col, value=top_left_cell_value)
-                
+
     # Read into pandas
     data = sheet.values
     cols = next(data)
     df = pd.DataFrame(data, columns=cols)
     return df
 
+
+def import_excel_streaming(
+    file_path: str,
+    db_path: str,
+    table_name: str,
+    conn: sqlite3.Connection
+) -> Iterator[int]:
+    """Import Excel using streaming (read_only mode).
+
+    Yields row count after each chunk for progress tracking.
+
+    Args:
+        file_path: Path to the Excel file
+        db_path: Path to the SQLite database
+        table_name: Name of the target table
+        conn: SQLite connection object
+
+    Yields:
+        int: Number of rows processed after each chunk
+
+    Raises:
+        ValueError: If file size exceeds MAX_EXCEL_SIZE (100MB)
+    """
+    import openpyxl
+
+    # Validate file size
+    file_size = os.path.getsize(file_path)
+    if file_size > MAX_EXCEL_SIZE:
+        raise ValueError(f"Excel 文件过大，最大支持 100MB: {file_path}")
+
+    # Open workbook in read-only mode for streaming
+    wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
+    sheet = wb.active
+
+    cursor = conn.cursor()
+    header: Optional[List[str]] = None
+    row_buffer: List[tuple] = []
+    rows_processed = 0
+    first_chunk = True
+
+    try:
+        for row in sheet.iter_rows(values_only=True):
+            # Skip completely empty rows at the start
+            if header is None:
+                if all(cell is None for cell in row):
+                    continue
+                # First non-empty row is the header
+                header = clean_column_names(list(row))
+                continue
+
+            # Skip completely empty data rows
+            if all(cell is None for cell in row):
+                continue
+
+            # Add row to buffer
+            row_buffer.append(tuple(row))
+            rows_processed += 1
+
+            # Insert when buffer reaches chunk size
+            if len(row_buffer) >= STREAMING_CHUNK_SIZE:
+                _insert_chunk(cursor, table_name, header, row_buffer, first_chunk)
+                first_chunk = False
+                row_buffer = []
+                yield rows_processed
+
+        # Insert remaining rows
+        if row_buffer:
+            _insert_chunk(cursor, table_name, header, row_buffer, first_chunk)
+            yield rows_processed
+
+        conn.commit()
+
+    finally:
+        wb.close()
+
+
+def _insert_chunk(
+    cursor: sqlite3.Cursor,
+    table_name: str,
+    columns: List[str],
+    rows: List[tuple],
+    is_first_chunk: bool
+) -> None:
+    """Insert a chunk of rows into the database.
+
+    Args:
+        cursor: SQLite cursor
+        table_name: Target table name
+        columns: Column names
+        rows: List of row tuples
+        is_first_chunk: If True, create table and clear existing data
+    """
+    if is_first_chunk:
+        # Create table (drop existing first for clean import)
+        cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+        col_defs = ", ".join([f'"{col}" TEXT' for col in columns])
+        cursor.execute(f"CREATE TABLE {table_name} ({col_defs})")
+
+    # Insert rows (append for subsequent chunks)
+    placeholders = ", ".join(["?" for _ in columns])
+    insert_sql = f"INSERT INTO {table_name} VALUES ({placeholders})"
+    cursor.executemany(insert_sql, rows)
+
 def import_to_sqlite(file_path, db_path, table_name=None):
     """Import CSV/XLSX into SQLite, handling complex headers and merged cells."""
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
-        
+
     ext = os.path.splitext(file_path)[1].lower()
     base_name = os.path.splitext(os.path.basename(file_path))[0]
-    
+
     if not table_name:
         # Clean base name for table name
         table_name = re.sub(r'\W+', '_', base_name).strip('_')
-        
-    conn = sqlite3.connect(db_path)
-    
-    # Initialize metadata table
-    init_meta_table(conn)
-    
-    # Calculate MD5
-    file_md5 = calculate_md5(file_path)
-    file_name = os.path.basename(file_path)
-    
-    # Check for duplicate import
-    existing_tables = check_duplicate_import(conn, file_md5)
-    if existing_tables:
-        print(f"File '{file_name}' with identical content already imported as tables: {', '.join(existing_tables)}. Skipping import.")
-        conn.close()
-        return existing_tables
 
-    cursor = conn.cursor()
+    # Use DatabaseRepository for connection pooling and WAL mode
+    repo = DatabaseRepository(db_path)
+
+    with repo.connection() as conn:
+        # Initialize metadata table
+        init_meta_table(conn)
+
+        # Calculate MD5
+        file_md5 = calculate_md5(file_path)
+        file_name = os.path.basename(file_path)
+
+        # Check for duplicate import
+        existing_tables = check_duplicate_import(conn, file_md5)
+        if existing_tables:
+            print(f"File '{file_name}' with identical content already imported as tables: {', '.join(existing_tables)}. Skipping import.")
+            return existing_tables
+
+        cursor = conn.cursor()
     
     def get_unique_table_name(base_name):
         t_name = base_name
