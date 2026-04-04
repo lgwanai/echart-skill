@@ -8,10 +8,12 @@ import socket
 import argparse
 import urllib.request
 import urllib.error
+import urllib.parse
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from logging_config import get_logger, configure_logging
+from validators import validate_file_path
 
 # Initialize logging
 configure_logging()
@@ -58,7 +60,21 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"status": "ok", "app": "data-skill"}).encode())
             return
-        super().do_GET()
+
+        # Path traversal protection
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # URL-decode the path to catch encoded traversal attempts
+        decoded_path = urllib.parse.unquote(self.path)
+        requested_path = os.path.join(base_dir, decoded_path.lstrip('/'))
+
+        try:
+            # Validate path is within base directory
+            validate_file_path(requested_path, base_dir)
+            # Continue with normal serving
+            super().do_GET()
+        except ValueError as e:
+            logger.warning("拒绝访问路径", path=self.path, reason=str(e))
+            self.send_error(403, f"访问被拒绝: {e}")
 
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
