@@ -112,8 +112,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md - DataMerger class with merge and save to SQLite (MERGE-01, MERGE-03)
-- [ ] 06-02-PLAN.md - Export functionality and CLI command (MERGE-02, MERGE-04)
+- [x] 06-01-PLAN.md - DataMerger class with merge and save to SQLite (MERGE-01, MERGE-03)
+- [x] 06-02-PLAN.md - Export functionality and CLI command (MERGE-02, MERGE-04)
 
 ## Progress
 
@@ -127,4 +127,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Dashboard Layouts | 2/2 | Complete | 03-01, 03-02 |
 | 4. URL/API Data Source | 2/2 | Complete | 04-01, 04-02 |
 | 5. Gantt Chart API | 2/2 | Complete | 05-01, 05-02 |
-| 6. Data Merge Capability | 0/2 | Pending | - |
+| 6. Data Merge Capability | 2/2 | Complete | 06-01, 06-02 |
