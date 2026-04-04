@@ -1,11 +1,11 @@
 import argparse
-import sqlite3
 import pandas as pd
 import os
 import sys
 
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from database import get_repository
 from validators import validate_table_name
 from logging_config import get_logger, configure_logging
 
@@ -24,17 +24,18 @@ def export_data(db_path, output_path, table_name=None, query=None):
     if not table_name and not query:
         raise ValueError("Either table_name or query must be provided.")
 
-    conn = sqlite3.connect(db_path)
+    repo = get_repository(db_path)
 
     try:
-        if query:
-            logger.info("执行查询", query_summary=query[:100] if query else None)
-            df = pd.read_sql_query(query, conn)
-        else:
-            # Validate table name to prevent SQL injection
-            table_name = validate_table_name(table_name)
-            logger.info("读取表", table_name=table_name)
-            df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
+        with repo.connection() as conn:
+            if query:
+                logger.info("执行查询", query_summary=query[:100] if query else None)
+                df = pd.read_sql_query(query, conn)
+            else:
+                # Validate table name to prevent SQL injection
+                table_name = validate_table_name(table_name)
+                logger.info("读取表", table_name=table_name)
+                df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
 
         # Determine export format based on file extension
         ext = os.path.splitext(output_path)[1].lower()
@@ -59,8 +60,6 @@ def export_data(db_path, output_path, table_name=None, query=None):
     except Exception as e:
         logger.error("导出失败", error=str(e), output_path=output_path)
         sys.exit(1)
-    finally:
-        conn.close()
 
 if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Export data from SQLite to CSV or Excel")
