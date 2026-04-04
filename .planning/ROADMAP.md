@@ -112,3 +112,13 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. Dashboard Layouts | 2/2 | Complete | 03-01, 03-02 |
 | 4. URL/API Data Source | 2/2 | Complete | 04-01, 04-02 |
 | 5. Gantt Chart API | 2/2 | Complete | 05-01, 05-02 |
+
+### Phase 6: 新增一个合并数据的能力，能够将指定表格批量合并成一个文件，并导入sqllite
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 6 to break down)

@@ -98,6 +98,10 @@ Recent decisions affecting current work:
 - [Phase 05-01]: Y-axis inverse for natural top-to-bottom task order in Gantt charts
 - [Phase 05-02]: Combined both documentation tasks in single commit since they modify same file section
 
+### Roadmap Evolution
+
+- Phase 6 added: 新增一个合并数据的能力，能够将指定表格批量合并成一个文件，并导入sqllite
+
 ### Pending Todos
 
 None yet.
