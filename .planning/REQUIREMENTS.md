@@ -9,8 +9,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Security
 
-- [ ] **SEC-01**: SQL injection vulnerabilities fixed in data_exporter.py and data_cleaner.py using table name whitelist validation
-- [ ] **SEC-02**: Input validation added for file paths, table names, and SQL queries using pydantic
+- [x] **SEC-01**: SQL injection vulnerabilities fixed in data_exporter.py and data_cleaner.py using table name whitelist validation
+- [x] **SEC-02**: Input validation added for file paths, table names, and SQL queries using pydantic
 - [ ] **SEC-03**: Baidu API key removed from config.txt, replaced with environment variable
 - [ ] **SEC-04**: Path traversal protection added to server.py file serving
 
@@ -18,7 +18,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 - [ ] **QUAL-01**: Logging framework (structlog) replaces all print() statements
 - [ ] **QUAL-02**: Silent exception handling eliminated - all exceptions logged
-- [ ] **QUAL-03**: pytest test framework set up with conftest.py fixtures
+- [x] **QUAL-03**: pytest test framework set up with conftest.py fixtures
 - [ ] **QUAL-04**: Unit tests for core modules (chart_generator, data_importer, server)
 - [ ] **QUAL-05**: Integration tests for end-to-end workflows
 - [ ] **QUAL-06**: Test coverage reaches 80%+ for core modules
@@ -85,13 +85,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Phase 1 | Pending |
-| SEC-02 | Phase 1 | Pending |
+| SEC-01 | Phase 1 | Complete |
+| SEC-02 | Phase 1 | Complete |
 | SEC-03 | Phase 1 | Pending |
 | SEC-04 | Phase 1 | Pending |
 | QUAL-01 | Phase 1 | Pending |
 | QUAL-02 | Phase 1 | Pending |
-| QUAL-03 | Phase 1 | Pending |
+| QUAL-03 | Phase 1 | Complete |
 | QUAL-04 | Phase 1 | Pending |
 | QUAL-05 | Phase 1 | Pending |
 | QUAL-06 | Phase 1 | Pending |
