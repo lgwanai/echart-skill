@@ -40,9 +40,9 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Data Source
 
-- [ ] **DATA-01**: URL data source import for JSON/CSV from HTTP endpoints
-- [ ] **DATA-02**: Basic auth and Bearer token support for API data sources
-- [ ] **DATA-03**: Schema inference for JSON API responses
+- [x] **DATA-01**: URL data source import for JSON/CSV from HTTP endpoints
+- [x] **DATA-02**: Basic auth and Bearer token support for API data sources
+- [x] **DATA-03**: Schema inference for JSON API responses
 - [ ] **DATA-04**: Manual refresh command for URL data sources
 
 ### Charts
@@ -104,9 +104,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-02 | Phase 3 | Complete |
 | DASH-03 | Phase 3 | Complete |
 | DASH-04 | Phase 3 | Complete |
-| DATA-01 | Phase 4 | Pending |
-| DATA-02 | Phase 4 | Pending |
-| DATA-03 | Phase 4 | Pending |
+| DATA-01 | Phase 4 | Complete |
+| DATA-02 | Phase 4 | Complete |
+| DATA-03 | Phase 4 | Complete |
 | DATA-04 | Phase 4 | Pending |
 | CHART-01 | Phase 5 | Pending |
 | CHART-02 | Phase 5 | Pending |
