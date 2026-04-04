@@ -9,6 +9,14 @@ import argparse
 import urllib.request
 import urllib.error
 
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from logging_config import get_logger, configure_logging
+
+# Initialize logging
+configure_logging()
+logger = get_logger(__name__)
+
 def find_free_port(start_port=8100, max_port=8200):
     for port in range(start_port, max_port):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -58,8 +66,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
         
     def log_message(self, format, *args):
-        # Suppress logging to keep console clean
-        pass
+        logger.debug("HTTP request", method=self.command, path=self.path)
 
 def run_server_forever(port, base_dir):
     """Run the server synchronously."""
@@ -113,7 +120,8 @@ if __name__ == "__main__":
     
     if args.daemon and args.port:
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        logger.info("启动本地服务器", port=args.port)
         run_server_forever(args.port, base_dir)
     else:
         url = ensure_server_running()
-        print(f"Server is running at {url}")
+        logger.info("服务器已启动", url=url)
