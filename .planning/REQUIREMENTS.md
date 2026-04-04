@@ -48,7 +48,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 ### Charts
 
 - [x] **CHART-01**: Gantt chart simplified API wrapper over existing template
-- [ ] **CHART-02**: Gantt chart documentation and examples added to SKILL.md
+- [x] **CHART-02**: Gantt chart documentation and examples added to SKILL.md
 
 ## v2 Requirements
 
@@ -109,7 +109,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-03 | Phase 4 | Complete |
 | DATA-04 | Phase 4 | Pending |
 | CHART-01 | Phase 5 | Complete |
-| CHART-02 | Phase 5 | Pending |
+| CHART-02 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 25 total
