@@ -94,7 +94,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can create Gantt chart with task array (name, start, end) input
   2. Gantt chart examples and API documentation are available in SKILL.md
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md - Gantt chart API implementation (CHART-01)
+- [ ] 05-02-PLAN.md - SKILL.md documentation update (CHART-02)
 
 ## Progress
 
@@ -102,10 +106,9 @@ Plans:
 Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
-| Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Security & Quality Foundation | 5/5 | Complete | 01-01, 01-02, 01-03, 01-04, 01-05 |
 | 2. Performance Optimization | 4/4 | Complete | 02-01, 02-02, 02-03, 02-04 |
 | 3. Dashboard Layouts | 2/2 | Complete | 03-01, 03-02 |
 | 4. URL/API Data Source | 1/2 | In progress | 04-01 |
-| 5. Gantt Chart API | 0/TBD | Not started | - |
+| 5. Gantt Chart API | 0/2 | Not started | - |
