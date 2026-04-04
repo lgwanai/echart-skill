@@ -4,6 +4,10 @@ import pandas as pd
 import os
 import sys
 
+# Add project root to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from validators import validate_table_name
+
 def export_data(db_path, output_path, table_name=None, query=None):
     """
     Export data from SQLite to a CSV or Excel file.
@@ -22,6 +26,8 @@ def export_data(db_path, output_path, table_name=None, query=None):
             print(f"Executing query: {query}")
             df = pd.read_sql_query(query, conn)
         else:
+            # Validate table name to prevent SQL injection
+            table_name = validate_table_name(table_name)
             print(f"Reading table: {table_name}")
             df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
 
@@ -42,6 +48,9 @@ def export_data(db_path, output_path, table_name=None, query=None):
         else:
             raise ValueError(f"Unsupported output format: {ext}. Please use .csv or .xlsx")
 
+    except ValueError:
+        # Re-raise validation errors (e.g., invalid table name)
+        raise
     except Exception as e:
         print(f"Error during export: {e}")
         sys.exit(1)
