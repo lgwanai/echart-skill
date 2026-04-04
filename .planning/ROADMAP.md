@@ -100,10 +100,25 @@ Plans:
 - [x] 05-01-PLAN.md - Gantt chart API implementation (CHART-01)
 - [x] 05-02-PLAN.md - SKILL.md documentation update (CHART-02)
 
+### Phase 6: Data Merge Capability
+**Goal**: Users can merge multiple SQLite tables into one and export/import as a single file
+**Depends on**: Phase 5
+**Requirements**: MERGE-01, MERGE-02, MERGE-03, MERGE-04
+**Success Criteria** (what must be TRUE):
+  1. User can specify multiple source tables to merge
+  2. Merged data can be exported to CSV or Excel file
+  3. Merged data can be saved to SQLite as a new table
+  4. CLI command provides simple interface for merge operations
+**Plans**: 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md - DataMerger class with merge and save to SQLite (MERGE-01, MERGE-03)
+- [ ] 06-02-PLAN.md - Export functionality and CLI command (MERGE-02, MERGE-04)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -112,13 +127,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. Dashboard Layouts | 2/2 | Complete | 03-01, 03-02 |
 | 4. URL/API Data Source | 2/2 | Complete | 04-01, 04-02 |
 | 5. Gantt Chart API | 2/2 | Complete | 05-01, 05-02 |
-
-### Phase 6: 新增一个合并数据的能力，能够将指定表格批量合并成一个文件，并导入sqllite
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 5
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (run /gsd:plan-phase 6 to break down)
+| 6. Data Merge Capability | 0/2 | Pending | - |
