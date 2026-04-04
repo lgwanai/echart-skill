@@ -1,5 +1,4 @@
 import argparse
-import sqlite3
 import pandas as pd
 import json
 import os
@@ -11,6 +10,7 @@ import sys
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from database import get_repository
 from logging_config import get_logger, configure_logging
 from server import ensure_server_running
 
@@ -232,14 +232,14 @@ def generate_chart(config):
     """
     db_path = config.get("db_path", "workspace.db")
     query = config.get("query")
-    
+
     if not query:
         raise ValueError("Missing SQL query in config")
-        
-    # 1. 提取数据
-    conn = sqlite3.connect(db_path)
-    df = pd.read_sql_query(query, conn)
-    conn.close()
+
+    # 1. 提取数据 - Use DatabaseRepository for connection pooling and WAL mode
+    repo = get_repository(db_path)
+    with repo.connection() as conn:
+        df = pd.read_sql_query(query, conn)
     
     if df.empty:
         logger.warning("查询返回空数据", query=query)
