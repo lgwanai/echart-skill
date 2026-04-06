@@ -27,3 +27,14 @@ config.txt
 __pycache__/
 *.py[cod]
 *$py.class
+.coverage
+logs/
+.claude/
+.planning/
+.pytest_cache/
+.ruff_cache/
+test/
+test_dashboard.db-shm
+test_dashboard.db-wal
+workspace.db-shm
+workspace.db-wal

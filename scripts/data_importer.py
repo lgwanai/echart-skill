@@ -803,18 +803,134 @@ def list_url_sources(db_path: str) -> List[dict]:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    parser = argparse.ArgumentParser(description="Import Excel/CSV to SQLite")
-    parser.add_argument("input_file", help="Path to the input Excel or CSV file")
-    parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
-    parser.add_argument("--table", default=None, help="Target table name (auto-generated if not provided)")
+    parser = argparse.ArgumentParser(
+        description="Import data from files or URLs into SQLite"
+    )
+    subparsers = parser.add_subparsers(dest="command", help="Import commands")
+
+    # File subparser (existing functionality)
+    file_parser = subparsers.add_parser("file", help="Import from file (CSV/Excel)")
+    file_parser.add_argument("input_file", help="Path to the input Excel or CSV file")
+    file_parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
+    file_parser.add_argument("--table", default=None, help="Target table name (auto-generated if not provided)")
+
+    # URL subparser
+    url_parser = subparsers.add_parser("url", help="Import from URL")
+    url_parser.add_argument("url", help="HTTP/HTTPS URL to fetch data from")
+    url_parser.add_argument("--format", required=True, choices=["json", "csv"], help="Data format")
+    url_parser.add_argument("--table", required=True, help="Target table name")
+    url_parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
+    url_parser.add_argument("--auth-type", choices=["basic", "bearer"], default=None, help="Authentication type")
+    url_parser.add_argument("--auth-user", help="Username for Basic Auth")
+    url_parser.add_argument("--auth-password", help="Password for Basic Auth")
+    url_parser.add_argument("--auth-token", help="Token for Bearer Auth")
+
+    # Refresh subparser
+    refresh_parser = subparsers.add_parser("refresh", help="Refresh URL data source")
+    refresh_parser.add_argument("table", help="Table name to refresh")
+    refresh_parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
+
+    # List subparser
+    list_parser = subparsers.add_parser("list", help="List URL data sources")
+    list_parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
 
     args = parser.parse_args()
 
-    try:
-        final_tables = import_to_sqlite(args.input_file, args.db, args.table)
-        if isinstance(final_tables, list):
-            print(f"SUCCESS: Data imported into tables: {', '.join(final_tables)}")
+    # Handle backward compatibility: if no subcommand, treat as file import
+    if args.command is None:
+        # Legacy mode: positional argument is input_file
+        if hasattr(args, 'input_file') and args.input_file:
+            try:
+                final_tables = import_to_sqlite(args.input_file, args.db, getattr(args, 'table', None))
+                if isinstance(final_tables, list):
+                    print(f"SUCCESS: Data imported into tables: {', '.join(final_tables)}")
+                else:
+                    print(f"SUCCESS: Data imported into table '{final_tables}'")
+            except Exception as e:
+                print(f"ERROR: {e}")
         else:
-            print(f"SUCCESS: Data imported into table '{final_tables}'")
-    except Exception as e:
-        print(f"ERROR: {e}")
+            parser.print_help()
+        exit(0)
+
+    if args.command == "file":
+        try:
+            final_tables = import_to_sqlite(args.input_file, args.db, args.table)
+            if isinstance(final_tables, list):
+                print(f"SUCCESS: Data imported into tables: {', '.join(final_tables)}")
+            else:
+                print(f"SUCCESS: Data imported into table '{final_tables}'")
+        except Exception as e:
+            print(f"ERROR: {e}")
+
+    elif args.command == "url":
+        try:
+            # Build auth config if provided
+            auth_config = None
+            if args.auth_type == "basic":
+                if not args.auth_user or not args.auth_password:
+                    print("ERROR: --auth-user and --auth-password required for Basic Auth")
+                    exit(1)
+                from scripts.url_data_source import BasicAuthConfig
+                auth_config = BasicAuthConfig(
+                    username=args.auth_user,
+                    password=args.auth_password
+                )
+            elif args.auth_type == "bearer":
+                if not args.auth_token:
+                    print("ERROR: --auth-token required for Bearer Auth")
+                    exit(1)
+                from scripts.url_data_source import BearerAuthConfig
+                auth_config = BearerAuthConfig(token=args.auth_token)
+
+            # Import from URL
+            table_name = import_from_url_sync(
+                url=args.url,
+                db_path=args.db,
+                table_name=args.table,
+                source_format=args.format,
+                auth_config=auth_config
+            )
+
+            # Get row count
+            conn = sqlite3.connect(args.db)
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+            row_count = cursor.fetchone()[0]
+            conn.close()
+
+            print(f"Imported {row_count} rows into table '{table_name}' from {args.url}")
+
+        except Exception as e:
+            print(f"ERROR: {e}")
+
+    elif args.command == "refresh":
+        try:
+            result = refresh_url_source_sync(args.db, args.table)
+
+            # Get row count
+            conn = sqlite3.connect(args.db)
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT COUNT(*) FROM {args.table}")
+            row_count = cursor.fetchone()[0]
+            conn.close()
+
+            print(f"Refreshed table '{args.table}' with {row_count} rows")
+
+        except Exception as e:
+            print(f"ERROR: {e}")
+
+    elif args.command == "list":
+        try:
+            sources = list_url_sources(args.db)
+
+            if not sources:
+                print("No URL data sources found.")
+            else:
+                # Print formatted table
+                print(f"{'Table':<20} {'URL':<40} {'Format':<8} {'Auth':<8}")
+                print("-" * 80)
+                for source in sources:
+                    print(f"{source['table_name']:<20} {source['source_url']:<40} {source['source_format']:<8} {(source['auth_type'] or 'none'):<8}")
+
+        except Exception as e:
+            print(f"ERROR: {e}")
