@@ -72,7 +72,7 @@ Each task was committed atomically:
 2. **Task 2: Update record_import() call sites** - `baa258d` (feat)
 3. **Task 3: Add record_merge() function** - `f1df989` (feat)
 
-**Plan metadata:** pending (docs: complete plan)
+**Plan metadata:** `eb086c1` (docs: complete plan)
 
 ## Files Created/Modified
 - `scripts/data_importer.py` - Schema migration, updated record_import() signature, 4 call sites updated
