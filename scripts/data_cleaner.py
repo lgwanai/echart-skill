@@ -20,11 +20,11 @@ def clean_old_data(db_path, days=30):
     repo = get_repository(db_path)
 
     with repo.connection() as conn:
-        cursor = conn.cursor()
-
         # Check if metadata table exists
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='_data_skill_meta'")
-        if not cursor.fetchone():
+        exists_result = conn.execute(
+            "SELECT table_name FROM information_schema.tables WHERE table_name = '_data_skill_meta'"
+        ).fetchone()
+        if not exists_result:
             logger.info("未找到元数据表，无需清理")
             return
 
@@ -32,13 +32,11 @@ def clean_old_data(db_path, days=30):
         cutoff_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
 
         # Find tables to drop
-        cursor.execute('''
+        stale_records = conn.execute('''
             SELECT table_name, file_name, last_used_time
             FROM _data_skill_meta
             WHERE last_used_time < ?
-        ''', (cutoff_date,))
-
-        stale_records = cursor.fetchall()
+        ''', [cutoff_date]).fetchall()
 
         if not stale_records:
             logger.info("未找到过期数据", days=days)
@@ -58,21 +56,17 @@ def clean_old_data(db_path, days=30):
                 continue
 
             # Drop the actual table
-            cursor.execute(f"DROP TABLE IF EXISTS {validated_name}")
-
-            # We should also try to drop any derived tables (views or _vX tables)
-            # that might have been created from this, but this requires parsing the name
-            # For safety, we only drop the original imported table for now
+            conn.execute(f"DROP TABLE IF EXISTS {validated_name}")
 
             # Remove from metadata
-            cursor.execute("DELETE FROM _data_skill_meta WHERE table_name = ?", (table_name,))
+            conn.execute("DELETE FROM _data_skill_meta WHERE table_name = ?", [table_name])
 
         conn.commit()
         logger.info("清理完成", deleted_count=len(stale_records))
 
 if __name__ == "__main__":  # pragma: no cover
-    parser = argparse.ArgumentParser(description="Clean up old unused data from SQLite")
-    parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
+    parser = argparse.ArgumentParser(description="Clean up old unused data from DuckDB")
+    parser.add_argument("--db", default="workspace.duckdb", help="Path to DuckDB database file")
     parser.add_argument("--days", type=int, default=30, help="Number of days of inactivity before cleaning")
 
     args = parser.parse_args()
