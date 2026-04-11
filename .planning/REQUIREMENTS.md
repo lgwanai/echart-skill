@@ -64,14 +64,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXPORT-02 | Phase 9 | Pending |
 | EXPORT-03 | Phase 9 | Pending |
 | EXPORT-04 | Phase 9 | Pending |
-| EXPORT-05 | Phase 9 | Pending |
+| EXPORT-05 | Phase 10 | Pending |
 | EMBED-01 | Phase 9 | Pending |
 | EMBED-02 | Phase 9 | Pending |
 | EMBED-03 | Phase 9 | Pending |
 | EMBED-04 | Phase 9 | Pending |
-| UX-01 | Phase 9 | Pending |
-| UX-02 | Phase 9 | Pending |
-| UX-03 | Phase 9 | Pending |
+| UX-01 | Phase 10 | Pending |
+| UX-02 | Phase 10 | Pending |
+| UX-03 | Phase 10 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 12 total
@@ -80,4 +80,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-11*
-*Last updated: 2026-04-11 after v1.1 milestone definition*
+*Last updated: 2026-04-11 after roadmap creation*

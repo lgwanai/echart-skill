@@ -17,6 +17,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Dashboard Layouts** - Multi-chart dashboard generation with grid layout
 - [x] **Phase 4: URL/API Data Source** - Import data from HTTP endpoints with authentication
 - [x] **Phase 5: Gantt Chart API** - Simplified Gantt chart wrapper
+- [x] **Phase 6: Data Merge Capability** - Merge multiple tables into one
+- [x] **Phase 7: SQLite → DuckDB Migration** - Leverage columnar storage
+- [x] **Phase 8: Import History & Metadata** - Markdown table history viewer
+- [ ] **Phase 9: HTML Export Engine** - Standalone HTML export with embedded data
+- [ ] **Phase 10: Export CLI & UX** - User-friendly command interface
 
 ## Phase Details
 
@@ -115,10 +120,72 @@ Plans:
 - [x] 06-01-PLAN.md - DataMerger class with merge and save to SQLite (MERGE-01, MERGE-03)
 - [x] 06-02-PLAN.md - Export functionality and CLI command (MERGE-02, MERGE-04)
 
+### Phase 7: SQLite → DuckDB Migration
+**Goal**: All data import and storage operations use DuckDB instead of SQLite, leveraging columnar storage and analytical query performance
+**Depends on**: Phase 6
+**Requirements**: DUCK-01, DUCK-02, DUCK-03
+**Success Criteria** (what must be TRUE):
+  1. All database operations use DuckDB connection pooling
+  2. Data importer creates DuckDB tables instead of SQLite
+  3. All scripts and documentation reference DuckDB
+**Plans**: 3 plans complete
+
+Plans:
+- [x] 07-01-PLAN.md - DatabaseRepository migration to DuckDB + dependency
+- [x] 07-02-PLAN.md - data_importer.py SQLite → DuckDB migration
+- [x] 07-03-PLAN.md - Remaining scripts + SKILL.md/README.md documentation update
+
+### Phase 8: Import History & Metadata
+**Goal**: Users can view import history, table structures, and table relationships in markdown table format, with complete metadata tracking
+**Depends on**: Phase 7
+**Requirements**: META-01, META-02, META-03, META-04
+**Success Criteria** (what must be TRUE):
+  1. Every import records file path, table name, import time, row count
+  2. Table relationships tracked when merge operations create new tables
+  3. Users can query import history in markdown table format
+  4. Users can view table structures in markdown table format
+**Plans**: 2 plans complete
+
+Plans:
+- [x] 08-01-PLAN.md - Extend metadata schema + update import/merge recording (META-01, META-02)
+- [x] 08-02-PLAN.md - History viewer module + CLI + SKILL.md documentation (META-03, META-04)
+
+### Phase 9: HTML Export Engine
+**Goal**: Users can export charts, dashboards, and Gantt charts as standalone HTML files with embedded data for offline sharing
+**Depends on**: Phase 8
+**Requirements**: EXPORT-01, EXPORT-02, EXPORT-03, EXPORT-04, EMBED-01, EMBED-02, EMBED-03, EMBED-04
+**Success Criteria** (what must be TRUE):
+  1. User can export dashboard as standalone HTML with all chart data embedded
+  2. User can export single chart as standalone HTML with query data embedded
+  3. User can export Gantt chart as standalone HTML with task data embedded
+  4. Exported HTML files work offline without server or database connection
+  5. Chinese characters are preserved correctly in embedded data
+**Plans**: 3 plans
+
+Plans:
+- [ ] 09-01-PLAN.md - HTML exporter base class with data embedding (EMBED-01, EMBED-02, EMBED-03, EMBED-04)
+- [ ] 09-02-PLAN.md - Chart and Dashboard export implementation (EXPORT-01, EXPORT-02, EXPORT-04)
+- [ ] 09-03-PLAN.md - Gantt chart export implementation (EXPORT-03)
+
+### Phase 10: Export CLI & UX
+**Goal**: Users have simple CLI commands for export operations with good defaults
+**Depends on**: Phase 9
+**Requirements**: EXPORT-05, UX-01, UX-02, UX-03
+**Success Criteria** (what must be TRUE):
+  1. CLI command provides simple interface for export operations
+  2. Export command accepts output path parameter
+  3. Exported HTML uses local ECharts library (no CDN)
+  4. Filename defaults to chart/dashboard title with timestamp
+**Plans**: 2 plans
+
+Plans:
+- [ ] 10-01-PLAN.md - CLI export commands with path and naming (EXPORT-05, UX-01, UX-03)
+- [ ] 10-02-PLAN.md - Local ECharts embedding + SKILL.md documentation (UX-02)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -128,26 +195,11 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. URL/API Data Source | 2/2 | Complete | 04-01, 04-02 |
 | 5. Gantt Chart API | 2/2 | Complete | 05-01, 05-02 |
 | 6. Data Merge Capability | 2/2 | Complete | 06-01, 06-02 |
-| 7. SQLite → DuckDB Migration | 1/3 | Complete    | 2026-04-11 |
+| 7. SQLite → DuckDB Migration | 3/3 | Complete | 07-01, 07-02, 07-03 |
+| 8. Import History & Metadata | 2/2 | Complete | 08-01, 08-02 |
+| 9. HTML Export Engine | 0/3 | Pending | — |
+| 10. Export CLI & UX | 0/2 | Pending | — |
 
-### Phase 7: 将数据导入sqllite的操作换成duckdb，取代sqllite技术方案。充分发挥duckdb优势
-
-**Goal:** All data import and storage operations use DuckDB instead of SQLite, leveraging columnar storage and analytical query performance
-**Depends on:** Phase 6
-**Plans:** 3/3 plans complete
-
-Plans:
-- [x] 07-01-PLAN.md — DatabaseRepository migration to DuckDB + dependency
-- [ ] 07-02-PLAN.md — data_importer.py SQLite → DuckDB migration
-- [ ] 07-03-PLAN.md — Remaining scripts + SKILL.md/README.md documentation update
-
-### Phase 8: 增加查看数据库和数据表功能，每次导入Excel需要记录文件名，对应的库和表，导入时间，Excel文件位置等信息，如果产生了关联统计新创建了表，也需要能够看到关联关系。当用户发出查看历史导入数据结构，或者查看历史数据表结构等指令时，给出相关结果。使用markdown，建议使用table格式，清晰简洁的给出结论
-
-**Goal:** Users can view import history, table structures, and table relationships in markdown table format, with complete metadata tracking for every import and merge operation
-**Depends on:** Phase 7
-**Requirements:** META-01, META-02, META-03, META-04
-**Plans:** 2/2 plans complete
-
-Plans:
-- [x] 08-01-PLAN.md — Extend metadata schema + update import/merge recording (META-01, META-02)
-- [ ] 08-02-PLAN.md — History viewer module + CLI + SKILL.md documentation (META-03, META-04)
+---
+*Roadmap defined: 2026-04-04*
+*Last updated: 2026-04-11 after v1.1 milestone planning*
