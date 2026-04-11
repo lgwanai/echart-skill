@@ -229,6 +229,101 @@ def generate_gantt_chart(config: dict) -> str:
     return output_path
 
 
+def export_standalone_gantt(config: dict, output_path: str, theme: str = "default") -> str:
+    """Export Gantt chart as standalone HTML file with embedded scripts.
+    
+    Generates a self-contained HTML file with ECharts library and
+    Gantt chart data embedded for offline sharing.
+    
+    Args:
+        config: Gantt configuration dict with:
+            - title: Chart title
+            - tasks: List of task dicts with name, start, end
+            Optional per task:
+            - category: Task category for grouping
+            - color: Custom bar color
+        output_path: Output HTML file path
+        theme: ECharts theme (default, dark, etc.)
+        
+    Returns:
+        Path to generated HTML file
+        
+    Example:
+        config = {
+            "title": "Project Timeline",
+            "tasks": [
+                {"name": "Design", "start": "2024-01-01", "end": "2024-01-15"},
+                {"name": "Development", "start": "2024-01-10", "end": "2024-02-01"},
+            ]
+        }
+        export_standalone_gantt(config, "timeline.html")
+    """
+    from scripts.html_exporter import HTMLExporter
+    
+    gantt_config = GanttChartConfig(**config)
+    
+    task_names = list(dict.fromkeys(task.name for task in gantt_config.tasks))
+    
+    all_dates = []
+    for task in gantt_config.tasks:
+        all_dates.extend([task.start, task.end])
+    
+    min_date = min(all_dates) - timedelta(days=1)
+    max_date = max(all_dates) + timedelta(days=1)
+    
+    series_data = []
+    for task in gantt_config.tasks:
+        category_index = task_names.index(task.name)
+        series_data.append([
+            category_index,
+            task.start.isoformat(),
+            task.end.isoformat(),
+            task.color,
+        ])
+    
+    echarts_option = {
+        "title": {"text": gantt_config.title, "left": "center"},
+        "tooltip": {"trigger": "item"},
+        "xAxis": {
+            "type": "time",
+            "position": "top",
+            "min": min_date.isoformat(),
+            "max": max_date.isoformat(),
+        },
+        "yAxis": {"type": "category", "data": task_names, "inverse": True},
+        "series": [
+            {
+                "type": "custom",
+                "renderItem": "__renderGanttItem__",
+                "encode": {"x": [1, 2], "y": 0},
+                "data": series_data,
+            }
+        ],
+    }
+    
+    custom_js = GANTT_RENDER_ITEM_JS.replace(
+        "function renderGanttItem", "var __renderGanttItem__ = function"
+    )
+    
+    exporter = HTMLExporter()
+    html = exporter.generate_standalone_html(
+        title=gantt_config.title,
+        option_json=json.dumps(echarts_option, ensure_ascii=False),
+        data_json="[]",
+        custom_js=custom_js,
+        theme=theme
+    )
+    
+    logger.info(
+        "Gantt chart exported as standalone HTML",
+        output_path=output_path,
+        theme=theme,
+        tasks=len(gantt_config.tasks)
+    )
+    
+    return exporter.export_to_file(html, output_path)
+
+
 if __name__ == "__main__":  # pragma: no cover
     import argparse
 

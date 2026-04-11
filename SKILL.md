@@ -163,3 +163,54 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | id   | VARCHAR | YES |
 | name | VARCHAR | NO  |
 ```
+
+### Scenario 11: Export Charts for Offline Sharing
+**Trigger**: User wants to share charts/dashboards as standalone HTML files that work offline.
+
+**Action**:
+
+**Export Chart:**
+```python
+from scripts.chart_generator import export_standalone_chart
+
+config = {
+    "db_path": "workspace.duckdb",
+    "query": "SELECT category, value FROM sales",
+    "title": "Sales by Category",
+    "echarts_option": {
+        "xAxis": {"type": "category"},
+        "yAxis": {"type": "value"},
+        "series": [{"type": "bar"}]
+    }
+}
+export_standalone_chart(config, "sales_chart.html", theme="default")
+```
+
+**Export Dashboard:**
+```python
+from scripts.dashboard_generator import export_standalone_dashboard
+
+export_standalone_dashboard("dashboard_config.json", "my_dashboard.html")
+```
+
+**Export Gantt Chart:**
+```python
+from scripts.gantt_chart import export_standalone_gantt
+
+config = {
+    "title": "Project Timeline",
+    "tasks": [
+        {"name": "Design", "start": "2024-01-01", "end": "2024-01-15"},
+        {"name": "Development", "start": "2024-01-10", "end": "2024-02-01"},
+        {"name": "Testing", "start": "2024-02-01", "end": "2024-02-15"},
+    ]
+}
+export_standalone_gantt(config, "project_timeline.html", theme="dark")
+```
+
+**Key Features:**
+- Exported files are self-contained (~1.2MB with ECharts library)
+- Work offline without any server
+- Can be shared via email or file transfer
+- Open in any modern browser
+- Support themes: `default`, `dark`
