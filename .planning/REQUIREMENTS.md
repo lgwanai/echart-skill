@@ -13,7 +13,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [x] **EXPORT-02**: User can export single chart as standalone HTML file with query data embedded
 - [x] **EXPORT-03**: User can export Gantt chart as standalone HTML file with task data embedded
 - [x] **EXPORT-04**: Exported HTML files work offline without server or database connection
-- [ ] **EXPORT-05**: CLI command provides simple interface for export operations
+- [x] **EXPORT-05**: CLI command provides simple interface for export operations
 
 ### Data Embedding
 
@@ -24,9 +24,9 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### User Experience
 
-- [ ] **UX-01**: Export command accepts output path parameter for file location
-- [ ] **UX-02**: Exported HTML includes ECharts library from local path (no CDN dependency)
-- [ ] **UX-03**: Exported HTML filename defaults to chart/dashboard title with timestamp
+- [x] **UX-01**: Export command accepts output path parameter for file location
+- [x] **UX-02**: Exported HTML includes ECharts library from local path (no CDN dependency)
+- [x] **UX-03**: Exported HTML filename defaults to chart/dashboard title with timestamp
 
 ## v2 Requirements
 
@@ -64,20 +64,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXPORT-02 | Phase 9 | Complete |
 | EXPORT-03 | Phase 9 | Complete |
 | EXPORT-04 | Phase 9 | Complete |
-| EXPORT-05 | Phase 10 | Pending |
+| EXPORT-05 | Phase 10 | Complete |
 | EMBED-01 | Phase 9 | Complete |
 | EMBED-02 | Phase 9 | Complete |
 | EMBED-03 | Phase 9 | Complete |
 | EMBED-04 | Phase 9 | Complete |
-| UX-01 | Phase 10 | Pending |
-| UX-02 | Phase 10 | Pending |
-| UX-03 | Phase 10 | Pending |
+| UX-01 | Phase 10 | Complete |
+| UX-02 | Phase 10 | Complete |
+| UX-03 | Phase 10 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 12 total
-- Mapped to phases: 12
+- Complete: 12 ✓
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-11*
-*Last updated: 2026-04-11 after Phase 9 completion*
+*Last updated: 2026-04-12 — Milestone v1.1 complete*

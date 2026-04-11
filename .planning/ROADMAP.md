@@ -20,8 +20,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Data Merge Capability** - Merge multiple tables into one
 - [x] **Phase 7: SQLite → DuckDB Migration** - Leverage columnar storage
 - [x] **Phase 8: Import History & Metadata** - Markdown table history viewer
-- [ ] **Phase 9: HTML Export Engine** - Standalone HTML export with embedded data
-- [ ] **Phase 10: Export CLI & UX** - User-friendly command interface
+- [x] **Phase 9: HTML Export Engine** - Standalone HTML export with embedded data
+- [x] **Phase 10: Export CLI & UX** - User-friendly command interface
 
 ## Phase Details
 
@@ -179,8 +179,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 10-01-PLAN.md - CLI export commands with path and naming (EXPORT-05, UX-01, UX-03)
-- [ ] 10-02-PLAN.md - Local ECharts embedding + SKILL.md documentation (UX-02)
+- [x] 10-01-PLAN.md - CLI export commands with path and naming (EXPORT-05, UX-01, UX-03) - COMPLETE
+- [x] 10-02-PLAN.md - Local ECharts embedding + SKILL.md documentation (UX-02) - COMPLETE
 
 ## Progress
 
@@ -198,8 +198,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. SQLite → DuckDB Migration | 3/3 | Complete | 07-01, 07-02, 07-03 |
 | 8. Import History & Metadata | 2/2 | Complete | 08-01, 08-02 |
 | 9. HTML Export Engine | 3/3 | Complete | 2026-04-11 |
-| 10. Export CLI & UX | 0/2 | Pending | — |
+| 10. Export CLI & UX | 2/2 | Complete | 2026-04-12 |
 
 ---
+
 *Roadmap defined: 2026-04-04*
-*Last updated: 2026-04-11 after v1.1 milestone planning*
+*Last updated: 2026-04-12 — Milestone v1.1 complete*

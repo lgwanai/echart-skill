@@ -19,10 +19,14 @@ Examples:
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
 import re
+
+# Add parent directory to path for imports when running directly
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from scripts.chart_generator import export_standalone_chart
 from scripts.dashboard_generator import export_standalone_dashboard

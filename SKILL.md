@@ -214,3 +214,88 @@ export_standalone_gantt(config, "project_timeline.html", theme="dark")
 - Can be shared via email or file transfer
 - Open in any modern browser
 - Support themes: `default`, `dark`
+
+### Scenario 12: CLI Export (Command Line)
+**Trigger**: User needs to export charts via command line for batch processing or automation.
+
+**Export Chart:**
+```bash
+# Basic usage (auto-generates filename with timestamp)
+python scripts/chart_cli.py export-chart config.json
+
+# Specify output path
+python scripts/chart_cli.py export-chart config.json --output reports/sales.html
+
+# Use dark theme
+python scripts/chart_cli.py export-chart config.json --theme dark
+```
+
+**Export Dashboard:**
+```bash
+python scripts/chart_cli.py export-dashboard dashboard_config.json
+
+# With custom output
+python scripts/chart_cli.py export-dashboard dashboard_config.json --output monthly_report.html --theme dark
+```
+
+**Export Gantt Chart:**
+```bash
+# Gantt chart config is a JSON array of tasks
+python scripts/chart_cli.py export-gantt tasks.json --title "项目进度"
+
+# With output path
+python scripts/chart_cli.py export-gantt tasks.json --title "Project Timeline" --output timeline.html
+```
+
+**Config File Format (for export-chart):**
+```json
+{
+    "title": "销售数据图表",
+    "db_path": "workspace.duckdb",
+    "query": "SELECT category, SUM(amount) as total FROM sales GROUP BY category",
+    "echarts_option": {
+        "xAxis": {"type": "category"},
+        "yAxis": {"type": "value"},
+        "series": [{"type": "bar"}]
+    }
+}
+```
+
+**Gantt Task Config Format (for export-gantt):**
+```json
+[
+    {"name": "需求分析", "start": "2024-01-01", "end": "2024-01-15"},
+    {"name": "系统设计", "start": "2024-01-10", "end": "2024-01-25"},
+    {"name": "开发实现", "start": "2024-01-20", "end": "2024-02-20"}
+]
+```
+
+**Command Parameters:**
+- `<config>`: Config file path (JSON format)
+- `--output`, `-o`: Output HTML path (optional, default: `{title}_{timestamp}.html`)
+- `--theme`: Chart theme (`default` or `dark`, default: `default`)
+- `--title`: Gantt chart title (export-gantt only)
+
+**View Help:**
+```bash
+python scripts/chart_cli.py --help
+python scripts/chart_cli.py export-chart --help
+```
+
+**Batch Export Example:**
+```bash
+# Export multiple charts
+for config in outputs/configs/*.json; do
+    python scripts/chart_cli.py export-chart "$config"
+done
+
+# Automated daily report
+python scripts/chart_cli.py export-dashboard daily_dashboard.json \
+    --output "reports/report_$(date +%Y%m%d).html"
+```
+
+**Notes:**
+- Exported HTML files work offline (ECharts library embedded)
+- File size ~1.2MB per export (includes ECharts library)
+- Chinese characters are preserved correctly
+- Generated filename format: `{sanitized_title}_{YYYYMMDD_HHMMSS}.html`
