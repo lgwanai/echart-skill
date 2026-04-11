@@ -1,11 +1,10 @@
 """
 Data Merger Module.
 
-Provides functionality to merge multiple SQLite tables into one and export/import merged data.
+Provides functionality to merge multiple DuckDB tables into one and export/import merged data.
 """
 
 import argparse
-import sqlite3
 import sys
 import os
 from typing import Optional
@@ -35,7 +34,7 @@ class MergeConfig(BaseModel):
 
     source_tables: list[str] = Field(..., min_length=2, description="Tables to merge (at least 2)")
     target_table: str = Field(..., description="Name for merged table")
-    db_path: str = Field(default="workspace.db", description="Database path")
+    db_path: str = Field(default="workspace.duckdb", description="Database path")
     export_file: Optional[str] = Field(default=None, description="Export to file (CSV/Excel)")
 
     @field_validator('source_tables')
@@ -65,7 +64,7 @@ class MergeConfig(BaseModel):
 
 
 class DataMerger:
-    """Merge multiple SQLite tables into one."""
+    """Merge multiple DuckDB tables into one."""
 
     def __init__(self, config: MergeConfig):
         self.config = config
@@ -78,11 +77,10 @@ class DataMerger:
             ValueError: If any source table does not exist
         """
         with self.repo.connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "SELECT name FROM sqlite_master WHERE type='table'"
-            )
-            existing_tables = {row[0] for row in cursor.fetchall()}
+            existing_tables_result = conn.execute(
+                "SELECT table_name FROM information_schema.tables WHERE table_schema = 'main'"
+            ).fetchall()
+            existing_tables = {row[0] for row in existing_tables_result}
 
         missing = set(self.config.source_tables) - existing_tables
         if missing:
@@ -115,7 +113,7 @@ class DataMerger:
         return merged
 
     def save_to_database(self, df: pd.DataFrame) -> None:
-        """Save merged DataFrame to SQLite.
+        """Save merged DataFrame to DuckDB.
 
         Args:
             df: DataFrame to save
@@ -151,7 +149,7 @@ class DataMerger:
 def main():
     """CLI entry point for data merger."""
     parser = argparse.ArgumentParser(
-        description="合并多个 SQLite 表格"
+        description="合并多个 DuckDB 表格"
     )
     parser.add_argument(
         "--tables", nargs="+", required=True,
@@ -162,8 +160,8 @@ def main():
         help="目标表名"
     )
     parser.add_argument(
-        "--db", default="workspace.db",
-        help="数据库路径 (默认: workspace.db)"
+        "--db", default="workspace.duckdb",
+        help="数据库路径 (默认: workspace.duckdb)"
     )
     parser.add_argument(
         "--export",
