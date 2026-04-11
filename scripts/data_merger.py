@@ -5,8 +5,10 @@ Provides functionality to merge multiple DuckDB tables into one and export/impor
 """
 
 import argparse
+import json
 import sys
 import os
+from datetime import datetime
 from typing import Optional
 
 import pandas as pd
@@ -27,6 +29,23 @@ SQL_RESERVED_WORDS = {
     'on', 'and', 'or', 'not', 'null', 'true', 'false', 'order', 'by',
     'group', 'having', 'union', 'except', 'intersect', 'as', 'distinct'
 }
+
+
+def record_merge(conn, source_tables: list[str], target_table: str, row_count: int):
+    """Record merge operation metadata with parent table relationships."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn.execute('''
+        INSERT OR REPLACE INTO _data_skill_meta
+        (file_name, table_name, import_time, last_used_time, parent_tables, row_count)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (
+        f"merge: {', '.join(source_tables)}",
+        target_table,
+        now, now,
+        json.dumps(source_tables),
+        row_count
+    ))
+    conn.commit()
 
 
 class MergeConfig(BaseModel):
@@ -120,6 +139,7 @@ class DataMerger:
         """
         with self.repo.connection() as conn:
             df.to_sql(self.config.target_table, conn, index=False, if_exists='replace')
+            record_merge(conn, self.config.source_tables, self.config.target_table, len(df))
             logger.info("保存到数据库", table=self.config.target_table, rows=len(df))
 
     def export_to_file(self, df: pd.DataFrame) -> None:
