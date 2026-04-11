@@ -1,40 +1,40 @@
 """
-DatabaseRepository with connection pooling and WAL mode for SQLite.
+DatabaseRepository with connection pooling for DuckDB.
 
-This module provides a thread-safe SQLite repository with connection pooling
+This module provides a thread-safe DuckDB repository with connection pooling
 to support concurrent read/write access in multi-agent scenarios.
 
 Features:
-- Queue-based connection pool (thread-safe)
-- WAL mode enabled for concurrent read/write
+- List-based connection pool with threading lock for write serialization
+- DuckDB's single-writer model protected by threading.Lock
 - Context manager for safe connection handling
 - High-level methods for common operations
 """
 
-import sqlite3
+import duckdb
+import threading
 import atexit
 from contextlib import contextmanager
-from queue import Queue
 from typing import Iterator, Any, Optional
 
 
 class DatabaseRepository:
-    """Thread-safe SQLite repository with connection pooling and WAL mode.
+    """Thread-safe DuckDB repository with connection pooling.
 
-    This class manages a pool of SQLite connections with WAL mode enabled,
-    allowing concurrent read and write operations from multiple threads.
+    This class manages a pool of DuckDB connections with thread-safe
+    write serialization, allowing concurrent read and write operations
+    from multiple threads.
 
     Attributes:
-        _db_path: Path to the SQLite database file.
-        _pool: Queue-based connection pool.
-        _lock: Thread lock for pool initialization.
+        _db_path: Path to the DuckDB database file.
+        _pool: List-based connection pool.
+        _lock: Thread lock for write serialization.
 
     Example:
-        >>> repo = DatabaseRepository("workspace.db", pool_size=5)
+        >>> repo = DatabaseRepository("workspace.duckdb", pool_size=5)
         >>> with repo.connection() as conn:
-        ...     cursor = conn.cursor()
-        ...     cursor.execute("SELECT * FROM users")
-        ...     print(cursor.fetchall())
+        ...     conn.execute("SELECT * FROM users")
+        ...     print(conn.fetchall())
         >>> repo.close_all()
     """
 
@@ -42,58 +42,60 @@ class DatabaseRepository:
         """Initialize the database repository with connection pool.
 
         Args:
-            db_path: Path to the SQLite database file.
+            db_path: Path to the DuckDB database file.
             pool_size: Number of connections in the pool (default: 5).
         """
         self._db_path = db_path
-        self._pool: Queue[sqlite3.Connection] = Queue(maxsize=pool_size)
+        self._pool: list[duckdb.DuckDBPyConnection] = []
+        self._lock = threading.Lock()
         self._initialize_pool(pool_size)
 
     def _initialize_pool(self, size: int) -> None:
-        """Create connection pool with WAL mode enabled.
+        """Create connection pool with DuckDB configuration.
 
         Each connection is configured with:
-        - check_same_thread=False: Required for pool usage
-        - WAL mode: Allows concurrent readers with writers
-        - synchronous=NORMAL: Better performance with WAL
-        - Row factory: Returns dict-like rows
+        - threads=4: Parallel query execution
+        - memory_limit=2GB: Memory usage cap
 
         Args:
             size: Number of connections to create.
         """
         for _ in range(size):
-            conn = sqlite3.connect(
-                self._db_path,
-                check_same_thread=False,  # Required for pool
-                timeout=5.0
-            )
-            conn.row_factory = sqlite3.Row
-            # Enable WAL mode for concurrent read/write
-            conn.execute("PRAGMA journal_mode=WAL")
-            # NORMAL is faster with WAL, still safe
-            conn.execute("PRAGMA synchronous=NORMAL")
-            self._pool.put(conn)
+            conn = self._create_connection()
+            self._pool.append(conn)
+
+    def _create_connection(self) -> duckdb.DuckDBPyConnection:
+        """Create a single DuckDB connection with optimal settings.
+
+        Returns:
+            duckdb.DuckDBPyConnection: A configured DuckDB connection.
+        """
+        conn = duckdb.connect(self._db_path)
+        conn.execute("SET threads=4")
+        conn.execute("SET memory_limit='2GB'")
+        return conn
 
     @contextmanager
-    def connection(self) -> Iterator[sqlite3.Connection]:
+    def connection(self) -> Iterator[duckdb.DuckDBPyConnection]:
         """Get a connection from the pool as a context manager.
 
         The connection is automatically returned to the pool when the
         context exits, even if an exception occurs.
 
         Yields:
-            sqlite3.Connection: A database connection from the pool.
+            duckdb.DuckDBPyConnection: A database connection from the pool.
 
         Example:
             >>> with repo.connection() as conn:
-            ...     cursor = conn.cursor()
-            ...     cursor.execute("SELECT 1")
+            ...     conn.execute("SELECT 1")
         """
-        conn = self._pool.get()
+        with self._lock:
+            conn = self._pool.pop()
         try:
             yield conn
         finally:
-            self._pool.put(conn)
+            with self._lock:
+                self._pool.append(conn)
 
     def execute_query(self, query: str, params: tuple = ()) -> list[dict]:
         """Execute a parameterized SELECT query and return results.
@@ -112,9 +114,13 @@ class DatabaseRepository:
             ... )
         """
         with self.connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, params)
-            return [dict(row) for row in cursor.fetchall()]
+            if params:
+                conn.execute(query, params)
+            else:
+                conn.execute(query)
+            columns = [desc[0] for desc in conn.description]
+            rows = conn.fetchall()
+            return [dict(zip(columns, row)) for row in rows]
 
     def execute_many(self, query: str, params_list: list[tuple]) -> int:
         """Execute many INSERT/UPDATE operations efficiently.
@@ -136,10 +142,8 @@ class DatabaseRepository:
             ... )
         """
         with self.connection() as conn:
-            cursor = conn.cursor()
-            cursor.executemany(query, params_list)
-            conn.commit()
-            return cursor.rowcount
+            conn.executemany(query, params_list)
+            return conn.rowcount
 
     def close_all(self) -> None:
         """Close all connections in the pool.
@@ -147,29 +151,30 @@ class DatabaseRepository:
         This method should be called when the repository is no longer
         needed to release database resources.
         """
-        while not self._pool.empty():
-            conn = self._pool.get()
-            conn.close()
+        with self._lock:
+            for conn in self._pool:
+                conn.close()
+            self._pool.clear()
 
 
 # Module-level singleton for backward compatibility
 _repo: Optional[DatabaseRepository] = None
 
 
-def get_repository(db_path: str = "workspace.db") -> DatabaseRepository:
+def get_repository(db_path: str = "workspace.duckdb") -> DatabaseRepository:
     """Get or create the database repository singleton.
 
     This function provides a convenient way to access a shared
     DatabaseRepository instance across the application.
 
     Args:
-        db_path: Path to the SQLite database file (default: "workspace.db").
+        db_path: Path to the DuckDB database file (default: "workspace.duckdb").
 
     Returns:
         DatabaseRepository: The singleton repository instance.
 
     Example:
-        >>> repo = get_repository("workspace.db")
+        >>> repo = get_repository("workspace.duckdb")
         >>> with repo.connection() as conn:
         ...     conn.execute("SELECT 1")
     """
