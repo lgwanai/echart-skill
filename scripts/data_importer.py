@@ -77,6 +77,19 @@ def init_meta_table(conn):
                 # Column might already exist from concurrent operation
                 pass
 
+    metadata_columns = [
+        ('file_path', 'TEXT'),
+        ('row_count', 'INTEGER'),
+        ('parent_tables', 'TEXT'),
+    ]
+
+    for col_name, col_type in metadata_columns:
+        if col_name not in existing_columns:
+            try:
+                conn.execute(f'ALTER TABLE _data_skill_meta ADD COLUMN {col_name} {col_type}')
+            except (duckdb.Error, Exception):
+                pass
+
     conn.commit()
 
 def check_duplicate_import(conn, md5_hash):
@@ -98,14 +111,14 @@ def check_duplicate_import(conn, md5_hash):
         return tables
     return None
 
-def record_import(conn, file_name, table_name, md5_hash):
+def record_import(conn, file_name, table_name, md5_hash, file_path=None, row_count=None):
     """Record import metadata."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     conn.execute('''
         INSERT OR REPLACE INTO _data_skill_meta
-        (file_name, table_name, md5_hash, import_time, last_used_time)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (file_name, table_name, md5_hash, now, now))
+        (file_name, table_name, md5_hash, import_time, last_used_time, file_path, row_count)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (file_name, table_name, md5_hash, now, now, file_path, row_count))
     conn.commit()
 
 
