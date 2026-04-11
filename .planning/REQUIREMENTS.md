@@ -9,18 +9,18 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### HTML Export
 
-- [ ] **EXPORT-01**: User can export dashboard as standalone HTML file with all data embedded
-- [ ] **EXPORT-02**: User can export single chart as standalone HTML file with query data embedded
-- [ ] **EXPORT-03**: User can export Gantt chart as standalone HTML file with task data embedded
-- [ ] **EXPORT-04**: Exported HTML files work offline without server or database connection
+- [x] **EXPORT-01**: User can export dashboard as standalone HTML file with all data embedded
+- [x] **EXPORT-02**: User can export single chart as standalone HTML file with query data embedded
+- [x] **EXPORT-03**: User can export Gantt chart as standalone HTML file with task data embedded
+- [x] **EXPORT-04**: Exported HTML files work offline without server or database connection
 - [ ] **EXPORT-05**: CLI command provides simple interface for export operations
 
 ### Data Embedding
 
-- [ ] **EMBED-01**: Query results are serialized as JSON and embedded in HTML
-- [ ] **EMBED-02**: ECharts options are embedded inline in HTML script tag
-- [ ] **EMBED-03**: Chinese characters are preserved correctly in embedded data (ensure_ascii=False)
-- [ ] **EMBED-04**: Embedded data size is logged for user awareness
+- [x] **EMBED-01**: Query results are serialized as JSON and embedded in HTML
+- [x] **EMBED-02**: ECharts options are embedded inline in HTML script tag
+- [x] **EMBED-03**: Chinese characters are preserved correctly in embedded data (ensure_ascii=False)
+- [x] **EMBED-04**: Embedded data size is logged for user awareness
 
 ### User Experience
 
@@ -60,15 +60,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EXPORT-01 | Phase 9 | Pending |
-| EXPORT-02 | Phase 9 | Pending |
-| EXPORT-03 | Phase 9 | Pending |
-| EXPORT-04 | Phase 9 | Pending |
+| EXPORT-01 | Phase 9 | Complete |
+| EXPORT-02 | Phase 9 | Complete |
+| EXPORT-03 | Phase 9 | Complete |
+| EXPORT-04 | Phase 9 | Complete |
 | EXPORT-05 | Phase 10 | Pending |
-| EMBED-01 | Phase 9 | Pending |
-| EMBED-02 | Phase 9 | Pending |
-| EMBED-03 | Phase 9 | Pending |
-| EMBED-04 | Phase 9 | Pending |
+| EMBED-01 | Phase 9 | Complete |
+| EMBED-02 | Phase 9 | Complete |
+| EMBED-03 | Phase 9 | Complete |
+| EMBED-04 | Phase 9 | Complete |
 | UX-01 | Phase 10 | Pending |
 | UX-02 | Phase 10 | Pending |
 | UX-03 | Phase 10 | Pending |
@@ -80,4 +80,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-11*
-*Last updated: 2026-04-11 after roadmap creation*
+*Last updated: 2026-04-11 after Phase 9 completion*

@@ -163,9 +163,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 09-01-PLAN.md - HTML exporter base class with data embedding (EMBED-01, EMBED-02, EMBED-03, EMBED-04)
-- [ ] 09-02-PLAN.md - Chart and Dashboard export implementation (EXPORT-01, EXPORT-02, EXPORT-04)
-- [ ] 09-03-PLAN.md - Gantt chart export implementation (EXPORT-03)
+- [x] 09-01-PLAN.md - HTML exporter base class with data embedding (EMBED-01, EMBED-02, EMBED-03, EMBED-04) - COMPLETE
+- [x] 09-02-PLAN.md - Chart and Dashboard export implementation (EXPORT-01, EXPORT-02, EXPORT-04) - COMPLETE
+- [x] 09-03-PLAN.md - Gantt chart export implementation (EXPORT-03) - COMPLETE
 
 ### Phase 10: Export CLI & UX
 **Goal**: Users have simple CLI commands for export operations with good defaults
@@ -197,7 +197,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Data Merge Capability | 2/2 | Complete | 06-01, 06-02 |
 | 7. SQLite → DuckDB Migration | 3/3 | Complete | 07-01, 07-02, 07-03 |
 | 8. Import History & Metadata | 2/2 | Complete | 08-01, 08-02 |
-| 9. HTML Export Engine | 0/3 | Pending | — |
+| 9. HTML Export Engine | 3/3 | Complete | 2026-04-11 |
 | 10. Export CLI & UX | 0/2 | Pending | — |
 
 ---
