@@ -128,15 +128,26 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. URL/API Data Source | 2/2 | Complete | 04-01, 04-02 |
 | 5. Gantt Chart API | 2/2 | Complete | 05-01, 05-02 |
 | 6. Data Merge Capability | 2/2 | Complete | 06-01, 06-02 |
-| 7. SQLite → DuckDB Migration | 1/3 | In Progress | 07-01 |
+| 7. SQLite → DuckDB Migration | 1/3 | Complete    | 2026-04-11 |
 
 ### Phase 7: 将数据导入sqllite的操作换成duckdb，取代sqllite技术方案。充分发挥duckdb优势
 
 **Goal:** All data import and storage operations use DuckDB instead of SQLite, leveraging columnar storage and analytical query performance
 **Depends on:** Phase 6
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] 07-01-PLAN.md — DatabaseRepository migration to DuckDB + dependency
 - [ ] 07-02-PLAN.md — data_importer.py SQLite → DuckDB migration
 - [ ] 07-03-PLAN.md — Remaining scripts + SKILL.md/README.md documentation update
+
+### Phase 8: 增加查看数据库和数据表功能，每次导入Excel需要记录文件名，对应的库和表，导入时间，Excel文件位置等信息，如果产生了关联统计新创建了表，也需要能够看到关联关系。当用户发出查看历史导入数据结构，或者查看历史数据表结构等指令时，给出相关结果。使用markdown，建议使用table格式，清晰简洁的给出结论
+
+**Goal:** Users can view import history, table structures, and table relationships in markdown table format, with complete metadata tracking for every import and merge operation
+**Depends on:** Phase 7
+**Requirements:** META-01, META-02, META-03, META-04
+**Plans:** 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Extend metadata schema + update import/merge recording (META-01, META-02)
+- [ ] 08-02-PLAN.md — History viewer module + CLI + SKILL.md documentation (META-03, META-04)
