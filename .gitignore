@@ -8,11 +8,12 @@ idea.md
 package.sh
 RELEASE_NOTE.md
 
-# 忽略本地 SQLite 数据库文件（避免上传敏感数据）
+# 忽略本地 SQLite/DuckDB 数据库文件（避免上传敏感数据）
 workspace.db
 *.db
 *.sqlite
 *.sqlite3
+*.duckdb
 
 # 忽略本地敏感配置文件
 config.txt
