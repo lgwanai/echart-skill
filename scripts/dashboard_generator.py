@@ -280,6 +280,118 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
     return output_path
 
 
+def export_standalone_dashboard(config_path: str, output_path: str, theme: str = "default") -> str:
+    """Export dashboard as standalone HTML file with embedded scripts.
+    
+    Generates a self-contained HTML file with all chart data and ECharts
+    library embedded, suitable for offline sharing.
+    
+    Args:
+        config_path: Path to dashboard configuration JSON file
+        output_path: Output HTML file path
+        theme: ECharts theme (default, dark, etc.)
+        
+    Returns:
+        Path to generated HTML file
+    """
+    from scripts.html_exporter import HTMLExporter
+    
+    config = load_dashboard_config(config_path)
+    
+    chart_inits = []
+    required_maps = set()
+    
+    exporter = HTMLExporter()
+    
+    for chart in config.charts:
+        df = fetch_chart_data(chart, config.db_path)
+        
+        option = chart.echarts_option.copy()
+        if not option.get('dataset') and not df.empty:
+            option['dataset'] = {'source': [df.columns.tolist()] + df.values.tolist()}
+        
+        option_json = json.dumps(option, ensure_ascii=False)
+        data_json = json.dumps(df.to_dict(orient='records'), ensure_ascii=False)
+        dataset_json = json.dumps([df.columns.tolist()] + df.values.tolist(), ensure_ascii=False)
+        
+        custom_js = f"var rawData = {data_json};\nvar datasetSource = {dataset_json};\n" + chart.custom_js
+        
+        maps = exporter._detect_required_maps(option_json, custom_js)
+        required_maps.update(maps)
+        
+        chart_init = f"""    (function() {{
+        var chart = echarts.init(document.getElementById('chart_{chart.id}'));
+        var option = {option_json};
+        {custom_js}
+        chart.setOption(option);
+        charts.push(chart);
+    }})();"""
+        chart_inits.append(chart_init)
+    
+    echarts_content = exporter._load_echarts()
+    map_scripts = "\n".join(exporter._load_map_script(m) for m in required_maps)
+    chart_inits_js = "\n".join(chart_inits)
+    
+    containers = []
+    for chart in config.charts:
+        pos = chart.position
+        containers.append(
+            f'<div id="chart_{chart.id}" style="grid-row: {pos.row + 1} / span {pos.row_span}; '
+            f'grid-column: {pos.col + 1} / span {pos.col_span};"></div>'
+        )
+    
+    theme_style = ""
+    if theme == "dark":
+        theme_style = "body { background-color: #1a1a1a; }"
+    
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{config.title}</title>
+    <style>
+        body {{ margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }}
+        .dashboard-grid {{
+            display: grid;
+            grid-template-columns: repeat({config.columns}, 1fr);
+            grid-auto-rows: {config.row_height}px;
+            gap: {config.gap}px;
+            padding: 16px;
+        }}
+        .chart-container {{ min-height: {config.row_height}px; border: 1px solid #ddd; border-radius: 4px; }}
+        {theme_style}
+    </style>
+</head>
+<body>
+    <div class="dashboard-grid">
+{chr(10).join('        ' + c for c in containers)}
+    </div>
+    <script>
+{echarts_content}
+    </script>
+    <script>
+{map_scripts}
+    </script>
+    <script>
+        var charts = [];
+{chart_inits_js}
+        window.addEventListener('resize', function() {{
+            charts.forEach(function(c) {{ c.resize(); }});
+        }});
+    </script>
+</body>
+</html>"""
+    
+    logger.info(
+        "Dashboard exported as standalone HTML",
+        output_path=output_path,
+        theme=theme,
+        charts=len(config.charts)
+    )
+    
+    return exporter.export_to_file(html, output_path)
+
+
 def generate_dashboard(config_path: str, output_path: str | None = None) -> str:
     """Generate dashboard from configuration file.
 

@@ -17,7 +17,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_repository
 from logging_config import get_logger, configure_logging
-from server import ensure_server_running
+from scripts.server import ensure_server_running
 
 # Initialize logging
 configure_logging()
@@ -381,6 +381,77 @@ def generate_echarts_html(df, config, output_path):
         rows=len(df)
     )
     return output_path
+
+
+def export_standalone_chart(config: dict, output_path: str, theme: str = "default") -> str:
+    """Export chart as standalone HTML file with embedded scripts.
+    
+    Generates a self-contained HTML file that can be shared and viewed
+    offline without any server or database connection.
+    
+    Args:
+        config: Chart configuration dict with:
+            - db_path: Path to database
+            - query: SQL query for data
+            - title: Chart title
+            - echarts_option: ECharts option dict
+            - custom_js: Optional custom JavaScript
+        output_path: Output HTML file path
+        theme: ECharts theme (default, dark, etc.)
+        
+    Returns:
+        Path to generated HTML file
+        
+    Example:
+        config = {
+            "db_path": "workspace.duckdb",
+            "query": "SELECT category, value FROM sales",
+            "title": "Sales by Category",
+            "echarts_option": {"xAxis": {"type": "category"}, "series": [{"type": "bar"}]}
+        }
+        export_standalone_chart(config, "sales_chart.html")
+    """
+    from scripts.html_exporter import HTMLExporter
+    
+    db_path = config.get("db_path", "workspace.duckdb")
+    query = config.get("query")
+    
+    if not query:
+        raise ValueError("Missing SQL query in config")
+    
+    repo = get_repository(db_path)
+    with repo.connection() as conn:
+        df = pd.read_sql_query(query, conn)
+    
+    if df.empty:
+        logger.warning("Query returned empty data", query=query)
+    
+    option = config.get("echarts_option", {})
+    if not option.get('dataset') and not df.empty:
+        option['dataset'] = {'source': [df.columns.tolist()] + df.values.tolist()}
+    
+    option_json = json.dumps(option, ensure_ascii=False)
+    data_json = json.dumps(df.to_dict(orient='records'), ensure_ascii=False)
+    custom_js = config.get("custom_js", "")
+    
+    exporter = HTMLExporter()
+    html = exporter.generate_standalone_html(
+        title=config.get("title", "Chart"),
+        option_json=option_json,
+        data_json=data_json,
+        custom_js=custom_js,
+        theme=theme
+    )
+    
+    logger.info(
+        "Chart exported as standalone HTML",
+        output_path=output_path,
+        theme=theme,
+        rows=len(df)
+    )
+    
+    return exporter.export_to_file(html, output_path)
+
 
 def generate_chart(config):
     """
