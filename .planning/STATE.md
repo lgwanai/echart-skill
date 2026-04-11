@@ -104,6 +104,10 @@ Recent decisions affecting current work:
 - [Phase 07-sqllite-duckdb-sqllite-duckdb]: Used information_schema.tables for table discovery — standard SQL, DuckDB compatible
 - [Phase 07-sqllite-duckdb-sqllite-duckdb]: DuckDB parameterized queries use list params instead of tuple params
 - [Phase 07-sqllite-duckdb-sqllite-duckdb]: Replaced sqlite3 CLI examples with DuckDB Python API in documentation
+- [Phase 07-02]: pd.to_sql replaced with conn.register() + CREATE TABLE AS — DuckDB-native approach avoids SQLAlchemy dependency
+- [Phase 07-02]: Function name import_to_sqlite preserved for backward compatibility despite DuckDB backend
+- [Phase 07-03]: dashboard_schema.py had zero SQLite references — only default db_path updated
+- [Phase 07-03]: url_data_source.py type mapping comments updated from "SQLite types" to "DuckDB types"
 
 ### Roadmap Evolution
 

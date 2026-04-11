@@ -1,5 +1,5 @@
 import argparse
-import sqlite3
+import duckdb
 import pandas as pd
 import os
 import re
@@ -38,10 +38,8 @@ def init_meta_table(conn):
     Creates _data_skill_meta table if it doesn't exist, and adds URL source
     columns if they don't exist (for backward compatibility).
     """
-    cursor = conn.cursor()
-
     # Create table if it doesn't exist
-    cursor.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS _data_skill_meta (
             file_name TEXT,
             table_name TEXT PRIMARY KEY,
@@ -56,8 +54,12 @@ def init_meta_table(conn):
     ''')
 
     # Check if URL columns exist (for backward compatibility)
-    cursor.execute("PRAGMA table_info(_data_skill_meta)")
-    existing_columns = {row[1] for row in cursor.fetchall()}
+    # DuckDB uses information_schema instead of PRAGMA table_info
+    rows = conn.execute('''
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = '_data_skill_meta'
+    ''').fetchall()
+    existing_columns = {row[0] for row in rows}
 
     # Add URL columns if missing
     url_columns = [
@@ -70,8 +72,8 @@ def init_meta_table(conn):
     for col_name, col_type in url_columns:
         if col_name not in existing_columns:
             try:
-                cursor.execute(f'ALTER TABLE _data_skill_meta ADD COLUMN {col_name} {col_type}')
-            except sqlite3.OperationalError:
+                conn.execute(f'ALTER TABLE _data_skill_meta ADD COLUMN {col_name} {col_type}')
+            except (duckdb.Error, Exception):
                 # Column might already exist from concurrent operation
                 pass
 
@@ -79,18 +81,15 @@ def init_meta_table(conn):
 
 def check_duplicate_import(conn, md5_hash):
     """Check if the file has already been imported with the same MD5. Returns a list of table names."""
-    cursor = conn.cursor()
-    cursor.execute('''
+    results = conn.execute('''
         SELECT table_name FROM _data_skill_meta 
         WHERE md5_hash = ?
-    ''', (md5_hash,))
-    results = cursor.fetchall()
+    ''', (md5_hash,)).fetchall()
     if results:
         tables = [r[0] for r in results]
-        # Update last_used_time since we accessed it
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         for t in tables:
-            cursor.execute('''
+            conn.execute('''
                 UPDATE _data_skill_meta 
                 SET last_used_time = ? 
                 WHERE table_name = ?
@@ -102,8 +101,7 @@ def check_duplicate_import(conn, md5_hash):
 def record_import(conn, file_name, table_name, md5_hash):
     """Record import metadata."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cursor = conn.cursor()
-    cursor.execute('''
+    conn.execute('''
         INSERT OR REPLACE INTO _data_skill_meta
         (file_name, table_name, md5_hash, import_time, last_used_time)
         VALUES (?, ?, ?, ?, ?)
@@ -112,18 +110,9 @@ def record_import(conn, file_name, table_name, md5_hash):
 
 
 def record_url_import(conn, url: str, table_name: str, source_format: str, auth_type: Optional[str] = None):
-    """Record URL data source import metadata.
-
-    Args:
-        conn: SQLite connection
-        url: Source URL
-        table_name: Target table name
-        source_format: 'json' or 'csv'
-        auth_type: 'basic' or 'bearer' or None
-    """
+    """Record URL data source import metadata."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cursor = conn.cursor()
-    cursor.execute('''
+    conn.execute('''
         INSERT OR REPLACE INTO _data_skill_meta
         (file_name, table_name, import_time, last_used_time,
          source_url, source_format, auth_type, last_refresh_time)
@@ -133,25 +122,17 @@ def record_url_import(conn, url: str, table_name: str, source_format: str, auth_
 
 
 def get_url_sources(conn) -> List[dict]:
-    """Get all URL data sources from metadata.
-
-    Args:
-        conn: SQLite connection
-
-    Returns:
-        List of dicts with table_name, source_url, source_format, auth_type
-    """
-    cursor = conn.cursor()
-    cursor.execute('''
+    """Get all URL data sources from metadata."""
+    rows = conn.execute('''
         SELECT table_name, source_url, source_format, auth_type
         FROM _data_skill_meta
         WHERE source_url IS NOT NULL
-    ''')
+    ''').fetchall()
     columns = ['table_name', 'source_url', 'source_format', 'auth_type']
-    return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    return [dict(zip(columns, row)) for row in rows]
 
 def clean_column_names(columns):
-    """Clean column names to be valid SQLite identifiers."""
+    """Clean column names to be valid DuckDB identifiers."""
     cleaned = []
     seen = set()
     for col in columns:
@@ -231,25 +212,12 @@ def import_excel_streaming(
     file_path: str,
     db_path: str,
     table_name: str,
-    conn: sqlite3.Connection,
+    conn,
     drop_null_columns: bool = True
 ) -> Iterator[int]:
     """Import Excel using streaming (read_only mode).
 
     Yields row count after each chunk for progress tracking.
-
-    Args:
-        file_path: Path to the Excel file
-        db_path: Path to the SQLite database
-        table_name: Name of the target table
-        conn: SQLite connection object
-        drop_null_columns: If True, remove columns with all NULL values
-
-    Yields:
-        int: Number of rows processed after each chunk
-
-    Raises:
-        ValueError: If file size exceeds MAX_EXCEL_SIZE (100MB)
     """
     import openpyxl
 
@@ -262,7 +230,6 @@ def import_excel_streaming(
     wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
     sheet = wb.active
 
-    cursor = conn.cursor()
     header: Optional[List[str]] = None
     row_buffer: List[tuple] = []
     rows_processed = 0
@@ -295,19 +262,19 @@ def import_excel_streaming(
 
             # Insert when buffer reaches chunk size
             if len(row_buffer) >= STREAMING_CHUNK_SIZE:
-                _insert_chunk(cursor, table_name, header, row_buffer, first_chunk)
+                _insert_chunk(conn, table_name, header, row_buffer, first_chunk)
                 first_chunk = False
                 row_buffer = []
                 yield rows_processed
 
         # Insert remaining rows
         if row_buffer:
-            _insert_chunk(cursor, table_name, header, row_buffer, first_chunk)
+            _insert_chunk(conn, table_name, header, row_buffer, first_chunk)
             yield rows_processed
 
         # Drop all-null columns if requested
         if drop_null_columns and null_column_indices and header:
-            _drop_null_columns(cursor, table_name, header, null_column_indices)
+            _drop_null_columns(conn, table_name, header, null_column_indices)
 
         conn.commit()
 
@@ -316,74 +283,53 @@ def import_excel_streaming(
 
 
 def _drop_null_columns(
-    cursor: sqlite3.Cursor,
+    conn,
     table_name: str,
     columns: List[str],
     null_indices: set
 ) -> None:
-    """Remove columns that contain only NULL values.
-
-    Args:
-        cursor: SQLite cursor
-        table_name: Table name
-        columns: Column names
-        null_indices: Set of column indices that are all NULL
-    """
+    """Remove columns that contain only NULL values."""
     if not null_indices:
         return
 
-    # Get columns to keep
     keep_columns = [col for i, col in enumerate(columns) if i not in null_indices]
 
     if len(keep_columns) == len(columns):
-        return  # Nothing to drop
+        return
 
     if not keep_columns:
-        return  # Don't drop all columns
+        return
 
-    # Create new table without null columns
     temp_table = f"{table_name}_clean"
     col_defs = ", ".join([f'"{col}" TEXT' for col in keep_columns])
-    cursor.execute(f"CREATE TABLE {temp_table} ({col_defs})")
+    conn.execute(f"CREATE TABLE {temp_table} ({col_defs})")
 
-    # Copy data
     cols_str = ", ".join([f'"{col}"' for col in keep_columns])
-    cursor.execute(f"INSERT INTO {temp_table} SELECT {cols_str} FROM {table_name}")
+    conn.execute(f"INSERT INTO {temp_table} SELECT {cols_str} FROM {table_name}")
 
-    # Replace original table
-    cursor.execute(f"DROP TABLE {table_name}")
-    cursor.execute(f"ALTER TABLE {temp_table} RENAME TO {table_name}")
+    conn.execute(f"DROP TABLE {table_name}")
+    conn.execute(f"ALTER TABLE {temp_table} RENAME TO {table_name}")
 
 
 def _insert_chunk(
-    cursor: sqlite3.Cursor,
+    conn,
     table_name: str,
     columns: List[str],
     rows: List[tuple],
     is_first_chunk: bool
 ) -> None:
-    """Insert a chunk of rows into the database.
-
-    Args:
-        cursor: SQLite cursor
-        table_name: Target table name
-        columns: Column names
-        rows: List of row tuples
-        is_first_chunk: If True, create table and clear existing data
-    """
+    """Insert a chunk of rows into the database."""
     if is_first_chunk:
-        # Create table (drop existing first for clean import)
-        cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+        conn.execute(f"DROP TABLE IF EXISTS {table_name}")
         col_defs = ", ".join([f'"{col}" TEXT' for col in columns])
-        cursor.execute(f"CREATE TABLE {table_name} ({col_defs})")
+        conn.execute(f"CREATE TABLE {table_name} ({col_defs})")
 
-    # Insert rows (append for subsequent chunks)
     placeholders = ", ".join(["?" for _ in columns])
     insert_sql = f"INSERT INTO {table_name} VALUES ({placeholders})"
-    cursor.executemany(insert_sql, rows)
+    conn.executemany(insert_sql, rows)
 
 def import_to_sqlite(file_path, db_path, table_name=None):
-    """Import CSV/XLSX into SQLite, handling complex headers and merged cells."""
+    """Import CSV/XLSX into DuckDB, handling complex headers and merged cells."""
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
 
@@ -391,37 +337,42 @@ def import_to_sqlite(file_path, db_path, table_name=None):
     base_name = os.path.splitext(os.path.basename(file_path))[0]
 
     if not table_name:
-        # Clean base name for table name
         table_name = re.sub(r'\W+', '_', base_name).strip('_')
 
-    # Use DatabaseRepository for connection pooling and WAL mode
     repo = DatabaseRepository(db_path)
 
     with repo.connection() as conn:
-        # Initialize metadata table
         init_meta_table(conn)
 
-        # Calculate MD5
         file_md5 = calculate_md5(file_path)
         file_name = os.path.basename(file_path)
 
-        # Check for duplicate import
         existing_tables = check_duplicate_import(conn, file_md5)
         if existing_tables:
             print(f"File '{file_name}' with identical content already imported as tables: {', '.join(existing_tables)}. Skipping import.")
             return existing_tables
 
-        cursor = conn.cursor()
-
         def get_unique_table_name(base_name):
             t_name = base_name
             counter = 1
             while True:
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (t_name,))
-                if not cursor.fetchone():
+                result = conn.execute(
+                    "SELECT table_name FROM information_schema.tables WHERE table_name = ? AND table_schema = 'main'",
+                    (t_name,)
+                ).fetchone()
+                if not result:
                     return t_name
                 t_name = f"{base_name}_v{counter}"
                 counter += 1
+
+        def _df_to_duckdb(conn, df, table_name, if_exists='replace'):
+            """Write a DataFrame to DuckDB using register + CREATE TABLE AS."""
+            conn.register('_tmp_df', df)
+            if if_exists == 'replace':
+                conn.execute(f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM _tmp_df")
+            elif if_exists == 'append':
+                conn.execute(f"INSERT INTO {table_name} SELECT * FROM _tmp_df")
+            conn.unregister('_tmp_df')
 
         imported_tables = []
 
@@ -438,23 +389,21 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                 if first_chunk:
                     chunk.columns = clean_column_names(chunk.columns)
                     final_cols = chunk.columns
-                    chunk.to_sql(target_table, conn, index=False, if_exists='replace')
+                    _df_to_duckdb(conn, chunk, target_table, 'replace')
                     first_chunk = False
                 else:
                     chunk.columns = final_cols
-                    chunk.to_sql(target_table, conn, index=False, if_exists='append')
+                    _df_to_duckdb(conn, chunk, target_table, 'append')
 
             print(f"CSV import completed successfully.")
             record_import(conn, file_name, target_table, file_md5)
             imported_tables.append(target_table)
 
         elif ext in ['.xlsx', '.xls', '.et']:
-            # Validate file size (user-facing limit)
             file_size = os.path.getsize(file_path)
-            if file_size > MAX_EXCEL_SIZE:  # 100MB
+            if file_size > MAX_EXCEL_SIZE:
                 raise ValueError(f"Excel 文件过大，最大支持 100MB: {file_path}")
 
-            # .et files (WPS) are not supported by openpyxl, use pandas fallback
             if ext == '.et':
                 print(f"Using pandas import for WPS .et file ({file_size / 1024 / 1024:.2f} MB)")
                 try:
@@ -474,7 +423,6 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     target_table = get_unique_table_name(base_sheet_table)
                     print(f"Processing Excel sheet '{sheet_name}' to table '{target_table}'...")
 
-                    # Use pandas for .et files
                     sample_df = pd.read_excel(file_path, sheet_name=sheet_name, nrows=20, header=None)
                     header_idx = find_header_row(sample_df)
                     df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=header_idx)
@@ -482,14 +430,13 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     df.dropna(how='all', inplace=True)
                     df.dropna(axis=1, how='all', inplace=True)
                     df.columns = clean_column_names(df.columns)
-                    df.to_sql(target_table, conn, index=False, if_exists='replace')
+                    _df_to_duckdb(conn, df, target_table, 'replace')
                     print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
 
                     sheet_file_name = f"{file_name}::{sheet_name}" if len(sheet_names) > 1 else file_name
                     record_import(conn, sheet_file_name, target_table, file_md5)
                     imported_tables.append(target_table)
             else:
-                # ALWAYS use streaming per locked decision "始终使用流式导入"
                 print(f"Using streaming import for Excel file ({file_size / 1024 / 1024:.2f} MB)")
 
                 try:
@@ -509,11 +456,10 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     target_table = get_unique_table_name(base_sheet_table)
                     print(f"Processing Excel sheet '{sheet_name}' to table '{target_table}'...")
 
-                    # Use streaming import for ALL Excel files
                     total_rows = 0
                     for progress in import_excel_streaming(file_path, db_path, target_table, conn):
                         total_rows = progress
-                        if progress % 50000 == 0:  # Log every 50k rows
+                        if progress % 50000 == 0:
                             print(f"  Progress: {progress} rows processed...")
 
                     print(f"Sheet '{sheet_name}' import completed. Loaded {total_rows} rows.")
@@ -522,7 +468,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     record_import(conn, sheet_file_name, target_table, file_md5)
                     imported_tables.append(target_table)
 
-        elif ext == '.numbers':  # pragma: no cover - requires optional dependency
+        elif ext == '.numbers':
             try:
                 from numbers_parser import Document
             except ImportError:
@@ -567,7 +513,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     df = df[1:]
 
                 df.columns = clean_column_names(df.columns)
-                df.to_sql(target_table, conn, index=False, if_exists='replace')
+                _df_to_duckdb(conn, df, target_table, 'replace')
                 print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
 
                 sheet_file_name = f"{file_name}::{sheet_name}" if len(sheets) > 1 else file_name
@@ -587,23 +533,7 @@ async def import_from_url(
     source_format: str,
     auth_config=None
 ) -> str:
-    """Import data from URL into SQLite.
-
-    Args:
-        url: HTTP/HTTPS URL to fetch
-        db_path: Path to SQLite database
-        table_name: Target table name
-        source_format: 'json' or 'csv'
-        auth_config: Optional authentication configuration (BasicAuthConfig or BearerAuthConfig)
-
-    Returns:
-        Name of created table
-
-    Raises:
-        ValueError: Invalid URL or format
-        httpx.HTTPStatusError: HTTP errors
-        httpx.TimeoutException: Request timeout
-    """
+    """Import data from URL into DuckDB."""
     from scripts.url_data_source import URLDataSource, URLDataSourceConfig, AuthConfig
 
     config = URLDataSourceConfig(
@@ -629,16 +559,16 @@ async def import_from_url(
             logger.warning("URL 返回空数据", url=url)
             raise ValueError("URL returned empty data")
 
-        # Import to SQLite
+        # Import to DuckDB
         repo = DatabaseRepository(db_path)
         with repo.connection() as conn:
-            # Initialize metadata table
             init_meta_table(conn)
 
-            # Create DataFrame and clean column names
             df = pd.DataFrame(records)
             df.columns = clean_column_names(df.columns.tolist())
-            df.to_sql(table_name, conn, index=False, if_exists='replace')
+            conn.register('_tmp_df', df)
+            conn.execute(f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM _tmp_df")
+            conn.unregister('_tmp_df')
 
             # Record import metadata
             auth_type = None
@@ -666,23 +596,12 @@ async def import_from_url(
 
 def import_from_url_sync(
     url: str,
-    db_path: str = "workspace.db",
+    db_path: str = "workspace.duckdb",
     table_name: Optional[str] = None,
     source_format: str = "json",
     auth_config=None
 ) -> str:
-    """Synchronous wrapper for URL import.
-
-    Args:
-        url: HTTP/HTTPS URL to fetch
-        db_path: Path to SQLite database
-        table_name: Target table name
-        source_format: 'json' or 'csv'
-        auth_config: Optional authentication configuration
-
-    Returns:
-        Name of created table
-    """
+    """Synchronous wrapper for URL import."""
     return asyncio.run(import_from_url(
         url=url,
         db_path=db_path,
@@ -696,33 +615,17 @@ async def refresh_url_source(db_path: str, table_name: str) -> bool:
     """Refresh a URL data source.
 
     Re-fetches data from the original URL and replaces the table content.
-    Note: Authentication is not persisted. Users must re-authenticate
-    for protected endpoints.
-
-    Args:
-        db_path: Path to SQLite database
-        table_name: Name of table to refresh
-
-    Returns:
-        True if refresh successful
-
-    Raises:
-        ValueError: If table is not a URL data source
     """
     from scripts.url_data_source import URLDataSource, URLDataSourceConfig
 
     repo = DatabaseRepository(db_path)
 
     with repo.connection() as conn:
-        cursor = conn.cursor()
-
-        # Check if this is a URL source
-        cursor.execute('''
+        row = conn.execute('''
             SELECT source_url, source_format
             FROM _data_skill_meta
             WHERE table_name = ? AND source_url IS NOT NULL
-        ''', (table_name,))
-        row = cursor.fetchone()
+        ''', (table_name,)).fetchone()
 
         if not row:
             raise ValueError(f"Table '{table_name}' is not a URL data source")
@@ -753,11 +656,12 @@ async def refresh_url_source(db_path: str, table_name: str) -> bool:
         # Clear table and re-insert
         df = pd.DataFrame(records)
         df.columns = clean_column_names(df.columns.tolist())
-        df.to_sql(table_name, conn, index=False, if_exists='replace')
+        conn.register('_tmp_df', df)
+        conn.execute(f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM _tmp_df")
+        conn.unregister('_tmp_df')
 
-        # Update last_refresh_time
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        cursor.execute('''
+        conn.execute('''
             UPDATE _data_skill_meta
             SET last_refresh_time = ?, last_used_time = ?
             WHERE table_name = ?
@@ -774,27 +678,12 @@ async def refresh_url_source(db_path: str, table_name: str) -> bool:
 
 
 def refresh_url_source_sync(db_path: str, table_name: str) -> bool:
-    """Synchronous wrapper for refresh_url_source.
-
-    Args:
-        db_path: Path to SQLite database
-        table_name: Name of table to refresh
-
-    Returns:
-        True if refresh successful
-    """
+    """Synchronous wrapper for refresh_url_source."""
     return asyncio.run(refresh_url_source(db_path, table_name))
 
 
 def list_url_sources(db_path: str) -> List[dict]:
-    """List all URL data sources.
-
-    Args:
-        db_path: Path to SQLite database
-
-    Returns:
-        List of dicts with table_name, source_url, source_format, auth_type
-    """
+    """List all URL data sources."""
     repo = DatabaseRepository(db_path)
 
     with repo.connection() as conn:
@@ -804,14 +693,14 @@ def list_url_sources(db_path: str) -> List[dict]:
 
 if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(
-        description="Import data from files or URLs into SQLite"
+        description="Import data from files or URLs into DuckDB"
     )
     subparsers = parser.add_subparsers(dest="command", help="Import commands")
 
     # File subparser (existing functionality)
     file_parser = subparsers.add_parser("file", help="Import from file (CSV/Excel)")
     file_parser.add_argument("input_file", help="Path to the input Excel or CSV file")
-    file_parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
+    file_parser.add_argument("--db", default="workspace.duckdb", help="Path to DuckDB database file")
     file_parser.add_argument("--table", default=None, help="Target table name (auto-generated if not provided)")
 
     # URL subparser
@@ -819,7 +708,7 @@ if __name__ == "__main__":  # pragma: no cover
     url_parser.add_argument("url", help="HTTP/HTTPS URL to fetch data from")
     url_parser.add_argument("--format", required=True, choices=["json", "csv"], help="Data format")
     url_parser.add_argument("--table", required=True, help="Target table name")
-    url_parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
+    url_parser.add_argument("--db", default="workspace.duckdb", help="Path to DuckDB database file")
     url_parser.add_argument("--auth-type", choices=["basic", "bearer"], default=None, help="Authentication type")
     url_parser.add_argument("--auth-user", help="Username for Basic Auth")
     url_parser.add_argument("--auth-password", help="Password for Basic Auth")
@@ -828,11 +717,11 @@ if __name__ == "__main__":  # pragma: no cover
     # Refresh subparser
     refresh_parser = subparsers.add_parser("refresh", help="Refresh URL data source")
     refresh_parser.add_argument("table", help="Table name to refresh")
-    refresh_parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
+    refresh_parser.add_argument("--db", default="workspace.duckdb", help="Path to DuckDB database file")
 
     # List subparser
     list_parser = subparsers.add_parser("list", help="List URL data sources")
-    list_parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
+    list_parser.add_argument("--db", default="workspace.duckdb", help="Path to DuckDB database file")
 
     args = parser.parse_args()
 
@@ -892,10 +781,8 @@ if __name__ == "__main__":  # pragma: no cover
             )
 
             # Get row count
-            conn = sqlite3.connect(args.db)
-            cursor = conn.cursor()
-            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
-            row_count = cursor.fetchone()[0]
+            conn = duckdb.connect(args.db)
+            row_count = conn.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()[0]
             conn.close()
 
             print(f"Imported {row_count} rows into table '{table_name}' from {args.url}")
@@ -908,10 +795,8 @@ if __name__ == "__main__":  # pragma: no cover
             result = refresh_url_source_sync(args.db, args.table)
 
             # Get row count
-            conn = sqlite3.connect(args.db)
-            cursor = conn.cursor()
-            cursor.execute(f"SELECT COUNT(*) FROM {args.table}")
-            row_count = cursor.fetchone()[0]
+            conn = duckdb.connect(args.db)
+            row_count = conn.execute(f"SELECT COUNT(*) FROM {args.table}").fetchone()[0]
             conn.close()
 
             print(f"Refreshed table '{args.table}' with {row_count} rows")
