@@ -146,8 +146,8 @@ Plans:
 **Goal:** Users can view import history, table structures, and table relationships in markdown table format, with complete metadata tracking for every import and merge operation
 **Depends on:** Phase 7
 **Requirements:** META-01, META-02, META-03, META-04
-**Plans:** 2 plans
+**Plans:** 1/2 plans complete
 
 Plans:
-- [ ] 08-01-PLAN.md — Extend metadata schema + update import/merge recording (META-01, META-02)
+- [x] 08-01-PLAN.md — Extend metadata schema + update import/merge recording (META-01, META-02)
 - [ ] 08-02-PLAN.md — History viewer module + CLI + SKILL.md documentation (META-03, META-04)

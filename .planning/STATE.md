@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-04-11T00:05:00.000Z"
-last_activity: 2026-04-11 — Phase 7 Plan 01 complete: DatabaseRepository migrated to DuckDB
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-04-11T18:59:00.000Z"
+last_activity: 2026-04-11 — Phase 8 Plan 01 complete: Metadata schema extended for history viewing
 progress:
   total_phases: 6
   completed_phases: 6
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 
 ## Current Position
 
-Phase: 7 of 7 (SQLite → DuckDB Migration)
-Plan: 1 of 3 in current phase
+Phase: 8 of 8 (Excel Metadata & Markdown Table History)
+Plan: 1 of 2 in current phase
 Status: **IN PROGRESS**
-Last activity: 2026-04-11 — Phase 7 Plan 01 complete: DatabaseRepository migrated to DuckDB
+Last activity: 2026-04-11 — Phase 8 Plan 01 complete: Metadata schema extended for history viewing
 
-Progress: [==========] 100% (Phase 7 in progress: 1/3 plans)
+Progress: [==========] 100% (Phase 8 in progress: 1/2 plans)
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [==========] 100% (Phase 7 in progress: 1/3 plans)
 - Last 5 plans: 07-01 (5 min), 06-02 (3 min), 06-01 (2 min), 05-02 (2 min), 05-01 (5 min)
 - Trend: stable
 | Phase 07-sqllite-duckdb-sqllite-duckdb P03 | 5min | 5 tasks | 6 files |
+| Phase 08-excel-excel-markdown-table P01 | 3min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -108,11 +109,15 @@ Recent decisions affecting current work:
 - [Phase 07-02]: Function name import_to_sqlite preserved for backward compatibility despite DuckDB backend
 - [Phase 07-03]: dashboard_schema.py had zero SQLite references — only default db_path updated
 - [Phase 07-03]: url_data_source.py type mapping comments updated from "SQLite types" to "DuckDB types"
+- [Phase 08-01]: Used information_schema.columns for column detection — DuckDB standard SQL approach
+- [Phase 08-01]: Backward compatibility: file_path and row_count default to NULL in record_import()
+- [Phase 08-01]: record_merge() placed in data_merger.py to avoid circular imports with data_importer
 
 ### Roadmap Evolution
 
 - Phase 6 added: 新增一个合并数据的能力，能够将指定表格批量合并成一个文件，并导入sqllite
 - Phase 7 added: 将数据导入sqllite的操作换成duckdb，取代sqllite技术方案。充分发挥duckdb优势
+- Phase 8 added: 增加查看数据库和数据表功能，记录导入元数据（文件名、库表、时间、文件位置），支持查看历史导入数据结构和表关联关系，以Markdown表格格式输出
 
 ### Pending Todos
 
@@ -124,6 +129,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-11T00:05:00.000Z
-Project Status: **IN PROGRESS** - Phase 7 Plan 01 complete, 2 plans remaining
-Current Work: DatabaseRepository migrated to DuckDB (07-01)
+Last session: 2026-04-11T18:59:00.000Z
+Project Status: **IN PROGRESS** - Phase 8 Plan 01 complete, 1 plan remaining
+Current Work: Metadata schema extended for history viewing (08-01)
