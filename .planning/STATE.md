@@ -1,126 +1,57 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: completed
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-04-11T11:02:00.000Z"
-last_activity: 2026-04-11 — Phase 8 Plan 02 complete: History viewer with markdown table CLI
+milestone: v1.1
+milestone_name: 协作能力
+status: initializing
+stopped_at: null
+last_updated: "2026-04-11T11:30:00.000Z"
+last_activity: 2026-04-11 — Milestone v1.1 started (协作能力)
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 17
-  completed_plans: 17
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-04)
+See: .planning/PROJECT.md (updated 2026-04-11)
 
 **Core value:** 让数据分析工作人员能够安全、高效地完成从数据导入到可视化输出的全流程，数据绝不出域。
-**Current focus:** Phase 3: Dashboard Layouts - Multi-chart dashboard generation
+**Current focus:** v1.1 协作能力 - 离线分享导出
 
 ## Current Position
 
-Phase: 8 of 8 (Excel Metadata & Markdown Table History)
-Plan: 2 of 2 in current phase
-Status: **COMPLETE**
-Last activity: 2026-04-11 — Phase 8 Plan 02 complete: History viewer with markdown table CLI
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-11 — Milestone v1.1 started
 
-Progress: [==========] 100% (Phase 8 complete: 2/2 plans)
+Progress: [          ] 0% (Requirements definition)
 
 ## Performance Metrics
 
-**Velocity:**
-- Total plans completed: 13
-- Average duration: 5 min
-- Total execution time: 1.08 hours
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01-security-quality-foundation | 5 | 27 min | 5 min |
-| 02-performance-optimization | 4 | 25 min | 6 min |
-| 03-dashboard-layouts | 2 | 9 min | 5 min |
-| 04-url-api-data-source | 1 | 5 min | 5 min |
-| 05-gantt-chart-api | 2 | 7 min | 4 min |
-| 06-sqllite | 2 | 5 min | 3 min |
-| 07-sqllite-duckdb-sqllite-duckdb | 1 | 5 min | 5 min |
-
-**Recent Trend:**
-- Last 5 plans: 07-01 (5 min), 06-02 (3 min), 06-01 (2 min), 05-02 (2 min), 05-01 (5 min)
-- Trend: stable
-| Phase 07-sqllite-duckdb-sqllite-duckdb P03 | 5min | 5 tasks | 6 files |
-| Phase 08-excel-excel-markdown-table P01 | 3min | 3 tasks | 2 files |
+**v1.0 Summary (completed):**
+- Total phases: 8
+- Total plans: 17
+- Average plan duration: 5 min
+- Total execution time: ~1.5 hours
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
 
-- [Phase 1]: Test framework selected (pytest) — enables TDD workflow for security fixes
-- [Phase 1]: Logging framework selected (structlog) — structured logs for AI agent consumption
-- [Phase 1 Plan 01]: Re-raise ValueError in data_exporter — allows callers to handle validation errors
-- [Phase 1 Plan 01]: Graceful skip in data_cleaner — handles corrupted metadata without failing cleanup
-- [Phase 1 Plan 02]: File-only logging — clean CLI with logs at logs/echart-skill.log
-- [Phase 1 Plan 02]: JSON with Chinese support — ensure_ascii=False preserves Chinese characters
-- [Phase 1 Plan 03]: Environment variable priority for secrets — BAIDU_AK from env, config.txt deprecated
-- [Phase 1 Plan 03]: Path validation reuse — use validate_file_path for server protection
-- [Phase 1 Plan 05]: pragma: no cover for untestable code — main blocks and optional dependencies excluded
-- [Phase 1 Plan 05]: caplog over capsys for structlog — log capture instead of stdout
-- [Phase 01-security-quality-foundation]: Module-level mocking for server dependency in chart_generator tests
-- [Phase 01-security-quality-foundation]: Shared fixtures from conftest.py for test isolation
-- [Phase 2 Plan 01]: WAL mode for concurrent read access — enables multiple agents to read database
-- [Phase 2 Plan 01]: Connection pooling via context manager — automatic cleanup on exit
-- [Phase 2 Plan 02]: ALL Excel files use streaming — per locked decision "始终使用流式导入"
-- [Phase 2 Plan 02]: 100MB max file size with Chinese error — user-facing limit for Excel files
-- [Phase 2 Plan 02]: 10,000 rows per chunk — balanced memory/performance for streaming import
-- [Phase 2 Plan 02]: .et files use pandas fallback — openpyxl doesn't support WPS format
-- [Phase 02-01]: Singleton pattern in get_repository() doesn't support multiple db paths - affects test isolation but not production
-- [Phase 02-04]: PID files stored in outputs/pids/ (gitignored runtime artifacts)
-- [Phase 02-04]: 5-minute inactivity timeout for server auto-shutdown
-- [Phase 02-04]: Signal 0 for non-destructive process existence check
-- [Phase 02-performance-optimization]: httpx AsyncClient for native async HTTP requests with tenacity retry
-- [Phase 02-performance-optimization]: Semaphore concurrency control (max 5 concurrent) for Baidu API QPS limit
-- [Phase 03-01]: Used pydantic v2 field_validator classmethod pattern for overlap detection
-- [Phase 03-01]: Validators raise ValueError with descriptive messages for user-friendly errors
-- [Phase 03-02]: Used scripts. prefix for imports to match test mocking pattern
-- [Phase 03-02]: IIFE pattern for chart initialization isolates chart variables in JavaScript scope
-- [Phase 03-02]: Added autouse fixture to reset database singleton between tests
-- [Phase 04-01]: Custom ServerError for selective retry on 5xx only, not 4xx client errors
-- [Phase 04-01]: SecretStr for auth credentials prevents token/password exposure in logs
-- [Phase 04-01]: Lazy import of clean_column_names avoids circular import issues
-- [Phase 05-01]: GanttTask accepts datetime or ISO string for start/end fields
-- [Phase 05-01]: renderItem function embedded as custom_js in chart config
-- [Phase 05-01]: Y-axis inverse for natural top-to-bottom task order in Gantt charts
-- [Phase 05-02]: Combined both documentation tasks in single commit since they modify same file section
-- [Phase 07-01]: List-based pool with threading.Lock replaces Queue-based pool for DuckDB single-writer model
-- [Phase 07-01]: DuckDB executemany rowcount returns -1 (known DuckDB limitation) — data correct but count unreliable
-- [Phase 07-sqllite-duckdb-sqllite-duckdb]: Used information_schema.tables for table discovery — standard SQL, DuckDB compatible
-- [Phase 07-sqllite-duckdb-sqllite-duckdb]: DuckDB parameterized queries use list params instead of tuple params
-- [Phase 07-sqllite-duckdb-sqllite-duckdb]: Replaced sqlite3 CLI examples with DuckDB Python API in documentation
-- [Phase 07-02]: pd.to_sql replaced with conn.register() + CREATE TABLE AS — DuckDB-native approach avoids SQLAlchemy dependency
-- [Phase 07-02]: Function name import_to_sqlite preserved for backward compatibility despite DuckDB backend
-- [Phase 07-03]: dashboard_schema.py had zero SQLite references — only default db_path updated
-- [Phase 07-03]: url_data_source.py type mapping comments updated from "SQLite types" to "DuckDB types"
-- [Phase 08-01]: Used information_schema.columns for column detection — DuckDB standard SQL approach
-- [Phase 08-01]: Backward compatibility: file_path and row_count default to NULL in record_import()
-- [Phase 08-01]: record_merge() placed in data_merger.py to avoid circular imports with data_importer
-- [Phase 08-02]: Used DatabaseRepository connection pooling for all history viewer queries
-- [Phase 08-02]: Backward compatible column detection — checks for row_count, parent_tables, file_path existence before querying
-- [Phase 08-02]: format_markdown_table() helper for consistent table alignment across all views
-
-### Roadmap Evolution
-
-- Phase 6 added: 新增一个合并数据的能力，能够将指定表格批量合并成一个文件，并导入sqllite
-- Phase 7 added: 将数据导入sqllite的操作换成duckdb，取代sqllite技术方案。充分发挥duckdb优势
-- Phase 8 added: 增加查看数据库和数据表功能，记录导入元数据（文件名、库表、时间、文件位置），支持查看历史导入数据结构和表关联关系，以Markdown表格格式输出
+Carried forward from v1.0:
+- DuckDB single-writer model with connection pooling
+- Streaming import for all Excel files (100MB limit)
+- Async HTTP client with retry logic
+- File-only logging for clean CLI
+- pydantic validators for configuration
 
 ### Pending Todos
 
@@ -132,6 +63,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-11T11:02:00.000Z
-Project Status: **COMPLETE** - Phase 8 complete: 2/2 plans done
-Current Work: History viewer with markdown table CLI (08-02) — Phase 8 complete
+Last session: 2026-04-11T11:30:00.000Z
+Project Status: v1.1 INITIALIZING - Gathering requirements
+Current Work: Defining v1.1 协作能力 requirements
