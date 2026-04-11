@@ -473,6 +473,7 @@ A: 创建一个 JSON 配置文件，定义图表位置和配置，然后使用 `
 | 数据清洗 | `scripts/data_cleaner.py` | 清洗、去重、标准化 |
 | 本地服务 | `scripts/server.py` | 本地 HTTP 服务，预览图表 |
 | 业务口径 | `scripts/metrics_manager.py` | 持久化业务规则和指标定义 |
+| 历史查看 | `scripts/history_viewer.py` | 查看导入历史、表结构、表关联关系 |
 
 ## 更新日志
 

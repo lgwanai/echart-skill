@@ -136,3 +136,30 @@ This skill transforms the agent into a powerful local data analysis assistant, s
    - `color`: Custom bar color (hex code)
 
 **Note**: Dates can be ISO strings or datetime objects. End date must be after start date.
+
+### Scenario 10: View Import History & Table Structure
+**Trigger**: User asks to view import history, check table structures, or see table relationships.
+**Action**:
+1. **查看导入历史**: Run `python scripts/data_importer.py history --db workspace.duckdb [--limit 20]`
+2. **查看指定表结构**: Run `python scripts/data_importer.py structure --db workspace.duckdb --table TABLE_NAME`
+3. **查看所有表结构**: Run `python scripts/data_importer.py structure --db workspace.duckdb`
+4. **查看表关联关系**: Run `python scripts/data_importer.py relationships --db workspace.duckdb`
+5. **一键查看全部**: Run `python scripts/data_importer.py show --db workspace.duckdb`
+
+**Example output**:
+```
+## 导入历史
+
+| 文件名           | 表名      | 行数 | 导入时间            | 文件路径              |
+| -------------- | ------- | -- | --------------- | ----------------- |
+| sales.xlsx     | sales   | 1500 | 2026-04-11 10:30 | /path/to/sales.xlsx |
+
+## 表结构: sales
+
+**行数:** 1500
+
+| 列名   | 类型      | 可空  |
+| ---- | ------- | --- |
+| id   | VARCHAR | YES |
+| name | VARCHAR | NO  |
+```
