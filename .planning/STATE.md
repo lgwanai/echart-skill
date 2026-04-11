@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-04-11T18:59:00.000Z"
-last_activity: 2026-04-11 — Phase 8 Plan 01 complete: Metadata schema extended for history viewing
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-04-11T11:02:00.000Z"
+last_activity: 2026-04-11 — Phase 8 Plan 02 complete: History viewer with markdown table CLI
 progress:
   total_phases: 6
   completed_phases: 6
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 8 of 8 (Excel Metadata & Markdown Table History)
-Plan: 1 of 2 in current phase
-Status: **IN PROGRESS**
-Last activity: 2026-04-11 — Phase 8 Plan 01 complete: Metadata schema extended for history viewing
+Plan: 2 of 2 in current phase
+Status: **COMPLETE**
+Last activity: 2026-04-11 — Phase 8 Plan 02 complete: History viewer with markdown table CLI
 
-Progress: [==========] 100% (Phase 8 in progress: 1/2 plans)
+Progress: [==========] 100% (Phase 8 complete: 2/2 plans)
 
 ## Performance Metrics
 
@@ -112,6 +112,9 @@ Recent decisions affecting current work:
 - [Phase 08-01]: Used information_schema.columns for column detection — DuckDB standard SQL approach
 - [Phase 08-01]: Backward compatibility: file_path and row_count default to NULL in record_import()
 - [Phase 08-01]: record_merge() placed in data_merger.py to avoid circular imports with data_importer
+- [Phase 08-02]: Used DatabaseRepository connection pooling for all history viewer queries
+- [Phase 08-02]: Backward compatible column detection — checks for row_count, parent_tables, file_path existence before querying
+- [Phase 08-02]: format_markdown_table() helper for consistent table alignment across all views
 
 ### Roadmap Evolution
 
@@ -129,6 +132,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-11T18:59:00.000Z
-Project Status: **IN PROGRESS** - Phase 8 Plan 01 complete, 1 plan remaining
-Current Work: Metadata schema extended for history viewing (08-01)
+Last session: 2026-04-11T11:02:00.000Z
+Project Status: **COMPLETE** - Phase 8 complete: 2/2 plans done
+Current Work: History viewer with markdown table CLI (08-02) — Phase 8 complete
