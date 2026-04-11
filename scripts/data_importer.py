@@ -409,7 +409,8 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     _df_to_duckdb(conn, chunk, target_table, 'append')
 
             print(f"CSV import completed successfully.")
-            record_import(conn, file_name, target_table, file_md5)
+            csv_row_count = conn.execute(f"SELECT COUNT(*) FROM {target_table}").fetchone()[0]
+            record_import(conn, file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=csv_row_count)
             imported_tables.append(target_table)
 
         elif ext in ['.xlsx', '.xls', '.et']:
@@ -447,7 +448,8 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
 
                     sheet_file_name = f"{file_name}::{sheet_name}" if len(sheet_names) > 1 else file_name
-                    record_import(conn, sheet_file_name, target_table, file_md5)
+                    et_row_count = conn.execute(f"SELECT COUNT(*) FROM {target_table}").fetchone()[0]
+                    record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=et_row_count)
                     imported_tables.append(target_table)
             else:
                 print(f"Using streaming import for Excel file ({file_size / 1024 / 1024:.2f} MB)")
@@ -478,7 +480,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     print(f"Sheet '{sheet_name}' import completed. Loaded {total_rows} rows.")
 
                     sheet_file_name = f"{file_name}::{sheet_name}" if len(sheet_names) > 1 else file_name
-                    record_import(conn, sheet_file_name, target_table, file_md5)
+                    record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=total_rows)
                     imported_tables.append(target_table)
 
         elif ext == '.numbers':
@@ -530,7 +532,8 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                 print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
 
                 sheet_file_name = f"{file_name}::{sheet_name}" if len(sheets) > 1 else file_name
-                record_import(conn, sheet_file_name, target_table, file_md5)
+                numbers_row_count = conn.execute(f"SELECT COUNT(*) FROM {target_table}").fetchone()[0]
+                record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=numbers_row_count)
                 imported_tables.append(target_table)
 
         else:
