@@ -4,7 +4,7 @@
 
 ## 项目亮点
 
-- 🛡️ **绝对安全的数据隐私**：摒弃了将原始数据或大文件直接发给大模型分析的传统方式。本技能要求 Agent 在本地存储数据（SQLite），并在本地生成代码进行解析和计算。数据绝不出域，最大程度保障企业隐私。
+- 🛡️ **绝对安全的数据隐私**：摒弃了将原始数据或大文件直接发给大模型分析的传统方式。本技能要求 Agent 在本地存储数据（DuckDB），并在本地生成代码进行解析和计算。数据绝不出域，最大程度保障企业隐私。
 - 📊 **全量图表支持 (ECharts 6.0)**：内置数百种 ECharts 官方图表 Prompt 模板，**100% 覆盖并支持 [ECharts 官方示例](https://echarts.apache.org/examples/zh/index.html) 中所有的图表绘制类型**。无论是基础的折柱饼、散点图，还是复杂的 3D 气泡图、关系图、桑基图、漏斗图，亦或是包含全国/全球静态离线地图的高级地理可视化，Agent 都能直接生成可交互的纯本地 HTML 页面。
 - 🤖 **Agent 原生设计**：专为自动化智能体打造的"操作说明书"，约束了 Agent 在面对复杂数据时的行为边界和操作规范。
 - 🤝 **广泛的兼容性**：支持主流的基于本地执行的 Agent 平台，包括但不限于 **OpenClaw, Claude Code, WorkBuddy, OpenCode, Trae** 等。
@@ -18,7 +18,7 @@
 2. **隐私泄漏风险**：将客户清单、财务报表等敏感数据发给云端模型是极其危险的。
 3. **容易把表搞坏**：大模型如果不加约束地直接用 Pandas 修改原表，一旦出错很难撤销。
 
-**Echart Skill 就是为了解决这些痛点而生**。它教导 Agent 如何在本地搭建轻量级的 SQLite 数据库，如何进行安全的增删改查，以及如何留下"后悔药（Undo）"机制。
+**Echart Skill 就是为了解决这些痛点而生**。它教导 Agent 如何在本地搭建高性能的 DuckDB 数据库（列式存储，分析查询性能卓越），如何进行安全的增删改查，以及如何留下"后悔药（Undo）"机制。
 
 ## 使用场景
 
@@ -31,11 +31,11 @@
 - **多图表仪表盘**：通过简单的 JSON 配置文件，一键生成包含多个图表的交互式仪表盘，支持灵活的网格布局和图表定位。
 - **URL 数据源接入**：支持直接从 HTTP/HTTPS URL 导入 JSON 或 CSV 数据，支持 Basic Auth 和 Bearer Token 认证，并可手动刷新数据源。
 - **甘特图支持**：提供简化的甘特图 API，只需提供任务名称、开始时间和结束时间，即可生成专业的项目进度可视化图表。
-- **表格合并能力**：支持将多个 SQLite 表格合并为一个，并导出为 CSV/Excel 文件或保存为新的数据库表。
+- **表格合并能力**：支持将多个 DuckDB 表格合并为一个，并导出为 CSV/Excel 文件或保存为新的数据库表。
 
 ## 核心工作流
 
-1. **导入拦截**：收到文件后，Agent 会调用内置的 `scripts/data_importer.py` 脚本，将数据清洗、规整后安全写入本地 `workspace.db` (SQLite)。
+1. **导入拦截**：收到文件后，Agent 会调用内置的 `scripts/data_importer.py` 脚本，将数据清洗、规整后安全写入本地 `workspace.duckdb` (DuckDB)。
 2. **本地探查**：Agent 使用 SQL 探查表结构（Schema）和部分统计信息，而不是读取所有行。
 3. **非破坏性操作**：当收到修改指令时，Agent 会生成 SQL 或 Python 脚本在本地运行。并且必须通过创建新表或视图（如 `CREATE TABLE v2 AS SELECT...`）来执行，确保原始数据不被污染。
 4. **结果输出**：根据要求，将处理好的数据重新导出为干净的 Excel，或生成可视化图表。对于地图类需求，优先使用本地静态地图，遇到精细维度则自动降级启用百度 AK 渲染模式。
@@ -52,15 +52,15 @@
 
 1. 运行内置导入脚本：
    ```bash
-   python scripts/data_importer.py "path/to/file.xlsx" --db workspace.db
+   python scripts/data_importer.py "path/to/file.xlsx" --db workspace.duckdb
    ```
    
    > **说明**：脚本自动计算文件 MD5，相同文件跳过重复导入。支持合并单元格处理、智能表头检测、大文件分块、列名规范化。
 
 2. 导入后快速检查数据结构：
    ```bash
-   sqlite3 workspace.db "PRAGMA table_info(table_name);"
-   sqlite3 workspace.db "SELECT * FROM table_name LIMIT 3;" -header -column
+   python -c "import duckdb; conn = duckdb.connect('workspace.duckdb'); print(conn.execute('DESCRIBE table_name').fetchdf())"
+   python -c "import duckdb; conn = duckdb.connect('workspace.duckdb'); print(conn.execute('SELECT * FROM table_name LIMIT 3').fetchdf())"
    ```
 
 3. 询问用户是否需要标准清洗（缺失值处理、去重等），通过 SQL 执行。
@@ -74,16 +74,16 @@
 **操作步骤**：
 
 1. 编写 SQL 查询语句
-2. 通过命令执行：`sqlite3 workspace.db "SELECT ..."`
+2. 通过 DuckDB Python API 执行：`python -c "import duckdb; conn = duckdb.connect('workspace.duckdb'); print(conn.execute('SELECT ...').fetchdf())"`
 3. 结构变更遵循 Undo 原则：`CREATE TABLE table_name_step2 AS SELECT ...`
 
 **示例**：
 ```bash
 # 筛选销售额前10的产品
-sqlite3 workspace.db "SELECT product, SUM(amount) as total FROM sales GROUP BY product ORDER BY total DESC LIMIT 10;"
+python -c "import duckdb; conn = duckdb.connect('workspace.duckdb'); print(conn.execute('SELECT product, SUM(amount) as total FROM sales GROUP BY product ORDER BY total DESC LIMIT 10').fetchdf())"
 
 # 创建清洗后的新表
-sqlite3 workspace.db "CREATE TABLE sales_clean AS SELECT * FROM sales WHERE amount > 0;"
+python -c "import duckdb; conn = duckdb.connect('workspace.duckdb'); conn.execute('CREATE TABLE sales_clean AS SELECT * FROM sales WHERE amount > 0')"
 ```
 
 ---
@@ -94,18 +94,18 @@ sqlite3 workspace.db "CREATE TABLE sales_clean AS SELECT * FROM sales WHERE amou
 
 **操作步骤**：
 
-1. 生成 Python 脚本使用 `pandas` 和 `sqlite3`
+1. 生成 Python 脚本使用 `pandas` 和 `duckdb`
 2. 模糊关联使用 `thefuzz` 或 `difflib` 库匹配键值
 3. 语义提取使用正则或启发式规则
 
 **示例 - 地址提取**：
 ```python
 import pandas as pd
-import sqlite3
+import duckdb
 import re
 
-conn = sqlite3.connect('workspace.db')
-df = pd.read_sql_query("SELECT * FROM customers", conn)
+conn = duckdb.connect('workspace.duckdb')
+df = conn.execute("SELECT * FROM customers").fetchdf()
 
 # 提取省市
 def extract_province(address):
@@ -113,7 +113,8 @@ def extract_province(address):
     return match.group(1) if match else '未知'
 
 df['province'] = df['address'].apply(extract_province)
-df.to_sql('customers_with_province', conn, if_exists='replace', index=False)
+conn.execute("DROP TABLE IF EXISTS customers_with_province")
+conn.execute("CREATE TABLE customers_with_province AS SELECT * FROM df")
 ```
 
 ---
@@ -131,7 +132,7 @@ df.to_sql('customers_with_province', conn, if_exists='replace', index=False)
 
    ```json
    {
-       "db_path": "workspace.db",
+       "db_path": "workspace.duckdb",
        "query": "SELECT category, SUM(value) as val FROM table GROUP BY category",
        "title": "销售分类统计",
        "output_path": "outputs/html/sales_chart.html",
@@ -173,20 +174,20 @@ df.to_sql('customers_with_province', conn, if_exists='replace', index=False)
 **合并操作**：
 ```bash
 # 方式1：连续导入到同一表
-python scripts/data_importer.py "report_jan.xlsx" --db workspace.db --table monthly_report
-python scripts/data_importer.py "report_feb.xlsx" --db workspace.db --table monthly_report
+python scripts/data_importer.py "report_jan.xlsx" --db workspace.duckdb --table monthly_report
+python scripts/data_importer.py "report_feb.xlsx" --db workspace.duckdb --table monthly_report
 
 # 方式2：使用数据合并脚本
-python scripts/data_merger.py --tables report_jan report_feb report_mar --target merged_report --db workspace.db
+python scripts/data_merger.py --tables report_jan report_feb report_mar --target merged_report --db workspace.duckdb
 ```
 
 **拆分操作**：
 ```python
 import pandas as pd
-import sqlite3
+import duckdb
 
-conn = sqlite3.connect('workspace.db')
-df = pd.read_sql_query("SELECT * FROM master_table", conn)
+conn = duckdb.connect('workspace.duckdb')
+df = conn.execute("SELECT * FROM master_table").fetchdf()
 
 # 按部门拆分
 for dept in df['department'].unique():
@@ -224,7 +225,7 @@ python scripts/data_exporter.py "outputs/summary.xlsx" --query "SELECT category,
 **操作命令**：
 ```bash
 # 清理30天未访问的表
-python scripts/data_cleaner.py --db workspace.db --days 30
+python scripts/data_cleaner.py --db workspace.duckdb --days 30
 ```
 
 ---
@@ -317,7 +318,7 @@ output_path = generate_gantt_chart(config)
             }
         }
     ],
-    "db_path": "workspace.db"
+    "db_path": "workspace.duckdb"
 }
 ```
 
@@ -347,10 +348,10 @@ python scripts/data_importer.py url "https://api.example.com/data" --format json
 **刷新数据源**：
 ```bash
 # 查看已导入的 URL 数据源
-python scripts/data_importer.py list --db workspace.db
+python scripts/data_importer.py list --db workspace.duckdb
 
 # 刷新指定表
-python scripts/data_importer.py refresh api_data --db workspace.db
+python scripts/data_importer.py refresh api_data --db workspace.duckdb
 ```
 
 **JSON 嵌套处理**：
@@ -451,7 +452,7 @@ A: 本技能为了应对"脏数据"，会在底层调用 `openpyxl` 来遍历并
 A: 本技能内置了"后悔药"机制。你可以直接对 Agent 说："刚才那一步算错了，撤销"，Agent 会由于没有覆盖原表，直接回退到上一个表版本。
 
 **Q: 支持连接外部的 MySQL 或 PostgreSQL 吗？**
-A: 本技能目前默认使用本地 SQLite 以追求开箱即用和零配置。如果需要连接外部数据库，你可以让 Agent 修改生成的连接字符串，架构上是完全支持的。
+A: 本技能目前默认使用本地 DuckDB 以追求开箱即用和零配置。DuckDB 采用列式存储，对分析型查询性能卓越。如果需要连接外部数据库，你可以让 Agent 修改生成的连接字符串，架构上是完全支持的。
 
 **Q: 如何从 API 接口导入数据？**
 A: 使用 `data_importer.py url` 命令，指定 URL 和格式即可导入。支持 Basic Auth 和 Bearer Token 认证。导入后可使用 `refresh` 命令刷新数据。
