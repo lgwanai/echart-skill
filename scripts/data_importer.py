@@ -739,6 +739,24 @@ if __name__ == "__main__":  # pragma: no cover
     list_parser = subparsers.add_parser("list", help="List URL data sources")
     list_parser.add_argument("--db", default="workspace.duckdb", help="Path to DuckDB database file")
 
+    # History subparser
+    history_parser = subparsers.add_parser("history", help="查看导入历史")
+    history_parser.add_argument("--db", default="workspace.duckdb", help="数据库路径")
+    history_parser.add_argument("--limit", type=int, default=20, help="显示记录数")
+
+    # Structure subparser
+    structure_parser = subparsers.add_parser("structure", help="查看表结构")
+    structure_parser.add_argument("--db", default="workspace.duckdb", help="数据库路径")
+    structure_parser.add_argument("--table", default=None, help="指定表名")
+
+    # Relationships subparser
+    rel_parser = subparsers.add_parser("relationships", help="查看表关联关系")
+    rel_parser.add_argument("--db", default="workspace.duckdb", help="数据库路径")
+
+    # Show all subparser
+    show_parser = subparsers.add_parser("show", help="一键查看全部信息")
+    show_parser.add_argument("--db", default="workspace.duckdb", help="数据库路径")
+
     args = parser.parse_args()
 
     # Handle backward compatibility: if no subcommand, treat as file import
@@ -833,5 +851,39 @@ if __name__ == "__main__":  # pragma: no cover
                 for source in sources:
                     print(f"{source['table_name']:<20} {source['source_url']:<40} {source['source_format']:<8} {(source['auth_type'] or 'none'):<8}")
 
+        except Exception as e:
+            print(f"ERROR: {e}")
+
+    elif args.command == "history":
+        try:
+            from scripts.history_viewer import view_import_history
+            print(view_import_history(args.db, args.limit))
+        except Exception as e:
+            print(f"ERROR: {e}")
+
+    elif args.command == "structure":
+        try:
+            from scripts.history_viewer import view_table_structure
+            print(view_table_structure(args.db, args.table))
+        except Exception as e:
+            print(f"ERROR: {e}")
+
+    elif args.command == "relationships":
+        try:
+            from scripts.history_viewer import view_table_relationships
+            print(view_table_relationships(args.db))
+        except Exception as e:
+            print(f"ERROR: {e}")
+
+    elif args.command == "show":
+        try:
+            from scripts.history_viewer import view_import_history, view_table_structure, view_table_relationships
+            output = []
+            output.append(view_import_history(args.db))
+            output.append("")
+            output.append(view_table_structure(args.db))
+            output.append("")
+            output.append(view_table_relationships(args.db))
+            print("\n".join(output))
         except Exception as e:
             print(f"ERROR: {e}")
