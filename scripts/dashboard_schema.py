@@ -84,7 +84,7 @@ class DashboardConfig(BaseModel):
     row_height: int = Field(default=400, ge=100, description="每行高度（像素）")
     gap: int = Field(default=16, ge=0, description="图表间距（像素）")
     charts: list[ChartConfig] = Field(min_length=1, description="图表配置列表")
-    db_path: str = Field(default="workspace.db", description="数据库路径")
+    db_path: str = Field(default="workspace.duckdb", description="数据库路径")
 
     @field_validator('charts')
     @classmethod

@@ -300,13 +300,13 @@ def infer_schema_from_json(data: Union[list[dict], dict]) -> dict[str, str]:
     """Infer column types from JSON data.
 
     Handles nested structures by flattening with underscore notation.
-    Returns a mapping of column names to SQLite types.
+    Returns a mapping of column names to DuckDB types.
 
     Args:
         data: JSON data (list of dicts or single dict)
 
     Returns:
-        Dict mapping column names to SQLite types (INTEGER, REAL, TEXT)
+        Dict mapping column names to DuckDB types (INTEGER, REAL, TEXT)
     """
     import pandas as pd
 
@@ -326,7 +326,7 @@ def infer_schema_from_json(data: Union[list[dict], dict]) -> dict[str, str]:
     # Flatten nested structures
     df = pd.json_normalize(data, sep='_')
 
-    # Infer types - map pandas dtypes to SQLite types
+    # Infer types - map pandas dtypes to DuckDB types
     type_map = {
         'int64': 'INTEGER',
         'Int64': 'INTEGER',
