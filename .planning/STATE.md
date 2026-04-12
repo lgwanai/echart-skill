@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: 高级数据源
-status: defining_requirements
-stopped_at: Starting milestone v1.2
-last_updated: "2026-04-12T01:00:00.000Z"
-last_activity: 2026-04-12 — Milestone v1.2 started: 高级数据源
+status: complete
+stopped_at: Milestone v1.2 complete
+last_updated: "2026-04-12T19:30:00.000Z"
+last_activity: 2026-04-12 — Milestone v1.2 completed: Database connections, HTTP enhancements, Polling
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 3
+  completed_phases: 3
+  total_plans: 7
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-12)
 
 **Core value:** 让数据分析工作人员能够安全、高效地完成从数据导入到可视化输出的全流程，数据绝不出域。
-**Current focus:** Milestone v1.2 高级数据源 — External database connections, HTTP enhancements, auto-refresh
+**Current focus:** Milestone v1.2 COMPLETE - Ready for commit
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: All phases complete
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-12 — Milestone v1.2 started
+Status: Milestone v1.2 complete
+Last activity: 2026-04-12 — All phases executed successfully
 
-Progress: [          ] 0% (Requirements phase)
+Progress: [██████████] 100% (3/3 phases complete)
 
 ## Performance Metrics
 
@@ -44,6 +44,11 @@ Progress: [          ] 0% (Requirements phase)
 - Total phases: 2
 - Total plans: 5
 - Total execution time: ~20 min
+
+**v1.2 Summary (completed):**
+- Total phases: 3
+- Total plans: 7
+- Total execution time: ~45 min
 
 ## Accumulated Context
 
@@ -62,16 +67,26 @@ Carried forward from v1.1:
 - ECharts library embedded inline (~1.1MB)
 - CLI export commands with auto-filename generation
 
+Added in v1.2:
+- SQLAlchemy Core for SQL databases (no ORM)
+- PyMongo for MongoDB with document flattening
+- ${ENV_VAR} placeholder resolution for secrets
+- Database CLI with query/list-tables/describe-table/import commands
+- API Key authentication (header and query param)
+- OAuth2 Client Credentials flow with token caching
+- POST, PUT, DELETE HTTP methods
+- APScheduler-based polling infrastructure
+
 ### Pending Todos
 
-None yet.
+None - Milestone v1.2 complete.
 
 ### Blockers/Concerns
 
-None yet.
+None.
 
 ## Session Continuity
 
-Last session: 2026-04-12T01:00:00.000Z
-Project Status: v1.2 INITIALIZING - Gathering requirements
-Current Work: Defining v1.2 高级数据源 requirements
+Last session: 2026-04-12T19:30:00.000Z
+Project Status: v1.2 COMPLETE - Ready for commit and push
+Current Work: All phases executed, ready to commit

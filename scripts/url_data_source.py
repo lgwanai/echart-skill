@@ -5,6 +5,9 @@ Provides async HTTP data fetching with authentication support:
 - URLDataSourceConfig: Pydantic configuration model
 - BasicAuthConfig: Basic authentication configuration
 - BearerAuthConfig: Bearer token authentication configuration
+- APIKeyHeaderAuthConfig: API Key in header authentication
+- APIKeyQueryParamAuthConfig: API Key in query parameter authentication
+- OAuth2ClientCredentialsConfig: OAuth2 Client Credentials flow
 - URLDataSource: Async HTTP client with retry and parsing
 
 Usage:
@@ -20,7 +23,9 @@ Usage:
     records = await source.fetch_and_parse()
 """
 
+import time
 from typing import Literal, Optional, Union
+from urllib.parse import urlencode, urlparse, parse_qs, urlunparse
 
 from pydantic import BaseModel, Field, SecretStr, field_validator
 import httpx
@@ -29,7 +34,6 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-# Constants
 MAX_RETRIES = 3
 MAX_RESPONSE_SIZE = 100 * 1024 * 1024  # 100MB
 
@@ -63,8 +67,100 @@ class BearerAuthConfig(BaseModel):
     token: SecretStr = Field(description="Bearer token value")
 
 
-# Union type for authentication configurations
-AuthConfig = Union[BasicAuthConfig, BearerAuthConfig]
+class APIKeyHeaderAuthConfig(BaseModel):
+    """API Key in HTTP header authentication.
+    
+    Attributes:
+        type: Authentication type, always 'api_key_header'
+        header_name: Header name for the API key (default: X-API-Key)
+        key: API key value (stored as SecretStr)
+    """
+    type: Literal["api_key_header"] = "api_key_header"
+    header_name: str = Field(default="X-API-Key", description="Header name for API key")
+    key: SecretStr = Field(description="API key value")
+
+
+class APIKeyQueryParamAuthConfig(BaseModel):
+    """API Key in URL query parameter authentication.
+    
+    Attributes:
+        type: Authentication type, always 'api_key_query'
+        param_name: Query parameter name (default: api_key)
+        key: API key value (stored as SecretStr)
+    """
+    type: Literal["api_key_query"] = "api_key_query"
+    param_name: str = Field(default="api_key", description="Query parameter name")
+    key: SecretStr = Field(description="API key value")
+
+
+class OAuth2ClientCredentialsConfig(BaseModel):
+    """OAuth2 Client Credentials flow configuration.
+    
+    Attributes:
+        type: Authentication type, always 'oauth2_client_credentials'
+        token_url: OAuth2 token endpoint URL
+        client_id: OAuth2 client ID
+        client_secret: OAuth2 client secret (stored as SecretStr)
+        scope: Optional OAuth2 scope
+    """
+    type: Literal["oauth2_client_credentials"] = "oauth2_client_credentials"
+    token_url: str = Field(description="OAuth2 token endpoint URL")
+    client_id: str = Field(description="OAuth2 client ID")
+    client_secret: SecretStr = Field(description="OAuth2 client secret")
+    scope: Optional[str] = Field(default=None, description="OAuth2 scope")
+
+
+class OAuth2TokenManager:
+    """Manages OAuth2 tokens with automatic refresh.
+    
+    Caches tokens and refreshes when expired or on 401 errors.
+    """
+    
+    def __init__(self, config: OAuth2ClientCredentialsConfig):
+        self.config = config
+        self._token: Optional[str] = None
+        self._expires_at: Optional[float] = None
+    
+    async def get_token(self) -> str:
+        if self._token and self._expires_at and time.time() < self._expires_at - 60:
+            return self._token
+        return await self._fetch_new_token()
+    
+    async def _fetch_new_token(self) -> str:
+        async with httpx.AsyncClient() as client:
+            data = {"grant_type": "client_credentials"}
+            if self.config.scope:
+                data["scope"] = self.config.scope
+            
+            response = await client.post(
+                self.config.token_url,
+                data=data,
+                auth=httpx.BasicAuth(
+                    self.config.client_id,
+                    self.config.client_secret.get_secret_value()
+                )
+            )
+            response.raise_for_status()
+            token_data = response.json()
+            
+            self._token = token_data["access_token"]
+            self._expires_at = time.time() + token_data.get("expires_in", 3600)
+            
+            logger.info("OAuth2 token fetched", expires_in=token_data.get("expires_in", 3600))
+            return self._token
+    
+    def invalidate(self) -> None:
+        self._token = None
+        self._expires_at = None
+
+
+AuthConfig = Union[
+    BasicAuthConfig, 
+    BearerAuthConfig, 
+    APIKeyHeaderAuthConfig, 
+    APIKeyQueryParamAuthConfig,
+    OAuth2ClientCredentialsConfig
+]
 
 
 class URLDataSourceConfig(BaseModel):
@@ -91,19 +187,24 @@ class URLDataSourceConfig(BaseModel):
     @field_validator('url')
     @classmethod
     def validate_url(cls, v: str) -> str:
-        """Validate that URL uses HTTP or HTTPS scheme.
-
-        Args:
-            v: URL string to validate
-
-        Returns:
-            Validated URL string
-
-        Raises:
-            ValueError: If URL does not start with http:// or https://
-        """
         if not v.startswith(('http://', 'https://')):
             raise ValueError("URL must start with http:// or https://")
+        return v
+    
+    @field_validator('auth', mode='before')
+    @classmethod
+    def validate_auth_dict(cls, v):
+        if isinstance(v, dict):
+            auth_type = v.get('type')
+            type_map = {
+                'basic': BasicAuthConfig,
+                'bearer': BearerAuthConfig,
+                'api_key_header': APIKeyHeaderAuthConfig,
+                'api_key_query': APIKeyQueryParamAuthConfig,
+                'oauth2_client_credentials': OAuth2ClientCredentialsConfig,
+            }
+            if auth_type in type_map:
+                return type_map[auth_type](**v)
         return v
 
 
@@ -112,7 +213,7 @@ class URLDataSource:
 
     Provides:
     - Async HTTP fetching with retry logic
-    - Basic Auth and Bearer token authentication
+    - Basic Auth, Bearer token, API Key, and OAuth2 authentication
     - Response size validation
     - JSON and CSV parsing
 
@@ -121,12 +222,10 @@ class URLDataSource:
     """
 
     def __init__(self, config: URLDataSourceConfig):
-        """Initialize the URL data source.
-
-        Args:
-            config: Configuration for the URL data source
-        """
         self.config = config
+        self._oauth2_manager: Optional[OAuth2TokenManager] = None
+        if isinstance(config.auth, OAuth2ClientCredentialsConfig):
+            self._oauth2_manager = OAuth2TokenManager(config.auth)
 
     def _build_auth(self) -> Optional[httpx.Auth]:
         """Build httpx auth from configuration.
@@ -147,11 +246,6 @@ class URLDataSource:
         return None
 
     def _build_headers(self) -> dict[str, str]:
-        """Build request headers including auth headers.
-
-        Returns:
-            Dictionary of HTTP headers
-        """
         headers = {
             "Accept": "application/json, text/csv, text/plain",
             "User-Agent": "echart-skill/1.0"
@@ -159,8 +253,36 @@ class URLDataSource:
 
         if isinstance(self.config.auth, BearerAuthConfig):
             headers["Authorization"] = f"Bearer {self.config.auth.token.get_secret_value()}"
+        elif isinstance(self.config.auth, APIKeyHeaderAuthConfig):
+            headers[self.config.auth.header_name] = self.config.auth.key.get_secret_value()
 
         return headers
+    
+    def _build_url_with_auth(self) -> str:
+        if not isinstance(self.config.auth, APIKeyQueryParamAuthConfig):
+            return self.config.url
+        
+        parsed = urlparse(self.config.url)
+        query_params = parse_qs(parsed.query)
+        query_params[self.config.auth.param_name] = [self.config.auth.key.get_secret_value()]
+        
+        new_query = urlencode(query_params, doseq=True)
+        return urlunparse(parsed._replace(query=new_query))
+
+    def _build_url_with_auth(self) -> str:
+        """Build URL with query params for API Key auth.
+        
+        Returns:
+            URL with query params added if API Key query param auth
+        """
+        if isinstance(self.config.auth, APIKeyQueryParamAuthConfig):
+            parsed = urlparse(self.config.url)
+            params = parse_qs(parsed.query)
+            params[self.config.auth.param_name] = self.config.auth.key.get_secret_value()
+            new_query = urlencode(params, doseq=True)
+            return urlunparse(parsed._replace(query=new_query))
+        
+        return self.config.url
 
     @retry(
         stop=stop_after_attempt(MAX_RETRIES),
@@ -169,38 +291,114 @@ class URLDataSource:
         reraise=True
     )
     async def fetch(self) -> str:
-        """Fetch data from URL with retry logic.
-
-        Retries only on 5xx server errors. 4xx client errors are not retried.
-
-        Returns:
-            Raw response content as string
-
-        Raises:
-            httpx.HTTPStatusError: On 4xx HTTP errors (no retry)
-            ServerError: On 5xx HTTP errors (triggers retry)
-            httpx.TimeoutException: On timeout
-            ValueError: If response too large
-        """
         timeout = httpx.Timeout(self.config.timeout)
+        
+        url = self._build_url_with_auth()
+        headers = self._build_headers()
+        
+        if self._oauth2_manager:
+            token = await self._oauth2_manager.get_token()
+            headers["Authorization"] = f"Bearer {token}"
 
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.get(
-                self.config.url,
+                url,
                 auth=self._build_auth(),
-                headers=self._build_headers()
+                headers=headers
             )
+            
+            if response.status_code == 401 and self._oauth2_manager:
+                self._oauth2_manager.invalidate()
+                token = await self._oauth2_manager.get_token()
+                headers["Authorization"] = f"Bearer {token}"
+                response = await client.get(url, auth=self._build_auth(), headers=headers)
 
-            # Handle 5xx errors separately for retry
             if response.status_code >= 500:
                 raise ServerError(
                     f"Server error {response.status_code}: {response.text[:200]}"
                 )
 
-            # Raise on 4xx errors (no retry)
             response.raise_for_status()
 
-            # Check content length
+            content_length = response.headers.get('content-length')
+            if content_length and int(content_length) > MAX_RESPONSE_SIZE:
+                raise ValueError(
+                    f"Response too large: {int(content_length) / 1024 / 1024:.1f}MB > 100MB limit"
+                )
+
+            return response.text
+
+    async def post(self, data: dict) -> str:
+        """Make POST request with JSON body.
+        
+        Args:
+            data: JSON body as dict
+            
+        Returns:
+            Response content as string
+        """
+        return await self._request_with_body("POST", data)
+
+    async def put(self, data: dict) -> str:
+        """Make PUT request with JSON body.
+        
+        Args:
+            data: JSON body as dict
+            
+        Returns:
+            Response content as string
+        """
+        return await self._request_with_body("PUT", data)
+
+    async def delete(self) -> str:
+        """Make DELETE request.
+        
+        Returns:
+            Response content as string
+        """
+        return await self._request_with_body("DELETE")
+
+    async def _request_with_body(self, method: str, data: Optional[dict] = None) -> str:
+        """Execute HTTP request with optional body.
+        
+        Args:
+            method: HTTP method (POST, PUT, DELETE)
+            data: Optional JSON body
+            
+        Returns:
+            Response content as string
+        """
+        timeout = httpx.Timeout(self.config.timeout)
+        url = self._build_url_with_auth()
+        headers = self._build_headers()
+        headers["Content-Type"] = "application/json"
+        
+        if self._oauth2_manager:
+            token = await self._oauth2_manager.get_token()
+            headers["Authorization"] = f"Bearer {token}"
+
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            response = await client.request(
+                method,
+                url,
+                auth=self._build_auth(),
+                headers=headers,
+                json=data
+            )
+            
+            if response.status_code == 401 and self._oauth2_manager:
+                self._oauth2_manager.invalidate()
+                token = await self._oauth2_manager.get_token()
+                headers["Authorization"] = f"Bearer {token}"
+                response = await client.request(method, url, auth=self._build_auth(), headers=headers, json=data)
+
+            if response.status_code >= 500:
+                raise ServerError(
+                    f"Server error {response.status_code}: {response.text[:200]}"
+                )
+
+            response.raise_for_status()
+
             content_length = response.headers.get('content-length')
             if content_length and int(content_length) > MAX_RESPONSE_SIZE:
                 raise ValueError(

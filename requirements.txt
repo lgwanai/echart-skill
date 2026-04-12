@@ -16,3 +16,12 @@ respx==0.22.0
 
 # DuckDB (Phase 7)
 duckdb
+
+# Database Connections (Phase 11)
+sqlalchemy>=2.0.0
+pymysql>=1.1.0
+psycopg2-binary>=2.9.0
+pymongo>=4.6.0
+
+# Polling (Phase 13)
+apscheduler>=3.10.0

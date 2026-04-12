@@ -15,6 +15,150 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 
 ---
 
+## SQL Generation Protocol (CRITICAL)
+
+> **重要**: 本项目使用 DuckDB 作为 SQL 引擎，其语法与 MySQL/PostgreSQL 有显著差异。为避免 SQL 执行错误，必须严格遵循以下流程。
+
+### 函数类别索引
+
+DuckDB 支持的 SQL 函数按以下类别组织（详见 `references/SQL_FUNCTIONS_REFERENCE.md`）：
+
+| 类别 | 适用场景 | 典型函数 |
+|------|----------|----------|
+| **聚合函数** | 求和、计数、平均值、最值 | `SUM`, `COUNT`, `AVG`, `MAX`, `MIN`, `GROUP_CONCAT`→`string_agg` |
+| **统计聚合函数** | 方差、标准差、相关性、分位数 | `STDDEV_SAMP`, `VAR_SAMP`, `CORR`, `MEDIAN`, `QUANTILE_CONT` |
+| **近似聚合函数** | 大数据近似统计 | `APPROX_COUNT_DISTINCT`, `APPROX_QUANTILE` |
+| **数值函数** | 数学计算、取整、三角函数 | `ROUND`, `CEIL`, `FLOOR`, `ABS`, `SQRT`, `POW`, `MOD`→`%` |
+| **文本/字符串函数** | 字符串处理、拼接、正则 | `CONCAT`, `SUBSTRING`, `UPPER`, `LOWER`, `LENGTH`, `REGEXP_REPLACE` |
+| **日期函数** | 日期计算、格式化 | `DATE_TRUNC`, `DATE_DIFF`, `LAST_DAY`, `STRFTIME`, `EXTRACT` |
+| **时间函数** | 时间处理 | `MAKE_TIME`, `DATE_PART` |
+| **时间戳函数** | 时间戳操作 | `EPOCH`, `STRPTIME`, `MAKE_TIMESTAMP`, `AGE` |
+| **时间间隔函数** | 时间间隔计算 | `TO_DAYS`, `TO_HOURS`, `TO_MINUTES` |
+| **窗口函数** | 排名、移动平均、前后值 | `ROW_NUMBER`, `RANK`, `LAG`, `LEAD`, `FIRST_VALUE`, `LAST_VALUE` |
+| **列表函数** | 数组/列表操作 | `LIST_VALUE`, `LIST_FILTER`, `LIST_TRANSFORM`, `UNNEST` |
+| **条件函数** | 条件判断、NULL处理 | `CASE WHEN`, `COALESCE`, `NULLIF`, `IF` |
+| **工具函数** | 类型检查、UUID生成 | `TYPEOF`, `UUID`, `HASH` |
+
+### SQL 生成流程（必须遵循）
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    SQL 生成智能流程                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Step 1: 需求分析                                                │
+│  ├─ 分析用户的查询意图（聚合？过滤？日期计算？字符串处理？）          │
+│  └─ 识别涉及的列及其数据类型                                       │
+│                                                                 │
+│  Step 2: 类别推断                                                │
+│  ├─ 根据需求推断需要的函数类别（可多选）                            │
+│  └─ 示例：求平均值 + 按月分组 → 聚合函数 + 日期函数                 │
+│                                                                 │
+│  Step 3: 函数上下文提取                                          │
+│  ├─ 读取 SQL_FUNCTIONS_REFERENCE.md 对应类别的函数说明            │
+│  └─ 将函数语法和示例作为上下文                                     │
+│                                                                 │
+│  Step 4: SQL 生成                                                │
+│  ├─ 仅使用文档中明确支持的函数                                     │
+│  └─ 对于不确定的函数，先查阅文档再使用                              │
+│                                                                 │
+│  Step 5: 执行验证                                                │
+│  ├─ 执行 SQL，检查是否有错误                                      │
+│  └─ 如有错误，进入 reAct 修复流程                                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 常见 MySQL → DuckDB 函数映射
+
+| MySQL 函数 | DuckDB 替代 | 说明 |
+|-----------|-------------|------|
+| `GROUP_CONCAT(col, sep)` | `string_agg(col, sep)` | 聚合字符串连接 |
+| `IFNULL(a, b)` | `COALESCE(a, b)` 或 `ifnull(a, b)` | NULL 替换 |
+| `IF(cond, a, b)` | `if(cond, a, b)` 或 `CASE WHEN` | 条件表达式 |
+| `DATE_FORMAT(date, '%Y-%m')` | `strftime(date, '%Y-%m')` | 日期格式化 |
+| `DATEDIFF(a, b)` | `date_diff('day', a, b)` | 日期差值 |
+| `NOW()` | `CURRENT_TIMESTAMP` 或 `today()` | 当前时间 |
+| `SUBSTRING(str, pos, len)` | `substring(str, pos, len)` | 子串（1-based） |
+| `CONCAT_WS(sep, a, b)` | `concat_ws(sep, a, b)` | 带分隔符连接 |
+| `FIND_IN_SET(str, list)` | `list_contains(string_split(list, ','), str)` | 列表查找 |
+| `REGEXP_LIKE(str, pattern)` | `regexp_matches(str, pattern)` | 正则匹配 |
+| `MOD(a, b)` | `a % b` | 取模运算 |
+| `POWER(x, y)` | `pow(x, y)` 或 `x ** y` | 幂运算 |
+
+### reAct 错误修复流程
+
+当 SQL 执行出错时，按照以下 reAct 循环进行修复：
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    reAct 修复循环                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. Thought: 分析错误信息                                         │
+│     ├─ 错误类型：函数不存在？语法错误？类型不匹配？                  │
+│     └─ 定位问题：哪个函数/语法导致了错误？                         │
+│                                                                 │
+│  2. Action: 查阅文档                                              │
+│     ├─ 在 SQL_FUNCTIONS_REFERENCE.md 中搜索正确函数               │
+│     └─ 或搜索类别索引找到替代方案                                  │
+│                                                                 │
+│  3. Observation: 确认修复方案                                     │
+│     ├─ 验证新函数的语法和参数                                      │
+│     └─ 确保与 DuckDB 兼容                                         │
+│                                                                 │
+│  4. Retry: 重新执行                                               │
+│     ├─ 应用修复后的 SQL                                           │
+│     └─ 如仍有错误，返回 Step 1                                     │
+│                                                                 │
+│  5. Fallback: 最多 3 次重试                                       │
+│     ├─ 3 次失败后，考虑使用 Python + pandas 替代                   │
+│     └─ 或向用户说明限制，寻求替代需求                               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 示例：完整 SQL 生成过程
+
+**用户需求**: "统计每个产品类别的月销售额，找出销售额前10的月份"
+
+**Step 1 - 需求分析**:
+- 聚合：按类别和月份分组求和
+- 日期处理：从日期字段提取月份
+- 排序：按销售额降序
+- 限制：取前10
+
+**Step 2 - 类别推断**:
+- 聚合函数 → `SUM`, `GROUP BY`
+- 日期函数 → `date_trunc` 或 `strftime`
+- 窗口函数（可选）→ `ROW_NUMBER` 或直接用 `ORDER BY + LIMIT`
+
+**Step 3 - 提取函数上下文**:
+```markdown
+# 从 SQL_FUNCTIONS_REFERENCE.md 读取：
+- date_trunc(part, date) - 截断到指定精度
+- SUM(arg) - 求和
+- string_agg(arg, sep) - 字符串聚合
+```
+
+**Step 4 - 生成 SQL**:
+```sql
+SELECT 
+    category,
+    date_trunc('month', sale_date) as month,
+    SUM(amount) as total_sales
+FROM sales
+GROUP BY category, date_trunc('month', sale_date)
+ORDER BY total_sales DESC
+LIMIT 10;
+```
+
+**Step 5 - 执行验证**: 
+- 成功 → 返回结果
+- 失败 → 进入 reAct 流程
+
+---
+
 ## Scenarios & Procedures
 
 ### Scenario 1: Data Import & Auto-Cleaning
@@ -35,9 +179,10 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 ### Scenario 2: Continuous Queries & Manipulation
 **Trigger**: User asks to filter, sort, aggregate, or add columns.
 **Action**:
-1. Formulate the SQL query. 
+1. **SQL Generation with Function Validation**: Follow the intelligent SQL generation workflow (see `SQL Generation Protocol` section below).
 2. Execute it via `RunCommand`: `python -c "import duckdb; conn = duckdb.connect('workspace.duckdb'); print(conn.execute('SELECT ...').fetchdf())"`
 3. For structural changes, remember the Undo principle: `CREATE TABLE table_name_step2 AS SELECT ...`
+4. **Error Handling**: If SQL execution fails, use the reAct recovery process (see `SQL Error Recovery (reAct)` section below).
 
 ### Scenario 3: Semantic Extraction & Fuzzy Join
 **Trigger**: User wants to split addresses, do sentiment analysis, or join tables with mismatched keys (e.g., "Beijing Branch" vs "Beijing Office").
@@ -299,3 +444,199 @@ python scripts/chart_cli.py export-dashboard daily_dashboard.json \
 - File size ~1.2MB per export (includes ECharts library)
 - Chinese characters are preserved correctly
 - Generated filename format: `{sanitized_title}_{YYYYMMDD_HHMMSS}.html`
+
+### Scenario 13: External Database Connections
+**Trigger**: User needs to query data from MySQL, PostgreSQL, MongoDB, or SQLite databases.
+
+**Action:**
+
+**1. Configure Connections (db_connections.json):**
+```json
+{
+    "connections": {
+        "mysql_prod": {
+            "type": "mysql",
+            "host": "localhost",
+            "port": 3306,
+            "database": "production",
+            "username": "admin",
+            "password": "${MYSQL_PASSWORD}"
+        },
+        "postgres_analytics": {
+            "type": "postgresql",
+            "host": "analytics-db.internal",
+            "database": "analytics",
+            "username": "reader",
+            "password": "${PG_PASSWORD}"
+        },
+        "mongo_docs": {
+            "type": "mongodb",
+            "connection_string": "${MONGODB_URI}"
+        },
+        "sqlite_local": {
+            "type": "sqlite",
+            "database": "/path/to/local.db"
+        }
+    }
+}
+```
+
+**2. Set Environment Variables for Secrets:**
+```bash
+export MYSQL_PASSWORD=your_password
+export PG_PASSWORD=your_password
+export MONGODB_URI="mongodb://user:pass@localhost:27017/docs"
+```
+
+**3. Query Database:**
+```bash
+# Execute SQL query
+python scripts/db_cli.py query mysql_prod "SELECT * FROM orders WHERE date > '2024-01-01'"
+
+# Query from file
+python scripts/db_cli.py query postgres_analytics --file queries/monthly_sales.sql --output json
+
+# MongoDB query (requires --collection)
+python scripts/db_cli.py query mongo_docs '{"status": "active"}' --collection users
+```
+
+**4. Discover Schema:**
+```bash
+# List tables
+python scripts/db_cli.py list-tables mysql_prod
+
+# List PostgreSQL tables in specific schema
+python scripts/db_cli.py list-tables postgres_analytics --schema public
+
+# Describe table structure
+python scripts/db_cli.py describe-table mysql_prod users
+
+# MongoDB: list databases
+python scripts/db_cli.py list-tables mongo_docs --show-databases
+
+# MongoDB: list collections
+python scripts/db_cli.py list-tables mongo_docs --database docs
+
+# MongoDB: infer collection schema
+python scripts/db_cli.py describe-table mongo_docs users
+```
+
+**5. Import to DuckDB:**
+```bash
+# Import SQL query results to DuckDB
+python scripts/db_cli.py import mysql_prod "SELECT * FROM customers" --table-name customers_import
+
+# Import with custom DuckDB path
+python scripts/db_cli.py import postgres_analytics "SELECT * FROM sales" --duckdb analytics.duckdb
+
+# Import MongoDB collection
+python scripts/db_cli.py import mongo_docs '{}' --collection users --table-name mongo_users
+```
+
+**6. After Import, Use with Charts:**
+```json
+{
+    "db_path": "workspace.duckdb",
+    "query": "SELECT * FROM customers_import",
+    "title": "Imported Customers",
+    "echarts_option": {
+        "xAxis": {"type": "category"},
+        "yAxis": {"type": "value"},
+        "series": [{"type": "bar"}]
+    }
+}
+```
+
+**Key Features:**
+- Connection config auto-discovered in current and parent directories
+- Use `${ENV_VAR}` placeholders for passwords (never hardcode secrets)
+- Query results automatically import to DuckDB with `import` command
+- Large results (>10K rows) are streamed
+- Metadata tracked in `_data_skill_meta` table
+- Support for MySQL, PostgreSQL, SQLite (via SQLAlchemy), and MongoDB (via PyMongo)
+
+**Notes:**
+- Default connection timeout: 30 seconds (override with `--timeout`)
+- MongoDB documents are flattened for tabular storage (nested fields become `parent_child`)
+- Arrays in MongoDB are expanded to indexed fields (`skills_0`, `skills_1`)
+
+### Scenario 14: Polling & Auto-Refresh
+**Trigger**: User needs to automatically refresh data from HTTP APIs or databases on a schedule.
+
+**Action:**
+
+**1. Create Polling Configuration (polling_config.json):**
+```json
+{
+    "jobs": [
+        {
+            "source_type": "http",
+            "source_name": "sales_api",
+            "interval_seconds": 300,
+            "table_name": "live_sales",
+            "http_config": {
+                "url": "https://api.example.com/sales",
+                "format": "json",
+                "auth": {"type": "bearer", "token": "${API_TOKEN}"}
+            }
+        },
+        {
+            "source_type": "database",
+            "source_name": "production_db",
+            "interval_seconds": 600,
+            "table_name": "live_orders",
+            "db_profile": "mysql_prod",
+            "query": "SELECT * FROM orders WHERE created_at > NOW() - INTERVAL 1 HOUR"
+        }
+    ]
+}
+```
+
+**2. Manage Polling Jobs:**
+```bash
+# List all polling jobs
+python scripts/polling_cli.py list
+
+# Show detailed status
+python scripts/polling_cli.py status
+python scripts/polling_cli.py status <job_id>
+
+# Manual refresh (trigger immediately)
+python scripts/polling_cli.py refresh
+python scripts/polling_cli.py refresh <job_id>
+
+# Add new polling job
+python scripts/polling_cli.py add --type http --name "my_api" --interval 300 --table api_data --http-config '{"url": "https://api.example.com/data", "format": "json"}'
+
+# Remove polling job
+python scripts/polling_cli.py remove <job_id>
+```
+
+**3. Use Polled Data in Charts:**
+```json
+{
+    "db_path": "workspace.duckdb",
+    "query": "SELECT * FROM live_sales ORDER BY timestamp DESC LIMIT 100",
+    "title": "Live Sales Data",
+    "echarts_option": {
+        "xAxis": {"type": "category"},
+        "yAxis": {"type": "value"},
+        "series": [{"type": "line", "smooth": true}]
+    }
+}
+```
+
+**Key Features:**
+- APScheduler-based background polling
+- HTTP sources with all auth types (Basic, Bearer, API Key, OAuth2)
+- Database polling for MySQL, PostgreSQL, MongoDB, SQLite
+- Automatic DuckDB table updates
+- Last refresh timestamp tracked in `_data_skill_meta`
+- Manual refresh on-demand
+- Error counting and status tracking
+
+**Notes:**
+- Minimum interval: 10 seconds
+- Maximum interval: 86400 seconds (24 hours)
+- Polling runs in background thread
+- Tables are replaced on each poll (not appended)

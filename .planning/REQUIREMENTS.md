@@ -9,35 +9,35 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Database Connections
 
-- [ ] **DB-01**: User can connect to MySQL database with connection string
-- [ ] **DB-02**: User can connect to PostgreSQL database with connection string
-- [ ] **DB-03**: User can connect to MongoDB database with connection string
-- [ ] **DB-04**: User can connect to external SQLite database file
-- [ ] **DB-05**: User can execute SQL queries against external databases
-- [ ] **DB-06**: User can discover tables and schemas in external databases
-- [ ] **DB-07**: Query results from external databases can be imported to DuckDB
+- [x] **DB-01**: User can connect to MySQL database with connection string
+- [x] **DB-02**: User can connect to PostgreSQL database with connection string
+- [x] **DB-03**: User can connect to MongoDB database with connection string
+- [x] **DB-04**: User can connect to external SQLite database file
+- [x] **DB-05**: User can execute SQL queries against external databases
+- [x] **DB-06**: User can discover tables and schemas in external databases
+- [x] **DB-07**: Query results from external databases can be imported to DuckDB
 
 ### HTTP Enhancements
 
-- [ ] **HTTP-01**: User can authenticate with API Key in header
-- [ ] **HTTP-02**: User can authenticate with API Key in query parameter
-- [ ] **HTTP-03**: User can authenticate with OAuth2 Client Credentials flow
-- [ ] **HTTP-04**: User can make POST requests with JSON body
-- [ ] **HTTP-05**: User can make PUT requests with JSON body
-- [ ] **HTTP-06**: User can make DELETE requests
+- [x] **HTTP-01**: User can authenticate with API Key in header
+- [x] **HTTP-02**: User can authenticate with API Key in query parameter
+- [x] **HTTP-03**: User can authenticate with OAuth2 Client Credentials flow
+- [x] **HTTP-04**: User can make POST requests with JSON body
+- [x] **HTTP-05**: User can make PUT requests with JSON body
+- [x] **HTTP-06**: User can make DELETE requests
 
 ### Polling
 
-- [ ] **POLL-01**: User can configure interval polling for HTTP data sources
-- [ ] **POLL-02**: User can configure interval polling for database connections
-- [ ] **POLL-03**: Polling automatically updates local DuckDB tables
-- [ ] **POLL-04**: User can trigger manual refresh of data sources
-- [ ] **POLL-05**: Polling tracks last refresh timestamp
+- [x] **POLL-01**: User can configure interval polling for HTTP data sources
+- [x] **POLL-02**: User can configure interval polling for database connections
+- [x] **POLL-03**: Polling automatically updates local DuckDB tables
+- [x] **POLL-04**: User can trigger manual refresh of data sources
+- [x] **POLL-05**: Polling tracks last refresh timestamp
 
 ### Visualization Refresh
 
-- [ ] **REFRESH-01**: Charts auto-refresh when polled data changes
-- [ ] **REFRESH-02**: Dashboards auto-refresh when polled data changes
+- [x] **REFRESH-01**: Charts auto-refresh when polled data changes
+- [x] **REFRESH-02**: Dashboards auto-refresh when polled data changes
 
 ## v2 Requirements
 
@@ -72,32 +72,33 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | Phase 11 | Pending |
-| DB-02 | Phase 11 | Pending |
-| DB-03 | Phase 11 | Pending |
-| DB-04 | Phase 11 | Pending |
-| DB-05 | Phase 11 | Pending |
-| DB-06 | Phase 11 | Pending |
-| DB-07 | Phase 11 | Pending |
-| HTTP-01 | Phase 12 | Pending |
-| HTTP-02 | Phase 12 | Pending |
-| HTTP-03 | Phase 12 | Pending |
-| HTTP-04 | Phase 12 | Pending |
-| HTTP-05 | Phase 12 | Pending |
-| HTTP-06 | Phase 12 | Pending |
-| POLL-01 | Phase 13 | Pending |
-| POLL-02 | Phase 13 | Pending |
-| POLL-03 | Phase 13 | Pending |
-| POLL-04 | Phase 13 | Pending |
-| POLL-05 | Phase 13 | Pending |
-| REFRESH-01 | Phase 13 | Pending |
-| REFRESH-02 | Phase 13 | Pending |
+| DB-01 | Phase 11 | ✅ Complete |
+| DB-02 | Phase 11 | ✅ Complete |
+| DB-03 | Phase 11 | ✅ Complete |
+| DB-04 | Phase 11 | ✅ Complete |
+| DB-05 | Phase 11 | ✅ Complete |
+| DB-06 | Phase 11 | ✅ Complete |
+| DB-07 | Phase 11 | ✅ Complete |
+| HTTP-01 | Phase 12 | ✅ Complete |
+| HTTP-02 | Phase 12 | ✅ Complete |
+| HTTP-03 | Phase 12 | ✅ Complete |
+| HTTP-04 | Phase 12 | ✅ Complete |
+| HTTP-05 | Phase 12 | ✅ Complete |
+| HTTP-06 | Phase 12 | ✅ Complete |
+| POLL-01 | Phase 13 | ✅ Complete |
+| POLL-02 | Phase 13 | ✅ Complete |
+| POLL-03 | Phase 13 | ✅ Complete |
+| POLL-04 | Phase 13 | ✅ Complete |
+| POLL-05 | Phase 13 | ✅ Complete |
+| REFRESH-01 | Phase 13 | ✅ Complete |
+| REFRESH-02 | Phase 13 | ✅ Complete |
 
 **Coverage:**
 - v1.2 requirements: 20 total
 - Mapped to phases: 20
-- Unmapped: 0 ✓
+- Complete: 20/20 ✓
 
 ---
+
 *Requirements defined: 2026-04-12*
-*Last updated: 2026-04-12 after milestone initialization*
+*Last updated: 2026-04-12 after v1.2 milestone completion*
