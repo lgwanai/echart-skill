@@ -1,47 +1,58 @@
-# Requirements: Echart Skill v1.1 协作能力
+# Requirements: Echart Skill v1.2 高级数据源
 
-**Defined:** 2026-04-11
+**Defined:** 2026-04-12
 **Core Value:** 让数据分析工作人员能够安全、高效地完成从数据导入到可视化输出的全流程，数据绝不出域。
 
-## v1.1 Requirements
+## v1.2 Requirements
 
 Requirements for this milestone. Each maps to roadmap phases.
 
-### HTML Export
+### Database Connections
 
-- [x] **EXPORT-01**: User can export dashboard as standalone HTML file with all data embedded
-- [x] **EXPORT-02**: User can export single chart as standalone HTML file with query data embedded
-- [x] **EXPORT-03**: User can export Gantt chart as standalone HTML file with task data embedded
-- [x] **EXPORT-04**: Exported HTML files work offline without server or database connection
-- [x] **EXPORT-05**: CLI command provides simple interface for export operations
+- [ ] **DB-01**: User can connect to MySQL database with connection string
+- [ ] **DB-02**: User can connect to PostgreSQL database with connection string
+- [ ] **DB-03**: User can connect to MongoDB database with connection string
+- [ ] **DB-04**: User can connect to external SQLite database file
+- [ ] **DB-05**: User can execute SQL queries against external databases
+- [ ] **DB-06**: User can discover tables and schemas in external databases
+- [ ] **DB-07**: Query results from external databases can be imported to DuckDB
 
-### Data Embedding
+### HTTP Enhancements
 
-- [x] **EMBED-01**: Query results are serialized as JSON and embedded in HTML
-- [x] **EMBED-02**: ECharts options are embedded inline in HTML script tag
-- [x] **EMBED-03**: Chinese characters are preserved correctly in embedded data (ensure_ascii=False)
-- [x] **EMBED-04**: Embedded data size is logged for user awareness
+- [ ] **HTTP-01**: User can authenticate with API Key in header
+- [ ] **HTTP-02**: User can authenticate with API Key in query parameter
+- [ ] **HTTP-03**: User can authenticate with OAuth2 Client Credentials flow
+- [ ] **HTTP-04**: User can make POST requests with JSON body
+- [ ] **HTTP-05**: User can make PUT requests with JSON body
+- [ ] **HTTP-06**: User can make DELETE requests
 
-### User Experience
+### Polling
 
-- [x] **UX-01**: Export command accepts output path parameter for file location
-- [x] **UX-02**: Exported HTML includes ECharts library from local path (no CDN dependency)
-- [x] **UX-03**: Exported HTML filename defaults to chart/dashboard title with timestamp
+- [ ] **POLL-01**: User can configure interval polling for HTTP data sources
+- [ ] **POLL-02**: User can configure interval polling for database connections
+- [ ] **POLL-03**: Polling automatically updates local DuckDB tables
+- [ ] **POLL-04**: User can trigger manual refresh of data sources
+- [ ] **POLL-05**: Polling tracks last refresh timestamp
+
+### Visualization Refresh
+
+- [ ] **REFRESH-01**: Charts auto-refresh when polled data changes
+- [ ] **REFRESH-02**: Dashboards auto-refresh when polled data changes
 
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
 
-### PDF Export
+### Cloud Data Sources
 
-- **PDF-01**: User can export dashboard as PDF file
-- **PDF-02**: PDF export supports custom page size and orientation
-- **PDF-03**: PDF includes header/footer with metadata
+- **CLOUD-01**: User can connect to AWS S3 buckets
+- **CLOUD-02**: User can connect to Google Cloud Storage
+- **CLOUD-03**: User can connect to Azure Blob Storage
 
-### Advanced Collaboration
+### Advanced Polling
 
-- **COLLAB-01**: Shareable report generation with embedded charts and annotations
-- **COLLAB-02**: Report templates for common analysis patterns
+- **POLL-ADV-01**: Smart polling with adaptive intervals
+- **POLL-ADV-02**: Change notifications via webhook
 
 ## Out of Scope
 
@@ -49,10 +60,11 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| PDF export | Deferred to v1.2, requires additional dependencies |
-| Real-time collaboration | Violates local-first principle |
-| Cloud sharing | Breaks data privacy guarantee |
-| Chart editing in exported HTML | Adds complexity, focus on sharing not editing |
+| Write operations to external databases | Read-only access, local-first principle |
+| Real-time streaming (WebSocket) | Polling sufficient for data analysis use case |
+| Cloud database services (RDS, Cloud SQL) | Focus on self-hosted databases first |
+| ORM models for external databases | SQLAlchemy Core sufficient for data extraction |
+| Celery task queue | Overkill for single-user local tool |
 
 ## Traceability
 
@@ -60,24 +72,32 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EXPORT-01 | Phase 9 | Complete |
-| EXPORT-02 | Phase 9 | Complete |
-| EXPORT-03 | Phase 9 | Complete |
-| EXPORT-04 | Phase 9 | Complete |
-| EXPORT-05 | Phase 10 | Complete |
-| EMBED-01 | Phase 9 | Complete |
-| EMBED-02 | Phase 9 | Complete |
-| EMBED-03 | Phase 9 | Complete |
-| EMBED-04 | Phase 9 | Complete |
-| UX-01 | Phase 10 | Complete |
-| UX-02 | Phase 10 | Complete |
-| UX-03 | Phase 10 | Complete |
+| DB-01 | Phase 11 | Pending |
+| DB-02 | Phase 11 | Pending |
+| DB-03 | Phase 11 | Pending |
+| DB-04 | Phase 11 | Pending |
+| DB-05 | Phase 11 | Pending |
+| DB-06 | Phase 11 | Pending |
+| DB-07 | Phase 11 | Pending |
+| HTTP-01 | Phase 12 | Pending |
+| HTTP-02 | Phase 12 | Pending |
+| HTTP-03 | Phase 12 | Pending |
+| HTTP-04 | Phase 12 | Pending |
+| HTTP-05 | Phase 12 | Pending |
+| HTTP-06 | Phase 12 | Pending |
+| POLL-01 | Phase 13 | Pending |
+| POLL-02 | Phase 13 | Pending |
+| POLL-03 | Phase 13 | Pending |
+| POLL-04 | Phase 13 | Pending |
+| POLL-05 | Phase 13 | Pending |
+| REFRESH-01 | Phase 13 | Pending |
+| REFRESH-02 | Phase 13 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 12 total
-- Complete: 12 ✓
+- v1.2 requirements: 20 total
+- Mapped to phases: 20
 - Unmapped: 0 ✓
 
 ---
-*Requirements defined: 2026-04-11*
-*Last updated: 2026-04-12 — Milestone v1.1 complete*
+*Requirements defined: 2026-04-12*
+*Last updated: 2026-04-12 after milestone initialization*

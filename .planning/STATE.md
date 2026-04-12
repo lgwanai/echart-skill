@@ -1,36 +1,36 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: 协作能力
-status: milestone_complete
-stopped_at: Milestone v1.1 complete
-last_updated: "2026-04-12T00:00:00.000Z"
-last_activity: 2026-04-12 — Milestone v1.1 complete: Export CLI & UX
+milestone: v1.2
+milestone_name: 高级数据源
+status: defining_requirements
+stopped_at: Starting milestone v1.2
+last_updated: "2026-04-12T01:00:00.000Z"
+last_activity: 2026-04-12 — Milestone v1.2 started: 高级数据源
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-11)
+See: .planning/PROJECT.md (updated 2026-04-12)
 
 **Core value:** 让数据分析工作人员能够安全、高效地完成从数据导入到可视化输出的全流程，数据绝不出域。
-**Current focus:** Milestone v1.1 COMPLETE — Ready for v1.2 planning
+**Current focus:** Milestone v1.2 高级数据源 — External database connections, HTTP enhancements, auto-refresh
 
 ## Current Position
 
-Phase: 10 COMPLETE
-Plan: All plans complete
-Status: Milestone v1.1 协作能力 COMPLETE
-Last activity: 2026-04-12 — Phase 10 complete (2/2 plans)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-12 — Milestone v1.2 started
 
-Progress: [==========] 100% (Milestone v1.1 complete)
+Progress: [          ] 0% (Requirements phase)
 
 ## Performance Metrics
 
@@ -58,6 +58,10 @@ Carried forward from v1.0:
 - File-only logging for clean CLI
 - pydantic validators for configuration
 
+Carried forward from v1.1:
+- ECharts library embedded inline (~1.1MB)
+- CLI export commands with auto-filename generation
+
 ### Pending Todos
 
 None yet.
@@ -68,6 +72,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-11T11:30:00.000Z
-Project Status: v1.1 INITIALIZING - Gathering requirements
-Current Work: Defining v1.1 协作能力 requirements
+Last session: 2026-04-12T01:00:00.000Z
+Project Status: v1.2 INITIALIZING - Gathering requirements
+Current Work: Defining v1.2 高级数据源 requirements

@@ -1,206 +1,87 @@
-# Roadmap: Echart Skill 质量提升与功能扩展
+# Roadmap: Echart Skill v1.2 高级数据源
 
 ## Overview
 
-This roadmap transforms echart-skill from a functional MVP into a production-ready data analysis toolkit. The journey prioritizes security and quality first (fixing critical SQL injection vulnerabilities and establishing test coverage), then optimizes performance for large-scale data handling, and finally expands features with dashboards, URL data sources, and enhanced chart APIs. Each phase builds on the previous, ensuring stable foundations before feature expansion.
+This milestone adds advanced data source capabilities: external database connections (MySQL, PostgreSQL, MongoDB, SQLite), enhanced HTTP authentication (API Key, OAuth2, additional methods), and scheduled polling with auto-refresh for visualizations. The journey prioritizes database connectivity first (most requested feature), then HTTP enhancements, and finally the polling infrastructure that ties everything together for live data.
 
 ## Phases
 
 **Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+- Phases 1-10: Completed in v1.0 and v1.1
+- Phases 11-13: v1.2 milestone work
 
-Decimal phases appear between their surrounding integers in numeric order.
-
-- [x] **Phase 1: Security & Quality Foundation** - Fix critical vulnerabilities and establish test coverage
-- [x] **Phase 2: Performance Optimization** - Optimize for large files and concurrent operations
-- [x] **Phase 3: Dashboard Layouts** - Multi-chart dashboard generation with grid layout
-- [x] **Phase 4: URL/API Data Source** - Import data from HTTP endpoints with authentication
-- [x] **Phase 5: Gantt Chart API** - Simplified Gantt chart wrapper
-- [x] **Phase 6: Data Merge Capability** - Merge multiple tables into one
-- [x] **Phase 7: SQLite → DuckDB Migration** - Leverage columnar storage
-- [x] **Phase 8: Import History & Metadata** - Markdown table history viewer
-- [x] **Phase 9: HTML Export Engine** - Standalone HTML export with embedded data
-- [x] **Phase 10: Export CLI & UX** - User-friendly command interface
+- [ ] **Phase 11: Database Connections** - Connect to MySQL, PostgreSQL, MongoDB, SQLite
+- [ ] **Phase 12: HTTP Enhancements** - API Key, OAuth2, POST/PUT/DELETE
+- [ ] **Phase 13: Polling & Auto-Refresh** - Scheduled data refresh with visualization updates
 
 ## Phase Details
 
-### Phase 1: Security & Quality Foundation
-**Goal**: Users can trust the system with sensitive data without security risks, and all core workflows are verified by automated tests
-**Depends on**: Nothing (first phase)
-**Requirements**: SEC-01, SEC-02, SEC-03, SEC-04, QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05, QUAL-06
+### Phase 11: Database Connections
+**Goal**: Users can connect to external databases and query data for analysis
+**Depends on**: Phase 10 (v1.1 complete)
+**Requirements**: DB-01, DB-02, DB-03, DB-04, DB-05, DB-06, DB-07
 **Success Criteria** (what must be TRUE):
-  1. SQL injection attempts through table names or file paths are blocked and logged
-  2. All exceptions are captured in structured logs visible to users and agents
-  3. Baidu API key is loaded from environment variable, not hardcoded
-  4. File serving rejects path traversal attempts (e.g., ../../../etc/passwd)
-  5. Test suite runs with 80%+ coverage on core modules
-**Plans**: 5 plans
-
-Plans:
-- [x] 01-01-PLAN.md - Test framework setup + SQL injection fixes (QUAL-03, SEC-01, SEC-02)
-- [x] 01-02-PLAN.md - Structured logging infrastructure (QUAL-01, QUAL-02)
-- [x] 01-03-PLAN.md - API key migration + Path traversal protection (SEC-03, SEC-04)
-- [x] 01-04-PLAN.md - Core module unit tests (QUAL-04)
-- [x] 01-05-PLAN.md - Integration tests + Coverage verification (QUAL-05, QUAL-06)
-
-### Phase 2: Performance Optimization
-**Goal**: Users can import and process large datasets (100MB+ Excel files) without memory issues or blocking operations
-**Depends on**: Phase 1
-**Requirements**: PERF-01, PERF-02, PERF-03, PERF-04, PERF-05
-**Success Criteria** (what must be TRUE):
-  1. Excel files larger than 50MB trigger streaming import instead of in-memory loading
-  2. Database queries use connection pooling with automatic cleanup
-  3. Geocoding API calls run concurrently with retry logic, not blocking the main thread
-  4. Server processes are tracked via PID files and cleaned up on exit
-  5. Multiple agents can read the database concurrently without locking
-**Plans**: 4 plans
-
-Plans:
-- [x] 02-01-PLAN.md - DatabaseRepository with connection pooling and WAL mode (PERF-01, PERF-05)
-- [x] 02-02-PLAN.md - Streaming Excel import for large files (PERF-02)
-- [x] 02-03-PLAN.md - Async geocoding with httpx and retry logic (PERF-03)
-- [x] 02-04-PLAN.md - Server process lifecycle with PID tracking (PERF-04)
-
-### Phase 3: Dashboard Layouts
-**Goal**: Users can create multi-chart dashboards with flexible grid layouts in a single HTML file
-**Depends on**: Phase 2
-**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04
-**Success Criteria** (what must be TRUE):
-  1. User can define dashboard layout with grid configuration (rows, columns, chart positions)
-  2. Dashboard configuration is validated against JSON schema before rendering
-  3. All charts in dashboard render in a single HTML file that opens in any browser
-  4. Dashboard generator script produces valid output from configuration file
-**Plans**: 2 plans
-
-Plans:
-- [x] 03-01-PLAN.md - Dashboard configuration schema with pydantic validation (DASH-02)
-- [x] 03-02-PLAN.md - Dashboard generator with CSS Grid layout (DASH-01, DASH-03, DASH-04)
-
-### Phase 4: URL/API Data Source
-**Goal**: Users can import data from HTTP endpoints (JSON/CSV) with authentication support
-**Depends on**: Phase 2
-**Requirements**: DATA-01, DATA-02, DATA-03, DATA-04
-**Success Criteria** (what must be TRUE):
-  1. User can import CSV or JSON data from HTTP/HTTPS URL
-  2. API endpoints with Basic Auth or Bearer token authentication are supported
-  3. JSON response schema is automatically inferred for nested structures
-  4. User can manually refresh URL data sources to get updated data
-**Plans**: 2 plans
-
-Plans:
-- [x] 04-01-PLAN.md - URLDataSource class with authentication support (DATA-01, DATA-02, DATA-03)
-- [x] 04-02-PLAN.md - CLI commands and metadata tracking for refresh (DATA-04)
-
-### Phase 5: Gantt Chart API
-**Goal**: Users can generate Gantt charts with a simple API without learning ECharts configuration details
-**Depends on**: Phase 2
-**Requirements**: CHART-01, CHART-02
-**Success Criteria** (what must be TRUE):
-  1. User can create Gantt chart with task array (name, start, end) input
-  2. Gantt chart examples and API documentation are available in SKILL.md
-**Plans**: 2 plans
-
-Plans:
-- [x] 05-01-PLAN.md - Gantt chart API implementation (CHART-01)
-- [x] 05-02-PLAN.md - SKILL.md documentation update (CHART-02)
-
-### Phase 6: Data Merge Capability
-**Goal**: Users can merge multiple SQLite tables into one and export/import as a single file
-**Depends on**: Phase 5
-**Requirements**: MERGE-01, MERGE-02, MERGE-03, MERGE-04
-**Success Criteria** (what must be TRUE):
-  1. User can specify multiple source tables to merge
-  2. Merged data can be exported to CSV or Excel file
-  3. Merged data can be saved to SQLite as a new table
-  4. CLI command provides simple interface for merge operations
-**Plans**: 2 plans
-
-Plans:
-- [x] 06-01-PLAN.md - DataMerger class with merge and save to SQLite (MERGE-01, MERGE-03)
-- [x] 06-02-PLAN.md - Export functionality and CLI command (MERGE-02, MERGE-04)
-
-### Phase 7: SQLite → DuckDB Migration
-**Goal**: All data import and storage operations use DuckDB instead of SQLite, leveraging columnar storage and analytical query performance
-**Depends on**: Phase 6
-**Requirements**: DUCK-01, DUCK-02, DUCK-03
-**Success Criteria** (what must be TRUE):
-  1. All database operations use DuckDB connection pooling
-  2. Data importer creates DuckDB tables instead of SQLite
-  3. All scripts and documentation reference DuckDB
-**Plans**: 3 plans complete
-
-Plans:
-- [x] 07-01-PLAN.md - DatabaseRepository migration to DuckDB + dependency
-- [x] 07-02-PLAN.md - data_importer.py SQLite → DuckDB migration
-- [x] 07-03-PLAN.md - Remaining scripts + SKILL.md/README.md documentation update
-
-### Phase 8: Import History & Metadata
-**Goal**: Users can view import history, table structures, and table relationships in markdown table format, with complete metadata tracking
-**Depends on**: Phase 7
-**Requirements**: META-01, META-02, META-03, META-04
-**Success Criteria** (what must be TRUE):
-  1. Every import records file path, table name, import time, row count
-  2. Table relationships tracked when merge operations create new tables
-  3. Users can query import history in markdown table format
-  4. Users can view table structures in markdown table format
-**Plans**: 2 plans complete
-
-Plans:
-- [x] 08-01-PLAN.md - Extend metadata schema + update import/merge recording (META-01, META-02)
-- [x] 08-02-PLAN.md - History viewer module + CLI + SKILL.md documentation (META-03, META-04)
-
-### Phase 9: HTML Export Engine
-**Goal**: Users can export charts, dashboards, and Gantt charts as standalone HTML files with embedded data for offline sharing
-**Depends on**: Phase 8
-**Requirements**: EXPORT-01, EXPORT-02, EXPORT-03, EXPORT-04, EMBED-01, EMBED-02, EMBED-03, EMBED-04
-**Success Criteria** (what must be TRUE):
-  1. User can export dashboard as standalone HTML with all chart data embedded
-  2. User can export single chart as standalone HTML with query data embedded
-  3. User can export Gantt chart as standalone HTML with task data embedded
-  4. Exported HTML files work offline without server or database connection
-  5. Chinese characters are preserved correctly in embedded data
+  1. User can connect to MySQL with connection string
+  2. User can connect to PostgreSQL with connection string
+  3. User can connect to MongoDB with connection string
+  4. User can connect to external SQLite file
+  5. User can discover tables and schemas
+  6. Query results import to DuckDB correctly
+  7. Credentials are handled securely (env vars, SecretStr)
 **Plans**: 3 plans
 
 Plans:
-- [x] 09-01-PLAN.md - HTML exporter base class with data embedding (EMBED-01, EMBED-02, EMBED-03, EMBED-04) - COMPLETE
-- [x] 09-02-PLAN.md - Chart and Dashboard export implementation (EXPORT-01, EXPORT-02, EXPORT-04) - COMPLETE
-- [x] 09-03-PLAN.md - Gantt chart export implementation (EXPORT-03) - COMPLETE
+- [ ] 11-01-PLAN.md - DatabaseConnector base class + SQLAlchemy integration (DB-01, DB-02, DB-04, DB-05)
+- [ ] 11-02-PLAN.md - MongoDB connector implementation (DB-03)
+- [ ] 11-03-PLAN.md - Schema discovery + metadata tracking + CLI commands (DB-06, DB-07)
 
-### Phase 10: Export CLI & UX
-**Goal**: Users have simple CLI commands for export operations with good defaults
-**Depends on**: Phase 9
-**Requirements**: EXPORT-05, UX-01, UX-02, UX-03
+### Phase 12: HTTP Enhancements
+**Goal**: Users have more authentication options and HTTP methods for API data sources
+**Depends on**: Phase 11
+**Requirements**: HTTP-01, HTTP-02, HTTP-03, HTTP-04, HTTP-05, HTTP-06
 **Success Criteria** (what must be TRUE):
-  1. CLI command provides simple interface for export operations
-  2. Export command accepts output path parameter
-  3. Exported HTML uses local ECharts library (no CDN)
-  4. Filename defaults to chart/dashboard title with timestamp
+  1. User can authenticate with API Key in header
+  2. User can authenticate with API Key in query parameter
+  3. User can authenticate with OAuth2 Client Credentials
+  4. User can make POST requests with JSON body
+  5. User can make PUT requests with JSON body
+  6. User can make DELETE requests
+  7. Token refresh works automatically for OAuth2
 **Plans**: 2 plans
 
 Plans:
-- [x] 10-01-PLAN.md - CLI export commands with path and naming (EXPORT-05, UX-01, UX-03) - COMPLETE
-- [x] 10-02-PLAN.md - Local ECharts embedding + SKILL.md documentation (UX-02) - COMPLETE
+- [ ] 12-01-PLAN.md - Enhanced authentication (API Key, OAuth2) (HTTP-01, HTTP-02, HTTP-03)
+- [ ] 12-02-PLAN.md - Additional HTTP methods (POST, PUT, DELETE) (HTTP-04, HTTP-05, HTTP-06)
+
+### Phase 13: Polling & Auto-Refresh
+**Goal**: Users can schedule automatic data refresh and see live visualizations
+**Depends on**: Phase 12
+**Requirements**: POLL-01, POLL-02, POLL-03, POLL-04, POLL-05, REFRESH-01, REFRESH-02
+**Success Criteria** (what must be TRUE):
+  1. User can configure interval polling for HTTP sources
+  2. User can configure interval polling for database connections
+  3. Polled data updates DuckDB tables automatically
+  4. User can trigger manual refresh
+  5. Last refresh timestamp is tracked
+  6. Charts refresh when data changes
+  7. Dashboards refresh when data changes
+**Plans**: 2 plans
+
+Plans:
+- [ ] 13-01-PLAN.md - Polling infrastructure with APScheduler (POLL-01, POLL-02, POLL-03, POLL-05)
+- [ ] 13-02-PLAN.md - Manual refresh + visualization auto-refresh (POLL-04, REFRESH-01, REFRESH-02)
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
+Phases execute in numeric order: 11 → 12 → 13
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Security & Quality Foundation | 5/5 | Complete | 01-01, 01-02, 01-03, 01-04, 01-05 |
-| 2. Performance Optimization | 4/4 | Complete | 02-01, 02-02, 02-03, 02-04 |
-| 3. Dashboard Layouts | 2/2 | Complete | 03-01, 03-02 |
-| 4. URL/API Data Source | 2/2 | Complete | 04-01, 04-02 |
-| 5. Gantt Chart API | 2/2 | Complete | 05-01, 05-02 |
-| 6. Data Merge Capability | 2/2 | Complete | 06-01, 06-02 |
-| 7. SQLite → DuckDB Migration | 3/3 | Complete | 07-01, 07-02, 07-03 |
-| 8. Import History & Metadata | 2/2 | Complete | 08-01, 08-02 |
-| 9. HTML Export Engine | 3/3 | Complete | 2026-04-11 |
-| 10. Export CLI & UX | 2/2 | Complete | 2026-04-12 |
+| 11. Database Connections | 0/3 | Pending | — |
+| 12. HTTP Enhancements | 0/2 | Pending | — |
+| 13. Polling & Auto-Refresh | 0/2 | Pending | — |
 
 ---
-
-*Roadmap defined: 2026-04-04*
-*Last updated: 2026-04-12 — Milestone v1.1 complete*
+*Roadmap defined: 2026-04-12*
+*Last updated: 2026-04-12 after v1.2 milestone planning*
