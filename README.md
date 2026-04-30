@@ -59,6 +59,7 @@
 | `/import` | `/i`, `/导入` | 数据导入 | `/import data.xlsx` |
 | `/query` | `/q`, `/sql`, `/查询` | SQL 查询 | `/query SELECT * FROM sales LIMIT 10` |
 | `/chart` | `/c`, `/图表` | 图表生成 | `/chart bar 销售额按类别` |
+| `/chart-list` | `/cl`, `/图表列表` | 查看支持的图表类型 | `/chart-list` |
 | `/export` | `/e`, `/导出` | 数据导出 | `/export result.csv --table sales` |
 | `/tables` | `/t`, `/表` | 查看表结构 | `/tables sales` |
 | `/history` | `/h`, `/历史` | 导入历史 | `/history --limit 20` |
@@ -82,6 +83,11 @@
 /chart bar 销售额按类别
 /chart line 月度销售趋势
 /chart pie 各产品占比
+
+# 查看支持的图表类型
+/chart-list              # 显示所有图表
+/chart-list basic        # 显示基础图表
+/chart-list 3d           # 显示3D图表
 
 # 数据导出
 /export result.csv --table sales
