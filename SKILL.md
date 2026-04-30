@@ -15,6 +15,195 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 
 ---
 
+## Command System
+
+> **双模式支持**: 本 Skill 同时支持**显性指令**和**模糊匹配**。当用户输入以 `/` 开头的指令时，直接执行对应操作；否则进行意图推断。
+
+### 显性指令列表
+
+| 指令 | 别名 | 功能 | 示例 |
+|------|------|------|------|
+| `/import` | `/i`, `/导入` | 数据导入 | `/import data.xlsx` |
+| `/query` | `/q`, `/sql`, `/查询` | 执行 SQL 查询 | `/query SELECT * FROM sales LIMIT 10` |
+| `/chart` | `/c`, `/图表`, `/viz` | 生成图表 | `/chart bar 销售额按类别` |
+| `/export` | `/e`, `/导出` | 数据导出 | `/export result.csv --table sales` |
+| `/tables` | `/t`, `/表`, `/结构` | 查看表结构 | `/tables sales` |
+| `/history` | `/h`, `/历史` | 查看导入历史 | `/history --limit 20` |
+| `/metrics` | `/m`, `/口径`, `/指标` | 指标管理 | `/metrics add 月活用户` |
+| `/help` | `/?`, `/帮助` | 显示帮助 | `/help` |
+| `/clean` | `/清理` | 清理旧数据 | `/clean --days 30` |
+| `/poll` | `/轮询` | 轮询管理 | `/poll status` |
+
+### 指令处理流程
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    输入处理流程                                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  用户输入                                                        │
+│      │                                                          │
+│      ▼                                                          │
+│  是否以 / 开头？                                                  │
+│      │                                                          │
+│      ├── 是 ──→ 匹配显性指令 ──→ 直接执行对应 Scenario            │
+│      │         │                                                │
+│      │         └── 未匹配 ──→ 显示 "未知指令，输入 /help 查看帮助" │
+│      │                                                          │
+│      └── 否 ──→ 模糊匹配流程                                     │
+│                │                                                │
+│                ├── 文件上传 ──→ Scenario 1 (数据导入)            │
+│                ├── 查询关键词 ──→ Scenario 2 (SQL 查询)           │
+│                ├── 图表关键词 ──→ Scenario 4 (图表生成)           │
+│                ├── 导出关键词 ──→ Scenario 6 (数据导出)           │
+│                └── 其他 ──→ 自然语言理解                          │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 指令详细说明
+
+#### `/import` - 数据导入
+```
+/import <文件路径> [--table <表名>] [--db <数据库路径>]
+/i <文件路径>  # 别名
+/导入 <文件路径>  # 中文别名
+
+示例:
+  /import data/sales.xlsx
+  /import report.csv --table monthly_report
+  /i data.xlsx --db custom.duckdb
+```
+
+#### `/query` - SQL 查询
+```
+/query <SQL语句>
+/q <SQL语句>  # 别名
+/sql <SQL语句>  # 别名
+/查询 <SQL语句>  # 中文别名
+
+示例:
+  /query SELECT * FROM sales LIMIT 10
+  /q SELECT category, SUM(amount) FROM sales GROUP BY category
+  /sql DESCRIBE sales
+```
+
+#### `/chart` - 图表生成
+```
+/chart <图表类型> [描述] [--table <表名>] [--output <路径>]
+/c <图表类型> [描述]  # 别名
+/图表 <图表类型> [描述]  # 中文别名
+
+支持的图表类型:
+  bar, line, pie, scatter, radar, map, funnel, gauge, 
+  heatmap, treemap, sunburst, sankey, graph, candlestick,
+  line3d, bar3d, scatter3d, surface
+
+示例:
+  /chart bar 销售额按类别
+  /chart line 月度销售趋势
+  /chart pie 各产品占比
+  /chart map 各省销售分布
+  /c scatter 价格与销量的关系 --table products
+```
+
+#### `/export` - 数据导出
+```
+/export <输出路径> [--table <表名>] [--query <SQL>]
+/e <输出路径>  # 别名
+/导出 <输出路径>  # 中文别名
+
+示例:
+  /export result.csv --table sales
+  /export report.xlsx --query "SELECT * FROM sales WHERE year=2024"
+  /e output/data.csv
+```
+
+#### `/tables` - 查看表结构
+```
+/tables [表名]
+/t [表名]  # 别名
+/表 [表名]  # 中文别名
+/结构 [表名]  # 中文别名
+
+示例:
+  /tables          # 显示所有表
+  /tables sales    # 显示 sales 表结构
+  /t               # 别名
+```
+
+#### `/history` - 查看导入历史
+```
+/history [--limit <数量>]
+/h [--limit <数量>]  # 别名
+/历史 [--limit <数量>]  # 中文别名
+
+示例:
+  /history          # 显示最近20条
+  /history --limit 50
+  /h --limit 10
+```
+
+#### `/metrics` - 指标管理
+```
+/metrics [add|list|show] [参数]
+/m [操作] [参数]  # 别名
+/口径 [操作]  # 中文别名
+/指标 [操作]  # 中文别名
+
+示例:
+  /metrics list                     # 列出所有指标
+  /metrics add 月活用户 --desc "当月至少登录一次的用户"
+  /metrics show 月活用户
+  /m list
+```
+
+#### `/help` - 显示帮助
+```
+/help
+/?  # 别名
+/帮助  # 中文别名
+```
+
+#### `/clean` - 清理旧数据
+```
+/clean [--days <天数>] [--db <数据库路径>]
+/清理 [--days <天数>]  # 中文别名
+
+示例:
+  /clean --days 30    # 清理30天未访问的表
+  /clean --days 7
+```
+
+#### `/poll` - 轮询管理
+```
+/poll [list|status|refresh|add|remove] [参数]
+/轮询 [操作]  # 中文别名
+
+示例:
+  /poll list              # 列出所有轮询任务
+  /poll status            # 显示详细状态
+  /poll refresh           # 手动刷新所有任务
+  /poll add --type http --name api_data --interval 300 --url "https://api.example.com/data"
+  /poll remove <job_id>
+```
+
+### 模糊匹配关键词
+
+当用户输入不是显性指令时，通过关键词推断意图：
+
+| 意图 | 触发关键词 | 执行 Scenario |
+|------|-----------|---------------|
+| 数据导入 | 上传、导入、import、load、打开文件、读取 | Scenario 1 |
+| SQL 查询 | 查询、筛选、统计、分组、排序、select、group by | Scenario 2 |
+| 图表生成 | 图表、可视化、画图、chart、plot、展示、可视化 | Scenario 4 |
+| 数据导出 | 导出、下载、export、保存、输出 | Scenario 6 |
+| 表结构 | 表结构、字段、列、describe、schema | Scenario 10 |
+| 导入历史 | 历史、导入记录、history | Scenario 10 |
+| 指标管理 | 指标、口径、定义、metric | Scenario 8 |
+
+---
+
 ## SQL Generation Protocol (CRITICAL)
 
 > **重要**: 本项目使用 DuckDB 作为 SQL 引擎，其语法与 MySQL/PostgreSQL 有显著差异。为避免 SQL 执行错误，必须严格遵循以下流程。
