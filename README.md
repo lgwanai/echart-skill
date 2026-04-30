@@ -9,6 +9,9 @@
 - 🤖 **Agent 原生设计**：专为自动化智能体打造的"操作说明书"，约束了 Agent 在面对复杂数据时的行为边界和操作规范。
 - 🤝 **广泛的兼容性**：支持主流的基于本地执行的 Agent 平台，包括但不限于 **OpenClaw, Claude Code, WorkBuddy, OpenCode, Trae** 等。
 - ⚡ **强大的"脏表"处理能力**：内置专门的 Python 导入器，能自动识别复杂表头，自动打平合并单元格，从容应对真实办公场景中的非标准 Excel 文件。
+- 💻 **显性指令支持**：支持 `/import`、`/query`、`/chart` 等显性指令，让操作更精准。同时也支持自然语言的模糊匹配。
+- 🔗 **外部数据库连接**：支持 MySQL、PostgreSQL、MongoDB、SQLite 等外部数据库查询和导入。
+- 🔄 **数据轮询刷新**：支持定时从 HTTP API 或数据库自动刷新数据，适合实时监控场景。
 
 ## 为什么要这个 Skill？
 
@@ -24,6 +27,7 @@
 
 - **智能数据导入**：全面兼容 `.csv`, `.xlsx`, `.xls`，以及 **WPS 数据文件 (`.et`)** 和 **Mac Numbers 文件 (`.numbers`)**。支持自动遍历并拆分导入所有工作表（Sheets）。超大文件自动分块（Chunking）导入，避免 OOM。
 - **对话式持续查询**：通过自然语言让 Agent 帮你进行筛选、排序、分组求和等连续操作。
+- **显性指令操作**：支持 `/import`、`/query`、`/chart` 等显性指令，精准控制操作类型。
 - **业务口径管理**：提供专门的统计口径和指标定义管理能力，持久化保存用户的业务规则，为大模型生成高准确度的 SQL 提供稳定上下文。
 - **语义提取与模糊匹配**：利用 Python 结合大模型能力，从杂乱的地址列提取省市，或将两张命名不一致的表（如"北京分公司"与"北京市分部"）进行模糊关联。
 - **全栈图表生成与报告**：直接生成纯本地交互式的 ECharts 图表，**支持数百种 ECharts 6.0 官方图表类型**。支持折线图、柱状图、饼图、散点图、雷达图、K线图、热力图、树图、旭日图、桑基图、漏斗图、仪表盘、3D图表以及带地理坐标的地图。内置中国省市及世界地图离线资源，完美支持断网环境下的数据可视化。
@@ -32,6 +36,8 @@
 - **URL 数据源接入**：支持直接从 HTTP/HTTPS URL 导入 JSON 或 CSV 数据，支持 Basic Auth 和 Bearer Token 认证，并可手动刷新数据源。
 - **甘特图支持**：提供简化的甘特图 API，只需提供任务名称、开始时间和结束时间，即可生成专业的项目进度可视化图表。
 - **表格合并能力**：支持将多个 DuckDB 表格合并为一个，并导出为 CSV/Excel 文件或保存为新的数据库表。
+- **外部数据库连接**：支持 MySQL、PostgreSQL、MongoDB、SQLite 等外部数据库的查询、Schema 发现和导入到 DuckDB。
+- **数据轮询刷新**：支持定时从 HTTP API 或外部数据库自动刷新数据，适合实时监控场景。
 
 ## 核心工作流
 
@@ -39,6 +45,63 @@
 2. **本地探查**：Agent 使用 SQL 探查表结构（Schema）和部分统计信息，而不是读取所有行。
 3. **非破坏性操作**：当收到修改指令时，Agent 会生成 SQL 或 Python 脚本在本地运行。并且必须通过创建新表或视图（如 `CREATE TABLE v2 AS SELECT...`）来执行，确保原始数据不被污染。
 4. **结果输出**：根据要求，将处理好的数据重新导出为干净的 Excel，或生成可视化图表。对于地图类需求，优先使用本地静态地图，遇到精细维度则自动降级启用百度 AK 渲染模式。
+
+---
+
+## 显性指令系统
+
+本 Skill 支持双模式交互：**显性指令**和**模糊匹配**。
+
+### 支持的指令
+
+| 指令 | 别名 | 功能 | 示例 |
+|------|------|------|------|
+| `/import` | `/i`, `/导入` | 数据导入 | `/import data.xlsx` |
+| `/query` | `/q`, `/sql`, `/查询` | SQL 查询 | `/query SELECT * FROM sales LIMIT 10` |
+| `/chart` | `/c`, `/图表` | 图表生成 | `/chart bar 销售额按类别` |
+| `/export` | `/e`, `/导出` | 数据导出 | `/export result.csv --table sales` |
+| `/tables` | `/t`, `/表` | 查看表结构 | `/tables sales` |
+| `/history` | `/h`, `/历史` | 导入历史 | `/history --limit 20` |
+| `/metrics` | `/m`, `/口径` | 指标管理 | `/metrics add 月活用户` |
+| `/help` | `/?`, `/帮助` | 显示帮助 | `/help` |
+| `/clean` | `/清理` | 清理旧数据 | `/clean --days 30` |
+| `/poll` | `/轮询` | 轮询管理 | `/poll status` |
+
+### 使用示例
+
+```bash
+# 数据导入
+/import sales.xlsx
+/i report.csv --table monthly_report
+
+# SQL 查询
+/query SELECT category, SUM(amount) FROM sales GROUP BY category
+/q SELECT * FROM sales WHERE year = 2024
+
+# 图表生成
+/chart bar 销售额按类别
+/chart line 月度销售趋势
+/chart pie 各产品占比
+
+# 数据导出
+/export result.csv --table sales
+/e report.xlsx --query "SELECT * FROM sales WHERE amount > 1000"
+
+# 查看表结构
+/tables          # 显示所有表
+/tables sales    # 显示 sales 表结构
+```
+
+### 模糊匹配关键词
+
+当用户输入不是显性指令时，系统会通过关键词推断意图：
+
+| 意图 | 触发关键词 |
+|------|-----------|
+| 数据导入 | 上传、导入、import、load、打开文件 |
+| SQL 查询 | 查询、筛选、统计、分组、排序、select |
+| 图表生成 | 图表、可视化、画图、chart、plot、展示 |
+| 数据导出 | 导出、下载、export、保存、输出 |
 
 ---
 
@@ -359,6 +422,129 @@ python scripts/data_importer.py refresh api_data --db workspace.duckdb
 
 ---
 
+### 场景 12：外部数据库连接
+
+**触发条件**：用户需要查询 MySQL、PostgreSQL、MongoDB 或 SQLite 数据库。
+
+**配置连接**（`db_connections.json`）：
+```json
+{
+    "connections": {
+        "mysql_prod": {
+            "type": "mysql",
+            "host": "localhost",
+            "port": 3306,
+            "database": "production",
+            "username": "admin",
+            "password": "${MYSQL_PASSWORD}"
+        },
+        "postgres_analytics": {
+            "type": "postgresql",
+            "host": "analytics-db.internal",
+            "database": "analytics",
+            "username": "reader",
+            "password": "${PG_PASSWORD}"
+        },
+        "mongo_docs": {
+            "type": "mongodb",
+            "connection_string": "${MONGODB_URI}"
+        }
+    }
+}
+```
+
+**查询与导入**：
+```bash
+# 查询外部数据库
+python scripts/db_cli.py query mysql_prod "SELECT * FROM orders WHERE date > '2024-01-01'"
+
+# 查看表结构
+python scripts/db_cli.py list-tables mysql_prod
+python scripts/db_cli.py describe-table mysql_prod users
+
+# 导入到 DuckDB
+python scripts/db_cli.py import mysql_prod "SELECT * FROM customers" --table-name customers_import
+```
+
+**支持的数据源**：
+- MySQL / MariaDB
+- PostgreSQL
+- MongoDB（自动展平嵌套文档）
+- SQLite
+
+---
+
+### 场景 13：数据轮询刷新
+
+**触发条件**：用户需要定时从 API 或数据库自动刷新数据。
+
+**创建轮询配置**（`polling_config.json`）：
+```json
+{
+    "jobs": [
+        {
+            "source_type": "http",
+            "source_name": "sales_api",
+            "interval_seconds": 300,
+            "table_name": "live_sales",
+            "http_config": {
+                "url": "https://api.example.com/sales",
+                "format": "json",
+                "auth": {"type": "bearer", "token": "${API_TOKEN}"}
+            }
+        },
+        {
+            "source_type": "database",
+            "source_name": "production_db",
+            "interval_seconds": 600,
+            "table_name": "live_orders",
+            "db_profile": "mysql_prod",
+            "query": "SELECT * FROM orders WHERE created_at > NOW() - INTERVAL 1 HOUR"
+        }
+    ]
+}
+```
+
+**管理轮询任务**：
+```bash
+# 列出所有任务
+python scripts/polling_cli.py list
+
+# 查看状态
+python scripts/polling_cli.py status
+
+# 手动刷新
+python scripts/polling_cli.py refresh
+
+# 添加新任务
+python scripts/polling_cli.py add --type http --name api_data --interval 300 --table api_data --url "https://api.example.com/data"
+
+# 移除任务
+python scripts/polling_cli.py remove <job_id>
+```
+
+---
+
+## SQL 函数参考
+
+本 Skill 使用 **DuckDB** 作为 SQL 引擎，语法与 MySQL/PostgreSQL 有差异。为避免 SQL 执行错误：
+
+1. **函数参考文档**：`references/SQL_FUNCTIONS_REFERENCE.md` 包含所有 DuckDB 支持的函数及其用法。
+2. **常见函数映射**：
+
+| MySQL 函数 | DuckDB 替代 |
+|-----------|-------------|
+| `GROUP_CONCAT(col, sep)` | `string_agg(col, sep)` |
+| `DATE_FORMAT(date, '%Y-%m')` | `strftime(date, '%Y-%m')` |
+| `DATEDIFF(a, b)` | `date_diff('day', a, b)` |
+| `NOW()` | `CURRENT_TIMESTAMP` 或 `today()` |
+| `IFNULL(a, b)` | `COALESCE(a, b)` |
+| `MOD(a, b)` | `a % b` |
+
+3. **错误修复流程**：当 SQL 执行出错时，系统会通过 reAct 循环自动定位问题、查阅文档并修复。
+
+---
+
 ## 安装方式
 
 将本 Skill 包导入到你的 Agent 平台的技能（Skills）库中即可：
@@ -474,6 +660,9 @@ A: 创建一个 JSON 配置文件，定义图表位置和配置，然后使用 `
 | 本地服务 | `scripts/server.py` | 本地 HTTP 服务，预览图表 |
 | 业务口径 | `scripts/metrics_manager.py` | 持久化业务规则和指标定义 |
 | 历史查看 | `scripts/history_viewer.py` | 查看导入历史、表结构、表关联关系 |
+| 外部数据库 | `scripts/db_cli.py` | MySQL/PostgreSQL/MongoDB 连接与查询 |
+| 数据轮询 | `scripts/polling_cli.py` | 定时刷新 HTTP API 或数据库数据 |
+| 图表 CLI | `scripts/chart_cli.py` | 命令行图表导出工具 |
 
 ## 更新日志
 
