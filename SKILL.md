@@ -34,6 +34,9 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | `/help` | `/?`, `/帮助` | 显示帮助 | `/help` |
 | `/clean` | `/清理` | 清理旧数据 | `/clean --days 30` |
 | `/poll` | `/轮询` | 轮询管理 | `/poll status` |
+| `/start` | `/server`, `/启动服务` | 启动本地服务 | `/start` |
+| `/stop` | `/停止服务` | 停止本地服务 | `/stop` |
+| `/status` | `/状态` | 查看服务状态和链接 | `/status` |
 
 ### 指令处理流程
 
@@ -255,6 +258,52 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   /poll remove <job_id>
 ```
 
+#### `/start` - 启动本地服务
+```
+/start [--port <端口>]
+/server [--port <端口>]  # 别名
+/启动服务 [--port <端口>]  # 中文别名
+
+启动本地 HTTP 服务器以查看生成的图表。
+
+参数:
+  --port <端口>  可选，指定端口号（默认自动选择 8100-8200）
+
+示例:
+  /start              # 自动选择可用端口启动
+  /start --port 8080  # 指定端口启动
+  /server             # 别名
+```
+
+#### `/stop` - 停止本地服务
+```
+/stop
+/停止服务  # 中文别名
+
+停止正在运行的本地 HTTP 服务器。
+
+示例:
+  /stop    # 停止服务
+```
+
+#### `/status` - 查看服务状态
+```
+/status
+/状态  # 中文别名
+
+查看服务运行状态和所有可访问的图表链接。
+
+显示内容:
+  - 服务状态（运行中/已停止）
+  - 运行端口
+  - 启动时间
+  - 运行时长
+  - 可访问图表列表（带完整 URL）
+
+示例:
+  /status  # 查看当前状态和链接
+```
+
 ### 模糊匹配关键词
 
 当用户输入不是显性指令时，通过关键词推断意图：
@@ -268,6 +317,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | 表结构 | 表结构、字段、列、describe、schema | Scenario 10 |
 | 导入历史 | 历史、导入记录、history | Scenario 10 |
 | 指标管理 | 指标、口径、定义、metric | Scenario 8 |
+| 服务管理 | 服务、服务器、启动、停止、server | Scenario 15 |
 
 ---
 
