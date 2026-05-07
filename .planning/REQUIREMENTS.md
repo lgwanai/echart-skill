@@ -41,10 +41,10 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Server Management
 
-- [ ] **SRV-01**: User can start local HTTP server with /start command (aliases: /server, /启动服务)
-- [ ] **SRV-02**: User can stop server with /stop command (alias: /停止服务)
-- [ ] **SRV-03**: User can check service status with /status command (alias: /状态)
-- [ ] **SRV-04**: Service state persists to outputs/.server_status.json (PID, port, start time)
+- [x] **SRV-01**: User can start local HTTP server with /start command (aliases: /server, /启动服务)
+- [x] **SRV-02**: User can stop server with /stop command (alias: /停止服务)
+- [x] **SRV-03**: User can check service status with /status command (alias: /状态)
+- [x] **SRV-04**: Service state persists to outputs/.server_status.json (PID, port, start time)
 - [x] **SRV-05**: User sees list of accessible chart URLs after starting server (with file metadata)
 
 ## v2 Requirements
