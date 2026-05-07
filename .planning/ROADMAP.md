@@ -98,6 +98,22 @@ Phases execute in numeric order: 11 → 12 → 13
 
 Plans:
 - [ ] 14-01-PLAN.md - Server management CLI with /start, /stop, /status commands (SRV-01, SRV-02, SRV-03, SRV-04)
+
+### Phase 15: 地图生成优化与测试验证
+**Goal**: Fix map chart generation issues, optimize prompts to use local static maps correctly, add comprehensive test validation
+**Depends on**: Phase 14
+**Requirements**: MAP-01, MAP-02, MAP-03, MAP-04, MAP-05
+**Success Criteria** (what must be TRUE):
+  1. All map prompt templates explicitly instruct to use local static maps (china.js, world.js) WITHOUT $.get or registerMap
+  2. SKILL.md contains clear Map Generation Priority rules with examples
+  3. Test suite validates China map, World map, Province map, BMap mode correctly
+  4. All map chart tests pass (test_china_static_map, test_world_static_map, test_bmap_mode_with_baidu_ak)
+  5. Documentation exists for map chart best practices (docs/map_chart_best_practices.md)
+  6. New prompt templates created for china_static_map.md and world_static_map.md
+**Plans**: 1 plan
+
+Plans:
+- [x] 15-01-PLAN.md - Map generation optimization: update SKILL.md, create test suite, add new prompt templates, create best practices documentation (MAP-01, MAP-02, MAP-03, MAP-04, MAP-05)
 - [ ] 14-02-PLAN.md - Status reporting and chart link listing utility (SRV-05)
 
 ---

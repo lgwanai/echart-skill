@@ -221,7 +221,12 @@ def run_server_forever(port, base_dir):
     CustomHTTPRequestHandler._lifecycle = lifecycle
 
     handler = CustomHTTPRequestHandler
-    with socketserver.TCPServer(("", port), handler) as httpd:
+    
+    # Create server with address reuse enabled to allow quick restart
+    class ReuseAddressServer(socketserver.TCPServer):
+        allow_reuse_address = True
+    
+    with ReuseAddressServer(("", port), handler) as httpd:
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:

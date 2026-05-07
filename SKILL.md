@@ -516,12 +516,40 @@ LIMIT 10;
        "echarts_option": { ... }, // Generated option from prompt
        "custom_js": "..." // Optional JS logic for complex data binding
    }
-   ```
-   *Note: All chart JS dependencies (like `echarts.min.js`, `china.js`, `bmap.min.js`) MUST use the local relative paths injected by the Python generator. DO NOT include any `<script src="https://cdn...">` remote links in the generated code to ensure offline support. Output files MUST be stored in the isolated `outputs/html/` directory.*
-   *CRITICAL ECHARTS RULE: The ECharts `pie` series DOES NOT support `coordinateSystem: 'geo'`. If the user asks to display data on a map, you MUST use `scatter` or `effectScatter` series with bubble sizes representing the values. NEVER attempt to put a pie chart on a geo map directly.*
-   *MAP FALLBACK RULE: For map-based charts, prioritize using local static maps (`china`, `world`, or specific province names). If the user needs to visualize data at a granularity not supported by local static JS (e.g., city-level dimensions without a corresponding local map, street-level data, or specific foreign countries not fully detailed in the world map), you MUST fallback to using ECharts `bmap` mode (Baidu Map API). This requires an AK (`ak` mode).*
-   *BAIDU AK RULE: If the user provides a Baidu Map AK, remember that there are two types of APIs: 1) JavaScript API (Frontend) and 2) Geocoding API (Backend Python). If the backend Python geocoding fails with "status 240", it means the AK is a Browser-type AK and lacks Backend Geocoding permissions. In this case, you should either fallback to hardcoded coordinates in JS or ask the user to provide a "Server-side" AK.*
-   *GANTT CHART RULE: Gantt charts use a dedicated simplified API (see Scenario 9) rather than the template-based approach. Use `scripts/gantt_chart.py` with `generate_gantt_chart()` for timeline visualizations.*
+```
+    *Note: All chart JS dependencies (like `echarts.min.js`, `china.js`, `bmap.min.js`) MUST use the local relative paths injected by the Python generator. DO NOT include any `<script src="https://cdn...">` remote links in the generated code to ensure offline support. Output files MUST be stored in the isolated `outputs/html/` directory.*
+    
+    **CRITICAL ECHARTS RULES**:
+    1. **Pie on Map**: The ECharts `pie` series DOES NOT support `coordinateSystem: 'geo'`. If the user asks to display data on a map, you MUST use `scatter` or `effectScatter` series with bubble sizes representing the values. NEVER attempt to put a pie chart on a geo map directly.
+    
+    2. **Map Generation Priority (CRITICAL)**:
+       - **Local Static Maps (First Choice)**: For China provinces (`"map": "china"`), World countries (`"map": "world"`), or Chinese provinces (`"map": "guangdong"`, `"map": "beijing"`), ALWAYS use local static map JS files directly. DO NOT use `$.get()` to fetch GeoJSON from remote URLs. DO NOT use `echarts.registerMap()` for these standard maps. Just set `"map": "china"` or `"map": "world"` in the series config - the generator will auto-inject the correct JS file.
+       
+       - **Example (CORRECT)**:
+         ```json
+         {
+           "series": [{
+             "type": "map",
+             "map": "china",  // Directly use map name
+             "roam": true,
+             "data": [{"name": "北京", "value": 15000}]
+           }]
+         }
+         ```
+       
+       - **Example (WRONG - DO NOT USE)**:
+         ```javascript
+         // ❌ DO NOT use $.get for local static maps
+         $.get(ROOT_PATH + '/data/asset/geo/china.json', function(geoJSON) {
+           echarts.registerMap('china', geoJSON);  // Unnecessary!
+         });
+         ```
+       
+       - **BMap Mode (Fallback)**: Use `"bmap"` mode only when local static maps don't cover the required granularity (e.g., city-level data without province map, street-level data, or specific foreign countries not in world.js). This requires `BAIDU_AK` environment variable.
+    
+    3. **Baidu AK Types**: If the user provides a Baidu Map AK, remember there are two types: 1) JavaScript API (Frontend) and 2) Geocoding API (Backend Python). If backend Python geocoding fails with "status 240", it means the AK is a Browser-type AK and lacks Backend Geocoding permissions. Fallback to hardcoded coordinates in JS or ask for a "Server-side" AK.
+    
+    4. **Gantt Chart**: Uses a dedicated simplified API (see Scenario 9) rather than the template-based approach. Use `scripts/gantt_chart.py` for timeline visualizations.
  7. Execute the command:
     ```bash
     python scripts/chart_generator.py --config outputs/configs/your_config.json

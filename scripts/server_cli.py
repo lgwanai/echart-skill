@@ -60,32 +60,42 @@ def save_status(status: dict) -> None:
         json.dump(status, f, indent=2)
 
 
-def start_server(port: int | None = None) -> dict:
+def start_server(port: int | None = None, force_restart: bool = False) -> dict:
     """Start the local HTTP server.
     
     Args:
         port: Optional specific port (default: auto-select from 8100-8200)
+        force_restart: If True, always restart even if already running
     
     Returns:
         Status dict with pid, port, start_time, status
     """
+    # Load existing status to remember previous port
+    existing_status = load_status()
+    previous_port = existing_status.get("port")
+    
     # Check if server already running
     running_port = check_server_running(*DEFAULT_PORT_RANGE)
+    
     if running_port:
-        # Load existing status
-        status = load_status()
-        if status.get("status") == "running" and status.get("port") == running_port:
-            # Server already running, return existing status
-            return status
-        
-        # Server running but status file missing/outdated, update it
-        return {
-            "pid": None,  # We don't know the PID
-            "port": running_port,
-            "start_time": datetime.now().isoformat(),
-            "status": "running",
-            "message": "Server already running"
-        }
+        # Server is running - stop it first to avoid duplicate instances
+        stop_result = stop_server()
+        if stop_result.get("status") not in ["stopped", "not_running"]:
+            # Failed to stop, return error
+            return {
+                "status": "error",
+                "message": f"Failed to stop existing server: {stop_result.get('message')}",
+                "previous_port": running_port
+            }
+        # Wait for port to be released
+        time.sleep(0.5)
+    
+    # If no specific port requested, try previous port first (for restart)
+    if port is None:
+        if previous_port and DEFAULT_PORT_RANGE[0] <= previous_port <= DEFAULT_PORT_RANGE[1]:
+            port = previous_port
+        else:
+            port = None  # Will auto-select
     
     # Find available port
     if port is None:
@@ -100,13 +110,17 @@ def start_server(port: int | None = None) -> dict:
     else:
         # Verify requested port is available
         import socket
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            try:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.bind(('', port))
-            except OSError as e:
+        except OSError:
+            # Port not available, try to find another
+            try:
+                port = find_free_port(*DEFAULT_PORT_RANGE)
+            except IOError as e:
                 return {
                     "status": "error",
-                    "message": f"Port {port} is not available",
+                    "message": f"Port {port} not available and no free ports found",
                     "error": str(e)
                 }
     
