@@ -1,5 +1,152 @@
 # Release Note - Echart Skill
 
+## v1.3.0 (2026-05-07)
+
+### 🎨 Dashboard 自然语言生成（重大更新）
+
+#### 简化 Dashboard 生成
+- **自然语言输入**：新增 `scripts/simple_dashboard.py`，支持用自然语言描述 Dashboard，无需编写复杂 JSON 配置
+- **智能解析**：自动解析图表类型和需求，如"各地区销售柱状图"自动识别为 bar 类型
+- **自动 SQL 生成**：系统根据 `group_by` 参数自动生成聚合 SQL 查询
+- **智能布局算法**：自动计算最优网格列数，智能分配图表位置，地图自动 2x1 大尺寸，饼图可纵向扩展
+
+#### 三种生成方式
+```bash
+# 方式一：自然语言（最简单）
+/dashboard 创建销售分析仪表盘，包含：地区柱状图、品类饼图、趋势折线图、全国地图
+
+# 方式二：简化 API
+dashboard.add_chart("bar", "地区销售", group_by="region")
+dashboard.add_chart("pie", "品类占比", group_by="category")
+
+# 方式三：一行代码
+create_dashboard_from_text("创建仪表盘，包含地区柱状图和品类饼图")
+```
+
+#### 支持 9 种图表类型
+- **柱状图** (bar): `group_by` 参数
+- **折线图** (line): `time_column` 参数
+- **饼图** (pie): `group_by` 参数
+- **地图** (map): `geo_column` 参数（自动识别层级）
+- **散点图** (scatter): `x_column`, `y_column`
+- **雷达图** (radar): `dimensions`
+- **漏斗图** (funnel): `group_by`
+- **树图** (treemap): `group_by`
+- **旭日图** (sunburst): `hierarchy`
+
+#### 可选参数
+- `agg_column`: 聚合列（默认求和）
+- `top_n`: Top N 结果
+- `sort`: 排序方向（asc/desc）
+- `filter`: WHERE 筛选条件
+
+### 🎯 Dashboard 专业 UI/UX 模板
+
+#### 现代化设计
+- **卡片式布局**：700+ 行专业 CSS 模板，带阴影效果和悬停动画
+- **深色/浅色主题**：完整的深色主题支持，CSS 变量驱动，一键切换
+- **响应式设计**：自动适配手机（单列）、平板（2列）、桌面（3列）
+- **Toast 通知**：操作反馈、错误提示、自动消失
+- **加载状态**：智能加载骨架屏动画
+
+#### 9 大交互功能
+- 🌓 **主题切换**：深色/浅色主题，偏好保存到 localStorage
+- 🔄 **自动刷新**：可配置刷新间隔（默认 30 秒）
+- 📄 **导出 PDF**：一键导出整个仪表盘为 PDF 文件
+- 🔍 **图表搜索**：按标题快速过滤图表
+- ⬇️ **单独下载**：每个图表支持下载为 PNG 图片
+- 🍞 **Toast 通知**：操作成功、错误提示
+- ⏳ **加载状态**：智能加载骨架屏
+- 📱 **响应式 Resize**：窗口改变自动调整图表大小
+- 🎨 **动画效果**：卡片悬停上移、阴影增强
+
+#### DashboardController 交互脚本
+- 主题切换 + localStorage 持久化
+- 自动刷新管理（可配置间隔）
+- 导出 PDF（支持 html2canvas + jsPDF）
+- 图表搜索/过滤功能
+- 单独下载图表 PNG
+- Toast 通知系统
+- 响应式 resize 处理
+
+### 🗺️ 地图三层级架构优化
+
+#### 明确的层级划分
+- **层级一：省份级别** → 使用 `china.js`（包含全国所有省份）
+- **层级二：城市级别** → 使用省份 JS（如 `guangdong.js` 包含 21 城市）
+- **层级三：区县街道** → 使用百度地图 API（需要 `BAIDU_AK`）
+
+#### 使用规则
+```
+省份数据（北京、上海、广东） → "map": "china"
+城市数据（广州、深圳、东莞） → "map": "guangdong"
+区县数据（天河区、南山区） → "bmap": {...}
+```
+
+#### 本地静态地图覆盖
+- ✅ **34 个省份地图**：每个省份包含所有城市数据
+- ✅ **完整城市名称**：使用全称（如"广州市"、"深圳市"）
+- ✅ **优先本地资源**：前两层使用本地静态地图，仅第三层需要百度 AK
+- ✅ **自动降级**：精细维度自动启用百度地图 API
+
+#### 测试验证
+- 新增 `tests/test_map_charts.py` 测试套件
+- 4 个测试全部通过：中国地图、世界地图、省份地图、百度地图模式
+- 验证本地静态地图 JS 正确注入
+- 验证不使用 $.get() 或 registerMap()
+
+#### 文档完善
+- `docs/map_chart_best_practices.md`：地图使用最佳实践
+- `references/prompts/map/china_static_map.md`：中国地图模板
+- `references/prompts/map/world_static_map.md`：世界地图模板
+- SKILL.md Scenario 4：地图生成规则和三层级说明
+
+### 📝 文档大幅更新
+
+#### README 重构
+- **快速开始**：环境要求、安装步骤、平台适配
+- **7 个详细案例**：数据导入、SQL查询、图表生成、Dashboard、导出、数据库、轮询
+- **三层级地图**：完整的使用规则和示例
+- **Dashboard 三种方式**：自然语言、简化API、一行代码
+- **FAQ 扩展**：新增 Dashboard 和地图问答
+
+#### SKILL.md 更新
+- Scenario 15：Dashboard 生成（4 种方法）
+- 新增 `/dashboard` 指令完整说明
+- 地图三层级架构决策树
+- 自然语言 Dashboard 示例
+
+### 🔧 服务管理优化
+
+- 新增 `/start`、`/stop`、`/status` 指令
+- `scripts/server_cli.py`：服务启动/停止/状态查询
+- `scripts/server_status.py`：图表链接列表显示
+- 自动启动服务：生成图表后自动启动本地服务器
+- PID 文件追踪：防止重复启动，端口冲突处理
+
+### 📦 功能模块
+
+| 新增模块 | 文件 | 说明 |
+|---------|------|------|
+| 简化 Dashboard | `scripts/simple_dashboard.py` | 自然语言生成、自动布局 |
+| Dashboard UI | `assets/dashboard/dashboard.css` | 700+ 行专业 UI 模板 |
+| Dashboard 交互 | `assets/dashboard/dashboard.js` | DashboardController 类 |
+| 服务管理 | `scripts/server_cli.py` | /start, /stop, /status |
+| 状态查询 | `scripts/server_status.py` | 图表链接列表 |
+| 地图测试 | `tests/test_map_charts.py` | 4 个地图测试 |
+| 地图文档 | `docs/map_chart_best_practices.md` | 最佳实践指南 |
+| 示例配置 | `examples/dashboard_config.json` | Dashboard 示例 |
+
+### 🎯 解决的问题
+
+1. **Dashboard 配置复杂** → 自然语言输入，一键生成
+2. **地图无法显示** → 明确三层级架构，优先本地静态地图
+3. **手动启动服务** → 自动启动，返回完整 URL
+4. **重复启动服务** → PID 追踪，端口冲突检测
+5. **文档不够详细** → 7 个案例，完整操作指南
+
+---
+
 ## v1.0.0 (2026-04-04)
 
 ### 🚀 新功能 (New Features)
