@@ -2,33 +2,85 @@
 
 This guide provides best practices for generating map charts using local static map files.
 
-## Core Principles
+## Map Hierarchy and Usage Rules
+
+### 🎯 **Three-Level Map Hierarchy**
+
+| Level | Coverage | Data Source | Usage |
+|-------|----------|-------------|-------|
+| **Province Level** | China provinces (北京, 上海, 广东...) | `china.js` | ✅ Always use local static map |
+| **City Level** | Cities within a province (广州, 深圳, 东莞...) | Province JS (e.g., `guangdong.js`) | ✅ Use local static province map |
+| **District/Street Level** | Districts, streets, custom locations | Baidu Map API | ⚠️ Requires `BAIDU_AK` |
+
+### 🎯 **Core Principles**
 
 ### 1. **ALWAYS Use Local Static Maps When Available**
 
-ECharts skill provides local static map JavaScript files for common regions:
-- `china.js` - China map (provinces)
-- `world.js` - World map (countries)
-- Province maps: `anhui.js`, `beijing.js`, `guangdong.js`, etc. (see `assets/echarts/`)
+ECharts skill provides local static map JavaScript files:
+- **National**: `china.js` (contains all provinces)
+- **Global**: `world.js` (contains all countries)
+- **Provincial**: `guangdong.js`, `beijing.js`, `zhejiang.js`, etc. (each contains all cities in that province)
+
+**Example**: Guangdong province map (`guangdong.js`) includes:
+- 广州市 (Guangzhou)
+- 深圳市 (Shenzhen)
+- 东莞市 (Dongguan)
+- 中山市 (Zhongshan)
+- 佛山市 (Foshan)
+- etc. (21 cities total)
 
 **DO NOT** use dynamic GeoJSON loading with `$.get()` and `echarts.registerMap()` for these maps!
 
 ### 2. **Correct Usage - Local Static Maps**
 
-```javascript
-// ✅ CORRECT - Use map name directly
+#### **Province Level (China Provinces)**
+```json
 {
   "series": [{
     "type": "map",
-    "map": "china",  // Directly use map name, NO need to register
-    "roam": true,
+    "map": "china",  // Use china.js
     "data": [
       {"name": "北京", "value": 15000},
-      {"name": "上海", "value": 12000}
+      {"name": "广东", "value": 18000}
     ]
   }]
 }
 ```
+
+#### **City Level (Cities within a Province)**
+```json
+{
+  "series": [{
+    "type": "map",
+    "map": "guangdong",  // Use guangdong.js (contains 21 cities)
+    "data": [
+      {"name": "广州市", "value": 5000},
+      {"name": "深圳市", "value": 6000},
+      {"name": "东莞市", "value": 3000}
+    ]
+  }]
+}
+```
+
+#### **District/Street Level (Requires Baidu Map)**
+```json
+{
+  "bmap": {
+    "center": [113.26, 23.13],  // Guangzhou coordinates
+    "zoom": 12,
+    "roam": true
+  },
+  "series": [{
+    "type": "scatter",
+    "coordinateSystem": "bmap",
+    "data": [
+      {"name": "天河区", "value": [113.33, 23.12, 1000]}
+    ]
+  }]
+}
+```
+
+**Note**: BMap mode requires `BAIDU_AK` environment variable.
 
 The chart generator will automatically inject the corresponding JS file:
 ```html
@@ -50,22 +102,24 @@ $.get(ROOT_PATH + '/data/asset/geo/china.json', function (geoJSON) {
 ```
 User wants to visualize geographical data
          │
-         ├── Is it China provinces?
-         │   └── YES → Use "map": "china"
+         ├── What granularity level?
          │
-         ├── Is it World countries?
-         │   └── YES → Use "map": "world"
+         ├── 1️⃣ PROVINCE LEVEL (中国省份)
+         │   ├── Beijing, Shanghai, Guangdong, Zhejiang...
+         │   └── ✅ Use "map": "china" (china.js)
+         │       └── Data: [{"name": "北京", "value": 15000}]
          │
-         ├── Is it a Chinese province (e.g., Guangdong cities)?
-         │   └── YES → Use "map": "guangdong" (or other province name)
+         ├── 2️⃣ CITY LEVEL (省内城市)
+         │   ├── Guangzhou, Shenzhen, Dongguan (in Guangdong)
+         │   ├── Hangzhou, Ningbo (in Zhejiang)
+         │   └── ✅ Use "map": "guangdong" (guangdong.js)
+         │       └── Data: [{"name": "广州市", "value": 5000}]
          │
-         ├── Is it city-level data WITHOUT province map?
-         │   └── YES → Use bmap mode (Baidu Map API)
-         │
-         └── Is it other countries/regions?
-             └── Check if local map JS exists
-                 ├── YES → Use "map": "{name}"
-                 └── NO → Use bmap mode or provide GeoJSON URL
+         └── 3️⃣ DISTRICT/STREET LEVEL (区县、街道)
+             ├── Tianhe District (天河区)
+             ├── Specific locations
+             └── ⚠️ Use "bmap" mode (requires BAIDU_AK)
+                 └── Data: [{"name": "天河区", "value": [lng, lat, val]}]
 ```
 
 ## Examples
@@ -124,6 +178,8 @@ User wants to visualize geographical data
 
 ### Province Map (Cities)
 
+**Example: Guangdong Province Cities**
+
 ```json
 {
   "title": {"text": "广东省各城市人口"},
@@ -132,20 +188,65 @@ User wants to visualize geographical data
   "series": [{
     "name": "人口",
     "type": "map",
-    "map": "guangdong",
+    "map": "guangdong",  // Uses guangdong.js (contains 21 cities)
     "roam": true,
     "label": {"show": true},
     "data": [
       {"name": "广州市", "value": 15000000},
-      {"name": "深圳市", "value": 13000000}
+      {"name": "深圳市", "value": 13000000},
+      {"name": "东莞市", "value": 8000000},
+      {"name": "佛山市", "value": 7000000}
     ]
   }]
 }
 ```
 
-### BMap Mode (City-level or Street-level)
+**Available Province Maps** (see `assets/echarts/`):
+- `anhui.js` (安徽 - 16 cities)
+- `beijing.js` (北京 - districts)
+- `chongqing.js` (重庆 - districts)
+- `fujian.js` (福建 - 9 cities)
+- `guangdong.js` (广东 - 21 cities)
+- `guangxi.js` (广西 - 14 cities)
+- `guizhou.js` (贵州 - 9 cities)
+- `hainan.js` (海南 - 4 cities)
+- `hebei.js` (河北 - 11 cities)
+- `heilongjiang.js` (黑龙江 - 13 cities)
+- `henan.js` (河南 - 18 cities)
+- `hubei.js` (湖北 - 17 cities)
+- `hunan.js` (湖南 - 14 cities)
+- `jiangsu.js` (江苏 - 13 cities)
+- `jiangxi.js` (江西 - 11 cities)
+- `jilin.js` (吉林 - 9 cities)
+- `liaoning.js` (辽宁 - 14 cities)
+- `neimenggu.js` (内蒙古 - 12 cities)
+- `ningxia.js` (宁夏 - 5 cities)
+- `qinghai.js` (青海 - 8 cities)
+- `shandong.js` (山东 - 17 cities)
+- `shanghai.js` (上海 - districts)
+- `shanxi.js` (山西 - 11 cities)
+- `shanxi1.js` (陕西 - 10 cities)
+- `sichuan.js` (四川 - 21 cities)
+- `taiwan.js` (台湾)
+- `tianjin.js` (天津 - districts)
+- `xianggang.js` (香港)
+- `xinjiang.js` (新疆 - 24 cities)
+- `xizang.js` (西藏 - 7 cities)
+- `yunnan.js` (云南 - 16 cities)
+- `zhejiang.js` (浙江 - 11 cities)
 
-When you need city-level or street-level data that's not covered by local static maps:
+**City Names Format**: Use full Chinese name (e.g., "广州市", "深圳市")
+
+### BMap Mode (District/Street Level)
+
+**When to Use BMap Mode**:
+1. ✅ District/county level data (区县级别) - e.g., 天河区, 南山区
+2. ✅ Street level data (街道级别)
+3. ✅ Custom locations not in static maps
+4. ❌ NOT for province-level data (use china.js)
+5. ❌ NOT for city-level data (use province.js)
+
+**Example**:
 
 ```json
 {

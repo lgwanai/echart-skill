@@ -205,6 +205,63 @@ class TestMapChartTemplates:
         assert "https://cdn.jsdelivr.net/npm/echarts" not in html
         assert "$.get" not in html
 
+    def test_province_static_map(self, test_db, tmp_path):
+        """Test Province map using local static province.js (NOT dynamic GeoJSON).
+        
+        Province maps (e.g., guangdong.js) contain city-level data.
+        Use full city names like "广州市", "深圳市".
+        """
+        config = {
+            "db_path": test_db,
+            "query": "SELECT city, population FROM gd_cities",
+            "title": "广东省各城市人口分布",
+            "output_path": str(tmp_path / "guangdong_map.html"),
+            "echarts_option": {
+                "title": {
+                    "text": "广东省各城市人口分布",
+                    "left": "center"
+                },
+                "tooltip": {
+                    "trigger": "item",
+                    "formatter": "{b}<br/>人口: {c}万人"
+                },
+                "visualMap": {
+                    "min": 200,
+                    "max": 1500,
+                    "left": "left",
+                    "top": "bottom",
+                    "text": ["高", "低"],
+                    "calculable": True,
+                    "inRange": {
+                        "color": ["#fee5d9", "#a50f15"]
+                    }
+                },
+                "series": [{
+                    "name": "人口",
+                    "type": "map",
+                    "map": "guangdong",
+                    "roam": True,
+                    "label": {
+                        "show": True
+                    },
+                    "data": []
+                }]
+            },
+            "custom_js": ""
+        }
+        
+        output = generate_chart(config)
+        
+        with open(output, 'r', encoding='utf-8') as f:
+            html = f.read()
+        
+        assert "guangdong.js" in html, "guangdong.js script must be included for Guangdong map"
+        assert "echarts.min.js" in html
+        assert "https://cdn.jsdelivr.net/npm/echarts" not in html
+        assert "$.get" not in html
+        
+        print(f"✅ Province (Guangdong) static map test passed: {output}")
+
     def test_bmap_mode_with_baidu_ak(self, test_db, tmp_path):
         """Test Baidu Map (bmap) mode when local static map is not sufficient."""
         config = {
