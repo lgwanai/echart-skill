@@ -83,6 +83,23 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
 }
 
+/* Dark Mode Form Controls */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] input::placeholder {
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .btn:focus {
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.4);
+}
+
 /* ============================================
    Base Styles
    ============================================ */
@@ -643,18 +660,27 @@ body {
 @media print {
   .dashboard-header,
   .dashboard-toolbar,
-  .toast-container {
-    display: none;
+  .toast-container,
+  #loading-overlay,
+  .loading-overlay {
+    display: none !important;
   }
   
   .chart-card {
     page-break-inside: avoid;
     box-shadow: none;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
   }
   
   .dashboard-grid {
     grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .visually-hidden {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
   }
 }
 

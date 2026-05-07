@@ -143,10 +143,9 @@ class TestMapChartTemplates:
         assert "china.js" in html, "china.js script must be included for China map"
         assert "echarts.min.js" in html, "echarts.min.js must be included"
         
-        # Validate NO remote CDN links
         assert "https://cdn.jsdelivr.net/npm/echarts" not in html, "Should NOT use remote CDN"
         assert "$.get" not in html, "Should NOT use dynamic $.get for GeoJSON loading"
-        assert "registerMap" not in config["custom_js"], "Should NOT manually register map for china.js"
+        assert "registerMap" not in html, "Should NOT manually registerMap for static maps"
         
         # Validate map type (basic check)
         assert '"type": "map"' in html or "type: 'map'" in html or 'type: "map"' in html
@@ -204,6 +203,7 @@ class TestMapChartTemplates:
         assert "echarts.min.js" in html
         assert "https://cdn.jsdelivr.net/npm/echarts" not in html
         assert "$.get" not in html
+        assert "registerMap" not in html, "Should NOT manually registerMap for static maps"
 
     def test_province_static_map(self, test_db, tmp_path):
         """Test Province map using local static province.js (NOT dynamic GeoJSON).
@@ -259,6 +259,7 @@ class TestMapChartTemplates:
         assert "echarts.min.js" in html
         assert "https://cdn.jsdelivr.net/npm/echarts" not in html
         assert "$.get" not in html
+        assert "registerMap" not in html, "Should NOT manually registerMap for static maps"
         
         print(f"✅ Province (Guangdong) static map test passed: {output}")
 

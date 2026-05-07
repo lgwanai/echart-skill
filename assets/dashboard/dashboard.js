@@ -27,13 +27,20 @@ class DashboardController {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('dashboard-theme', theme);
     
-    // Update ECharts theme
+    const newCharts = [];
     this.charts.forEach(chart => {
-      const option = chart.getOption();
-      chart.dispose();
-      const newChart = echarts.init(chart.getDom(), theme);
-      newChart.setOption(option);
+      try {
+        const option = chart.getOption();
+        const dom = chart.getDom();
+        chart.dispose();
+        const newChart = echarts.init(dom, theme);
+        newChart.setOption(option);
+        newCharts.push(newChart);
+      } catch (e) {
+        console.warn('Failed to re-init chart with new theme:', e);
+      }
     });
+    this.charts = newCharts;
   }
   
   /**
@@ -89,6 +96,8 @@ class DashboardController {
    * Refresh all charts
    */
   async refreshAllCharts() {
+    if (this._refreshing) return;
+    this._refreshing = true;
     this.showLoading();
     
     try {
@@ -103,6 +112,7 @@ class DashboardController {
       console.error('Refresh error:', error);
     } finally {
       this.hideLoading();
+      this._refreshing = false;
     }
   }
   
@@ -137,13 +147,13 @@ class DashboardController {
     this.showToast('Preparing export...', 'info');
     
     try {
-      // Use html2canvas and jsPDF if available
-      if (typeof html2canvas !== 'undefined' && typeof jsPDF !== 'undefined') {
+      if (typeof html2canvas !== 'undefined' && (typeof jsPDF !== 'undefined' || (typeof jspdf !== 'undefined' && jspdf.jsPDF))) {
+        var JsPDF = typeof jsPDF !== 'undefined' ? jsPDF : jspdf.jsPDF;
         const element = document.querySelector('.dashboard-container');
         const canvas = await html2canvas(element);
         const imgData = canvas.toDataURL('image/png');
         
-        const pdf = new jsPDF('l', 'mm', 'a4');
+        const pdf = new JsPDF('l', 'mm', 'a4');
         const imgWidth = 297;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         
@@ -238,14 +248,21 @@ class DashboardController {
    */
   filterCharts(keyword) {
     this.charts.forEach(chart => {
-      const card = chart.getDom().closest('.chart-card');
-      if (card) {
-        const title = card.querySelector('.chart-card-title').textContent.toLowerCase();
-        if (keyword === '' || title.includes(keyword.toLowerCase())) {
-          card.style.display = '';
-        } else {
-          card.style.display = 'none';
+      try {
+        const card = chart.getDom().closest('.chart-card');
+        if (card) {
+          const titleEl = card.querySelector('.chart-card-title');
+          if (titleEl) {
+            const title = titleEl.textContent.toLowerCase();
+            if (keyword === '' || title.includes(keyword.toLowerCase())) {
+              card.style.display = '';
+            } else {
+              card.style.display = 'none';
+            }
+          }
         }
+      } catch (e) {
+        console.warn('filterCharts error:', e);
       }
     });
   }
@@ -259,12 +276,27 @@ class DashboardController {
     
     const cards = Array.from(container.children);
     cards.sort((a, b) => {
-      const titleA = a.querySelector('.chart-card-title').textContent;
-      const titleB = b.querySelector('.chart-card-title').textContent;
-      return order === 'asc' ? titleA.localeCompare(titleB) : titleB.localeCompare(titleA);
+      const titleA = a.querySelector('.chart-card-title');
+      const titleB = b.querySelector('.chart-card-title');
+      const textA = titleA ? titleA.textContent : '';
+      const textB = titleB ? titleB.textContent : '';
+      return order === 'asc' ? textA.localeCompare(textB) : textB.localeCompare(textA);
     });
     
     cards.forEach(card => container.appendChild(card));
+  }
+  
+  /**
+   * Destroy the dashboard instance, clean up listeners and intervals
+   */
+  destroy() {
+    this.stopAutoRefresh();
+    this.charts.forEach(chart => {
+      try { chart.dispose(); } catch (e) { /* ignore */ }
+    });
+    this.charts = [];
+    const toastContainer = document.getElementById('toast-container');
+    if (toastContainer) toastContainer.innerHTML = '';
   }
   
   /**

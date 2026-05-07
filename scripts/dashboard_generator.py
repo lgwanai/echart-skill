@@ -14,6 +14,7 @@ Usage:
     python scripts/dashboard_generator.py --config dashboard_config.json --output output.html
 """
 import argparse
+import html as html_mod
 import json
 import os
 import sys
@@ -206,11 +207,15 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
 
         # Build chart card HTML
         pos = chart.position
+        title_html = html_mod.escape(chart.title)
+        title_js = json.dumps(chart.title)
+        id_html = html_mod.escape(chart.id)
+        id_js = json.dumps(chart.id)
         chart_card = f"""        <div class="chart-card" style="grid-row: {pos.row + 1} / span {pos.row_span}; grid-column: {pos.col + 1} / span {pos.col_span};">
             <div class="chart-card-header">
-                <h3 class="chart-card-title">{chart.title}</h3>
+                <h3 class="chart-card-title">{title_html}</h3>
                 <div class="chart-card-actions">
-                    <button class="btn btn-icon btn-ghost" onclick="dashboard.downloadChart('{chart.id}', '{chart.title}.png')" title="Download">
+                    <button class="btn btn-icon btn-ghost" onclick="dashboard.downloadChart({id_js}, {title_js} + '.png')" title="Download">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M10 12l-4-4h3V3h2v5h3l-4 4zm-7 5v-2h14v2H3z"/>
                         </svg>
@@ -218,7 +223,7 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
                 </div>
             </div>
             <div class="chart-card-body">
-                <div id="chart_{chart.id}" class="chart-container"></div>
+                <div id="chart_{id_html}" class="chart-container"></div>
             </div>
         </div>"""
         chart_cards.append(chart_card)
@@ -226,7 +231,7 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
         # Build chart init script
         chart_init = f"""
     (function() {{
-        var chart = echarts.init(document.getElementById('chart_{chart.id}'));
+        var chart = echarts.init(document.getElementById({json.dumps('chart_' + chart.id)}));
         var option = {option_json};
         {custom_js}
         chart.setOption(option);
@@ -243,14 +248,19 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
         config.charts, option_jsons, base_url
     )
 
-    # Build HTML template
+    # Build HTML template (escape user-provided values)
+    title_escaped = html_mod.escape(config.title)
+    title_js = json.dumps(config.title)
+    css_url_escaped = html_mod.escape(dashboard_css_url, quote=True)
+    js_url_escaped = html_mod.escape(dashboard_js_url, quote=True)
+    
     html_template = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{config.title}</title>
-    <link rel="stylesheet" href="{dashboard_css_url}">
+    <title>{title_escaped}</title>
+    <link rel="stylesheet" href="{css_url_escaped}">
     <style>
         :root {{
             --grid-columns: {config.columns};
@@ -272,7 +282,7 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
                     <svg class="dashboard-title-icon" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M3 13h8v8H3v-8zm0-10h8v8H3V3zm10 0h8v8h-8V3zm0 10h8v8h-8v-8z"/>
                     </svg>
-                    {config.title}
+                    {title_escaped}
                 </h1>
                 <div class="header-actions">
                     <span id="dashboard-timestamp" class="header-timestamp">Last updated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}</span>
@@ -333,7 +343,7 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
         var dashboard = new DashboardController({{
             charts: charts,
             config: {{
-                title: '{config.title}',
+                title: {title_js},
                 autoRefreshInterval: 30000
             }}
         }});
@@ -343,7 +353,7 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
             dashboard.filterCharts(e.target.value);
         }});
     </script>
-    <script src="{dashboard_js_url}"></script>
+    <script src="{js_url_escaped}"></script>
 </body>
 </html>"""
 

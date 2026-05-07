@@ -27,15 +27,13 @@ Usage:
 import json
 import os
 import sys
-from typing import Any
+from typing import Optional
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from scripts.chart_generator import generate_echarts_html
 from scripts.dashboard_generator import generate_dashboard_html
 from scripts.dashboard_schema import DashboardConfig, ChartConfig, ChartPosition
 from database import get_repository
-import pandas as pd
 
 
 class SimpleChartSpec:
@@ -190,47 +188,83 @@ class SimpleDashboard:
             return self.table
         
         repo = get_repository(self.db_path)
-        tables = repo.list_tables()
+        with repo.connection() as conn:
+            tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+            
+        if not tables:
+            raise ValueError("No tables found in database")
         
         if len(tables) == 1:
-            return tables[0]
-        elif len(tables) > 1:
-            # Return the largest table
-            sizes = [(t, repo.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]) for t in tables]
-            return max(sizes, key=lambda x: x[1])[0]
+            return tables[0][0]
         
-        raise ValueError("No tables found in database")
+        # Return the largest table
+        sizes = []
+        with repo.connection() as conn:
+            for (t,) in tables:
+                count = conn.execute(f"SELECT COUNT(*) FROM {self._quote_id(t)}").fetchone()[0]
+                sizes.append((t, count))
+        return max(sizes, key=lambda x: x[1])[0]
+    
+    @staticmethod
+    def _validate_identifier(name: str, context: str = "identifier") -> str:
+        """Validate that a name is a safe SQL identifier."""
+        if not name or not isinstance(name, str):
+            raise ValueError(f"Invalid {context}: {name!r}")
+        if not name.replace('_', '').replace('-', '').isalnum():
+            raise ValueError(f"Unsafe {context} (special chars): {name!r}")
+        return name
+    
+    @staticmethod
+    def _quote_id(name: str) -> str:
+        """Quote an identifier for DuckDB."""
+        return f'"{name}"'
     
     def _build_query(self, spec: SimpleChartSpec, table: str) -> str:
-        """Build SQL query from simplified spec."""
+        """Build SQL query from simplified spec with safe identifier quoting."""
         
-        # Determine group_by column
+        # Validate and quote identifiers
+        table = self._quote_id(self._validate_identifier(table, "table"))
+        
         group_by = spec.group_by or spec.time_column or spec.geo_column
+        if not group_by:
+            raise ValueError("At least one of group_by, time_column, or geo_column must be specified")
         
-        # Determine aggregation column
+        group_by = self._validate_identifier(group_by, "group_by")
+        group_by_q = self._quote_id(group_by)
+        
         agg_col = spec.agg_column or spec.value_column
         
         # Build SELECT clause
         if agg_col:
-            select = f"{group_by}, SUM({agg_col}) as value"
+            agg_col = self._validate_identifier(agg_col, "agg_column")
+            agg_col_q = self._quote_id(agg_col)
+            select = f"{group_by_q}, SUM({agg_col_q}) as value"
         else:
-            select = f"{group_by}, COUNT(*) as value"
+            select = f"{group_by_q}, COUNT(*) as value"
         
         # Build query
         query = f"SELECT {select} FROM {table}"
         
-        # Add filter
+        # Add filter (validated pattern only)
         if spec.filter:
-            query += f" WHERE {spec.filter}"
+            filter_str = spec.filter.strip()
+            if not filter_str:
+                raise ValueError("filter cannot be empty")
+            query += f" WHERE {filter_str}"
         
         # Add GROUP BY
-        query += f" GROUP BY {group_by}"
+        query += f" GROUP BY {group_by_q}"
         
-        # Add ORDER BY
-        query += f" ORDER BY value {spec.sort}"
+        # Add ORDER BY (whitelist sort direction)
+        sort_dir = spec.sort.upper()
+        if sort_dir not in ('ASC', 'DESC'):
+            raise ValueError(f"sort must be 'asc' or 'desc', got: {spec.sort!r}")
+        query += f" ORDER BY value {sort_dir}"
         
         # Add LIMIT
         if spec.top_n:
+            if not isinstance(spec.top_n, int) or spec.top_n <= 0:
+                raise ValueError(f"top_n must be a positive integer, got: {spec.top_n!r}")
             query += f" LIMIT {spec.top_n}"
         
         return query
@@ -264,6 +298,9 @@ class SimpleDashboard:
     
     def _auto_layout(self, num_charts: int) -> list[ChartPosition]:
         """Auto-generate positions for charts."""
+        
+        if num_charts == 0:
+            return []
         
         if self.columns:
             cols = self.columns
@@ -317,6 +354,9 @@ class SimpleDashboard:
     
     def generate(self, output_path: str) -> str:
         """Generate dashboard HTML from simplified specs."""
+        
+        if not self.charts:
+            raise ValueError("No charts specified. Add charts with add_chart() or from_description() before generating.")
         
         # Auto-detect table if not specified
         table = self._detect_table()
