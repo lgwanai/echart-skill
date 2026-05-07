@@ -13,6 +13,7 @@ import signal
 import argparse
 import subprocess
 import time
+import fcntl
 from datetime import datetime
 from pathlib import Path
 
@@ -70,111 +71,123 @@ def start_server(port: int | None = None, force_restart: bool = False) -> dict:
     Returns:
         Status dict with pid, port, start_time, status
     """
-    # Load existing status to remember previous port
-    existing_status = load_status()
-    previous_port = existing_status.get("port")
+    # File lock to prevent concurrent start_server calls
+    lock_path = os.path.join(STATUS_DIR, ".start_server.lock")
+    os.makedirs(STATUS_DIR, exist_ok=True)
+    lock_fd = open(lock_path, 'w')
+    try:
+        fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except (IOError, OSError):
+        lock_fd.close()
+        return {
+            "status": "error",
+            "message": "Another start/stop operation is in progress. Please wait."
+        }
     
-    # Check if server already running
-    running_port = check_server_running(*DEFAULT_PORT_RANGE)
-    
-    if running_port:
-        # Server is running - stop it first to avoid duplicate instances
-        stop_result = stop_server()
-        if stop_result.get("status") not in ["stopped", "not_running"]:
-            # Failed to stop, return error
-            return {
-                "status": "error",
-                "message": f"Failed to stop existing server: {stop_result.get('message')}",
-                "previous_port": running_port
-            }
-        # Wait for port to be released
-        time.sleep(0.5)
-    
-    # If no specific port requested, try previous port first (for restart)
-    if port is None:
-        if previous_port and DEFAULT_PORT_RANGE[0] <= previous_port <= DEFAULT_PORT_RANGE[1]:
-            port = previous_port
-        else:
-            port = None  # Will auto-select
-    
-    # Find available port
-    if port is None:
-        try:
-            port = find_free_port(*DEFAULT_PORT_RANGE)
-        except IOError as e:
-            return {
-                "status": "error",
-                "message": f"No available ports in range {DEFAULT_PORT_RANGE[0]}-{DEFAULT_PORT_RANGE[1]}",
-                "error": str(e)
-            }
-    else:
-        # Verify requested port is available
-        import socket
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.bind(('', port))
-        except OSError:
-            # Port not available, try to find another
+    try:
+        # Load existing status to remember previous port
+        existing_status = load_status()
+        previous_port = existing_status.get("port")
+        
+        # Check if server already running
+        running_port = check_server_running(*DEFAULT_PORT_RANGE)
+        
+        if running_port:
+            # Server is running - stop it first to avoid duplicate instances
+            stop_result = stop_server()
+            if stop_result.get("status") not in ["stopped", "not_running"]:
+                return {
+                    "status": "error",
+                    "message": f"Failed to stop existing server: {stop_result.get('message')}",
+                    "previous_port": running_port
+                }
+            time.sleep(0.5)
+        
+        # If no specific port requested, try previous port first (for restart)
+        if port is None:
+            if previous_port and DEFAULT_PORT_RANGE[0] <= previous_port <= DEFAULT_PORT_RANGE[1]:
+                port = previous_port
+            else:
+                port = None  # Will auto-select
+        
+        # Find available port
+        if port is None:
             try:
                 port = find_free_port(*DEFAULT_PORT_RANGE)
             except IOError as e:
                 return {
                     "status": "error",
-                    "message": f"Port {port} not available and no free ports found",
+                    "message": f"No available ports in range {DEFAULT_PORT_RANGE[0]}-{DEFAULT_PORT_RANGE[1]}",
                     "error": str(e)
                 }
-    
-    # Start server as daemon process
-    server_script = Path(__file__).parent / "server.py"
-    cmd = [sys.executable, str(server_script), "--daemon", "--port", str(port)]
-    
-    try:
-        if sys.platform == 'win32':
-            proc = subprocess.Popen(
-                cmd,
-                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
         else:
-            proc = subprocess.Popen(
-                cmd,
-                start_new_session=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
+            import socket
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.bind(('', port))
+            except OSError:
+                try:
+                    port = find_free_port(*DEFAULT_PORT_RANGE)
+                except IOError as e:
+                    return {
+                        "status": "error",
+                        "message": f"Port {port} not available and no free ports found",
+                        "error": str(e)
+                    }
         
-        # Wait for server to start
-        start_time = time.time()
-        while time.time() - start_time < SERVER_START_TIMEOUT:
-            time.sleep(0.1)
-            if check_server_running(port, port + 1):
-                break
-        else:
-            # Timeout waiting for server
-            return {
-                "status": "timeout",
-                "message": f"Server failed to start within {SERVER_START_TIMEOUT}s",
-                "port": port
+        # Start server as daemon process
+        server_script = Path(__file__).parent / "server.py"
+        cmd = [sys.executable, str(server_script), "--daemon", "--port", str(port)]
+        
+        try:
+            if sys.platform == 'win32':
+                proc = subprocess.Popen(
+                    cmd,
+                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+            else:
+                proc = subprocess.Popen(
+                    cmd,
+                    start_new_session=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+            
+            # Wait for server to start
+            start_time = time.time()
+            while time.time() - start_time < SERVER_START_TIMEOUT:
+                time.sleep(0.1)
+                if check_server_running(port, port + 1):
+                    break
+            else:
+                return {
+                    "status": "timeout",
+                    "message": f"Server failed to start within {SERVER_START_TIMEOUT}s",
+                    "port": port
+                }
+            
+            # Save status
+            status = {
+                "pid": proc.pid,
+                "port": port,
+                "start_time": datetime.now().isoformat(),
+                "status": "running"
             }
-        
-        # Save status
-        status = {
-            "pid": proc.pid,
-            "port": port,
-            "start_time": datetime.now().isoformat(),
-            "status": "running"
-        }
-        save_status(status)
-        
-        return status
-        
-    except Exception as e:
-        return {
-            "status": "error",
-            "message": f"Failed to start server: {str(e)}",
-            "error": str(e)
-        }
+            save_status(status)
+            
+            return status
+            
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Failed to start server process: {str(e)}",
+                "error": str(e)
+            }
+    finally:
+        fcntl.flock(lock_fd, fcntl.LOCK_UN)
+        lock_fd.close()
 
 
 def stop_server() -> dict:

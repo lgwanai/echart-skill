@@ -248,8 +248,8 @@ def ensure_server_running():
     port = check_server_running()
 
     if not port:
-        # Clean up orphan processes on common ports before starting
-        for p in range(8100, 8110):
+        # Clean up orphan processes on ports 8100-8200 (matches find_free_port range)
+        for p in range(8100, 8201):
             lifecycle = ServerLifecycle(p)
             lifecycle.kill_orphan()
 
