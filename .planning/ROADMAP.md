@@ -132,6 +132,23 @@ Plans:
 
 Plans:
 - [x] 16-01-PLAN.md - Dashboard generation: create professional UI template, update dashboard_generator.py, add /dashboard command to SKILL.md, create example config (DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06)
+
+### Phase 17: Dashboard自然语言生成支持
+**Goal**: Simplify dashboard generation with natural language interface and auto-layout
+**Depends on**: Phase 16
+**Requirements**: NL-DASH-01, NL-DASH-02, NL-DASH-03, NL-DASH-04, NL-DASH-05
+**Success Criteria** (what must be TRUE):
+  1. Users can describe dashboard in natural language without writing SQL or config
+  2. System auto-parses chart descriptions and generates SQL
+  3. Auto-layout algorithm positions charts intelligently
+  4. SimpleDashboard API supports 9 chart types with minimal parameters
+  5. /dashboard command accepts natural language description
+  6. SKILL.md updated with natural language dashboard generation
+  7. README includes 3 dashboard generation methods
+**Plans**: 1 plan
+
+Plans:
+- [x] 17-01-PLAN.md - Simplified dashboard: create SimpleDashboard class, auto-layout algorithm, natural language parser, update SKILL.md and README (NL-DASH-01, NL-DASH-02, NL-DASH-03, NL-DASH-04, NL-DASH-05)
 - [ ] 14-02-PLAN.md - Status reporting and chart link listing utility (SRV-05)
 
 ---

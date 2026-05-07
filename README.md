@@ -233,81 +233,102 @@
 
 ---
 
-### 案例四：专业 Dashboard 生成
+### 案例四：专业 Dashboard 生成（自然语言）
 
-**场景**：生成多图表组合的交互式仪表盘
+**场景**：用自然语言快速生成多图表仪表盘
 
-#### 创建配置文件
+#### 方法一：自然语言描述（推荐）
 
-创建 `dashboard_config.json`：
-
-```json
-{
-    "title": "电商数据分析仪表盘",
-    "columns": 3,
-    "row_height": 400,
-    "gap": 24,
-    "db_path": "workspace.duckdb",
-    "charts": [
-        {
-            "id": "sales_trend",
-            "position": {"row": 0, "col": 0, "col_span": 2, "row_span": 1},
-            "title": "月度销售趋势",
-            "query": "SELECT month, SUM(amount) as sales FROM sales GROUP BY month",
-            "echarts_option": {
-                "xAxis": {"type": "category"},
-                "yAxis": {"type": "value"},
-                "series": [{"type": "line", "smooth": true}]
-            },
-            "custom_js": "option.series[0].data = rawData.map(r => r.sales); option.xAxis.data = rawData.map(r => r.month);"
-        },
-        {
-            "id": "region_pie",
-            "position": {"row": 0, "col": 2, "col_span": 1, "row_span": 2},
-            "title": "地区销售占比",
-            "query": "SELECT region, SUM(amount) as sales FROM sales GROUP BY region",
-            "echarts_option": {
-                "series": [{"type": "pie", "radius": ["40%", "70%"]}]
-            },
-            "custom_js": "option.series[0].data = rawData.map(r => ({name: r.region, value: r.sales}));"
-        },
-        {
-            "id": "category_bar",
-            "position": {"row": 1, "col": 0, "col_span": 2, "row_span": 1},
-            "title": "产品类别对比",
-            "query": "SELECT category, SUM(amount) as sales FROM sales GROUP BY category ORDER BY sales DESC LIMIT 10",
-            "echarts_option": {
-                "xAxis": {"type": "category"},
-                "yAxis": {"type": "value"},
-                "series": [{"type": "bar"}]
-            },
-            "custom_js": "option.series[0].data = rawData.map(r => r.sales); option.xAxis.data = rawData.map(r => r.category);"
-        },
-        {
-            "id": "china_map",
-            "position": {"row": 2, "col": 0, "col_span": 3, "row_span": 1},
-            "title": "全国销售热力图",
-            "query": "SELECT province, SUM(amount) as sales FROM sales GROUP BY province",
-            "echarts_option": {
-                "visualMap": {"min": 0, "max": 100000},
-                "series": [{
-                    "type": "map",
-                    "map": "china",
-                    "roam": true,
-                    "data": []
-                }]
-            },
-            "custom_js": "option.series[0].data = rawData.map(r => ({name: r.province, value: r.sales}));"
-        }
-    ]
-}
-```
-
-#### 生成 Dashboard
+最简单的方式，直接描述想要的图表：
 
 ```bash
-/dashboard outputs/configs/dashboard_config.json --output outputs/html/dashboard.html
+/dashboard 创建销售分析仪表盘，包含：
+- 各地区销售柱状图
+- 产品类别饼图
+- 月度趋势折线图
+- 全国分布地图
 ```
+
+系统自动完成：
+1. 解析图表类型和需求
+2. 自动生成 SQL 查询
+3. 智能布局排版
+4. 生成专业仪表盘
+
+#### 方法二：简化 API（Python）
+
+```python
+from scripts.simple_dashboard import SimpleDashboard
+
+# 创建仪表盘
+dashboard = SimpleDashboard(
+    title="销售数据分析",
+    db_path="workspace.duckdb"
+)
+
+# 添加图表（一行代码一个图表）
+dashboard.add_chart("bar", "地区销售额", group_by="region")
+dashboard.add_chart("pie", "品类占比", group_by="category")
+dashboard.add_chart("line", "月度趋势", time_column="month")
+dashboard.add_chart("map", "全国分布", geo_column="province")
+
+# 生成
+dashboard.generate("outputs/html/dashboard.html")
+```
+
+#### 方法三：一行代码生成
+
+```python
+from scripts.simple_dashboard import create_dashboard_from_text
+
+create_dashboard_from_text(
+    """
+    创建电商数据仪表盘，包含：
+    - 各渠道销售柱状图
+    - 产品类别饼图
+    - 日销售趋势折线图
+    - 全国订单分布地图
+    """,
+    output_path="outputs/html/dashboard.html"
+)
+```
+
+#### 支持的图表类型
+
+| 图表类型 | 关键词 | 必需参数 | 示例 |
+|---------|--------|---------|------|
+| 柱状图 | `"bar"` | `group_by` | 各地区销售柱状图 |
+| 折线图 | `"line"` | `time_column` | 月度趋势折线图 |
+| 饼图 | `"pie"` | `group_by` | 产品类别饼图 |
+| 地图 | `"map"` | `geo_column` | 全国分布地图 |
+| 散点图 | `"scatter"` | `x_column`, `y_column` | 价格销量散点图 |
+| 雷达图 | `"radar"` | `dimensions` | 产品评分雷达图 |
+| 漏斗图 | `"funnel"` | `group_by` | 销售漏斗图 |
+| 树图 | `"treemap"` | `group_by` | 类别层级树图 |
+| 旭日图 | `"sunburst"` | `hierarchy` | 产品结构旭日图 |
+
+#### 可选参数
+
+```python
+dashboard.add_chart(
+    chart_type="bar",
+    title="Top 10 产品",
+    group_by="product",
+    agg_column="sales",      # 聚合列（默认求和）
+    top_n=10,                # Top N
+    sort="desc",             # 排序方式
+    filter="region='华东'"   # 筛选条件
+)
+```
+
+#### 智能布局算法
+
+系统自动：
+- 根据图表数量计算最优网格列数
+- 智能分配图表位置
+- 地图自动获得 2x1 大尺寸
+- 饼图可自动纵向扩展
+- 平衡布局避免空白
 
 #### Dashboard 专业功能
 

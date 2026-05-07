@@ -134,40 +134,46 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 
 #### `/dashboard` - 仪表盘生成
 ```
-/dashboard <配置文件> [--output <输出路径>]
-/db <配置文件>  # 别名
-/仪表盘 <配置文件>  # 中文别名
+/dashboard <描述> [--output <输出路径>]
+/db <描述>  # 别名
+/仪表盘 <描述>  # 中文别名
 
 示例:
+  # 自然语言描述（推荐）
+  /dashboard 创建销售分析仪表盘，包含：各地区销售柱状图、产品类别饼图、月度趋势折线图、全国分布地图
+  
+  # 简化配置文件
   /dashboard outputs/configs/dashboard.json
-  /db dashboard.json --output outputs/html/sales_dashboard.html
-  /dashboard examples/dashboard_config.json
+  
+  # 指定输出路径
+  /dashboard 销售数据仪表盘，包含地区柱状图和类别饼图 --output outputs/html/sales.html
 
 功能:
-  - 生成专业的多图表仪表盘
-  - 支持卡片式布局、响应式设计
-  - 深色/浅色主题切换
-  - 自动刷新、导出PDF
-  - 交互式图表、搜索过滤
+  - ✅ 自然语言描述自动解析
+  - ✅ 智能布局算法自动排版
+  - ✅ 简化 API，无需编写 SQL
+  - ✅ 专业卡片式布局
+  - ✅ 深色/浅色主题切换
+  - ✅ 响应式设计
+  - ✅ 自动刷新、导出 PDF
+  - ✅ 图表搜索、单独下载
 
-配置文件格式:
-  {
-    "title": "仪表盘标题",
-    "columns": 3,
-    "row_height": 400,
-    "gap": 24,
-    "db_path": "workspace.duckdb",
-    "charts": [
-      {
-        "id": "chart1",
-        "position": {"row": 0, "col": 0, "col_span": 2, "row_span": 1},
-        "title": "图表标题",
-        "query": "SELECT * FROM table",
-        "echarts_option": {...},
-        "custom_js": "..."
-      }
-    ]
-  }
+支持图表类型:
+  - bar (柱状图): group_by 参数
+  - line (折线图): time_column 参数
+  - pie (饼图): group_by 参数  
+  - map (地图): geo_column 参数
+  - scatter (散点图): x_column, y_column
+  - radar (雷达图): dimensions
+  - funnel (漏斗图): group_by
+  - treemap (树图): group_by
+  - sunburst (旭日图): hierarchy
+
+自然语言描述示例:
+  - 各地区销售柱状图 → 自动识别为 bar 类型，group_by='region'
+  - 月度趋势折线图 → 自动识别为 line 类型，time_column='month'
+  - 产品类别饼图 → 自动识别为 pie 类型，group_by='category'
+  - 全国分布地图 → 自动识别为 map 类型，geo_column='province'
 ```
 
 **支持的图表类型完整列表：**
@@ -970,61 +976,97 @@ python scripts/db_cli.py import mongo_docs '{}' --collection users --table-name 
 - MongoDB documents are flattened for tabular storage (nested fields become `parent_child`)
 - Arrays in MongoDB are expanded to indexed fields (`skills_0`, `skills_1`)
 
-### Scenario 15: Dashboard Generation
-**Trigger**: User needs to create multi-chart dashboards with professional UI/UX design.
+### Scenario 15: Dashboard Generation (Simplified Natural Language)
+**Trigger**: User needs to create multi-chart dashboards with natural language.
 
-**Action:**
+**Method 1: Natural Language Description (Recommended)**
 
-**1. Create Dashboard Configuration (dashboard_config.json):**
-```json
-{
-    "title": "销售数据分析仪表盘",
-    "columns": 3,
-    "row_height": 400,
-    "gap": 24,
-    "db_path": "workspace.duckdb",
-    "charts": [
-        {
-            "id": "chart1",
-            "position": {"row": 0, "col": 0, "col_span": 2, "row_span": 1},
-            "title": "月度销售趋势",
-            "query": "SELECT month, SUM(amount) as sales FROM sales GROUP BY month ORDER BY month",
-            "echarts_option": {
-                "xAxis": {"type": "category"},
-                "yAxis": {"type": "value"},
-                "series": [{"type": "line", "smooth": true}]
-            }
-        },
-        {
-            "id": "chart2",
-            "position": {"row": 0, "col": 2, "col_span": 1, "row_span": 2},
-            "title": "地区销售分布",
-            "query": "SELECT region, SUM(amount) as sales FROM sales GROUP BY region",
-            "echarts_option": {
-                "series": [{"type": "pie", "radius": "50%"}]
-            }
-        },
-        {
-            "id": "chart3",
-            "position": {"row": 1, "col": 0, "col_span": 2, "row_span": 1},
-            "title": "产品类别对比",
-            "query": "SELECT category, SUM(amount) as sales FROM sales GROUP BY category",
-            "echarts_option": {
-                "xAxis": {"type": "category"},
-                "yAxis": {"type": "value"},
-                "series": [{"type": "bar"}]
-            }
-        }
-    ]
-}
+Simply describe what you want in plain language:
+
+```
+/dashboard 创建销售分析仪表盘，包含：
+- 各地区销售柱状图
+- 产品类别饼图
+- 月度趋势折线图
+- 全国分布地图
 ```
 
-**2. Generate Dashboard:**
-```bash
-python scripts/dashboard_generator.py --config outputs/configs/dashboard_config.json --output outputs/html/dashboard.html
+**Method 2: Simplified Python API**
+
+```python
+from scripts.simple_dashboard import SimpleDashboard
+
+# Create dashboard with simplified API
+dashboard = SimpleDashboard(
+    title="销售数据分析",
+    db_path="workspace.duckdb"
+)
+
+# Add charts with simple descriptions
+dashboard.add_chart("bar", "地区销售额", group_by="region")
+dashboard.add_chart("pie", "品类占比", group_by="category")  
+dashboard.add_chart("line", "月度趋势", time_column="month")
+dashboard.add_chart("map", "全国分布", geo_column="province")
+
+# Generate
+dashboard.generate("outputs/html/dashboard.html")
 ```
 
-**3. Dashboard Features:**
+**Method 3: Direct Text-to-Dashboard**
+
+```python
+from scripts.simple_dashboard import create_dashboard_from_text
+
+create_dashboard_from_text(
+    """
+    创建销售分析仪表盘，包含：
+    - 各地区销售柱状图
+    - 产品类别饼图
+    - 月度趋势折线图  
+    - 全国分布地图
+    """,
+    db_path="workspace.duckdb",
+    output_path="outputs/html/dashboard.html"
+)
+```
+
+**Supported Chart Types in Simplified API:**
+
+| Chart Type | Keyword | Required Parameters |
+|-------------|---------|---------------------|
+| Bar Chart | `"bar"` | `group_by` |
+| Line Chart | `"line"` | `time_column` or `group_by` |
+| Pie Chart | `"pie"` | `group_by` |
+| Map Chart | `"map"` | `geo_column` (province/city) |
+| Scatter | `"scatter"` | `x_column`, `y_column` |
+| Radar | `"radar"` | `dimensions` |
+| Funnel | `"funnel"` | `group_by` |
+| Treemap | `"treemap"` | `group_by` |
+| Sunburst | `"sunburst"` | `hierarchy` |
+
+**Optional Parameters:**
+
+```python
+dashboard.add_chart(
+    chart_type="bar",
+    title="Top 10 产品",
+    group_by="product",
+    agg_column="sales",      # 聚合列（默认求和）
+    top_n=10,                # Top N
+    sort="desc",             # 排序方式
+    filter="region='华东'"   # 筛选条件
+)
+```
+
+**Auto-Layout Algorithm:**
+
+The system automatically:
+- Calculates optimal grid columns based on chart count
+- Assigns chart positions intelligently
+- Maps get 2x1 span, Pies can span vertically
+- Balances layout to avoid gaps
+
+**Dashboard Features:**
 - ✅ **Professional Card-based Layout**: Modern UI with shadow and hover effects
 - ✅ **Dark/Light Theme Toggle**: Press the theme button to switch themes
 - ✅ **Responsive Design**: Auto-adjusts for mobile, tablet, and desktop
@@ -1034,55 +1076,58 @@ python scripts/dashboard_generator.py --config outputs/configs/dashboard_config.
 - ✅ **Chart Search**: Filter charts by title
 - ✅ **Download Charts**: Download individual charts as PNG images
 
-**Dashboard Layout Options:**
+**Example Use Cases:**
+
+**E-commerce Dashboard:**
 ```
-Grid Layout Examples:
-┌──────────────────────────────────────┐
-│  columns: 3, row_height: 400px      │
-├─────────────────────┬────────────────┤
-│ Chart 1 (2x1)       │ Chart 2 (1x2)  │
-│                     │                │
-├─────────────────────┤                │
-│ Chart 3 (2x1)       │                │
-├─────────────────────┼────────────────┤
-│ Chart 4 (1x1)       │ Chart 5 (2x1)  │
-│                     │                │
-│                     ├────────────────┤
-│                     │ Chart 6 (1x1)  │
-└─────────────────────┴────────────────┘
+/dashboard 创建电商数据仪表盘，包含：
+- 各渠道销售柱状图
+- 产品类别饼图
+- 日销售趋势折线图
+- 全国订单分布地图
 ```
 
-**Position Configuration:**
-- `row`: Starting row (0-indexed)
-- `col`: Starting column (0-indexed)
-- `col_span`: Number of columns to span (default: 1)
-- `row_span`: Number of rows to span (default: 1)
+**Financial Dashboard:**
+```
+/dashboard 创建财务分析仪表盘，包含：
+- 月度收入折线图
+- 费用类别饼图
+- 部门预算柱状图
+- 季度对比雷达图
+```
 
-**4. Export Standalone Dashboard:**
+**Method 4: Advanced Configuration (Legacy)**
+
+For complex dashboards requiring full control, use JSON config:
+
+```json
+{
+    "title": "销售数据概览",
+    "columns": 3,
+    "row_height": 400,
+    "gap": 24,
+    "db_path": "workspace.duckdb",
+    "charts": [
+        {
+            "id": "chart1",
+            "position": {"row": 0, "col": 0, "col_span": 2, "row_span": 1},
+            "title": "月度销售趋势",
+            "query": "SELECT month, SUM(amount) as sales FROM sales GROUP BY month",
+            "echarts_option": {
+                "xAxis": {"type": "category"},
+                "yAxis": {"type": "value"},
+                "series": [{"type": "line", "smooth": true}]
+            },
+            "custom_js": "option.series[0].data = rawData.map(r => r.sales);"
+        }
+    ]
+}
+```
+
+Generate:
 ```bash
-python scripts/dashboard_generator.py --export outputs/configs/dashboard_config.json --output standalone_dashboard.html --theme dark
+python scripts/dashboard_generator.py --config config.json --output dashboard.html
 ```
-
-This generates a self-contained HTML file (~2MB with embedded ECharts library) that can be shared offline.
-
-**5. CLI Dashboard Generation:**
-```bash
-# Basic usage
-python scripts/dashboard_generator.py --config dashboard.json --output output.html
-
-# Export standalone
-python scripts/dashboard_generator.py --export dashboard.json --output standalone.html --theme dark
-
-# Generate from inline JSON
-python scripts/dashboard_generator.py --config '{"title":"My Dashboard","columns":2,"charts":[]}'
-```
-
-**Notes:**
-- Dashboard CSS and JS are located in `assets/dashboard/`
-- Uses CSS Grid with modern browser support (Chrome 57+, Firefox 52+, Safari 10.1+)
-- Export functionality requires html2canvas and jsPDF libraries (auto-loaded)
-- Charts automatically resize on window resize
-- Theme preference saved to localStorage
 **Trigger**: User needs to automatically refresh data from HTTP APIs or databases on a schedule.
 
 **Action:**
