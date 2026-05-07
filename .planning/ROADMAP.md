@@ -114,6 +114,24 @@ Plans:
 
 Plans:
 - [x] 15-01-PLAN.md - Map generation optimization: update SKILL.md, create test suite, add new prompt templates, create best practices documentation (MAP-01, MAP-02, MAP-03, MAP-04, MAP-05)
+
+### Phase 16: Dashboard专业仪表盘支持
+**Goal**: Add professional dashboard generation with modern UI/UX, interactive features, and responsive design
+**Depends on**: Phase 15
+**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06
+**Success Criteria** (what must be TRUE):
+  1. Users can generate multi-chart dashboards with /dashboard command
+  2. Dashboard uses professional card-based layout with CSS Grid
+  3. Dark/Light theme toggle works correctly
+  4. Dashboard is fully responsive (mobile, tablet, desktop)
+  5. Users can export dashboard as PDF
+  6. Charts support auto-refresh, search filtering, and individual download
+  7. Dashboard assets (CSS/JS) are properly loaded from assets/dashboard/
+  8. Example dashboard configuration exists (examples/dashboard_config.json)
+**Plans**: 1 plan
+
+Plans:
+- [x] 16-01-PLAN.md - Dashboard generation: create professional UI template, update dashboard_generator.py, add /dashboard command to SKILL.md, create example config (DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06)
 - [ ] 14-02-PLAN.md - Status reporting and chart link listing utility (SRV-05)
 
 ---

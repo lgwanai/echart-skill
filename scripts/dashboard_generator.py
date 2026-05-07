@@ -150,8 +150,12 @@ def aggregate_map_scripts(
 def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
     """Generate HTML file with dashboard containing all charts.
 
-    Creates a single HTML file with CSS Grid layout where each chart
-    is positioned according to its configuration.
+    Creates a single HTML file with professional UI/UX design including:
+    - Modern card-based layout
+    - Dark/Light theme toggle
+    - Responsive grid layout
+    - Interactive features (refresh, export, filters)
+    - Auto-refresh capability
 
     Args:
         config: Validated dashboard configuration.
@@ -161,10 +165,24 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
         Path to generated HTML file.
     """
     base_url = ensure_server_running()
+    
+    # Ensure dashboard assets directory exists
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    dashboard_assets_dir = os.path.join(base_dir, 'assets', 'dashboard')
+    os.makedirs(dashboard_assets_dir, exist_ok=True)
+    
+    # Link dashboard CSS and JS
+    dashboard_css_path = os.path.join(dashboard_assets_dir, 'dashboard.css')
+    dashboard_js_path = os.path.join(dashboard_assets_dir, 'dashboard.js')
+    
+    # Use embedded CSS/JS if files don't exist (fallback)
+    dashboard_css_url = f"{base_url}/assets/dashboard/dashboard.css"
+    dashboard_js_url = f"{base_url}/assets/dashboard/dashboard.js"
 
     # Collect chart initialization scripts
     chart_inits = []
     option_jsons = []
+    chart_cards = []
 
     for chart in config.charts:
         # Fetch data
@@ -186,57 +204,57 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
         option_json = json.dumps(option, ensure_ascii=False)
         option_jsons.append(option_json)
 
+        # Build chart card HTML
+        pos = chart.position
+        chart_card = f"""        <div class="chart-card" style="grid-row: {pos.row + 1} / span {pos.row_span}; grid-column: {pos.col + 1} / span {pos.col_span};">
+            <div class="chart-card-header">
+                <h3 class="chart-card-title">{chart.title}</h3>
+                <div class="chart-card-actions">
+                    <button class="btn btn-icon btn-ghost" onclick="dashboard.downloadChart('{chart.id}', '{chart.title}.png')" title="Download">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 12l-4-4h3V3h2v5h3l-4 4zm-7 5v-2h14v2H3z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="chart-card-body">
+                <div id="chart_{chart.id}" class="chart-container"></div>
+            </div>
+        </div>"""
+        chart_cards.append(chart_card)
+
         # Build chart init script
         chart_init = f"""
-    (function(chartId, optionJson, customJs) {{
-        var chart = echarts.init(document.getElementById(chartId));
-        var option = optionJson;
-        customJs;
+    (function() {{
+        var chart = echarts.init(document.getElementById('chart_{chart.id}'));
+        var option = {option_json};
+        {custom_js}
         chart.setOption(option);
         charts.push(chart);
-    }})('chart_{chart.id}', {option_json}, function() {{ {custom_js} }});
+    }})();
 """
         chart_inits.append(chart_init)
+
+    chart_cards_html = "\n".join(chart_cards)
+    chart_inits_html = "\n".join(chart_inits)
 
     # Aggregate map scripts
     bmap_script, china_script, world_script, province_scripts = aggregate_map_scripts(
         config.charts, option_jsons, base_url
     )
 
-    # Build chart containers with grid positioning
-    chart_containers = []
-    for chart in config.charts:
-        pos = chart.position
-        container = f"""        <div id="chart_{chart.id}" class="chart-container" style="grid-row: {pos.row + 1} / span {pos.row_span}; grid-column: {pos.col + 1} / span {pos.col_span};"></div>"""
-        chart_containers.append(container)
-
-    chart_containers_html = "\n".join(chart_containers)
-    chart_inits_html = "\n".join(chart_inits)
-
     # Build HTML template
-    html_template = f"""
-<!DOCTYPE html>
-<html>
+    html_template = f"""<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{config.title}</title>
+    <link rel="stylesheet" href="{dashboard_css_url}">
     <style>
-        body {{
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }}
-        .dashboard-grid {{
-            display: grid;
-            grid-template-columns: repeat({config.columns}, 1fr);
-            grid-auto-rows: {config.row_height}px;
-            gap: {config.gap}px;
-            padding: 16px;
-        }}
-        .chart-container {{
-            min-height: {config.row_height}px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        :root {{
+            --grid-columns: {config.columns};
+            --row-height: {config.row_height}px;
         }}
     </style>
     <script src="{base_url}/assets/echarts/echarts.min.js"></script>
@@ -246,19 +264,88 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
     {province_scripts}
 </head>
 <body>
-    <div class="dashboard-grid">
-{chart_containers_html}
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="dashboard-title">
+                    <svg class="dashboard-title-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 13h8v8H3v-8zm0-10h8v8H3V3zm10 0h8v8h-8V3zm0 10h8v8h-8v-8z"/>
+                    </svg>
+                    {config.title}
+                </h1>
+                <div class="header-actions">
+                    <span id="dashboard-timestamp" class="header-timestamp">Last updated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}</span>
+                    <button id="theme-toggle" class="btn btn-ghost btn-icon" title="Toggle Theme">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 01-6-6 6 6 0 016-6V2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="dashboard-toolbar">
+            <div class="toolbar-content">
+                <div class="toolbar-filters">
+                    <input type="text" id="chart-filter" class="form-input" placeholder="Search charts..." style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; width: 200px;">
+                </div>
+                <div class="toolbar-actions">
+                    <button id="refresh-dashboard" class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M13.65 2.35A8 8 0 102.35 13.65 8 8 0 0013.65 2.35zM8 14A6 6 0 118 2a6 6 0 010 12z"/>
+                            <path d="M7 4h2v4.5l3 1.5-.75 1.5L7 9.5V4z"/>
+                        </svg>
+                        Refresh
+                    </button>
+                    <button id="export-dashboard" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M14 12v2H2v-2h12zm0-6v2H2V6h12zm0-6v2H2V0h12z"/>
+                        </svg>
+                        Export PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Body -->
+        <main class="dashboard-body">
+            <div class="dashboard-grid" style="--grid-columns: {config.columns}; --row-height: {config.row_height}px;">
+{chart_cards_html}
+            </div>
+        </main>
+
+        <!-- Toast Container -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay visually-hidden">
+            <div class="spinner"></div>
+        </div>
     </div>
-    <script type="text/javascript">
+
+    <script>
         var charts = [];
 {chart_inits_html}
-        window.addEventListener('resize', function() {{
-            charts.forEach(function(c) {{ c.resize(); }});
+
+        // Initialize dashboard controller
+        var dashboard = new DashboardController({{
+            charts: charts,
+            config: {{
+                title: '{config.title}',
+                autoRefreshInterval: 30000
+            }}
+        }});
+
+        // Chart filter
+        document.getElementById('chart-filter').addEventListener('input', function(e) {{
+            dashboard.filterCharts(e.target.value);
         }});
     </script>
+    <script src="{dashboard_js_url}"></script>
 </body>
-</html>
-"""
+</html>"""
 
     # Ensure output directory exists
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)

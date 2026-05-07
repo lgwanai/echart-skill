@@ -1,0 +1,214 @@
+{
+    "title": "电商销售数据分析仪表盘",
+    "columns": 3,
+    "row_height": 400,
+    "gap": 24,
+    "db_path": "workspace.duckdb",
+    "charts": [
+        {
+            "id": "sales_trend",
+            "position": {
+                "row": 0,
+                "col": 0,
+                "col_span": 2,
+                "row_span": 1
+            },
+            "title": "月度销售趋势",
+            "query": "SELECT month, SUM(amount) as sales FROM sales GROUP BY month ORDER BY month",
+            "echarts_option": {
+                "title": {
+                    "text": "月度销售额（万元）",
+                    "left": "center"
+                },
+                "tooltip": {
+                    "trigger": "axis"
+                },
+                "xAxis": {
+                    "type": "category",
+                    "axisLabel": {
+                        "rotate": 45
+                    }
+                },
+                "yAxis": {
+                    "type": "value",
+                    "name": "销售额"
+                },
+                "series": [{
+                    "type": "line",
+                    "smooth": true,
+                    "symbol": "circle",
+                    "symbolSize": 8,
+                    "lineStyle": {
+                        "width": 3
+                    },
+                    "areaStyle": {
+                        "opacity": 0.3
+                    }
+                }]
+            },
+            "custom_js": "option.series[0].data = rawData.map(r => r.sales); option.xAxis.data = rawData.map(r => r.month);"
+        },
+        {
+            "id": "region_pie",
+            "position": {
+                "row": 0,
+                "col": 2,
+                "col_span": 1,
+                "row_span": 2
+            },
+            "title": "地区销售占比",
+            "query": "SELECT region, SUM(amount) as sales FROM sales GROUP BY region ORDER BY sales DESC",
+            "echarts_option": {
+                "title": {
+                    "text": "地区分布",
+                    "left": "center"
+                },
+                "tooltip": {
+                    "trigger": "item",
+                    "formatter": "{b}: {c}万元 ({d}%)"
+                },
+                "legend": {
+                    "orient": "horizontal",
+                    "bottom": 10
+                },
+                "series": [{
+                    "type": "pie",
+                    "radius": ["40%", "70%"],
+                    "center": ["50%", "45%"],
+                    "label": {
+                        "show": true,
+                        "formatter": "{b}\n{d}%"
+                    },
+                    "emphasis": {
+                        "label": {
+                            "show": true,
+                            "fontSize": 16,
+                            "fontWeight": "bold"
+                        }
+                    }
+                }]
+            },
+            "custom_js": "option.series[0].data = rawData.map(r => ({name: r.region, value: r.sales}));"
+        },
+        {
+            "id": "category_bar",
+            "position": {
+                "row": 1,
+                "col": 0,
+                "col_span": 2,
+                "row_span": 1
+            },
+            "title": "产品类别销售对比",
+            "query": "SELECT category, SUM(amount) as sales FROM sales GROUP BY category ORDER BY sales DESC LIMIT 10",
+            "echarts_option": {
+                "title": {
+                    "text": "Top 10 产品类别",
+                    "left": "center"
+                },
+                "tooltip": {
+                    "trigger": "axis",
+                    "axisPointer": {
+                        "type": "shadow"
+                    }
+                },
+                "xAxis": {
+                    "type": "category",
+                    "axisLabel": {
+                        "rotate": 30
+                    }
+                },
+                "yAxis": {
+                    "type": "value",
+                    "name": "销售额（万元）"
+                },
+                "series": [{
+                    "type": "bar",
+                    "barWidth": "60%",
+                    "itemStyle": {
+                        "borderRadius": [4, 4, 0, 0]
+                    }
+                }]
+            },
+            "custom_js": "option.series[0].data = rawData.map(r => r.sales); option.xAxis.data = rawData.map(r => r.category);"
+        },
+        {
+            "id": "channel_trend",
+            "position": {
+                "row": 2,
+                "col": 0,
+                "col_span": 1,
+                "row_span": 1
+            },
+            "title": "渠道销售趋势",
+            "query": "SELECT channel, month, SUM(amount) as sales FROM sales GROUP BY channel, month ORDER BY month",
+            "echarts_option": {
+                "title": {
+                    "text": "渠道对比",
+                    "left": "center"
+                },
+                "tooltip": {
+                    "trigger": "axis"
+                },
+                "legend": {
+                    "bottom": 0
+                },
+                "xAxis": {
+                    "type": "category"
+                },
+                "yAxis": {
+                    "type": "value"
+                },
+                "series": []
+            },
+            "custom_js": "const channels = [...new Set(rawData.map(r => r.channel))]; option.legend.data = channels; option.xAxis.data = [...new Set(rawData.map(r => r.month))]; option.series = channels.map(ch => ({name: ch, type: 'line', data: rawData.filter(r => r.channel === ch).map(r => r.sales)}));"
+        },
+        {
+            "id": "china_map",
+            "position": {
+                "row": 2,
+                "col": 1,
+                "col_span": 2,
+                "row_span": 1
+            },
+            "title": "全国销售热力图",
+            "query": "SELECT province, SUM(amount) as sales FROM sales GROUP BY province",
+            "echarts_option": {
+                "title": {
+                    "text": "全国销售分布",
+                    "left": "center"
+                },
+                "tooltip": {
+                    "trigger": "item",
+                    "formatter": "{b}<br/>销售额: {c}万元"
+                },
+                "visualMap": {
+                    "min": 0,
+                    "max": 100000,
+                    "left": "left",
+                    "top": "bottom",
+                    "text": ["高", "低"],
+                    "calculable": true,
+                    "inRange": {
+                        "color": ["#f7fbff", "#08306b"]
+                    }
+                },
+                "series": [{
+                    "name": "销售额",
+                    "type": "map",
+                    "map": "china",
+                    "roam": true,
+                    "label": {
+                        "show": true
+                    },
+                    "emphasis": {
+                        "label": {
+                            "show": true
+                        }
+                    },
+                    "data": []
+                }]
+            },
+            "custom_js": "option.series[0].data = rawData.map(r => ({name: r.province, value: r.sales}));"
+        }
+    ]
+}

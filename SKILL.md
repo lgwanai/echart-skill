@@ -35,6 +35,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | `/help` | `/?`, `/帮助` | 显示帮助 | `/help` |
 | `/clean` | `/清理` | 清理旧数据 | `/clean --days 30` |
 | `/poll` | `/轮询` | 轮询管理 | `/poll status` |
+| `/dashboard` | `/db`, `/仪表盘` | 生成仪表盘 | `/dashboard config.json` |
 | `/start` | `/server`, `/启动服务` | 启动本地服务 | `/start` |
 | `/stop` | `/停止服务` | 停止本地服务 | `/stop` |
 | `/status` | `/状态` | 查看服务状态和链接 | `/status` |
@@ -129,6 +130,44 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   /chart-list basic        # 显示基础图表
   /chart-list 3d           # 显示3D图表
   /cl                      # 别名
+```
+
+#### `/dashboard` - 仪表盘生成
+```
+/dashboard <配置文件> [--output <输出路径>]
+/db <配置文件>  # 别名
+/仪表盘 <配置文件>  # 中文别名
+
+示例:
+  /dashboard outputs/configs/dashboard.json
+  /db dashboard.json --output outputs/html/sales_dashboard.html
+  /dashboard examples/dashboard_config.json
+
+功能:
+  - 生成专业的多图表仪表盘
+  - 支持卡片式布局、响应式设计
+  - 深色/浅色主题切换
+  - 自动刷新、导出PDF
+  - 交互式图表、搜索过滤
+
+配置文件格式:
+  {
+    "title": "仪表盘标题",
+    "columns": 3,
+    "row_height": 400,
+    "gap": 24,
+    "db_path": "workspace.duckdb",
+    "charts": [
+      {
+        "id": "chart1",
+        "position": {"row": 0, "col": 0, "col_span": 2, "row_span": 1},
+        "title": "图表标题",
+        "query": "SELECT * FROM table",
+        "echarts_option": {...},
+        "custom_js": "..."
+      }
+    ]
+  }
 ```
 
 **支持的图表类型完整列表：**
@@ -931,7 +970,119 @@ python scripts/db_cli.py import mongo_docs '{}' --collection users --table-name 
 - MongoDB documents are flattened for tabular storage (nested fields become `parent_child`)
 - Arrays in MongoDB are expanded to indexed fields (`skills_0`, `skills_1`)
 
-### Scenario 14: Polling & Auto-Refresh
+### Scenario 15: Dashboard Generation
+**Trigger**: User needs to create multi-chart dashboards with professional UI/UX design.
+
+**Action:**
+
+**1. Create Dashboard Configuration (dashboard_config.json):**
+```json
+{
+    "title": "销售数据分析仪表盘",
+    "columns": 3,
+    "row_height": 400,
+    "gap": 24,
+    "db_path": "workspace.duckdb",
+    "charts": [
+        {
+            "id": "chart1",
+            "position": {"row": 0, "col": 0, "col_span": 2, "row_span": 1},
+            "title": "月度销售趋势",
+            "query": "SELECT month, SUM(amount) as sales FROM sales GROUP BY month ORDER BY month",
+            "echarts_option": {
+                "xAxis": {"type": "category"},
+                "yAxis": {"type": "value"},
+                "series": [{"type": "line", "smooth": true}]
+            }
+        },
+        {
+            "id": "chart2",
+            "position": {"row": 0, "col": 2, "col_span": 1, "row_span": 2},
+            "title": "地区销售分布",
+            "query": "SELECT region, SUM(amount) as sales FROM sales GROUP BY region",
+            "echarts_option": {
+                "series": [{"type": "pie", "radius": "50%"}]
+            }
+        },
+        {
+            "id": "chart3",
+            "position": {"row": 1, "col": 0, "col_span": 2, "row_span": 1},
+            "title": "产品类别对比",
+            "query": "SELECT category, SUM(amount) as sales FROM sales GROUP BY category",
+            "echarts_option": {
+                "xAxis": {"type": "category"},
+                "yAxis": {"type": "value"},
+                "series": [{"type": "bar"}]
+            }
+        }
+    ]
+}
+```
+
+**2. Generate Dashboard:**
+```bash
+python scripts/dashboard_generator.py --config outputs/configs/dashboard_config.json --output outputs/html/dashboard.html
+```
+
+**3. Dashboard Features:**
+- ✅ **Professional Card-based Layout**: Modern UI with shadow and hover effects
+- ✅ **Dark/Light Theme Toggle**: Press the theme button to switch themes
+- ✅ **Responsive Design**: Auto-adjusts for mobile, tablet, and desktop
+- ✅ **Interactive Charts**: Each chart supports zoom, pan, tooltip
+- ✅ **Auto-refresh**: Configure auto-refresh interval (default: 30 seconds)
+- ✅ **Export PDF**: Export entire dashboard as PDF file
+- ✅ **Chart Search**: Filter charts by title
+- ✅ **Download Charts**: Download individual charts as PNG images
+
+**Dashboard Layout Options:**
+```
+Grid Layout Examples:
+┌──────────────────────────────────────┐
+│  columns: 3, row_height: 400px      │
+├─────────────────────┬────────────────┤
+│ Chart 1 (2x1)       │ Chart 2 (1x2)  │
+│                     │                │
+├─────────────────────┤                │
+│ Chart 3 (2x1)       │                │
+├─────────────────────┼────────────────┤
+│ Chart 4 (1x1)       │ Chart 5 (2x1)  │
+│                     │                │
+│                     ├────────────────┤
+│                     │ Chart 6 (1x1)  │
+└─────────────────────┴────────────────┘
+```
+
+**Position Configuration:**
+- `row`: Starting row (0-indexed)
+- `col`: Starting column (0-indexed)
+- `col_span`: Number of columns to span (default: 1)
+- `row_span`: Number of rows to span (default: 1)
+
+**4. Export Standalone Dashboard:**
+```bash
+python scripts/dashboard_generator.py --export outputs/configs/dashboard_config.json --output standalone_dashboard.html --theme dark
+```
+
+This generates a self-contained HTML file (~2MB with embedded ECharts library) that can be shared offline.
+
+**5. CLI Dashboard Generation:**
+```bash
+# Basic usage
+python scripts/dashboard_generator.py --config dashboard.json --output output.html
+
+# Export standalone
+python scripts/dashboard_generator.py --export dashboard.json --output standalone.html --theme dark
+
+# Generate from inline JSON
+python scripts/dashboard_generator.py --config '{"title":"My Dashboard","columns":2,"charts":[]}'
+```
+
+**Notes:**
+- Dashboard CSS and JS are located in `assets/dashboard/`
+- Uses CSS Grid with modern browser support (Chrome 57+, Firefox 52+, Safari 10.1+)
+- Export functionality requires html2canvas and jsPDF libraries (auto-loaded)
+- Charts automatically resize on window resize
+- Theme preference saved to localStorage
 **Trigger**: User needs to automatically refresh data from HTTP APIs or databases on a schedule.
 
 **Action:**
