@@ -39,6 +39,14 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [x] **REFRESH-01**: Charts auto-refresh when polled data changes
 - [x] **REFRESH-02**: Dashboards auto-refresh when polled data changes
 
+### Server Management
+
+- [ ] **SRV-01**: User can start local HTTP server with /start command (aliases: /server, /启动服务)
+- [ ] **SRV-02**: User can stop server with /stop command (alias: /停止服务)
+- [ ] **SRV-03**: User can check service status with /status command (alias: /状态)
+- [ ] **SRV-04**: Service state persists to outputs/.server_status.json (PID, port, start time)
+- [ ] **SRV-05**: User sees list of accessible chart URLs after starting server (with file metadata)
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -92,11 +100,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | POLL-05 | Phase 13 | ✅ Complete |
 | REFRESH-01 | Phase 13 | ✅ Complete |
 | REFRESH-02 | Phase 13 | ✅ Complete |
+| SRV-01 | Phase 14 | ⏳ Planned |
+| SRV-02 | Phase 14 | ⏳ Planned |
+| SRV-03 | Phase 14 | ⏳ Planned |
+| SRV-04 | Phase 14 | ⏳ Planned |
+| SRV-05 | Phase 14 | ⏳ Planned |
 
 **Coverage:**
 - v1.2 requirements: 20 total
 - Mapped to phases: 20
 - Complete: 20/20 ✓
+- Phase 14 requirements: 5 total
+- Mapped to phases: 5
+- Complete: 0/5 (planned)
 
 ---
 

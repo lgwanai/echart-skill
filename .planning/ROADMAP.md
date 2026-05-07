@@ -82,14 +82,23 @@ Phases execute in numeric order: 11 → 12 → 13
 | 12. HTTP Enhancements | 2/2 | ✅ Complete | 2026-04-12 |
 | 13. Polling & Auto-Refresh | 2/2 | ✅ Complete | 2026-04-12 |
 
-### Phase 14: 增加服务启动和关闭指令支持，目前生成的页面需要本地服务才能看到，但是重启电脑后，页面就无法看到了，启动后还需要给出当前能够访问的连接列表
-
-**Goal:** [To be planned]
-**Depends on:** Phase 13
-**Plans:** 0 plans
+### Phase 14: 服务启动和关闭指令支持
+**Goal**: Add /start, /stop, /status commands to manage local HTTP server for viewing generated charts, with link list display after service starts
+**Depends on**: Phase 13
+**Requirements**: SRV-01, SRV-02, SRV-03, SRV-04, SRV-05
+**Success Criteria** (what must be TRUE):
+  1. User can start local HTTP server with /start command
+  2. User can stop server with /stop command
+  3. User can check service status with /status command
+  4. Service state persists to outputs/.server_status.json
+  5. Server starts on available port (8100-8200)
+  6. User sees list of accessible chart URLs after starting server
+  7. Status shows file names with creation times and full URLs
+**Plans**: 2 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 14 to break down)
+- [ ] 14-01-PLAN.md - Server management CLI with /start, /stop, /status commands (SRV-01, SRV-02, SRV-03, SRV-04)
+- [ ] 14-02-PLAN.md - Status reporting and chart link listing utility (SRV-05)
 
 ---
 
