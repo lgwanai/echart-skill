@@ -82,6 +82,15 @@ Phases execute in numeric order: 11 → 12 → 13
 | 12. HTTP Enhancements | 2/2 | ✅ Complete | 2026-04-12 |
 | 13. Polling & Auto-Refresh | 2/2 | ✅ Complete | 2026-04-12 |
 
+### Phase 14: 增加服务启动和关闭指令支持，目前生成的页面需要本地服务才能看到，但是重启电脑后，页面就无法看到了，启动后还需要给出当前能够访问的连接列表
+
+**Goal:** [To be planned]
+**Depends on:** Phase 13
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 14 to break down)
+
 ---
 
 *Milestone v1.2 COMPLETE - All phases executed successfully.*

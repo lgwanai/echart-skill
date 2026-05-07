@@ -52,6 +52,10 @@ Progress: [██████████] 100% (3/3 phases complete)
 
 ## Accumulated Context
 
+### Roadmap Evolution
+
+- Phase 14 added: 增加服务启动和关闭指令支持，目前生成的页面需要本地服务才能看到，但是重启电脑后，页面就无法看到了，启动后还需要给出当前能够访问的连接列表
+
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
