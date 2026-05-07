@@ -12,6 +12,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 2. **DuckDB as the Engine**: All CSV/Excel files should be imported into a local DuckDB database (default: `workspace.duckdb`). Rely on SQL for robust data manipulation (filtering, joining, grouping). DuckDB's columnar storage delivers superior analytical performance.
 3. **Non-Destructive Operations (Undo Mechanism)**: Do not overwrite original tables. When modifying data, create a new table (e.g., `CREATE TABLE table_v2 AS SELECT ...`) or a View. This guarantees the user can always say "undo the last step".
 4. **Data Privacy**: Keep data local. Only send aggregated statistics or schema info into the context window.
+5. **Auto-start Server**: After generating ANY HTML chart/dashboard, ALWAYS ensure the local server is running and return the access URL. Use `python scripts/server_cli.py start` to auto-start if not running.
 
 ---
 
@@ -312,12 +313,12 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 |------|-----------|---------------|
 | 数据导入 | 上传、导入、import、load、打开文件、读取 | Scenario 1 |
 | SQL 查询 | 查询、筛选、统计、分组、排序、select、group by | Scenario 2 |
-| 图表生成 | 图表、可视化、画图、chart、plot、展示、可视化 | Scenario 4 |
+| 图表生成 | 图表、可视化、画图、chart、plot、展示、可视化 | Scenario 4 + 自动启动服务 |
 | 数据导出 | 导出、下载、export、保存、输出 | Scenario 6 |
 | 表结构 | 表结构、字段、列、describe、schema | Scenario 10 |
 | 导入历史 | 历史、导入记录、history | Scenario 10 |
 | 指标管理 | 指标、口径、定义、metric | Scenario 8 |
-| 服务管理 | 服务、服务器、启动、停止、server | Scenario 15 |
+| 服务管理 | 服务、服务器、启动、停止、server、start、stop | 直接执行 /start 或 /stop |
 
 ---
 
@@ -521,11 +522,36 @@ LIMIT 10;
    *MAP FALLBACK RULE: For map-based charts, prioritize using local static maps (`china`, `world`, or specific province names). If the user needs to visualize data at a granularity not supported by local static JS (e.g., city-level dimensions without a corresponding local map, street-level data, or specific foreign countries not fully detailed in the world map), you MUST fallback to using ECharts `bmap` mode (Baidu Map API). This requires an AK (`ak` mode).*
    *BAIDU AK RULE: If the user provides a Baidu Map AK, remember that there are two types of APIs: 1) JavaScript API (Frontend) and 2) Geocoding API (Backend Python). If the backend Python geocoding fails with "status 240", it means the AK is a Browser-type AK and lacks Backend Geocoding permissions. In this case, you should either fallback to hardcoded coordinates in JS or ask the user to provide a "Server-side" AK.*
    *GANTT CHART RULE: Gantt charts use a dedicated simplified API (see Scenario 9) rather than the template-based approach. Use `scripts/gantt_chart.py` with `generate_gantt_chart()` for timeline visualizations.*
-7. Execute the command:
-   ```bash
-   python scripts/chart_generator.py --config outputs/configs/your_config.json
-   ```
-8. The script will automatically start a local HTTP server and return an access URL. Provide this URL to the user to view the interactive chart.
+ 7. Execute the command:
+    ```bash
+    python scripts/chart_generator.py --config outputs/configs/your_config.json
+    ```
+
+ 8. **[CRITICAL] Auto-start Server**: After generating the chart, you MUST ensure the local server is running:
+    ```bash
+    # Check server status, auto-start if not running
+    python scripts/server_cli.py status
+    # If status is not "running", start the server:
+    python scripts/server_cli.py start
+    ```
+
+ 9. **Return Access URL**: Get the server status and return the full chart URL to the user:
+    ```bash
+    # Get server port and status
+    python scripts/server_cli.py status
+
+    # Then construct and return the full URL:
+    # http://localhost:{port}/{chart_filename}.html
+    ```
+    
+    Example output to user:
+    ```
+    ✅ Chart generated: outputs/html/sales_chart.html
+     
+    📊 View chart: http://localhost:8100/sales_chart.html
+    ```
+    
+    **IMPORTANT**: Always verify server is running after chart generation. If server start fails, retry once. If still fails, show the local file path as fallback.
 
 ### Scenario 5: File Merging & Splitting
 **Trigger**: User needs to combine multiple identical reports or split a master sheet by department.
@@ -579,14 +605,25 @@ LIMIT 10;
            {"name": "Testing", "start": "2024-01-25", "end": "2024-02-10"}
        ]
    }
-   output_path = generate_gantt_chart(config)
-   ```
-2. The generated HTML will open in browser with interactive Gantt chart.
-3. Tasks support optional fields:
-   - `category`: For grouping tasks in rows
-   - `color`: Custom bar color (hex code)
+    output_path = generate_gantt_chart(config)
+    ```
 
-**Note**: Dates can be ISO strings or datetime objects. End date must be after start date.
+ 2. **[CRITICAL] Auto-start Server**: After generating the Gantt chart, ensure server is running:
+    ```bash
+    python scripts/server_cli.py start  # Auto-starts if not running
+    ```
+
+ 3. Return the access URL:
+    ```
+    ✅ Gantt chart generated: outputs/html/project_gantt.html
+    📊 View chart: http://localhost:{port}/project_gantt.html
+    ```
+
+ 4. Tasks support optional fields:
+    - `category`: For grouping tasks in rows
+    - `color`: Custom bar color (hex code)
+
+ **Note**: Dates can be ISO strings or datetime objects. End date must be after start date.
 
 ### Scenario 10: View Import History & Table Structure
 **Trigger**: User asks to view import history, check table structures, or see table relationships.
