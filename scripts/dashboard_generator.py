@@ -166,6 +166,9 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
         Path to generated HTML file.
     """
     base_url = ensure_server_running()
+    if base_url is None:
+        logger.warning("Server failed to start, using relative paths as fallback")
+        base_url = "http://127.0.0.1:8100"
     
     # Ensure dashboard assets directory exists
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

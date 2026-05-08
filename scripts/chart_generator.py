@@ -300,6 +300,9 @@ def generate_echarts_html(df, config, output_path):
 
     # Get server base url first to construct absolute paths for local assets
     base_url = ensure_server_running()
+    if base_url is None:
+        logger.warning("Server failed to start, using relative paths as fallback")
+        base_url = "http://127.0.0.1:8100"  # fallback default
 
     # 2. BMap script injection check
     if ("bmap" in json.dumps(option) or "bmap" in custom_js) and baidu_ak:

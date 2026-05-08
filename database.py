@@ -90,7 +90,10 @@ class DatabaseRepository:
             ...     conn.execute("SELECT 1")
         """
         with self._lock:
-            conn = self._pool.pop()
+            if self._pool:
+                conn = self._pool.pop()
+            else:
+                conn = duckdb.connect(self.db_path)
         try:
             yield conn
         finally:

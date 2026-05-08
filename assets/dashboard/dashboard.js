@@ -21,12 +21,6 @@ class DashboardController {
     this.startAutoRefresh();
   }
   
-  init() {
-    this.applyTheme(this.theme);
-    this.setupEventListeners();
-    this.startAutoRefresh();
-  }
-  
   /**
    * Apply theme (light/dark)
    */
@@ -146,7 +140,7 @@ class DashboardController {
     
     try {
       if (typeof html2canvas !== 'undefined' && (typeof jsPDF !== 'undefined' || (typeof jspdf !== 'undefined' && jspdf.jsPDF))) {
-        var JsPDF = typeof jsPDF !== 'undefined' ? jsPDF : jspdf.jsPDF;
+        const JsPDF = typeof jsPDF !== 'undefined' ? jsPDF : jspdf.jsPDF;
         const element = document.querySelector('.dashboard-container');
         const canvas = await html2canvas(element);
         const imgData = canvas.toDataURL('image/png');

@@ -216,14 +216,13 @@ class SimpleDashboard:
             raise ValueError(f"Unsafe {context} (special chars): {name!r}")
         return name
     
-    # Allowed filter operators (whitelist pattern)
+    # Allowed filter operators (whitelist: column operator value, no semicolons/comments)
     _FILTER_PATTERN = re.compile(
-        r'^[\w\u4e00-\u9fff]+'           # column name
-        r'\s*(=|!=|<|>|<=|>=|LIKE|IN)\s*'  # operator
-        r'.+$',                           # value
+        r'^[\w\u4e00-\u9fff]+'                # column name
+        r'\s*(=|!=|<|>|<=|>=|LIKE|IN|NOT IN)\s*'  # operator
+        r'[^;\'"\-]+$',                        # value (no semicolons, quotes, or double-dash)
         re.IGNORECASE
     )
-        return name
     
     @staticmethod
     def _quote_id(name: str) -> str:
