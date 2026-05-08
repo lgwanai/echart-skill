@@ -216,11 +216,12 @@ class SimpleDashboard:
             raise ValueError(f"Unsafe {context} (special chars): {name!r}")
         return name
     
-    # Allowed filter operators (whitelist: column operator value, no semicolons/comments)
+    # Allowed filter operators (whitelist: column operator value)
+    # Blocks semicolons, SQL comments (-- /*), allowing hyphens for negative numbers
     _FILTER_PATTERN = re.compile(
-        r'^[\w\u4e00-\u9fff]+'                # column name
-        r'\s*(=|!=|<|>|<=|>=|LIKE|IN|NOT IN)\s*'  # operator
-        r'[^;\'"\-]+$',                        # value (no semicolons, quotes, or double-dash)
+        r'^[\w\u4e00-\u9fff]+'                      # column name
+        r'\s*(=|!=|<|>|<=|>=|LIKE|IN|NOT IN)\s*'    # operator
+        r'(?!.*(?:--|/\*|;))[^\'"]+$',              # value: no comments, no semicolons
         re.IGNORECASE
     )
     

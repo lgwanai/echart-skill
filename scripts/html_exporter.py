@@ -12,6 +12,7 @@ Features:
 - Data size logging for user awareness
 """
 
+import html as html_mod
 import json
 import os
 from pathlib import Path
@@ -212,16 +213,22 @@ class HTMLExporter:
             theme_js = "myChart.setOption({ backgroundColor: '#1a1a1a' });"
         
         # Build HTML
+        # Safe string escaping
+        title_escaped = html_mod.escape(title)
+        # Escape </script> sequences in JSON strings for script-safe embedding
+        option_safe = option_json.replace('</', '<\\/')
+        data_safe = data_json.replace('</', '<\\/')
+        
         html = f"""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{title}</title>
+    <title>{title_escaped}</title>
     <style>{style}
     </style>
 </head>
 <body>
-    <div id="title">{title}</div>
+    <div id="title">{title_escaped}</div>
     <div id="main"></div>
     <script>
 {echarts_content}
@@ -232,8 +239,8 @@ class HTMLExporter:
     <script type="text/javascript">
         (function() {{
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {option_json};
-            var rawData = {data_json};
+            var option = {option_safe};
+            var rawData = {data_safe};
             {custom_js}
             myChart.setOption(option);
             {theme_js}

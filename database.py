@@ -162,6 +162,7 @@ class DatabaseRepository:
 
 # Module-level singleton for backward compatibility
 _repo: Optional[DatabaseRepository] = None
+_get_repo_lock = threading.Lock()
 
 
 def get_repository(db_path: str = "workspace.duckdb") -> DatabaseRepository:
@@ -183,9 +184,10 @@ def get_repository(db_path: str = "workspace.duckdb") -> DatabaseRepository:
     """
     global _repo
     if _repo is None:
-        _repo = DatabaseRepository(db_path)
-        # Register cleanup on program exit
-        atexit.register(_cleanup_repo)
+        with _get_repo_lock:
+            if _repo is None:
+                _repo = DatabaseRepository(db_path)
+                atexit.register(_cleanup_repo)
     return _repo
 
 
