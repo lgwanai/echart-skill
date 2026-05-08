@@ -9,8 +9,16 @@ class DashboardController {
     this.config = options.config || {};
     this.theme = localStorage.getItem('dashboard-theme') || 'light';
     this.autoRefreshInterval = null;
+    this._refreshing = false;
+    this._listeners = {};
     
     this.init();
+  }
+  
+  init() {
+    this.applyTheme(this.theme);
+    this.setupEventListeners();
+    this.startAutoRefresh();
   }
   
   init() {
@@ -56,40 +64,30 @@ class DashboardController {
    * Setup event listeners
    */
   setupEventListeners() {
-    // Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
-      themeToggle.addEventListener('click', () => this.toggleTheme());
+      const handler = () => this.toggleTheme();
+      themeToggle.addEventListener('click', handler);
+      this._listeners.themeToggle = { el: themeToggle, handler: handler };
     }
     
-    // Refresh button
     const refreshBtn = document.getElementById('refresh-dashboard');
     if (refreshBtn) {
-      refreshBtn.addEventListener('click', () => this.refreshAllCharts());
+      const handler = () => this.refreshAllCharts();
+      refreshBtn.addEventListener('click', handler);
+      this._listeners.refreshBtn = { el: refreshBtn, handler: handler };
     }
     
-    // Export button
     const exportBtn = document.getElementById('export-dashboard');
     if (exportBtn) {
-      exportBtn.addEventListener('click', () => this.exportDashboard());
+      const handler = () => this.exportDashboard();
+      exportBtn.addEventListener('click', handler);
+      this._listeners.exportBtn = { el: exportBtn, handler: handler };
     }
     
-    // Auto-refresh toggle
-    const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
-    if (autoRefreshToggle) {
-      autoRefreshToggle.addEventListener('change', (e) => {
-        if (e.target.checked) {
-          this.startAutoRefresh();
-        } else {
-          this.stopAutoRefresh();
-        }
-      });
-    }
-    
-    // Resize handler
-    window.addEventListener('resize', () => {
-      this.resizeCharts();
-    });
+    const resizeHandler = () => { this.resizeCharts(); };
+    window.addEventListener('resize', resizeHandler);
+    this._listeners.resizeHandler = resizeHandler;
   }
   
   /**
@@ -196,11 +194,19 @@ class DashboardController {
     
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.innerHTML = `
-      <span class="toast-icon">${icons[type]}</span>
-      <span class="toast-message">${message}</span>
-      <button class="toast-close" onclick="this.parentElement.remove()">×</button>
-    `;
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'toast-icon';
+    iconSpan.textContent = icons[type];
+    const msgSpan = document.createElement('span');
+    msgSpan.className = 'toast-message';
+    msgSpan.textContent = message;
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'toast-close';
+    closeBtn.textContent = '\u00d7';
+    closeBtn.addEventListener('click', function() { toast.remove(); });
+    toast.appendChild(iconSpan);
+    toast.appendChild(msgSpan);
+    toast.appendChild(closeBtn);
     
     container.appendChild(toast);
     
@@ -291,6 +297,17 @@ class DashboardController {
    */
   destroy() {
     this.stopAutoRefresh();
+    
+    Object.values(this._listeners).forEach(entry => {
+      if (entry.el) {
+        entry.el.removeEventListener('click', entry.handler);
+      }
+    });
+    if (this._listeners.resizeHandler) {
+      window.removeEventListener('resize', this._listeners.resizeHandler);
+    }
+    this._listeners = {};
+    
     this.charts.forEach(chart => {
       try { chart.dispose(); } catch (e) { /* ignore */ }
     });

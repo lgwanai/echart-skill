@@ -270,10 +270,16 @@ def ensure_server_running():
 
         # Wait a moment for it to start
         import time
+        started = False
         for _ in range(10):
             time.sleep(0.2)
             if check_server_running(port, port + 1):
+                started = True
                 break
+        
+        if not started:
+            logger.warning("Server failed to start within timeout", port=port)
+            return None
 
     return f"http://127.0.0.1:{port}"
 

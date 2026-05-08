@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import html as html_mod
 import json
 import os
 import io
@@ -338,12 +339,13 @@ def generate_echarts_html(df, config, output_path):
             
     province_scripts_html = "\n        ".join(province_map_scripts)
     
+    title_escaped = html_mod.escape(title)
     html_template = f"""
     <!DOCTYPE html>
     <html>
     <head>
         <meta charset="utf-8">
-        <title>{title}</title>
+        <title>{title_escaped}</title>
         <script src="{base_url}/assets/echarts/echarts.min.js"></script>
         {bmap_script}
         {china_map_script}

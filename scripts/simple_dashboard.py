@@ -26,6 +26,7 @@ Usage:
 
 import json
 import os
+import re
 import sys
 from typing import Optional
 
@@ -210,8 +211,18 @@ class SimpleDashboard:
         """Validate that a name is a safe SQL identifier."""
         if not name or not isinstance(name, str):
             raise ValueError(f"Invalid {context}: {name!r}")
-        if not name.replace('_', '').replace('-', '').isalnum():
+        stripped = name.replace('_', '').replace('-', '')
+        if not stripped or not stripped.isalnum():
             raise ValueError(f"Unsafe {context} (special chars): {name!r}")
+        return name
+    
+    # Allowed filter operators (whitelist pattern)
+    _FILTER_PATTERN = re.compile(
+        r'^[\w\u4e00-\u9fff]+'           # column name
+        r'\s*(=|!=|<|>|<=|>=|LIKE|IN)\s*'  # operator
+        r'.+$',                           # value
+        re.IGNORECASE
+    )
         return name
     
     @staticmethod
@@ -245,11 +256,13 @@ class SimpleDashboard:
         # Build query
         query = f"SELECT {select} FROM {table}"
         
-        # Add filter (validated pattern only)
+        # Add filter (validated against whitelist pattern)
         if spec.filter:
             filter_str = spec.filter.strip()
             if not filter_str:
                 raise ValueError("filter cannot be empty")
+            if not self._FILTER_PATTERN.match(filter_str):
+                raise ValueError(f"Unsafe filter expression: {filter_str!r}")
             query += f" WHERE {filter_str}"
         
         # Add GROUP BY
@@ -442,7 +455,6 @@ class SimpleDashboard:
             
             # Parse chart description
             # Format: "- 地区销售柱状图" or "- 各地区销售 (柱状图)"
-            import re
             
             # Try to extract chart type
             chart_types = ["柱状图", "折线图", "饼图", "地图", "散点图", "雷达图", "漏斗图", "树图", "旭日图"]
@@ -510,7 +522,6 @@ def create_dashboard_from_text(
     if not title:
         lines = description.strip().split('\n')
         first_line = lines[0] if lines else "Dashboard"
-        import re
         title = re.sub(r'创建|仪表盘|，|包含', '', first_line).strip() or "Dashboard"
     
     dashboard = SimpleDashboard(title=title, db_path=db_path)

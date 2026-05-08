@@ -29,6 +29,7 @@ except ImportError:
 
 # Constants
 STATUS_FILE = Path("outputs/.server_status.json")
+STATUS_DIR = STATUS_FILE.parent
 SERVER_START_TIMEOUT = 2.0  # seconds
 SERVER_STOP_TIMEOUT = 1.0  # seconds
 DEFAULT_PORT_RANGE = (8100, 8200)
@@ -72,9 +73,9 @@ def start_server(port: int | None = None, force_restart: bool = False) -> dict:
         Status dict with pid, port, start_time, status
     """
     # File lock to prevent concurrent start_server calls
-    lock_path = os.path.join(STATUS_DIR, ".start_server.lock")
-    os.makedirs(STATUS_DIR, exist_ok=True)
-    lock_fd = open(lock_path, 'w')
+    lock_path = STATUS_DIR / ".start_server.lock"
+    STATUS_DIR.mkdir(parents=True, exist_ok=True)
+    lock_fd = open(str(lock_path), 'w')
     try:
         fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except (IOError, OSError):
