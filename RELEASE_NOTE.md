@@ -1,5 +1,37 @@
 # Release Note - Echart Skill
 
+## v1.3.1 (2026-05-07) - Bug Fix Release
+
+### 🔒 安全修复
+
+- **SQL 注入修复** (`simple_dashboard.py`)：`filter` 参数添加正则白名单验证，防止恶意 SQL 注入
+- **XSS 修复** (`chart_generator.py`)：图表标题 HTML 转义，防止跨站脚本攻击
+- **XSS 修复** (`dashboard_generator.py`)：所有用户提供的标题/ID 使用 `html.escape()` 和 `json.dumps()` 安全输出
+- **DOM XSS 修复** (`dashboard.js`)：`showToast()` 改用 `textContent` 替代 `innerHTML`
+
+### 🐛 致命 Bug 修复
+
+- **服务启动崩溃** (`server_cli.py`)：修复 `STATUS_DIR` 未定义导致 `NameError` 崩溃
+- **并发竞态** (`server_cli.py`)：添加 `fcntl.flock` 文件锁防止并发创建僵尸进程
+- **组件泄漏** (`dashboard.js`)：修复 `applyTheme()` 主题切换后图表实例泄漏，导致所有操作崩溃
+- **PDF 导出失效** (`dashboard.js`)：修复 `jsPDF` 全局检测，兼容 UMD 模块导出
+- **死链接返回** (`server.py`)：修复 `ensure_server_running()` 超时仍返回假 URL
+- **图表崩溃** (`simple_dashboard.py`)：修复空图表列表导致 `generate()` 崩溃
+- **方法不存在** (`simple_dashboard.py`)：修复 `_detect_table()` 调用不存在的 API
+- **孤儿进程泄漏** (`server.py`)：扩展清理端口范围 8100→8200
+
+### 🛡️ 健壮性提升
+
+- **事件监听清理** (`dashboard.js`)：`destroy()` 方法正确移除所有事件监听器
+- **空指针保护** (`dashboard.js`)：`filterCharts`/`sortCharts` 添加缺失标题元素的空值保护
+- **并发请求保护** (`dashboard.js`)：自动刷新添加 `_refreshing` 标志防止重复调用
+- **打印样式** (`dashboard.css`)：修复打印模式隐藏元素和 `clip` 重置
+- **暗色模式** (`dashboard.css`)：添加表单控件暗色主题样式
+- **标识符验证** (`simple_dashboard.py`)：修复纯下划线标识符被错误拒绝
+- **文件锁** (`server_cli.py`)：`start_server()` 与 `stop_server()` 互斥执行
+
+---
+
 ## v1.3.0 (2026-05-07)
 
 ### 🎨 Dashboard 自然语言生成（重大更新）
