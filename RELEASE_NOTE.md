@@ -1,5 +1,44 @@
 # Release Note - Echart Skill
 
+## v1.3.2 (2026-05-09) - Comprehensive Security & Robustness
+
+### 🔒 安全审计结果
+
+经过 5 轮深度代码审查，修复了 **10 CRITICAL + 18 HIGH + 16 MEDIUM** 级别问题。
+
+#### SQL 注入修复
+- **filter 参数** (`simple_dashboard.py`)：添加正则白名单验证，阻断分号、注释 (`--`, `/*`) 注入
+- **table_name 参数** (`data_importer.py`)：CLI 传入的表名需经 `validate_table_name()` 验证
+- **标识符验证** (`simple_dashboard.py`)：所有 SQL 标识符经 `_validate_identifier()` + `_quote_id()` 双重保护
+
+#### XSS 跨站脚本修复
+- **chart_generator.py**: 图表 title HTML 转义 (`html.escape()`)
+- **dashboard_generator.py**: 所有用户输入 title/id 经 `html.escape()` + `json.dumps()` 安全输出
+- **html_exporter.py**: title 转义 + JSON `</script>` 序列防护
+- **dashboard.js**: `showToast()` 改用 `textContent` 替代 `innerHTML`
+
+#### 服务稳定性修复
+- **STATUS_DIR 崩溃** (`server_cli.py`)：修复未定义变量导致 `NameError`
+- **并发竞态** (`server_cli.py`)：`fcntl.flock` 文件锁防止重复启动
+- **死链接返回** (`server.py`)：`ensure_server_running()` 超时返回 None
+- **连接池耗尽** (`database.py`)：空池自动创建新连接
+- **线程安全** (`database.py`)：`get_repository()` 单例双重检查锁
+
+#### Dashboard 交互修复
+- **图表泄漏** (`dashboard.js`)：`applyTheme()` 主题切换后正确更新 `this.charts`
+- **PDF 导出** (`dashboard.js`)：修复 `jsPDF` UMD 模块检测
+- **事件监听** (`dashboard.js`)：`destroy()` 完整清理事件监听器
+- **并发刷新** (`dashboard.js`)：`_refreshing` 标志防止重复刷新
+- **空指针保护** (`dashboard.js`)：`filterCharts`/`sortCharts` 空元素保护
+- **打印样式** (`dashboard.css`)：修复 `clip` 重置和暗色模式
+
+#### 语法错误修复
+- **simple_dashboard.py**：删除类体级别遗留的 `return name`（SyntaxError）
+- **dashboard.js**：删除重复的 `init()` 方法
+- **server_cli.py**：修复 `start_server()` 缩进错误的 try/except
+
+---
+
 ## v1.3.1 (2026-05-07) - Bug Fix Release
 
 ### 🔒 安全修复

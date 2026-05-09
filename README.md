@@ -1,4 +1,4 @@
-# Echart Skill v1.3.1
+# Echart Skill v1.3.2
 
 专门为 AI Agent 设计的本地数据分析与处理技能包（Skill），旨在解决日常办公场景下的高频、复杂数据分析任务。
 
