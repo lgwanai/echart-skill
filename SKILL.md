@@ -39,6 +39,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | `/start` | `/server`, `/启动服务` | 启动本地服务 | `/start` |
 | `/stop` | `/停止服务` | 停止本地服务 | `/stop` |
 | `/status` | `/状态` | 查看服务状态和链接 | `/status` |
+| `/echart-update` | `/update`, `/更新` | 从 GitHub 拉取最新代码并备份旧文件 | `/echart-update` |
 
 ### 指令处理流程
 
@@ -347,7 +348,31 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   - 可访问图表列表（带完整 URL）
 
 示例:
-  /status  # 查看当前状态和链接
+   /status  # 查看当前状态和链接
+```
+
+#### `/echart-update` - 更新 Skill
+```
+/echart-update
+/update  # 别名
+/更新  # 中文别名
+
+从 GitHub 拉取最新代码，更新 skill，并自动备份旧文件到 backup 目录。
+
+功能:
+  - ✅ 自动创建带日期的备份压缩包
+  - ✅ 排除临时文件和数据库文件
+  - ✅ Git pull 拉取最新代码
+  - ✅ 备份文件保存在 backup/ 目录
+
+示例:
+   /echart-update  # 更新并备份
+   /update         # 别名
+   /更新           # 中文别名
+
+输出:
+   📦 备份文件: backup/echart-skill_backup_20260524_120000.zip
+   ✅ 更新成功
 ```
 
 ### 模糊匹配关键词
@@ -364,6 +389,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | 导入历史 | 历史、导入记录、history | Scenario 10 |
 | 指标管理 | 指标、口径、定义、metric | Scenario 8 |
 | 服务管理 | 服务、服务器、启动、停止、server、start、stop | 直接执行 /start 或 /stop |
+| Skill 更新 | 更新、拉取、update、pull、升级 | 执行 /echart-update |
 
 ---
 

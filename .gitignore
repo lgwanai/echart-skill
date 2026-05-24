@@ -2,6 +2,7 @@
 dist/
 tmp/
 outputs/
+backup/
 
 # 忽略开发设计文档与打包脚本
 idea.md
