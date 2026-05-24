@@ -357,22 +357,26 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 /update  # 别名
 /更新  # 中文别名
 
-从 GitHub 拉取最新代码，更新 skill，并自动备份旧文件到 backup 目录。
+自动更新 echart-skill，支持首次安装和后续更新。
 
 功能:
-  - ✅ 自动创建带日期的备份压缩包
-  - ✅ 排除临时文件和数据库文件
-  - ✅ Git pull 拉取最新代码
+  - ✅ 自动检测：是 git 仓库则 pull，否则提示 clone
+  - ✅ 更新前自动创建带日期的备份压缩包
+  - ✅ 排除临时文件、数据库文件等
   - ✅ 备份文件保存在 backup/ 目录
 
-示例:
-   /echart-update  # 更新并备份
-   /update         # 别名
-   /更新           # 中文别名
+首次安装:
+  cd ~/.agents/skills  # 或你的 skill 目录
+  git clone https://github.com/lgwanai/echart-skill.git
+
+后续更新:
+  /echart-update  # 自动 pull + 备份
+  /update         # 别名
+  /更新           # 中文别名
 
 输出:
-   📦 备份文件: backup/echart-skill_backup_20260524_120000.zip
-   ✅ 更新成功
+  📦 备份文件: backup/echart-skill_backup_20260524_120000.zip
+  ✅ 更新成功
 ```
 
 ### 模糊匹配关键词

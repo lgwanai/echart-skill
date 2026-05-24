@@ -3,29 +3,23 @@
 echart-skill 更新脚本
 
 功能：
-1. Git pull 从 GitHub 拉取最新代码
-2. 备份旧文件到 backup 目录（带日期压缩包）
+1. 首次安装：git clone 从 GitHub 克隆代码
+2. 后续更新：git pull 拉取最新代码
+3. 更新前自动备份旧文件到 backup 目录
 """
 
 import os
 import sys
 import subprocess
-import shutil
 import zipfile
 from datetime import datetime
 from pathlib import Path
 
 
-REPO_URL = "https://github.com/lgwanai/echart-skill"
+REPO_URL = "https://github.com/lgwanai/echart-skill.git"
 BACKUP_DIR = "backup"
 EXCLUDE_DIRS = {".git", "backup", "dist", "tmp", "outputs", "__pycache__", "node_modules"}
-EXCLUDE_FILES = {"workspace.db", "workspace.duckdb", ".DS_Store", "*.pyc", "*.log"}
-
-
-def get_skill_root():
-    """获取 skill 根目录"""
-    script_dir = Path(__file__).parent.resolve()
-    return script_dir.parent
+EXCLUDE_FILES = {"workspace.db", "workspace.duckdb", ".DS_Store", "*.pyc", "*.log", "*.duckdb"}
 
 
 def should_exclude(path: Path) -> bool:
@@ -70,14 +64,45 @@ def create_backup(skill_root: Path) -> str:
     return str(backup_path)
 
 
+def is_git_repo(path: Path) -> bool:
+    """检查是否是 git 仓库"""
+    return (path / ".git").exists()
+
+
+def git_clone(target_dir: Path) -> bool:
+    """执行 git clone"""
+    print(f"\n📥 克隆仓库: {REPO_URL}")
+    
+    parent_dir = target_dir.parent
+    repo_name = target_dir.name
+    
+    try:
+        result = subprocess.run(
+            ["git", "clone", REPO_URL, repo_name],
+            cwd=parent_dir,
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+        
+        if result.returncode == 0:
+            print(f"✅ 克隆成功")
+            return True
+        else:
+            print(f"❌ 克隆失败: {result.stderr.strip()}")
+            return False
+            
+    except subprocess.TimeoutExpired:
+        print("❌ 克隆超时")
+        return False
+    except Exception as e:
+        print(f"❌ 克隆异常: {e}")
+        return False
+
+
 def git_pull(skill_root: Path) -> bool:
     """执行 git pull"""
     print("\n📥 拉取最新代码...")
-    
-    git_dir = skill_root / ".git"
-    if not git_dir.exists():
-        print("❌ 当前目录不是 git 仓库")
-        return False
     
     try:
         result = subprocess.run(
@@ -90,7 +115,7 @@ def git_pull(skill_root: Path) -> bool:
         
         if result.returncode == 0:
             print(f"✅ 更新成功")
-            if result.stdout:
+            if result.stdout and result.stdout.strip() != "Already up to date.":
                 print(result.stdout.strip())
             return True
         else:
@@ -105,27 +130,42 @@ def git_pull(skill_root: Path) -> bool:
         return False
 
 
+def update_skill(skill_root: Path) -> bool:
+    """更新 skill（自动判断 clone 或 pull）"""
+    if is_git_repo(skill_root):
+        return git_pull(skill_root)
+    else:
+        print("\n⚠️ 当前目录不是 git 仓库")
+        print("💡 请先执行以下命令安装:")
+        print(f"   cd {skill_root.parent}")
+        print(f"   git clone {REPO_URL}")
+        return False
+
+
 def main():
     """主函数"""
-    skill_root = get_skill_root()
+    skill_root = Path(__file__).parent.resolve().parent
     print(f"📁 Skill 目录: {skill_root}")
     
-    backup_path = create_backup(skill_root)
+    backup_path = None
+    if skill_root.exists() and list(skill_root.iterdir()):
+        if is_git_repo(skill_root):
+            backup_path = create_backup(skill_root)
+        else:
+            print("\n⚠️ 首次安装，跳过备份")
     
-    success = git_pull(skill_root)
+    success = update_skill(skill_root)
     
+    print("\n" + "="*50)
     if success:
-        print("\n" + "="*50)
         print("🎉 echart-skill 更新完成!")
-        print(f"📦 备份文件: {backup_path}")
-        print("="*50)
-        return 0
     else:
-        print("\n" + "="*50)
-        print("⚠️ 更新失败，已保留备份")
+        print("⚠️ 更新失败")
+    if backup_path:
         print(f"📦 备份文件: {backup_path}")
-        print("="*50)
-        return 1
+    print("="*50)
+    
+    return 0 if success else 1
 
 
 if __name__ == "__main__":
