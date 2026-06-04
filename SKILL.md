@@ -366,7 +366,12 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   - ✅ 备份文件保存在 backup/ 目录
 
 首次安装:
+  # macOS/Linux
   cd ~/.agents/skills  # 或你的 skill 目录
+  git clone https://github.com/lgwanai/echart-skill.git
+
+  # Windows (PowerShell)
+  cd $env:USERPROFILE\.agents\skills
   git clone https://github.com/lgwanai/echart-skill.git
 
 后续更新:
@@ -630,31 +635,35 @@ LIMIT 10;
     python scripts/chart_generator.py --config outputs/configs/your_config.json
     ```
 
- 8. **[CRITICAL] Auto-start Server**: After generating the chart, you MUST ensure the local server is running:
+ 8. **[CRITICAL] Return Chart Access**: After generating the chart, check the server configuration:
+
     ```bash
-    # Check server status, auto-start if not running
-    python scripts/server_cli.py status
-    # If status is not "running", start the server:
-    python scripts/server_cli.py start
+    # Check config: is server enabled?
+    python -c "from scripts.config_manager import get_config; print(get_config().server.enabled)"
     ```
 
- 9. **Return Access URL**: Get the server status and return the full chart URL to the user:
-    ```bash
-    # Get server port and status
-    python scripts/server_cli.py status
-
-    # Then construct and return the full URL:
-    # http://localhost:{port}/{chart_filename}.html
+    **If server is disabled (default)**:
+    - The chart is a self-contained HTML file (all JS embedded inline).
+    - Return the absolute file path directly:
     ```
-    
-    Example output to user:
+    ✅ 图表已生成: /absolute/path/to/outputs/html/sales_chart.html
+    📂 可在浏览器中直接打开: file:///absolute/path/to/outputs/html/sales_chart.html
+    ```
+
+    **If server is enabled** (user has set `"server.enabled": true` in `echart_config.json`):
+    - Start or check the server:
+      ```bash
+      python scripts/server_cli.py status
+      python scripts/server_cli.py start  # auto-starts if not running
+      ```
+    - Return the access URL:
     ```
     ✅ Chart generated: outputs/html/sales_chart.html
-     
-    📊 View chart: http://localhost:8100/sales_chart.html
+    📊 View chart: http://localhost:{port}/outputs/html/sales_chart.html
     ```
-    
-    **IMPORTANT**: Always verify server is running after chart generation. If server start fails, retry once. If still fails, show the local file path as fallback.
+    - If server start fails, retry once. If still fails, fall back to showing the local file path.
+
+    **IMPORTANT**: All generated HTML files are now **self-contained** — they embed the ECharts library and all map scripts inline, so they work offline without any server.
 
 ### Scenario 5: File Merging & Splitting
 **Trigger**: User needs to combine multiple identical reports or split a master sheet by department.

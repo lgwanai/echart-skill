@@ -107,7 +107,11 @@ class TestGenerateEchartsHTML:
             content = f.read()
 
         assert "<!DOCTYPE html>" in content
-        assert "echarts.min.js" in content
+        # ECharts library is embedded inline (self-contained HTML)
+        assert "echarts" in content.lower()
+        # No remote script references
+        assert 'src="http://' not in content
+        assert 'src="https://' not in content
         assert "Test Chart" in content
 
     def test_html_with_dataset(self, temp_output_dir):
@@ -357,7 +361,9 @@ class TestHTMLWithMapScripts:
         with open(output_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        assert "china.js" in content
+        assert "china" in content.lower(), "China map content must be embedded"
+        # No remote script references
+        assert 'src="http://' not in content
 
     def test_html_with_world_map(self, temp_output_dir):
         """HTML should include world.js when world map is used."""
@@ -378,7 +384,8 @@ class TestHTMLWithMapScripts:
         with open(output_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        assert "world.js" in content
+        assert "world" in content.lower(), "World map content must be embedded"
+        assert 'src="http://' not in content
 
     def test_html_with_bmap(self, temp_output_dir):
         """HTML should include bmap script when bmap is used."""
@@ -399,4 +406,4 @@ class TestHTMLWithMapScripts:
         with open(output_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        assert "bmap.min.js" in content
+        assert "bmap" in content.lower(), "bmap content must be embedded"

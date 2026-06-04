@@ -139,13 +139,16 @@ class TestMapChartTemplates:
         with open(output, 'r', encoding='utf-8') as f:
             html = f.read()
         
-        # Validate local static map script is included
-        assert "china.js" in html, "china.js script must be included for China map"
-        assert "echarts.min.js" in html, "echarts.min.js must be included"
-        
+        # Validate echarts and map content is embedded inline
+        assert "china" in html.lower(), "China map content must be embedded"
+        assert "echarts" in html.lower(), "ECharts library must be embedded"
+        assert "台湾" in html or "Taiwan" in html, "china.js GeoJSON data must be embedded"
+
         assert "https://cdn.jsdelivr.net/npm/echarts" not in html, "Should NOT use remote CDN"
         assert "$.get" not in html, "Should NOT use dynamic $.get for GeoJSON loading"
-        assert "registerMap" not in html, "Should NOT manually registerMap for static maps"
+        # No remote script src references at all
+        assert 'src="http://' not in html, "Should NOT have remote HTTP script references"
+        assert 'src="https://' not in html, "Should NOT have remote HTTPS script references"
         
         # Validate map type (basic check)
         assert '"type": "map"' in html or "type: 'map'" in html or 'type: "map"' in html
@@ -199,11 +202,12 @@ class TestMapChartTemplates:
         with open(output, 'r', encoding='utf-8') as f:
             html = f.read()
         
-        assert "world.js" in html, "world.js script must be included for World map"
-        assert "echarts.min.js" in html
+        assert "world" in html.lower(), "World map content must be embedded"
+        assert "echarts" in html.lower(), "ECharts library must be embedded"
         assert "https://cdn.jsdelivr.net/npm/echarts" not in html
         assert "$.get" not in html
-        assert "registerMap" not in html, "Should NOT manually registerMap for static maps"
+        assert 'src="http://' not in html, "Should NOT have remote HTTP script references"
+        assert 'src="https://' not in html, "Should NOT have remote HTTPS script references"
 
     def test_province_static_map(self, test_db, tmp_path):
         """Test Province map using local static province.js (NOT dynamic GeoJSON).
@@ -255,11 +259,12 @@ class TestMapChartTemplates:
         with open(output, 'r', encoding='utf-8') as f:
             html = f.read()
         
-        assert "guangdong.js" in html, "guangdong.js script must be included for Guangdong map"
-        assert "echarts.min.js" in html
+        assert "guangdong" in html.lower(), "Guangdong map content must be embedded"
+        assert "echarts" in html.lower(), "ECharts library must be embedded"
         assert "https://cdn.jsdelivr.net/npm/echarts" not in html
         assert "$.get" not in html
-        assert "registerMap" not in html, "Should NOT manually registerMap for static maps"
+        assert 'src="http://' not in html, "Should NOT have remote HTTP script references"
+        assert 'src="https://' not in html, "Should NOT have remote HTTPS script references"
         
         print(f"✅ Province (Guangdong) static map test passed: {output}")
 
@@ -299,7 +304,7 @@ class TestMapChartTemplates:
         with open(output, 'r', encoding='utf-8') as f:
             html = f.read()
         
-        assert "bmap.min.js" in html, "bmap.min.js must be included for bmap mode"
+        assert "bmap" in html.lower(), "bmap content must be embedded for bmap mode"
         assert "api.map.baidu.com/api" in html, "Baidu Map API must be included"
         assert '"coordinateSystem": "bmap"' in html or 'coordinateSystem: "bmap"' in html
 

@@ -1,5 +1,42 @@
 # Release Note - Echart Skill
 
+## v1.4.0 (2026-06-05) - Self-Contained HTML & Configurable Architecture
+
+### 🧩 自包含单文件 HTML（重大变更）
+
+- **内联 ECharts 库**：图表 HTML 不再引用远程或本地 URL 的 `echarts.min.js`，而是将完整的 ECharts 库（~1.1MB）直接嵌入 HTML 中
+- **内联地图脚本**：`china.js`、`world.js` 及所有省份地图 JS 均内联嵌入
+- **离线可用**：生成的 HTML 为完全自包含的单文件，无外部依赖，可在任意浏览器直接打开
+- **端口无关**：图表不再依赖服务器端口，服务重启换端口后旧图表仍可正常查看
+
+### ⚙️ 灵活的服务与输出配置
+
+- **服务默认为关闭**：`server.enabled` 默认为 `false`，生成图表后直接显示文件绝对路径
+- **可配置输出目录**：`output.dir` 配置项支持自定义图表输出路径
+- **集中配置文件**：新增 `echart_config.json`，统一管理服务、输出、百度地图 AK 等配置
+- **配置管理器**：新增 `scripts/config_manager.py`，自动创建默认配置、热加载
+
+### 🗺️ 智能地图名称标准化
+
+- **自动名称规范化**：数据中的「北京市」「广东省」「新疆维吾尔自治区」等全称自动规范化为地图所需的「北京」「广东」「新疆」
+- **19 种映射规则**：覆盖所有省级行政区全称→简称的映射
+- **DataFrame 级处理**：在数据层面进行标准化，保证 dataset、series.data、rawData 全部一致
+- **Prompt 更新**：地图模板提示词强调使用规范简称
+
+### 🪟 Windows 平台优化
+
+- **静默后台服务**：使用 `CREATE_NO_WINDOW` 标志，Windows 服务进程不再弹出命令行窗口
+- **端口复用**：启动服务时扫描并清理所有残留的数据服务进程，确保端口不漂移
+- **进程清理增强**：PID 文件失效时仍能通过端口探测找到并终止旧进程
+
+### 📝 文档更新
+
+- **SKILL.md Scenario 4**：更新图表生成后处理逻辑，区分服务开启/关闭状态的输出格式
+- **README**：新增自包含 HTML、配置系统、地图标准化、Windows 优化等特性说明
+- **echart_config.example.json**：配置模板文件
+
+---
+
 ## v1.3.2 (2026-05-09) - Comprehensive Security & Robustness
 
 ### 🔒 安全审计结果

@@ -119,9 +119,17 @@ option.series[0].data = rawData.map(function(row) {
 });
 ```
 
+### ⚠️ CRITICAL: Map Name Normalization
+
+**ALWAYS use the short/canonical province name** without suffixes like "省"、"市"、"自治区"、"特别行政区". The chart generator will auto-normalize names, but using the correct canonical names prevents matching issues.
+
+👉 **Use**: `北京` | ❌ **Avoid**: `北京市`
+
+The generator applies automatic normalization for common variations, but using canonical names in your `custom_js` data mapping ensures 100% accuracy.
+
 ### 省份名称对照表
 
-确保使用正确的中文省份名称：
+确保使用正确的中文省份名称（推荐使用**简称**）：
 
 | 简称 | 全称（建议使用） |
 |------|------------------|

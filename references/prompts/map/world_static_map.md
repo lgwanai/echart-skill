@@ -31,7 +31,7 @@ $.get(ROOT_PATH + '/data/asset/geo/world.json', function(geoJSON) {
 ### 数据结构要求
 
 用户数据应包含：
-- **国家名称列**：国家名称（英文），如"China"、"United States"、"Japan"等
+- **国家名称列**：国家名称（英文），如"China"、"United States"、"Japan"等。**必须与 world.js 地图文件中的名称完全一致**，否则对应区域不会高亮。
 - **数值列**：对应国家的数值，如销售额、GDP、人口等
 
 示例数据：

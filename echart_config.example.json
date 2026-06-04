@@ -1,0 +1,13 @@
+{
+    "_comment": "echart-skill 配置文件。复制为 echart_config.json 后修改。",
+    "server": {
+        "_comment": "本地 HTTP 服务器配置",
+        "enabled": false,
+        "port_range": [8100, 8200]
+    },
+    "output": {
+        "_comment": "图表输出目录（相对于项目根目录）",
+        "dir": "outputs/html"
+    },
+    "baidu_ak": ""
+}

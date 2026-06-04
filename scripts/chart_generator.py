@@ -18,6 +18,8 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_repository
 from logging_config import get_logger, configure_logging
+from scripts.config_manager import get_config
+from scripts.html_exporter import HTMLExporter
 from scripts.server import ensure_server_running
 
 # Initialize logging
@@ -28,14 +30,119 @@ logger = get_logger(__name__)
 MAX_CONCURRENT_GEOCODING = 5
 GEOCODING_TIMEOUT = 10.0
 
+# ---------------------------------------------------------------------------
+# Map name normalization
+# ---------------------------------------------------------------------------
+# The ECharts china.js / world.js map files use canonical names that may
+# differ from the names produced by SQL queries or LLM-generated data.
+# This table maps common variations to the canonical form expected by the map.
+NAME_NORMALIZATION_MAP: dict[str, str] = {
+    # Provincial-level: full name → canonical short name
+    "北京市": "北京",
+    "上海市": "上海",
+    "天津市": "天津",
+    "重庆市": "重庆",
+    "河北省": "河北",
+    "山西省": "山西",
+    "辽宁省": "辽宁",
+    "吉林省": "吉林",
+    "黑龙江省": "黑龙江",
+    "江苏省": "江苏",
+    "浙江省": "浙江",
+    "安徽省": "安徽",
+    "福建省": "福建",
+    "江西省": "江西",
+    "山东省": "山东",
+    "河南省": "河南",
+    "湖北省": "湖北",
+    "湖南省": "湖南",
+    "广东省": "广东",
+    "广西壮族自治区": "广西",
+    "海南省": "海南",
+    "四川省": "四川",
+    "贵州省": "贵州",
+    "云南省": "云南",
+    "西藏自治区": "西藏",
+    "陕西省": "陕西",
+    "甘肃省": "甘肃",
+    "青海省": "青海",
+    "宁夏回族自治区": "宁夏",
+    "新疆维吾尔自治区": "新疆",
+    "内蒙古自治区": "内蒙古",
+    "台湾省": "台湾",
+    "香港特别行政区": "香港",
+    "澳门特别行政区": "澳门",
+}
+
+
+def normalize_map_name(name: str) -> str:
+    """Normalize a region name to its canonical map form.
+
+    Strips common suffixes ("省", "市", "自治区", "特别行政区") and
+    consults a lookup table for known variations.
+
+    Args:
+        name: Raw region name from data (e.g. "北京市", "广东省")
+
+    Returns:
+        Canonical name expected by the map GeoJSON (e.g. "北京", "广东")
+    """
+    if not name or not isinstance(name, str):
+        return name
+
+    # Check exact-match lookup table first
+    if name in NAME_NORMALIZATION_MAP:
+        return NAME_NORMALIZATION_MAP[name]
+
+    # Generic suffix stripping (order matters: longer suffixes first)
+    suffixes = [
+        "维吾尔自治区", "壮族自治区", "回族自治区", "特别行政区",
+        "自治区", "省", "市",
+    ]
+    result = name
+    for suffix in suffixes:
+        if result.endswith(suffix) and len(result) > len(suffix):
+            result = result[: -len(suffix)]
+            break
+
+    return result
+
+
+def normalize_map_data(data: list, name_key: str = "name") -> list:
+    """Normalize region names in a list of map data items.
+
+    Args:
+        data: List of dicts with a ``name`` field (e.g. ``[{name: "北京市", value: 100}]``)
+        name_key: The key in each dict that holds the region name
+
+    Returns:
+        New list with normalized names. Items without the name_key are passed
+        through unchanged.
+    """
+    normalized = []
+    for item in data:
+        if isinstance(item, dict) and name_key in item:
+            original = item[name_key]
+            new_name = normalize_map_name(original)
+            if new_name != original:
+                logger.debug(
+                    "地图名称已标准化",
+                    original=original,
+                    normalized=new_name,
+                )
+            item = {**item, name_key: new_name}
+        normalized.append(item)
+    return normalized
+
+
 def get_baidu_ak():
     """
-    Retrieve Baidu AK from environment variable.
-    config.txt support is DEPRECATED and will be removed.
+    Retrieve Baidu AK from config file, environment variable, or legacy config.txt.
 
     Priority:
     1. BAIDU_AK environment variable
-    2. config.txt (deprecated, shows warning)
+    2. echart_config.json baidu_ak field
+    3. config.txt (deprecated, shows warning)
     """
     import warnings
 
@@ -43,6 +150,14 @@ def get_baidu_ak():
     ak = os.environ.get('BAIDU_AK')
     if ak:
         return ak
+
+    # Secondary: echart_config.json
+    try:
+        cfg = get_config()
+        if cfg.baidu_ak:
+            return cfg.baidu_ak
+    except Exception:
+        pass
 
     # Fallback: config.txt (DEPRECATED)
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,7 +170,7 @@ def get_baidu_ak():
                     ak = line.strip().split('=', 1)[1]
                     if ak:
                         warnings.warn(
-                            "从 config.txt 读取 BAIDU_AK 已弃用，请设置环境变量 BAIDU_AK",
+                            "从 config.txt 读取 BAIDU_AK 已弃用，请设置环境变量 BAIDU_AK 或在 echart_config.json 中配置",
                             DeprecationWarning,
                             stacklevel=2
                         )
@@ -64,7 +179,7 @@ def get_baidu_ak():
     # If not found or empty
     logger.warning(
         "使用 ECharts 地图功能需要百度地图 AK",
-        action="请设置环境变量 BAIDU_AK",
+        action="请设置环境变量 BAIDU_AK 或在 echart_config.json 中配置 baidu_ak",
         url="https://lbsyun.baidu.com/apiconsole/key"
     )
     return None
@@ -74,7 +189,7 @@ def get_geo_coord(address, ak):
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     cache_file = os.path.join(base_dir, 'references', 'geo_cache.json')
     cache = {}
-    
+
     os.makedirs(os.path.dirname(cache_file), exist_ok=True)
     if os.path.exists(cache_file):
         try:
@@ -82,10 +197,10 @@ def get_geo_coord(address, ak):
                 cache = json.load(f)
         except Exception:
             pass
-            
+
     if address in cache:
         return cache[address]
-        
+
     url = f"https://api.map.baidu.com/geocoding/v3/?address={urllib.parse.quote(address)}&output=json&ak={ak}"
     try:
         req = urllib.request.Request(url)
@@ -277,123 +392,212 @@ def replace_placeholders(obj, replacements):
         return obj
     return obj
 
+
+def _is_map_chart(option: dict, custom_js: str) -> bool:
+    """Detect if the current chart config is for a map-type visualization.
+
+    Checks both the ECharts option's series types and typical map-related
+    keywords in the custom JS.
+    """
+    combined = json.dumps(option, ensure_ascii=False) + custom_js
+
+    # Check series types
+    for series in option.get("series", []):
+        if series.get("type") in ("map", "geo"):
+            return True
+        # scatter/effectScatter with geo/bmap coordinateSystem
+        if series.get("type") in ("scatter", "effectScatter") and \
+           series.get("coordinateSystem") in ("geo", "bmap"):
+            return True
+
+    # Keyword fallback
+    map_keywords = ["map", "china", "world", "geo", "bmap"]
+    return any(kw in combined for kw in map_keywords)
+
+
 def generate_echarts_html(df, config, output_path):
-    """Generate an interactive HTML file using ECharts configuration directly."""
+    """Generate an interactive HTML file using ECharts configuration.
+
+    The generated HTML is a **self-contained** single file with the ECharts
+    library and all required map scripts embedded inline — no external
+    script references, no dependency on a running local server.
+    """
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     baidu_ak = get_baidu_ak()
     bmap_script = ""
-    
+
     title = config.get("title", "Chart")
     custom_js = config.get("custom_js", "")
     option = config.get("echarts_option", {})
-    
+
     # 1. Automatic Dataset Injection (if not already provided by custom option)
     if not option.get('dataset') and not df.empty:
-        # Check if custom_js relies heavily on rawData, if so we provide it
         dataset_source = [df.columns.tolist()] + df.values.tolist()
         option['dataset'] = {'source': dataset_source}
-    
+
     raw_data_json = json.dumps(df.to_dict(orient='records'), ensure_ascii=False)
-    # Expose rawData and datasetSource to JS scope for complex scripts
-    dataset_source_json = json.dumps([df.columns.tolist()] + df.values.tolist(), ensure_ascii=False)
-    custom_js = f"var rawData = {raw_data_json};\nvar datasetSource = {dataset_source_json};\n" + custom_js
+    dataset_source_json = json.dumps(
+        [df.columns.tolist()] + df.values.tolist(), ensure_ascii=False
+    )
+    custom_js = (
+        f"var rawData = {raw_data_json};\n"
+        f"var datasetSource = {dataset_source_json};\n"
+        + custom_js
+    )
 
-    # Get server base url first to construct absolute paths for local assets
-    base_url = ensure_server_running()
-    if base_url is None:
-        logger.warning("Server failed to start, using relative paths as fallback")
-        base_url = "http://127.0.0.1:8100"  # fallback default
+    # 2. Map name normalization — normalise the DataFrame and option data
+    #    so that "北京市" → "北京", "广东省" → "广东", etc.
+    is_map = _is_map_chart(option, custom_js)
+    if is_map:
+        # Normalize the DataFrame if it has a 'name' column (common for map data)
+        if 'name' in df.columns:
+            name_col_idx = list(df.columns).index('name')
+            df_values = df.values.tolist()
+            for row_idx, row in enumerate(df_values):
+                original_name = row[name_col_idx]
+                normalized = normalize_map_name(str(original_name))
+                if normalized != original_name:
+                    df_values[row_idx][name_col_idx] = normalized
+            # Rebuild DataFrame with normalized values
+            import pandas as _pd
+            df = _pd.DataFrame(df_values, columns=df.columns)
 
-    # 2. BMap script injection check
-    if ("bmap" in json.dumps(option) or "bmap" in custom_js) and baidu_ak:
-        bmap_script = f"""
-        <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak={baidu_ak}"></script>
-        <script src="{base_url}/assets/echarts/bmap.min.js"></script>
-        """
+        # Rebuild dataset source from normalized DataFrame
+        if not df.empty:
+            dataset_source = [df.columns.tolist()] + df.values.tolist()
+            option['dataset'] = {'source': dataset_source}
+
+        # Normalize option series data
+        for i, series in enumerate(option.get("series", [])):
+            if "data" in series and isinstance(series["data"], list):
+                option["series"][i]["data"] = normalize_map_data(
+                    series["data"], name_key="name"
+                )
+
+    # Rebuild JSON strings from (possibly normalized) data
+    raw_data_json = json.dumps(df.to_dict(orient='records'), ensure_ascii=False)
+    dataset_source_json = json.dumps(
+        [df.columns.tolist()] + df.values.tolist(), ensure_ascii=False
+    )
+    custom_js = (
+        f"var rawData = {raw_data_json};\n"
+        f"var datasetSource = {dataset_source_json};\n"
+        + config.get("custom_js", "")
+    )
+
+    # 3. Load ECharts and map scripts via HTMLExporter for inline embedding
+    exporter = HTMLExporter(base_dir)
+    try:
+        echarts_js = exporter._load_echarts()
+    except FileNotFoundError:
+        logger.error("ECharts 库文件缺失", path=exporter.assets_dir / exporter.ECHARTS_FILE)
+        echarts_js = "/* ECharts library not found — chart rendering disabled */"
+
     option_json = json.dumps(option, ensure_ascii=False)
-    
-    # 自动检测是否使用了 'china' 地图并注入 china.js
-    china_map_script = ""
-    if "china" in option_json or "china" in custom_js or "中国" in option_json or "中国" in custom_js:
-        china_map_script = f'<script src="{base_url}/assets/echarts/china.js"></script>'
-        
-    # 自动检测是否使用了 'world' 地图并注入 world.js
-    world_map_script = ""
-    if "world" in option_json or "world" in custom_js or "世界" in option_json or "世界" in custom_js:
-        world_map_script = f'<script src="{base_url}/assets/echarts/world.js"></script>'
-    
-    # 自动检测是否使用了各省市地图并注入对应的 js (如果有)
-    province_map_scripts = []
-    province_pinyin_map = {
-        "安徽": "anhui", "澳门": "aomen", "北京": "beijing", "重庆": "chongqing",
-        "福建": "fujian", "甘肃": "gansu", "广东": "guangdong", "广西": "guangxi",
-        "贵州": "guizhou", "海南": "hainan", "河北": "hebei", "黑龙江": "heilongjiang",
-        "河南": "henan", "湖北": "hubei", "湖南": "hunan", "江苏": "jiangsu",
-        "江西": "jiangxi", "吉林": "jilin", "辽宁": "liaoning", "内蒙古": "neimenggu",
-        "宁夏": "ningxia", "青海": "qinghai", "山东": "shandong", "上海": "shanghai",
-        "山西": "shanxi", "陕西": "shanxi1", "四川": "sichuan", "台湾": "taiwan",
-        "天津": "tianjin", "香港": "xianggang", "新疆": "xinjiang", "西藏": "xizang",
-        "云南": "yunnan", "浙江": "zhejiang"
-    }
-    
-    for cn_name, pinyin in province_pinyin_map.items():
-        if cn_name in option_json or cn_name in custom_js or pinyin in custom_js:
-            province_map_scripts.append(f'<script src="{base_url}/assets/echarts/{pinyin}.js"></script>')
-            
-    province_scripts_html = "\n        ".join(province_map_scripts)
-    
+    required_maps = exporter._detect_required_maps(option_json, custom_js)
+    map_scripts_inline = "\n".join(
+        exporter._load_map_script(m) for m in required_maps if exporter._load_map_script(m)
+    )
+
+    # 4. BMap script injection (requires remote Baidu Maps API)
+    bmap_script = ""
+    if ("bmap" in json.dumps(option) or "bmap" in custom_js) and baidu_ak:
+        bmap_script = (
+            f'<script type="text/javascript" '
+            f'src="https://api.map.baidu.com/api?v=3.0&ak={baidu_ak}"></script>\n'
+            '        <script>\n'
+        )
+        # Embed bmap.min.js inline if available
+        bmap_js = exporter._load_map_script("bmap.min")
+        if bmap_js:
+            bmap_script += bmap_js
+        bmap_script += '\n        </script>'
+
+    # 5. Determine server / file-path output
+    cfg = get_config()
+
+    # Resolve output directory from config
+    output_dir = cfg.output.dir if cfg.output.dir else "outputs/html"
+    # If output_path is relative or bare filename, prepend output_dir
+    if not os.path.isabs(output_path):
+        output_path = os.path.join(base_dir, output_dir, os.path.basename(output_path))
+
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+
     title_escaped = html_mod.escape(title)
-    html_template = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <title>{title_escaped}</title>
-        <script src="{base_url}/assets/echarts/echarts.min.js"></script>
-        {bmap_script}
-        {china_map_script}
-        {world_map_script}
-        {province_scripts_html}
-    </head>
-    <body>
-        <div id="main" style="width: 100%; height: 800px;"></div>
-        <script type="text/javascript">
+
+    # Escape </script> sequences in JSON strings for safe script embedding
+    option_safe = option_json.replace('</', '<\\/')
+    data_safe = raw_data_json.replace('</', '<\\/')
+
+    # Build self-contained HTML with embedded scripts
+    html_template = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{title_escaped}</title>
+</head>
+<body>
+    <div id="main" style="width: 100%; height: 800px;"></div>
+    <script>
+{echarts_js}
+    </script>
+    <script>
+{map_scripts_inline}
+    </script>
+    {bmap_script}
+    <script type="text/javascript">
+        (function() {{
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {option_json};
-            
-            {custom_js}
-            
+            var option = {option_safe};
+            var rawData = {data_safe};
+
+            {config.get("custom_js", "")}
+
             myChart.setOption(option);
             window.addEventListener('resize', function() {{
                 myChart.resize();
             }});
-        </script>
-    </body>
-    </html>
-    """
-    
-    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+        }})();
+    </script>
+</body>
+</html>
+"""
+
     with io.open(output_path, 'w', encoding='utf-8') as f:
         f.write(html_template)
-    
+
+    abs_path = os.path.abspath(output_path)
     rel_path = os.path.relpath(output_path, base_dir).replace(os.sep, '/')
-    access_url = f"{base_url}/{rel_path}"
+
+    # Build access info based on server config
+    if cfg.server.enabled:
+        base_url = ensure_server_running()
+        if base_url is None:
+            logger.warning("Server failed to start, showing file path as fallback")
+            access_info = f"file://{abs_path}"
+        else:
+            access_info = f"{base_url}/{rel_path}"
+    else:
+        access_info = f"file://{abs_path}"
 
     logger.info(
         "ECharts 图表已生成",
-        output_path=output_path,
-        access_url=access_url,
-        rows=len(df)
+        output_path=abs_path,
+        access=access_info,
+        server_enabled=cfg.server.enabled,
+        rows=len(df),
+        maps_embedded=len(required_maps),
     )
     return output_path
 
 
 def export_standalone_chart(config: dict, output_path: str, theme: str = "default") -> str:
     """Export chart as standalone HTML file with embedded scripts.
-    
+
     Generates a self-contained HTML file that can be shared and viewed
     offline without any server or database connection.
-    
+
     Args:
         config: Chart configuration dict with:
             - db_path: Path to database
@@ -403,10 +607,10 @@ def export_standalone_chart(config: dict, output_path: str, theme: str = "defaul
             - custom_js: Optional custom JavaScript
         output_path: Output HTML file path
         theme: ECharts theme (default, dark, etc.)
-        
+
     Returns:
         Path to generated HTML file
-        
+
     Example:
         config = {
             "db_path": "workspace.duckdb",
@@ -416,29 +620,27 @@ def export_standalone_chart(config: dict, output_path: str, theme: str = "defaul
         }
         export_standalone_chart(config, "sales_chart.html")
     """
-    from scripts.html_exporter import HTMLExporter
-    
     db_path = config.get("db_path", "workspace.duckdb")
     query = config.get("query")
-    
+
     if not query:
         raise ValueError("Missing SQL query in config")
-    
+
     repo = get_repository(db_path)
     with repo.connection() as conn:
         df = pd.read_sql_query(query, conn)
-    
+
     if df.empty:
         logger.warning("Query returned empty data", query=query)
-    
+
     option = config.get("echarts_option", {})
     if not option.get('dataset') and not df.empty:
         option['dataset'] = {'source': [df.columns.tolist()] + df.values.tolist()}
-    
+
     option_json = json.dumps(option, ensure_ascii=False)
     data_json = json.dumps(df.to_dict(orient='records'), ensure_ascii=False)
     custom_js = config.get("custom_js", "")
-    
+
     exporter = HTMLExporter()
     html = exporter.generate_standalone_html(
         title=config.get("title", "Chart"),
@@ -447,14 +649,14 @@ def export_standalone_chart(config: dict, output_path: str, theme: str = "defaul
         custom_js=custom_js,
         theme=theme
     )
-    
+
     logger.info(
         "Chart exported as standalone HTML",
         output_path=output_path,
         theme=theme,
         rows=len(df)
     )
-    
+
     return exporter.export_to_file(html, output_path)
 
 
@@ -465,13 +667,13 @@ def generate_chart(config):
         "db_path": "workspace.db",
         "query": "SELECT category, SUM(value) as val FROM table GROUP BY category",
         "chart_type": "bar" | "pie" | "line" | "scatter" | "map",
-        "x_col": "category", 
-        "y_col": "val",      
+        "x_col": "category",
+        "y_col": "val",
         "title": "图表标题",
         "xlabel": "X轴标签",
         "ylabel": "Y轴标签",
-        "output_path": "tmp/chart.html", 
-        "show_labels": True 
+        "output_path": "tmp/chart.html",
+        "show_labels": True
     }
     """
     db_path = config.get("db_path", "workspace.db")
@@ -484,19 +686,25 @@ def generate_chart(config):
     repo = get_repository(db_path)
     with repo.connection() as conn:
         df = pd.read_sql_query(query, conn)
-    
+
     if df.empty:
         logger.warning("查询返回空数据", query=query)
         return None
 
     logger.info("数据查询成功", rows=len(df))
-    
+
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    default_output = os.path.join(base_dir, "outputs", "html", "chart.html")
+    # Use configured output directory as default
+    try:
+        cfg = get_config()
+        output_dir = cfg.output.dir if cfg.output.dir else "outputs/html"
+    except Exception:
+        output_dir = "outputs/html"
+    default_output = os.path.join(base_dir, output_dir, "chart.html")
     output_path = config.get("output_path", default_output)
     if not output_path.endswith('.html'):
         output_path = os.path.splitext(output_path)[0] + '.html'
-        
+
     return generate_echarts_html(df, config, output_path)
 
 if __name__ == "__main__":  # pragma: no cover
@@ -512,6 +720,8 @@ if __name__ == "__main__":  # pragma: no cover
         else:
             config = json.loads(args.config)
 
-        generate_chart(config)
+        result = generate_chart(config)
+        if result:
+            print(f"✅ 图表已生成: {result}")
     except Exception as e:
         logger.error("图表生成失败", error=str(e), config=config if 'config' in dir() else None)

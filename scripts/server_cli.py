@@ -13,9 +13,79 @@ import signal
 import argparse
 import subprocess
 import time
-import fcntl
 from datetime import datetime
 from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Cross-platform file locking
+# fcntl is Unix-only; msvcrt on Windows provides equivalent functionality.
+# ---------------------------------------------------------------------------
+if sys.platform == 'win32':
+    import msvcrt
+
+    def _acquire_file_lock(f):
+        """Non-blocking exclusive lock on Windows (mandatory lock)."""
+        try:
+            f.seek(0)
+            msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
+            return True
+        except (IOError, OSError):
+            return False
+
+    def _release_file_lock(f):
+        """Release lock on Windows."""
+        try:
+            f.seek(0)
+            msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
+        except (IOError, OSError):
+            pass
+else:
+    import fcntl
+
+    def _acquire_file_lock(f):
+        """Non-blocking exclusive advisory lock on Unix (macOS/Linux)."""
+        try:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return True
+        except (IOError, OSError):
+            return False
+
+    def _release_file_lock(f):
+        """Release advisory lock on Unix."""
+        try:
+            fcntl.flock(f, fcntl.LOCK_UN)
+        except (IOError, OSError):
+            pass
+
+
+# ---------------------------------------------------------------------------
+# Cross-platform process helpers
+# Windows does not have SIGKILL; fall back to SIGTERM which maps to
+# TerminateProcess on that platform.
+# ---------------------------------------------------------------------------
+_SIGKILL = getattr(signal, 'SIGKILL', signal.SIGTERM)
+
+
+def _is_process_alive(pid: int) -> bool:
+    """Check whether a process exists (cross-platform)."""
+    try:
+        os.kill(pid, 0)
+        return True
+    except (OSError, ProcessLookupError):
+        return False
+
+
+def _terminate_process(pid: int, force: bool = False) -> None:
+    """Terminate a process gracefully, or force-kill it.
+
+    On Unix:     SIGTERM (graceful) / SIGKILL (force).
+    On Windows:  both map to ``TerminateProcess`` via ``os.kill``.
+    """
+    sig = _SIGKILL if force else signal.SIGTERM
+    try:
+        os.kill(pid, sig)
+    except (OSError, ProcessLookupError):
+        pass  # already dead
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -75,10 +145,9 @@ def start_server(port: int | None = None, force_restart: bool = False) -> dict:
     # File lock to prevent concurrent start_server calls
     lock_path = STATUS_DIR / ".start_server.lock"
     STATUS_DIR.mkdir(parents=True, exist_ok=True)
-    lock_fd = open(str(lock_path), 'w')
-    try:
-        fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except (IOError, OSError):
+    # Open in binary mode – required by msvcrt on Windows, harmless on Unix
+    lock_fd = open(str(lock_path), 'wb')
+    if not _acquire_file_lock(lock_fd):
         lock_fd.close()
         return {
             "status": "error",
@@ -94,7 +163,19 @@ def start_server(port: int | None = None, force_restart: bool = False) -> dict:
         running_port = check_server_running(*DEFAULT_PORT_RANGE)
         
         if running_port:
-            # Server is running - stop it first to avoid duplicate instances
+            # Server is running - stop it first to avoid duplicate instances.
+            # Also scan ALL ports in range for orphan servers not tracked by
+            # the status file (e.g. stale PID file from previous run).
+            for p in range(DEFAULT_PORT_RANGE[0], DEFAULT_PORT_RANGE[1] + 1):
+                if check_server_running(p, p + 1):
+                    lifecycle = ServerLifecycle(p)
+                    # Try PID-based kill first
+                    pid = lifecycle.read_pid()
+                    if pid and _is_process_alive(pid):
+                        _terminate_process(pid, force=True)
+                    # Also try status-file stop
+                    lifecycle.kill_orphan()
+
             stop_result = stop_server()
             if stop_result.get("status") not in ["stopped", "not_running"]:
                 return {
@@ -142,9 +223,15 @@ def start_server(port: int | None = None, force_restart: bool = False) -> dict:
         
         try:
             if sys.platform == 'win32':
+                # CREATE_NO_WINDOW (0x08000000) prevents a console window from appearing.
+                # DETACHED_PROCESS detaches from the parent console.
+                # CREATE_NEW_PROCESS_GROUP ensures Ctrl+C doesn't propagate.
+                _CREATE_NO_WINDOW = 0x08000000
                 proc = subprocess.Popen(
                     cmd,
-                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
+                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+                    | subprocess.DETACHED_PROCESS
+                    | _CREATE_NO_WINDOW,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL
                 )
@@ -187,7 +274,7 @@ def start_server(port: int | None = None, force_restart: bool = False) -> dict:
                 "error": str(e)
             }
     finally:
-        fcntl.flock(lock_fd, fcntl.LOCK_UN)
+        _release_file_lock(lock_fd)
         lock_fd.close()
 
 
@@ -226,26 +313,20 @@ def stop_server() -> dict:
                 save_status(stopped_status)
                 return stopped_status
     
-    # Send SIGTERM to process
+    # Graceful termination first, then force-kill after timeout
     try:
-        os.kill(pid, signal.SIGTERM)
-        
+        _terminate_process(pid, force=False)
+
         # Wait for process to terminate
         start_time = time.time()
         while time.time() - start_time < SERVER_STOP_TIMEOUT:
             time.sleep(0.1)
-            try:
-                os.kill(pid, 0)  # Check if process still exists
-            except (OSError, ProcessLookupError):
-                # Process terminated
+            if not _is_process_alive(pid):
                 break
         else:
-            # Timeout, force kill
-            try:
-                os.kill(pid, signal.SIGKILL)
-            except (OSError, ProcessLookupError):
-                pass
-        
+            # Timeout, force kill (SIGKILL on Unix, SIGTERM on Windows)
+            _terminate_process(pid, force=True)
+
         # Update status
         stopped_status = {
             "status": "stopped",
@@ -254,9 +335,9 @@ def stop_server() -> dict:
             "message": "Server stopped successfully"
         }
         save_status(stopped_status)
-        
+
         return stopped_status
-        
+
     except (OSError, ProcessLookupError) as e:
         # Process doesn't exist
         stopped_status = {
@@ -266,7 +347,7 @@ def stop_server() -> dict:
             "message": "Server was not running (process not found)"
         }
         save_status(stopped_status)
-        
+
         return stopped_status
     except Exception as e:
         return {
@@ -299,11 +380,7 @@ def get_status() -> dict:
         # Check if process exists
         process_alive = False
         if pid:
-            try:
-                os.kill(pid, 0)
-                process_alive = True
-            except (OSError, ProcessLookupError):
-                process_alive = False
+            process_alive = _is_process_alive(pid)
         
         # Check if port is responding
         port_responding = False

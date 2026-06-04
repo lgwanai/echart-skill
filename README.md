@@ -1,4 +1,4 @@
-# Echart Skill v1.3.2
+# Echart Skill v1.4.0
 
 专门为 AI Agent 设计的本地数据分析与处理技能包（Skill），旨在解决日常办公场景下的高频、复杂数据分析任务。
 
@@ -6,6 +6,9 @@
 
 - 🛡️ **绝对安全的数据隐私**：本技能要求 Agent 在本地存储数据（DuckDB），并在本地生成代码进行解析和计算。数据绝不出域，最大程度保障企业隐私。
 - 📊 **全量图表支持 (ECharts 6.0)**：内置数百种 ECharts 官方图表 Prompt 模板，**100% 覆盖 ECharts 所有图表类型**，包括 3D 气泡图、关系图、桑基图、漏斗图等。
+- 🧩 **自包含单文件 HTML**：生成的图表为完全自包含的单一 HTML 文件，ECharts 库和所有地图脚本均内联嵌入，离线可用，不受服务端口变化影响。
+- ⚙️ **灵活的服务配置**：本地预览服务默认为关闭状态；可通过 `echart_config.json` 配置启用、自定义输出目录、百度地图 AK 等。
+- 🗺️ **智能地图名称标准化**：自动将数据中的「北京市」「广东省」等全称规范化为地图所需的「北京」「广东」，确保地图渲染一次成功。
 - 🤖 **Dashboard 自然语言生成**：一句话描述即生成专业仪表盘——"创建销售分析仪表盘，包含地区柱状图、品类饼图、趋势折线图、分布地图"。
 - 🎨 **专业 Dashboard UI/UX**：9 大交互功能（主题切换、导出 PDF、自动刷新、图表搜索），响应式卡片布局，深色/浅色主题。
 - 🗺️ **三层级地图架构**：省份→城市→区县，优先静态本地地图（34 省份 + 全部城市），精细维度自动降级百度地图。
@@ -14,6 +17,7 @@
 - 💻 **15+ 显性指令**：`/import`、`/query`、`/chart`、`/dashboard`、`/export` 等，兼顾精准指令与自然语言。
 - 🔗 **外部数据库**：MySQL、PostgreSQL、MongoDB、SQLite 查询与导入。
 - 🔄 **数据轮询**：定时从 HTTP API 或数据库自动刷新，适合实时监控。
+- 🪟 **Windows 无感后台服务**：Windows 平台服务进程完全静默运行，无命令行窗口弹出。
 
 ---
 
@@ -28,16 +32,49 @@
 
 1. **下载并解压 Skill 包**
 
+   **macOS / Linux:**
    ```bash
    unzip echart-skill_*.zip -d ~/skills/
    cd ~/skills/echart-skill
    ```
 
+   **Windows (PowerShell):**
+   ```powershell
+   Expand-Archive echart-skill_*.zip -DestinationPath $env:USERPROFILE\skills\
+   cd $env:USERPROFILE\skills\echart-skill
+   ```
+
 2. **安装 Python 依赖**
 
+   > 💡 **网络不佳？** 如果发布包已包含 `wheels/` 目录，直接使用下方的离线安装命令，无需联网下载。
+
+   **在线安装（默认）：**
    ```bash
+   # 完整安装（核心 + 可选依赖，约 100 MB）
    pip install -r requirements.txt
+
+   # 或仅核心依赖（约 40 MB，覆盖 90% 场景）
+   pip install -r requirements-core.txt
    ```
+
+   **离线安装（无需网络）：**
+   ```bash
+   # macOS / Linux
+   bash scripts/install.sh --offline
+
+   # Windows
+   scripts\install.bat --offline
+
+   # 也可以只装核心依赖（更小更快）
+   bash scripts/install.sh --offline --core-only
+   ```
+
+   **依赖说明：**
+
+   | 文件 | 内容 | 大小 | 何时需要 |
+   |------|------|------|----------|
+   | `requirements-core.txt` | DuckDB, pandas, openpyxl 等 | ~40 MB | 总是需要 |
+   | `requirements-optional.txt` | MySQL/PostgreSQL/MongoDB 驱动、轮询、测试 | ~60 MB | 连接外部数据库时 |
 
 3. **导入到你的 Agent 平台**
 
@@ -45,19 +82,27 @@
 
    #### Claude Code / OpenClaw
 
+   **macOS / Linux:**
    ```bash
    # 创建符号链接（推荐）
    ln -s ~/skills/echart-skill ~/.claude/skills/echart-skill
-   
+
    # 或直接复制
    cp -r ~/skills/echart-skill ~/.claude/skills/
+   ```
+
+   **Windows (PowerShell):**
+   ```powershell
+   # 复制到 Claude Code skills 目录
+   New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills"
+   Copy-Item -Recurse "$env:USERPROFILE\skills\echart-skill" "$env:USERPROFILE\.claude\skills\"
    ```
 
    在项目根目录创建 `CLAUDE.md`：
 
    ```markdown
    # 项目说明
-   
+
    @~/.claude/skills/echart-skill/SKILL.md
    ```
 
@@ -69,16 +114,24 @@
    cp -r ~/skills/echart-skill ~/.workbuddy/skills/
    ```
 
+   **Windows:**
+   ```powershell
+   Copy-Item -Recurse "$env:USERPROFILE\skills\echart-skill" "$env:USERPROFILE\.trae\skills\"
+   Copy-Item -Recurse "$env:USERPROFILE\skills\echart-skill" "$env:USERPROFILE\.workbuddy\skills\"
+   ```
+
 4. **配置百度地图 AK（可选）**
 
    如需生成精细维度的地图（区县、街道），需配置百度地图 AK：
 
+   **macOS / Linux:**
    ```bash
-   # macOS/Linux
    echo 'export BAIDU_AK=你的百度地图AK' >> ~/.zshrc
    source ~/.zshrc
-   
-   # Windows
+   ```
+
+   **Windows:**
+   ```cmd
    setx BAIDU_AK "你的百度地图AK"
    ```
 
@@ -618,21 +671,51 @@ Grid Layout (columns: 3, row_height: 400px)
 
 ## 安装与配置
 
+### 在线安装 vs 离线安装
+
+| 方式 | 适用场景 | 命令 | 是否需要网络 |
+|------|----------|------|:---:|
+| 在线安装 | 网络良好 | `pip install -r requirements.txt` | ✅ 是 |
+| 离线安装 | 网络差/无网络 | `bash scripts/install.sh --offline` | ❌ 否 |
+| 核心依赖 | 仅需基础功能 | `bash scripts/install.sh --offline --core-only` | ❌ 否 |
+
+> 💡 **离线包说明**：如果发布包 (`echart-skill_*.zip`) 内包含 `wheels/` 目录（约 323 MB），
+> 用户端运行 `install.sh` / `install.bat` 时会自动检测并使用本地 wheels，完全跳过 PyPI 下载。
+> 维护者生成离线包：`bash scripts/download_wheels.sh && bash package.sh --offline`。
+
 ### 通用安装步骤
 
 1. 下载最新版本的 `echart-skill_*.zip` 压缩包并解压。
 2. 根据你所使用的 Agent 平台，选择对应的安装方式。
+3. 安装 Python 依赖：
+
+   ```bash
+   # macOS / Linux
+   bash scripts/install.sh              # 在线（需网络）
+   bash scripts/install.sh --offline    # 离线（需 wheels/ 目录）
+
+   # Windows
+   scripts\install.bat                  # 在线
+   scripts\install.bat --offline        # 离线
+   ```
 
 ### 各平台安装方法
 
 #### Claude Code
 
+**macOS / Linux:**
 ```bash
 # 方法1：创建符号链接（推荐，方便更新）
 ln -s /path/to/echart-skill ~/.claude/skills/echart-skill
 
 # 方法2：直接复制
 cp -r /path/to/echart-skill ~/.claude/skills/
+```
+
+**Windows (PowerShell):**
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills"
+Copy-Item -Recurse "C:\path\to\echart-skill" "$env:USERPROFILE\.claude\skills\"
 ```
 
 在项目根目录创建 `CLAUDE.md`：
@@ -645,10 +728,17 @@ cp -r /path/to/echart-skill ~/.claude/skills/
 
 #### Trae / WorkBuddy
 
+**macOS / Linux:**
 ```bash
 cp -r /path/to/echart-skill ~/.trae/skills/
 # 或
 cp -r /path/to/echart-skill ~/.workbuddy/skills/
+```
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item -Recurse "C:\path\to\echart-skill" "$env:USERPROFILE\.trae\skills\"
+Copy-Item -Recurse "C:\path\to\echart-skill" "$env:USERPROFILE\.workbuddy\skills\"
 ```
 
 ### 地图配置（可选）
@@ -659,12 +749,43 @@ cp -r /path/to/echart-skill ~/.workbuddy/skills/
 # macOS/Linux
 echo 'export BAIDU_AK=你的百度地图AK' >> ~/.zshrc
 source ~/.zshrc
+```
 
-# Windows
+```cmd
+:: Windows (CMD, 以管理员身份运行)
 setx BAIDU_AK "你的百度地图AK"
 ```
 
 免费申请地址：[百度地图开放平台](https://lbsyun.baidu.com/index.php?title=jspopularGL/guide/getkey)
+
+### 应用配置（echart_config.json）
+
+首次运行时系统会自动创建 `echart_config.json`（默认配置如下），可按需修改：
+
+```json
+{
+  "server": {
+    "enabled": false,
+    "port_range": [8100, 8200]
+  },
+  "output": {
+    "dir": "outputs/html"
+  },
+  "baidu_ak": ""
+}
+```
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `server.enabled` | `false` | 是否在生成图表后启动本地 HTTP 预览服务 |
+| `server.port_range` | `[8100, 8200]` | 服务端口范围 |
+| `output.dir` | `outputs/html` | 图表 HTML 输出目录（相对于项目根目录） |
+| `baidu_ak` | `""` | 百度地图 AK（也可通过环境变量 `BAIDU_AK` 设置） |
+
+> 💡 **提示**：
+> - 服务关闭时，生成图表后直接显示文件绝对路径（`file:///...`）。
+> - 所有图表 HTML 为**自包含单文件**，可在任意浏览器中离线打开。
+> - `baidu_ak` 优先级：环境变量 `BAIDU_AK` > `echart_config.json` > 旧版 `config.txt`。
 
 ---
 

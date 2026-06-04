@@ -75,7 +75,7 @@ class ServerLifecycle:
         self.last_request_file.write_text(datetime.now().isoformat())
 
     def is_server_active(self, pid: int) -> bool:
-        """Check if a process with given PID is running.
+        """Check if a process with given PID is running (cross-platform).
 
         Args:
             pid: Process ID to check
@@ -84,7 +84,8 @@ class ServerLifecycle:
             True if process is running, False otherwise
         """
         try:
-            # Signal 0 doesn't kill the process, just checks if it exists
+            # Signal 0 checks existence without sending a real signal.
+            # Works on Unix (kill(2)) and Windows (OpenProcess + GetExitCodeProcess).
             os.kill(pid, 0)
             return True
         except (OSError, ProcessLookupError):
@@ -260,8 +261,14 @@ def ensure_server_running():
         cmd = [sys.executable, os.path.abspath(__file__), "--daemon", "--port", str(port)]
 
         if sys.platform == 'win32':
+            # CREATE_NO_WINDOW (0x08000000) prevents a console window from appearing.
+            # DETACHED_PROCESS detaches from the parent console.
+            # CREATE_NEW_PROCESS_GROUP ensures Ctrl+C doesn't propagate.
+            _CREATE_NO_WINDOW = 0x08000000
             subprocess.Popen(cmd,
-                             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
+                             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+                             | subprocess.DETACHED_PROCESS
+                             | _CREATE_NO_WINDOW,
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         else:
             subprocess.Popen(cmd,
