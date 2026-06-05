@@ -152,13 +152,28 @@
 ### 🟢 模板模式（优先 — 27 种图表 × 41 个模板）
 
 ```
-用户请求 → 查 templates/INDEX.md → 定位模板 → 读占位符 → 生成 data JSON → 输出
+用户请求 → 查 templates/INDEX.md → 定位模板 → 读占位符 → 生成 data JSON → build_template.py → 输出
 ```
 
 **Agent 只需生成 data JSON，不需要写任何 ECharts option 代码：**
-- 模板 = 完整 HTML + 内联 ECharts 库 + 预配置的 option 结构
+- 模板 = 完整 HTML + 预配置的 option 结构 + `{{ECHARTS_INLINE}}` 标记
 - 占位符 = `{{TITLE}}`, `{{DATA}}`, `{{CATEGORIES}}`, `{{VALUES}}` 等
 - data JSON 格式由模板头部注释定义
+
+**模板 JS 内联机制：**
+
+| 标记 | 注入内容 | 覆盖 |
+|------|---------|------|
+| `<!-- {{ECHARTS_INLINE}} -->` | echarts.min.js (1.1MB) | 全部 41 个模板 |
+| `<!-- {{MAP_INLINE}} -->` | china.js / guangdong.js / world.js 等 | 5 个地图模板，自动检测 MAP_NAME |
+| `<!-- {{GL_INLINE}} -->` | echarts-gl.min.js (625KB) | 5 个 3D 模板 |
+
+```bash
+# 生成自包含 HTML：
+python scripts/build_template.py references/templates/bar/basic.html \
+  -d data.json -o outputs/html/chart.html
+# 输出：单个 .html 文件，双击浏览器即可打开，零外部依赖
+```
 
 ### 🔵 组合模式
 

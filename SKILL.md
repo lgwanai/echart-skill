@@ -791,6 +791,7 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 | 案例索引 | `references/knowledge/examples/INDEX.md` |
 | 模板映射索引 | `references/templates/INDEX.md` |
 | HTML 模板 | `references/templates/<类型>/<模板>.html` |
+| 模板构建脚本 | `scripts/build_template.py` |
 | 概念文件 | `references/knowledge/concepts/` |
 | 图表类型文件 | `references/knowledge/chart-types/` |
 | API 文件 | `references/knowledge/api/` |
