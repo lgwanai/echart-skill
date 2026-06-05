@@ -93,40 +93,51 @@ def build(template_path, data=None, output_path=None):
     with open(template_path, "r", encoding="utf-8") as f:
         html = f.read()
 
-    # Step 1a: Replace ECharts inline marker
+    MAPS_DIR = BASE_DIR / "assets" / "echarts"
+
+    # Step 1: Replace fixed markers (don't depend on data)
     echarts_js = _load_echarts_js()
     html = html.replace("<!-- {{ECHARTS_INLINE}} -->", f'<script>\n{echarts_js}\n</script>')
 
-    # Step 1b: Replace ECharts GL inline marker (3D charts)
-    gl_path = BASE_DIR / "assets" / "echarts" / "echarts-gl.min.js"
+    gl_path = MAPS_DIR / "echarts-gl.min.js"
     if "<!-- {{GL_INLINE}} -->" in html:
         if gl_path.exists():
             with open(gl_path, "r", encoding="utf-8") as f:
-                gl_js = f.read()
-            html = html.replace("<!-- {{GL_INLINE}} -->", f'<script>\n{gl_js}\n</script>')
+                html = html.replace("<!-- {{GL_INLINE}} -->", f'<script>\n{f.read()}\n</script>')
         else:
             html = html.replace("<!-- {{GL_INLINE}} -->",
                                 "<!-- echarts-gl.min.js not found — 3D charts will not render -->")
 
-    # Step 1c: Replace Map inline marker — auto-detect map name from template content
-    if "<!-- {{MAP_INLINE}} -->" in html:
-        # Detect which map is needed: look for map: 'NAME' or map: "NAME" in the template
-        map_match = re.search(r"map:\s*['\"](\w+)['\"]", html)
-        map_name = map_match.group(1) if map_match else "china"
-        map_path = BASE_DIR / "assets" / "echarts" / f"{map_name}.js"
-        if map_path.exists():
-            with open(map_path, "r", encoding="utf-8") as f:
-                map_js = f.read()
-            html = html.replace("<!-- {{MAP_INLINE}} -->", f'<script>\n{map_js}\n</script>')
-        else:
-            html = html.replace("<!-- {{MAP_INLINE}} -->",
-                                f"<!-- map '{map_name}.js' not found in assets/echarts/ -->")
-
-    # Step 2: Replace all {{PLACEHOLDER}} variables
+    # Step 2: Replace all {{PLACEHOLDER}} variables FIRST (so map name is resolved)
     if data:
         for key, value in data.items():
             placeholder = f"{{{{{key}}}}}"  # {{KEY}}
             html = html.replace(placeholder, _json_safe(value))
+
+    # Step 3: Map injection — AFTER data replacement, detect actual map name
+    if "<!-- {{MAP_INLINE}} -->" in html:
+        # Find all map names in the processed HTML (supports 'map', 'geo', 'series-map')
+        # Patterns: map: 'china'  map: "guangdong"  geo: { map: 'beijing' }
+        map_names = set(re.findall(r"""map['\"]\s*:\s*['\"]([\w-]+)['\"]""", html))
+        # Also check bmap mode
+        if re.search(r'coordinateSystem:\s*[\'"]bmap[\'"]', html):
+            map_names.add("bmap")
+
+        injected = []
+        for map_name in map_names:
+            map_path = MAPS_DIR / f"{map_name}.js"
+            if map_path.exists():
+                with open(map_path, "r", encoding="utf-8") as f:
+                    injected.append(f'<script>\n{f.read()}\n</script>')
+            else:
+                injected.append(f"<!-- map '{map_name}.js' not found — region may not render -->")
+
+        if injected:
+            html = html.replace("<!-- {{MAP_INLINE}} -->", "\n".join(injected))
+        else:
+            html = html.replace("<!-- {{MAP_INLINE}} -->",
+                                "<!-- no map detected → inject default china.js -->\n" +
+                                f'<script>\n{MAPS_DIR.joinpath("china.js").read_text()}\n</script>')
 
     # Step 3: Write output
     if output_path:
