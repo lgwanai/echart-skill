@@ -19,7 +19,7 @@
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  tooltip: { formatter: '{a}<br/>{b}: {c}' + '{{UNIT}}' },
+  tooltip: { formatter: '{a}<br/>{b}: {c}' + {{UNIT}} },
   series: [{
     type: 'gauge',
     startAngle: {{START_ANGLE}},   // 180 (half) | 210 (car) | 225
@@ -35,7 +35,7 @@ var option = {
     axisLabel: { show: {{LABEL_SHOW}} },
     detail: {
       valueAnimation: true,
-      formatter: '{value}' + '{{UNIT}}',
+      formatter: '{value}' + {{UNIT}},
       fontSize: 32,
       fontWeight: 'bold',
       offsetCenter: [0, '60%']
