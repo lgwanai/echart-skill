@@ -860,7 +860,7 @@ setx BAIDU_AK "你的百度地图AK"
 > 💡 **提示**：
 > - 服务关闭时，生成图表后直接显示文件绝对路径（`file:///...`）。
 > - 所有图表 HTML 为**自包含单文件**，可在任意浏览器中离线打开。
-> - `baidu_ak` 优先级：环境变量 `BAIDU_AK` > `echart_config.json` > 旧版 `config.txt`。
+> - `baidu_ak` 优先级：环境变量 `BAIDU_AK` > `echart_config.json`。
 
 ---
 
