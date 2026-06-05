@@ -38,15 +38,14 @@ def _load_echarts_js():
 
 
 def _json_safe(value):
-    """Convert a Python value to a template-safe string.
+    """Convert a Python value to valid JS syntax for template insertion.
 
-    Rules:
-    - Lists & dicts → JSON string (e.g. [1,2,3] or {"name":"A"})
-    - bool → "true" / "false"
-    - None → "null"
-    - number → string representation
-    - string that looks like JSON (starts with { or [) → use as-is (JS code injection)
-    - plain string → use as-is (for HTML text like title, no extra quotes)
+    All values are produced as valid JS expressions:
+    - Lists/dicts → JSON literal: [1,2,3] or {"name":"A"}
+    - Strings → JS-quoted: 'horizontal' or '60%'
+    - Numbers → number literal: 123
+    - bool/None → true/false/null
+    - JSON-prefixed strings (starts with [ or {) → raw JSON (for inline JS expressions)
     """
     if value is True:
         return "true"
@@ -60,7 +59,10 @@ def _json_safe(value):
         return json.dumps(value, ensure_ascii=False)
     if isinstance(value, str):
         stripped = value.strip()
-        # If it's already valid JSON array/object, insert raw (for inline JS)
+        # JS keywords — return bare
+        if stripped in ("true", "false", "null", "undefined"):
+            return stripped
+        # Already valid JSON array/object → raw JS expression
         if (stripped.startswith("[") and stripped.endswith("]")) or \
            (stripped.startswith("{") and stripped.endswith("}")):
             try:
@@ -68,9 +70,20 @@ def _json_safe(value):
                 return stripped
             except json.JSONDecodeError:
                 pass
-        # Plain string (TITLE, label text, etc.) — no extra JSON quotes
-        return value
+        # Numeric string like "123" or "3.14" → raw number
+        try:
+            float(stripped)
+            return stripped
+        except ValueError:
+            pass
+        return _js_string(value)
     return str(value)
+
+
+def _js_string(s):
+    """Wrap a string as a valid JS single-quoted string literal."""
+    escaped = s.replace("\\", "\\\\").replace("'", "\\'")
+    return f"'{escaped}'"
 
 
 def build(template_path, data=None, output_path=None):
@@ -138,6 +151,19 @@ def build(template_path, data=None, output_path=None):
             html = html.replace("<!-- {{MAP_INLINE}} -->",
                                 "<!-- no map detected → inject default china.js -->\n" +
                                 f'<script>\n{MAPS_DIR.joinpath("china.js").read_text()}\n</script>')
+
+    # Post-process: TITLE in HTML context — strip JS quotes added by _json_safe
+    # _json_safe wraps strings as 'value', but HTML text needs bare text
+    html = re.sub(
+        r"<title>'([^']*)'</title>",
+        r'<title>\1</title>',
+        html
+    )
+    html = re.sub(
+        r'(<div[^>]*id="title"[^>]*>)\'([^\']*)\'(</div>)',
+        r'\1\2\3',
+        html
+    )
 
     # Step 3: Write output
     if output_path:

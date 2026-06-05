@@ -21,7 +21,7 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   baseOption: {
     timeline: { axisType: 'category', autoPlay: true, playInterval: 1000, data: {{TIMELINE}} },
-    title: { text: '{{TITLE}}' },
+    title: { text: {{TITLE}} },
     tooltip: {},
     grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
     xAxis: { type: 'category', data: {{CATEGORIES}} },

@@ -36,7 +36,7 @@ function convertFlights(flights) {
 var option = {
   tooltip: { trigger: 'item', formatter: function(p) { return p.data ? p.data.fromName + ' -> ' + p.data.toName : ''; } },
   geo: {
-    map: '{{MAP_NAME}}', roam: true,
+    map: {{MAP_NAME}}, roam: true,
     label: { show: false },
     itemStyle: { areaColor: '#323c48', borderColor: '#111' },
     emphasis: { itemStyle: { areaColor: '#2a333d' } }

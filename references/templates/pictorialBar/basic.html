@@ -27,13 +27,13 @@ var option = {
   yAxis: { type: 'value', splitLine: { show: false }, axisLabel: { show: false }, axisTick: { show: false } },
   series: [{
     type: 'pictorialBar',
-    symbol: '{{SYMBOL}}',          // 'path://...' | 'image://...' | 'circle' | 'rect'
+    symbol: {{SYMBOL}},          // 'path://...' | 'image://...' | 'circle' | 'rect'
     symbolSize: {{SYMBOL_SIZE}},    // [width, height] | number
-    symbolRepeat: '{{SYMBOL_REPEAT}}',  // 'fixed' | true
+    symbolRepeat: {{SYMBOL_REPEAT}},  // 'fixed' | true
     symbolBoundingData: {{SYMBOL_BOUNDING}},  // number (unit value per symbol)
     symbolClip: {{SYMBOL_CLIP}},    // true | false
-    symbolPosition: '{{SYMBOL_POS}}',  // 'start' | 'end'
-    symbolMargin: '{{SYMBOL_MARGIN}}',  // '5%' | number
+    symbolPosition: {{SYMBOL_POS}},  // 'start' | 'end'
+    symbolMargin: {{SYMBOL_MARGIN}},  // '5%' | number
     itemStyle: { color: {{COLOR}} },
     label: { show: {{LABEL_SHOW}}, position: 'top' },
     data: {{VALUES}}

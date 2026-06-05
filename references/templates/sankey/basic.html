@@ -23,11 +23,11 @@ var option = {
   series: [{
     type: 'sankey',
     layout: 'none',
-    orient: '{{ORIENT}}',          // 'horizontal' | 'vertical'
-    nodeAlign: '{{NODE_ALIGN}}',   // 'left' | 'right' | 'justify'
+    orient: {{ORIENT}},          // 'horizontal' | 'vertical'
+    nodeAlign: {{NODE_ALIGN}},   // 'left' | 'right' | 'justify'
     emphasis: { focus: 'adjacency' },
     nodeWidth: 20, nodeGap: 8,
-    label: { show: true, position: '{{LABEL_POS}}' },
+    label: { show: true, position: {{LABEL_POS}} },
     lineStyle: { color: 'gradient', curveness: 0.5 },
     data: {{NODES}},
     links: {{LINKS}}

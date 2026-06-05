@@ -28,15 +28,15 @@ var seriesData = flights.map(function(item) {
 });
 var option = {
   globe: {
-    baseTexture: '{{BASE_TEXTURE}}',
-    shading: 'color', environment: '{{ENVIRONMENT}}',
+    baseTexture: {{BASE_TEXTURE}},
+    shading: 'color', environment: {{ENVIRONMENT}},
     viewControl: { autoRotate: {{AUTO_ROTATE}} }
   },
   series: [{
     type: 'lines3D',
     coordinateSystem: 'globe',
     effect: { show: true, period: 4, trailLength: 0.2, constantSpeed: 30 },
-    lineStyle: { width: 1, color: '{{LINE_COLOR}}', opacity: 0.6 },
+    lineStyle: { width: 1, color: {{LINE_COLOR}}, opacity: 0.6 },
     blendMode: 'lighter',
     data: seriesData
   }]

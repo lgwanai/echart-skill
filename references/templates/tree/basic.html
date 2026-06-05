@@ -23,13 +23,13 @@ var option = {
   series: [{
     type: 'tree',
     data: {{DATA}},
-    orient: '{{ORIENT}}',         // 'LR' | 'RL' | 'TB' | 'BT'
-    layout: '{{LAYOUT}}',         // 'orthogonal' | 'radial'
+    orient: {{ORIENT}},         // 'LR' | 'RL' | 'TB' | 'BT'
+    layout: {{LAYOUT}},         // 'orthogonal' | 'radial'
     roam: true,
     symbolSize: 7,
     top: '1%', left: '7%', bottom: '1%', right: '20%',
-    label: { position: '{{LABEL_POS}}', verticalAlign: 'middle', align: 'right', fontSize: 10 },
-    leaves: { label: { position: '{{LEAF_POS}}', verticalAlign: 'middle', align: 'left' } },
+    label: { position: {{LABEL_POS}}, verticalAlign: 'middle', align: 'right', fontSize: 10 },
+    leaves: { label: { position: {{LEAF_POS}}, verticalAlign: 'middle', align: 'left' } },
     emphasis: { focus: 'descendant' },
     expandAndCollapse: {{EXPAND_COLLAPSE}},   // true | false
     animationDuration: 550,

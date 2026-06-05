@@ -25,8 +25,8 @@ var option = {
     formatter: function(p) { return p.seriesName + '<br/>(' + p.value[0] + ', ' + p.value[1] + '): ' + (p.value[2] || p.value[3]); }
   },
   grid: { left: '5%', right: '10%', bottom: '10%', top: '10%' },
-  xAxis: { type: 'value', name: '{{X_NAME}}' },
-  yAxis: { type: 'value', name: '{{Y_NAME}}' },
+  xAxis: { type: 'value', name: {{X_NAME}} },
+  yAxis: { type: 'value', name: {{Y_NAME}} },
   visualMap: {
     dimension: 2,
     min: {{VMIN}}, max: {{VMAX}},

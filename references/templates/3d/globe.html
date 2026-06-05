@@ -25,10 +25,10 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   backgroundColor: '#000',
   globe: {
-    baseTexture: '{{BASE_TEXTURE}}',
-    heightTexture: '{{HEIGHT_TEXTURE}}',
-    shading: '{{SHADING}}',
-    environment: '{{ENVIRONMENT}}',
+    baseTexture: {{BASE_TEXTURE}},
+    heightTexture: {{HEIGHT_TEXTURE}},
+    shading: {{SHADING}},
+    environment: {{ENVIRONMENT}},
     {{LAYERS}}
     light: { main: { intensity: 1.2 } },
     viewControl: { autoRotate: {{AUTO_ROTATE}}, autoRotateSpeed: 0.5 }

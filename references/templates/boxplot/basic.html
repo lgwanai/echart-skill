@@ -23,7 +23,7 @@ var option = {
   tooltip: { trigger: 'item', axisPointer: { type: 'shadow' } },
   grid: { left: '10%', right: '10%', bottom: '10%' },
   xAxis: { type: 'category', data: {{CATEGORIES}} },
-  yAxis: { type: 'value', name: '{{Y_AXIS_NAME}}' },
+  yAxis: { type: 'value', name: {{Y_AXIS_NAME}} },
   dataset: [
     { source: {{RAW_DATA}} },
     { transform: { type: 'boxplot' } },

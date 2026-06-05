@@ -20,12 +20,12 @@
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  title: { text: '{{TITLE}}', left: 'center' },
+  title: { text: {{TITLE}}, left: 'center' },
   tooltip: {},
   legend: {{LEGEND}},
   series: [{
     type: 'graph',
-    layout: '{{LAYOUT}}',          // 'force' | 'circular' | 'none'
+    layout: {{LAYOUT}},          // 'force' | 'circular' | 'none'
     roam: true,
     draggable: true,
     symbolSize: {{SYMBOL_SIZE}},   // number | function
