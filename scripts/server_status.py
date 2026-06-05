@@ -58,9 +58,12 @@ def get_chart_links(html_dir: str = "outputs/html", port: int | None = None) -> 
         for file in html_path.glob("*.html"):
             try:
                 stat = file.stat()
+                # Build URL relative to project root so the path matches the
+                # server's document root.  e.g. outputs/html/bar_chart.html
+                rel_path = str(file).replace('\\', '/')
                 charts.append({
                     "filename": file.name,
-                    "url": f"http://127.0.0.1:{port}/{file.name}",
+                    "url": f"http://127.0.0.1:{port}/{rel_path}",
                     "path": str(file.resolve()),
                     "size_bytes": stat.st_size,
                     "created": datetime.fromtimestamp(stat.st_ctime).isoformat(),

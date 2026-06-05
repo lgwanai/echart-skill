@@ -1,32 +1,96 @@
 #!/bin/bash
+# =============================================================================
+# echart-skill Release Packager
+# =============================================================================
+# Creates a release zip with optional offline wheel bundle.
+#
+# Before packaging for offline release:
+#   bash scripts/download_wheels.sh              # download all wheels
+#   bash scripts/download_wheels.sh --core-only  # or core-only (smaller)
+#
+# Usage:
+#   bash package.sh              # package without wheels (smaller, needs network)
+#   bash package.sh --offline    # package WITH wheels (larger, works offline)
+# =============================================================================
 
-# 获取当前时间戳，格式：YYYYMMDD_HHMMSS
+# Get current timestamp
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 PACKAGE_NAME="echart-skill_${TIMESTAMP}.zip"
 DIST_DIR="dist"
 
-# 确保 dist 目录存在
+# Ensure dist directory exists
 mkdir -p "$DIST_DIR"
 
-echo "开始打包 Echart Skill..."
+INCLUDE_WHEELS=false
+if [[ "${1:-}" == "--offline" ]]; then
+    INCLUDE_WHEELS=true
+fi
 
-# 执行打包命令
-# -r 递归
-# -q 静默模式
-# -x 排除指定文件或目录
-zip -r -q "$DIST_DIR/$PACKAGE_NAME" . \
-    -x "idea.md" \
-    -x "package.sh" \
-    -x "workspace.db" \
-    -x "dist/*" \
-    -x "tmp/*" \
-    -x "outputs/*" \
-    -x "test/*" \
-    -x "*.git*" \
-    -x "config.txt" \
-    -x "*.gitignore" \
-    -x "*.skill" \
-    -x "*.DS_Store"
+echo "📦 Packaging Echart Skill …"
 
-echo "✅ 打包完成！"
-echo "📦 输出文件: $DIST_DIR/$PACKAGE_NAME"
+if $INCLUDE_WHEELS; then
+    if [[ -d wheels ]] && ls wheels/*.whl &>/dev/null; then
+        WHEEL_COUNT=$(ls -1 wheels/*.whl 2>/dev/null | wc -l | tr -d ' ')
+        echo "   Including $WHEEL_COUNT offline wheels"
+    else
+        echo "⚠️  --offline requested but wheels/ dir is empty or missing."
+        echo "   Run first: bash scripts/download_wheels.sh"
+        echo "   Continuing WITHOUT wheels …"
+        INCLUDE_WHEELS=false
+    fi
+fi
+
+# Build exclude list
+EXCLUDES=(
+    ".git/*"
+    ".gitignore"
+    ".gitattributes"
+    ".claude/*"
+    ".planning/*"
+    ".pytest_cache/*"
+    "__pycache__/*"
+    "*.pyc"
+    "*.pyo"
+    "*.DS_Store"
+    "idea.md"
+    "package.sh"
+    "workspace.db"
+    "workspace.duckdb"
+    "dist/*"
+    "tmp/*"
+    "outputs/*"
+    "logs/*"
+    "config.txt"
+    "*.skill"
+)
+
+# Exclude wheels unless --offline
+if ! $INCLUDE_WHEELS; then
+    EXCLUDES+=("wheels/*")
+fi
+
+# Build the -x arguments
+ZIP_ARGS=()
+for pattern in "${EXCLUDES[@]}"; do
+    ZIP_ARGS+=(-x "$pattern")
+done
+
+# Execute packaging
+zip -r -q "$DIST_DIR/$PACKAGE_NAME" . "${ZIP_ARGS[@]}"
+
+# Report
+SIZE=$(du -sh "$DIST_DIR/$PACKAGE_NAME" | cut -f1)
+
+echo ""
+echo "✅ Packaging complete!"
+echo "   📦 $DIST_DIR/$PACKAGE_NAME  ($SIZE)"
+echo ""
+
+if $INCLUDE_WHEELS; then
+    echo "   🛡️  Offline-ready: users can install without PyPI access."
+    echo "      They run:  bash scripts/install.sh --offline"
+    echo "      (or on Windows:  scripts\\install.bat --offline)"
+else
+    echo "   🌐 Online install required (pip downloads from PyPI)."
+    echo "      For offline release:  bash package.sh --offline"
+fi
