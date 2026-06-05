@@ -93,10 +93,34 @@ def build(template_path, data=None, output_path=None):
     with open(template_path, "r", encoding="utf-8") as f:
         html = f.read()
 
-    # Step 1: Replace ECharts inline marker
+    # Step 1a: Replace ECharts inline marker
     echarts_js = _load_echarts_js()
-    inline_tag = f'<script>\n{echarts_js}\n</script>'
-    html = html.replace("<!-- {{ECHARTS_INLINE}} -->", inline_tag)
+    html = html.replace("<!-- {{ECHARTS_INLINE}} -->", f'<script>\n{echarts_js}\n</script>')
+
+    # Step 1b: Replace ECharts GL inline marker (3D charts)
+    gl_path = BASE_DIR / "assets" / "echarts" / "echarts-gl.min.js"
+    if "<!-- {{GL_INLINE}} -->" in html:
+        if gl_path.exists():
+            with open(gl_path, "r", encoding="utf-8") as f:
+                gl_js = f.read()
+            html = html.replace("<!-- {{GL_INLINE}} -->", f'<script>\n{gl_js}\n</script>')
+        else:
+            html = html.replace("<!-- {{GL_INLINE}} -->",
+                                "<!-- echarts-gl.min.js not found — 3D charts will not render -->")
+
+    # Step 1c: Replace Map inline marker — auto-detect map name from template content
+    if "<!-- {{MAP_INLINE}} -->" in html:
+        # Detect which map is needed: look for map: 'NAME' or map: "NAME" in the template
+        map_match = re.search(r"map:\s*['\"](\w+)['\"]", html)
+        map_name = map_match.group(1) if map_match else "china"
+        map_path = BASE_DIR / "assets" / "echarts" / f"{map_name}.js"
+        if map_path.exists():
+            with open(map_path, "r", encoding="utf-8") as f:
+                map_js = f.read()
+            html = html.replace("<!-- {{MAP_INLINE}} -->", f'<script>\n{map_js}\n</script>')
+        else:
+            html = html.replace("<!-- {{MAP_INLINE}} -->",
+                                f"<!-- map '{map_name}.js' not found in assets/echarts/ -->")
 
     # Step 2: Replace all {{PLACEHOLDER}} variables
     if data:
