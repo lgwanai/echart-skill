@@ -1,0 +1,42 @@
+<!--
+  Template: tree/basic.html
+  Chart Type: Tree (树图)
+  Data Pattern: HIERARCHY (single root wrapped in array)
+  Data Format: [{name: string, value?: number, collapsed?: boolean, children?: [...]}]
+  Covers: tree-basic, tree-vertical, tree-radial, tree-orient-*, tree-polyline, tree-legend (7 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: { trigger: 'item', triggerOn: 'mousemove' },
+  series: [{
+    type: 'tree',
+    data: {{DATA}},
+    orient: '{{ORIENT}}',         // 'LR' | 'RL' | 'TB' | 'BT'
+    layout: '{{LAYOUT}}',         // 'orthogonal' | 'radial'
+    roam: true,
+    symbolSize: 7,
+    top: '1%', left: '7%', bottom: '1%', right: '20%',
+    label: { position: '{{LABEL_POS}}', verticalAlign: 'middle', align: 'right', fontSize: 10 },
+    leaves: { label: { position: '{{LEAF_POS}}', verticalAlign: 'middle', align: 'left' } },
+    emphasis: { focus: 'descendant' },
+    expandAndCollapse: {{EXPAND_COLLAPSE}},   // true | false
+    animationDuration: 550,
+    animationDurationUpdate: 750
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

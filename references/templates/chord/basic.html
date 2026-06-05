@@ -1,0 +1,35 @@
+<!--
+  Template: chord/basic.html
+  Chart Type: Chord (和弦图)
+  Data Pattern: NODES_LINKS
+  Data Format: { nodes: [{name: string}, ...], links: [{source: string, target: string, value: number}, ...] }
+  Covers: chord-simple, chord-style, chord-lineStyle-color, chord-minAngle (4 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: {},
+  series: [{
+    type: 'chord',
+    radius: ['30%', '70%'],
+    label: { show: true, rotate: {{LABEL_ROTATE}} },
+    emphasis: { lineStyle: { width: 8 }, itemStyle: { borderWidth: 0 } },
+    data: {{NODES}},
+    links: {{LINKS}}
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

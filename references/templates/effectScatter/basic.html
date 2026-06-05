@@ -1,0 +1,47 @@
+<!--
+  Template: effectScatter/basic.html
+  Chart Type: EffectScatter (涟漪散点图)
+  Data Pattern: GEO_VALUE (same as scatter/geo, but type: 'effectScatter')
+  Data Format: { geoCoordMap: {"name": [lng,lat]}, data: [{name: string, value: number}, ...] }
+  Covers: effectScatter-bmap, effectScatter-map (2 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var geoCoordMap = {{GEO_COORD_MAP}};
+var rawData = {{DATA}};
+function convertData(data) {
+  return data.map(function(item) {
+    return { name: item.name, value: geoCoordMap[item.name] ? geoCoordMap[item.name].concat(item.value) : [0,0,item.value] };
+  });
+}
+var option = {
+  tooltip: { trigger: 'item', formatter: function(p) { return p.name + ': ' + (p.value[2]||p.value[1]||p.value[0]); } },
+  geo: {
+    map: '{{MAP_NAME}}', roam: true,
+    label: { show: false },
+    itemStyle: { areaColor: '#323c48', borderColor: '#111' }
+  },
+  series: [{
+    type: 'effectScatter',
+    coordinateSystem: 'geo',
+    rippleEffect: { brushType: 'stroke', scale: 4 },
+    symbolSize: function(val) { return val[2] / {{SIZE_SCALE}} || 10; },
+    data: convertData(rawData),
+    label: { show: true, position: 'right', formatter: '{b}' }
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

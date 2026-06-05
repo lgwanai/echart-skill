@@ -1,0 +1,40 @@
+<!--
+  Template: boxplot/basic.html
+  Chart Type: Boxplot (箱线图)
+  Data Pattern: DATASET (raw data + ecStat boxplot transform)
+  Data Format: dataset.source: [[value1, value2, ...], ...]  (each sub-array = one group)
+  Covers: boxplot-multi, boxplot-light-velocity, boxplot-light-velocity2 (3 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+// ecStat transform is expected to be pre-registered via echarts.registerTransform()
+var option = {
+  tooltip: { trigger: 'item', axisPointer: { type: 'shadow' } },
+  grid: { left: '10%', right: '10%', bottom: '10%' },
+  xAxis: { type: 'category', data: {{CATEGORIES}} },
+  yAxis: { type: 'value', name: '{{Y_AXIS_NAME}}' },
+  dataset: [
+    { source: {{RAW_DATA}} },
+    { transform: { type: 'boxplot' } },
+    { fromDatasetIndex: 1, fromTransformResult: 1 }
+  ],
+  series: [
+    { type: 'boxplot', datasetIndex: 1, itemStyle: { color: '#5470c6' } },
+    { type: 'scatter', datasetIndex: 2, symbolSize: 6, itemStyle: { color: '#666' } }
+  ]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

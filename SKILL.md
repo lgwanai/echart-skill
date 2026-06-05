@@ -631,7 +631,83 @@ LIMIT 10;
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 🗺️ 检索决策树
+### 🗺️ 生成模式决策树（MUST FOLLOW — 先判断模式，再执行）
+
+```
+用户图表需求
+    │
+    ├── 是单个图表？
+    │   ├── 模板存在？(查 templates/INDEX.md)
+    │   │   ├── YES → 🟢 模板模式（最快最可靠）
+    │   │   │   1. 读取模板 HTML → 获取占位符列表
+    │   │   │   2. 按模板 data 格式从 DuckDB 生成 JSON
+    │   │   │   3. 填充占位符 → 输出
+    │   │   │
+    │   │   └── NO → 🟡 知识库模式（兜底）
+    │   │       1. 查 knowledge/INDEX.md → 读知识片段
+    │   │       2. 查 examples/INDEX.md → 读案例 main.js
+    │   │       3. 知识 + 案例 → 生成完整 option
+    │   │       4. 用 chart_generator.py 生成 HTML
+    │   │
+    │   └── 需要自定义系列？(custom series)
+    │       └── 🟡 知识库模式 + custom/error-bar.html 模板
+    │
+    ├── 是多个图表组合？(dashboard / 混合布局)
+    │   ├── 每个子图表有独立模板？
+    │   │   └── YES → 🔵 组合模式
+    │   │       1. 对每个子图表执行模板模式
+    │   │       2. 用 grid 布局将多个图表放入一个 HTML
+    │   │       3. 每个图表独立 init + setOption
+    │   │       4. 所有 JS 内联到单个文件
+    │   │
+    │   └── 子图表类型复杂？→ 用 /dashboard 命令 + SimpleDashboard API
+    │
+    └── 是 Dashboard？（3+ 图表 + 交互）
+        └── 🟣 Dashboard 模式
+            1. 使用 SimpleDashboard API
+            2. 自然语言描述 → 自动解析图表类型
+            3. 自动布局 + 卡片式 UI
+            4. 参考 Scenario 15
+```
+
+### 🟢 模板模式（优先使用）
+
+当 `templates/INDEX.md` 中有匹配模板时，**必须优先使用模板模式**：
+
+1. 用户请求 → 提取图表类型 + 特征词 → 查 `templates/INDEX.md` → 定位模板
+2. 读模板 HTML 文件 → 获取 `{{占位符}}` 列表和 data 格式
+3. 从 DuckDB 查询数据 → 按模板格式生成 JSON
+4. 填充占位符 → `chart_generator.py` 内联 JS 库 → 输出
+
+### 🔵 组合模式（多图表）
+
+当用户需求=多个独立图表组合在一个页面时：
+
+1. 拆解需求为 N 个子图表
+2. 每个子图表独立走模板模式
+3. 用多 grid 布局组装：
+```html
+<div id="chart1" style="width:50%;height:400px;float:left"></div>
+<div id="chart2" style="width:50%;height:400px;float:left"></div>
+<script>
+var c1 = echarts.init(document.getElementById('chart1'));
+c1.setOption({{OPTION1}});
+var c2 = echarts.init(document.getElementById('chart2'));
+c2.setOption({{OPTION2}});
+</script>
+```
+4. 输出为单个 self-contained HTML
+
+### 🟡 知识库模式（兜底 — 无模板时使用）
+
+当 `templates/INDEX.md` 中**没有**匹配模板时（如用户需要 custom series、极特殊图表、或模板覆盖不到的变体），回退到 4 步工作流：
+
+1. 查 `knowledge/INDEX.md` → 读知识片段
+2. 查 `examples/INDEX.md` → 读案例 main.js
+3. 知识 + 案例代码一起作为上下文 → 生成完整 echarts option
+4. 通过 chart_generator.py 生成 HTML
+
+### 🗺️ 检索决策树（知识库模式专用）
 
 ```
 用户请求图表
@@ -668,12 +744,53 @@ LIMIT 10;
         └── 查 examples/INDEX.md → 读 <匹配案例>/main.js
 ```
 
+### 🗺️ 模板选择决策树（必须执行）
+
+```
+Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
+
+查询 references/templates/INDEX.md，按以下规则匹配：
+
+1. 提取图表类型关键词 → 定位模板目录
+   bar/柱状图 → templates/bar/
+   line/折线图 → templates/line/
+   pie/饼图 → templates/pie/
+   ... (完整映射见 templates/INDEX.md)
+
+2. 提取特征关键词 → 定位具体模板文件
+   bar + "堆叠" → bar/stack.html
+   bar + "横向" → bar/horizontal.html
+   bar + "瀑布" → bar/waterfall.html
+   bar + "动态/排序/竞赛" → bar/race.html
+   bar + (其他) → bar/basic.html
+   line + "面积" → line/basic.html (areaStyle:{})
+   line + "阶梯" → line/basic.html (step:'end')
+   line + "堆叠" → line/stack.html
+   line + "XY/数值" → line/xy.html
+   line + (其他) → line/basic.html
+   pie + "环形" → pie/basic.html (radius:['40%','70%'])
+   pie + "玫瑰" → pie/basic.html (roseType:'area')
+   scatter + "气泡" → scatter/bubble.html
+   scatter + "地图" → scatter/geo.html
+   (完整特征匹配表见 templates/INDEX.md)
+
+3. 读取模板文件 → 获取占位符列表
+   模板中所有 {{VARIABLE}} 即需要生成的 data 字段
+   模板头部注释说明 data 格式和示例
+
+4. 根据模板要求的 data 格式 → 从 DuckDB 生成 JSON
+   模板只定义数据注入点，不定义数据来源
+   Agent 负责 SQL → JSON 转换
+```
+
 ### 📂 文件路径速查
 
 | 类别 | 路径 |
 |------|------|
 | 知识库索引 | `references/knowledge/INDEX.md` |
 | 案例索引 | `references/knowledge/examples/INDEX.md` |
+| 模板映射索引 | `references/templates/INDEX.md` |
+| HTML 模板 | `references/templates/<类型>/<模板>.html` |
 | 概念文件 | `references/knowledge/concepts/` |
 | 图表类型文件 | `references/knowledge/chart-types/` |
 | API 文件 | `references/knowledge/api/` |

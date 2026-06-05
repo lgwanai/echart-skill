@@ -1,0 +1,42 @@
+<!--
+  Template: 3d/surface.html
+  Chart Type: Surface (3D曲面图)
+  Data Pattern: EQUATION or XYZ_TRIPLES
+  Data Format: { equation: {x:{step,min,max}, y:{step,min,max}, z:function(x,y)} }
+           or  [[x, y, z], ...]
+  Covers: simple-surface, surface-wave, surface-breather, surface-golden-rose,
+          surface-leather, surface-mollusc-shell, surface-theme-roses, sphere-parametric-surface,
+          parametric-surface-rose, image-surface-sushuang, metal-surface (11 examples)
+  NOTE: Requires echarts-gl extension
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: {},
+  visualMap: { show: false, dimension: 2, min: -1, max: 1, inRange: { color: ['#313695', '#4575b4', '#74add1', '#fee090', '#fdae61', '#f46d43', '#d73027'] } },
+  xAxis3D: { type: 'value' }, yAxis3D: { type: 'value' }, zAxis3D: { type: 'value' },
+  grid3D: { viewControl: { projection: '{{PROJECTION}}' } },
+  series: [{
+    type: 'surface',
+    {{DATA_OR_EQUATION}}              // equation: {...}  or  data: [[x,y,z],...]
+    parametric: {{PARAMETRIC}},       // true | false
+    wireframe: { show: {{WIREFRAME}} },
+    shading: 'realistic',
+    itemStyle: { color: '{{COLOR}}' }
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

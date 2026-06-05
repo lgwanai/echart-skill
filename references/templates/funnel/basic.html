@@ -1,0 +1,39 @@
+<!--
+  Template: funnel/basic.html
+  Chart Type: Funnel (漏斗图)
+  Data Pattern: NAMED_VALUE
+  Data Format: [{name: string, value: number}, ...]
+  Covers: funnel, funnel-align, funnel-customize, funnel-mutiple (4 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: { trigger: 'item', formatter: '{a}<br/>{b}: {c}' },
+  legend: { top: '5%', left: 'center' },
+  series: [{
+    type: 'funnel',
+    left: '10%', top: 60, bottom: 60, width: '80%',
+    min: {{MIN_VALUE}},            // 0
+    max: {{MAX_VALUE}},            // 100
+    sort: '{{SORT}}',             // 'descending' | 'ascending' | 'none'
+    gap: 2,
+    label: { show: true, position: '{{LABEL_POS}}' },    // 'inside' | 'outside'
+    emphasis: { label: { fontSize: 20 } },
+    data: {{DATA}}
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

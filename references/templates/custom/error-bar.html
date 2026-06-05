@@ -1,0 +1,40 @@
+<!--
+  Template: custom/error-bar.html
+  Chart Type: Custom Error Bar (自定义误差棒图)
+  Data Pattern: CUSTOM_VALUE
+  Data Format: [[xIdx, lowValue, highValue], ...] with encode: {x:0, y:[1,2]}
+  Covers: custom-error-bar, custom-error-scatter, custom-profile, custom-gantt-flight,
+          custom-profit, custom-cartesian-polygon, custom-ohlc, custom-wind,
+          custom-spiral-race, custom-hexbin, custom-calendar-icon, custom-gauge,
+          custom-bar-trend, custom-polar-heatmap (14 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: { trigger: 'item' },
+  grid: { left: '5%', right: '5%', bottom: '10%', top: '10%' },
+  xAxis: { type: 'category', data: {{CATEGORIES}} },
+  yAxis: { type: 'value' },
+  series: [{
+    type: 'custom',
+    renderItem: {{RENDER_ITEM}},     // function(params, api) { ... } or registered name string
+    encode: {{ENCODE}},              // { x: 0, y: [1, 2] }
+    data: {{DATA}},
+    itemStyle: { borderWidth: 2 }
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

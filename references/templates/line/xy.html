@@ -1,0 +1,37 @@
+<!--
+  Template: line/xy.html
+  Chart Type: Cartesian Line (XY折线图, numeric axes)
+  Data Pattern: XY_PAIRS
+  Data Format: [[x, y], [x, y], ...]
+  Covers: line-function, line-pen, line-draggable, line-in-cartesian-coordinate-system,
+          line-fisheye-lens, line-easing (6 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: { trigger: 'axis' },
+  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+  xAxis: { type: 'value' },
+  yAxis: { type: 'value' },
+  series: [{
+    type: 'line',
+    smooth: {{SMOOTH}},
+    showSymbol: false,
+    data: {{DATA}}
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

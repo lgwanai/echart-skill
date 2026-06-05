@@ -1,0 +1,44 @@
+<!--
+  Template: scatter/bubble.html
+  Chart Type: Bubble Scatter (气泡图 — size-encoded third dimension)
+  Data Pattern: XY_PAIRS + visualMap on symbolSize
+  Data Format: [[x, y, sizeValue], ...]
+  Covers: scatter-life-expectancy-timeline, scatter-world-population,
+          scatter-aqi-color, scatter-nebula, scatter-painter-choice (5 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: {
+    trigger: 'item',
+    formatter: function(p) { return p.seriesName + '<br/>(' + p.value[0] + ', ' + p.value[1] + '): ' + (p.value[2] || p.value[3]); }
+  },
+  grid: { left: '5%', right: '10%', bottom: '10%', top: '10%' },
+  xAxis: { type: 'value', name: '{{X_NAME}}' },
+  yAxis: { type: 'value', name: '{{Y_NAME}}' },
+  visualMap: {
+    dimension: 2,
+    min: {{VMIN}}, max: {{VMAX}},
+    inRange: { symbolSize: [5, 60], color: ['#50a3ba', '#eac736', '#d94e5d'] }
+  },
+  series: [{
+    type: 'scatter',
+    data: {{DATA}},
+    emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

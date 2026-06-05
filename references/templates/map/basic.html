@@ -1,0 +1,45 @@
+<!--
+  Template: map/basic.html
+  Chart Type: Map (地图)
+  Data Pattern: NAMED_VALUE (name matches map region names)
+  Data Format: [{name: string, value: number}, ...]
+  Covers: map-usa, map-HK, map-bar-morph, map-iceland-pie, map-polygon, map3d-* (11 examples)
+  NOTE: Generator auto-injects the map JS file based on {{MAP_NAME}}
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: { trigger: 'item', formatter: '{b}<br/>{c}' },
+  visualMap: {
+    min: {{VMIN}},
+    max: {{VMAX}},
+    left: 'left',
+    top: 'bottom',
+    text: ['High', 'Low'],
+    calculable: true,
+    inRange: { color: ['#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695'] }
+  },
+  series: [{
+    type: 'map',
+    map: '{{MAP_NAME}}',       // 'china' | 'world' | province name (auto-injected)
+    roam: true,
+    label: { show: {{LABEL_SHOW}}, fontSize: 10 },
+    emphasis: { label: { show: true } },
+    data: {{DATA}}
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

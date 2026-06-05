@@ -1,4 +1,4 @@
-# Echart Skill v1.4.0
+# Echart Skill v1.5.0
 
 专门为 AI Agent 设计的本地数据分析与处理技能包（Skill），旨在解决日常办公场景下的高频、复杂数据分析任务。
 
@@ -141,34 +141,60 @@
 
 ## ECharts 图表生成工作流 ⛔ 硬性约束
 
-**每次生成 ECharts 图表代码，必须执行以下 4 步，不可跳过任何一步。**
+### 🎯 三级生成策略
+
+| 模式 | 触发条件 | 可靠度 | 说明 |
+|------|---------|--------|------|
+| 🟢 **模板模式** | 41 个模板覆盖了需求 | ★★★★★ | 只需生成 data JSON，零语法错误 |
+| 🔵 **组合模式** | 多图表拼装到单页 | ★★★★★ | 多个模板 + grid 布局组装 |
+| 🟡 **知识库兜底** | 模板覆盖不到的需求 | ★★★★ | 知识片段 + 356 案例代码参考 |
+
+### 🟢 模板模式（优先 — 27 种图表 × 41 个模板）
 
 ```
-Step 1: 双索引检索（两个索引都必须查）
-  ✅ 必读 references/knowledge/INDEX.md → 定位知识文件
-  ✅ 必读 references/knowledge/examples/INDEX.md → 定位匹配案例
-
-Step 2: 读取知识片段 → 语法约束
-  ✅ 读取对应的 chart-types / concepts / patterns / api 文件
-
-Step 3: 读取案例代码 → 最关键一步，禁止跳过
-  ✅ 必须读取至少 1 个匹配案例的 main.js
-  ⚠️  案例代码 = 真实可工作的配置，是最可靠的语法参考
-
-Step 4: 聚合生成 → 知识 + 案例一起作为上下文提交
-  ✅ 知识 = 语法约束层  |  案例 = 真值参考层  |  缺一不可
+用户请求 → 查 templates/INDEX.md → 定位模板 → 读占位符 → 生成 data JSON → 输出
 ```
 
-### 知识库结构
+**Agent 只需生成 data JSON，不需要写任何 ECharts option 代码：**
+- 模板 = 完整 HTML + 内联 ECharts 库 + 预配置的 option 结构
+- 占位符 = `{{TITLE}}`, `{{DATA}}`, `{{CATEGORIES}}`, `{{VALUES}}` 等
+- data JSON 格式由模板头部注释定义
+
+### 🔵 组合模式
 
 ```
-references/knowledge/                    案例代码（必读）：
-├── INDEX.md              主索引     /Users/wuliang/workspace/
-├── concepts/  8 个概念              echarts-examples/
-├── chart-types/  4 个图表            ├── bar-simple/main.js
-├── api/  6 个 API 参考               ├── line-smooth/main.js
-├── patterns/  10 个模式              ├── pie-doughnut/main.js
-└── examples/INDEX.md  356 个案例     └── ... (共 356 个)
+多个独立图表 → 各自走模板模式 → grid 布局组装 → 单 HTML 输出
+```
+
+### 🟡 知识库兜底（无模板时）
+
+```
+Step 1: 查 references/knowledge/INDEX.md → 定位知识文件
+Step 2: 读知识片段（concepts/chart-types/api/patterns）→ 语法约束
+Step 3: 读 356 案例 main.js → 真值参考
+Step 4: 知识 + 案例一起提交 → 生成完整 option
+```
+
+### 项目结构
+
+```
+references/
+├── templates/              # 41 个 HTML 模板（优先使用）
+│   ├── INDEX.md            # 模板映射决策表
+│   ├── bar/  5 个模板      # basic, stack, horizontal, waterfall, race
+│   ├── line/  3 个模板     # basic, stack, xy
+│   ├── pie/  1 个模板      # basic (含 doughnut/rose 变体)
+│   ├── scatter/  3 个模板  # basic, bubble, geo
+│   ├── 3d/  5 个模板       # bar3d, scatter3d, surface, globe, lines3d
+│   └── ...  22 个更多模板  # 覆盖所有 27 种图表类型
+├── knowledge/              # 知识库（兜底使用）
+│   ├── INDEX.md            # 主索引
+│   ├── concepts/  8 个     # 核心概念
+│   ├── chart-types/  4 个  # 图表类型语法指南
+│   ├── api/  6 个          # API 参考
+│   ├── patterns/  10 个    # 最佳实践
+│   └── examples/INDEX.md   # 356 案例索引
+└── prompts/                # ⚠️ 已废弃
 ```
 
 ---

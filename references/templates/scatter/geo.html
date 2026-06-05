@@ -1,0 +1,72 @@
+<!--
+  Template: scatter/geo.html
+  Chart Type: Scatter on Geo Map (地理散点图)
+  Data Pattern: GEO_VALUE
+  Data Format: [{name: string, value: [lng, lat, val?]}, ...]
+  Covers: scatter-map, scatter-map-brush, effectScatter-map, effectScatter-bmap (4 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var geoCoordMap = {{GEO_COORD_MAP}};  // {"name": [lng, lat], ...}
+var rawData = {{DATA}};  // [{name: string, value: number}, ...]
+
+function convertData(data) {
+  return data.map(function(item) {
+    return {
+      name: item.name,
+      value: geoCoordMap[item.name] ? geoCoordMap[item.name].concat(item.value) : [0, 0, item.value]
+    };
+  });
+}
+
+var option = {
+  tooltip: {
+    trigger: 'item',
+    formatter: function(p) { return p.name + ': ' + (p.value[2] || p.value[1] || p.value[0]); }
+  },
+  geo: {
+    map: '{{MAP_NAME}}',    // 'china' | 'world' | province name
+    roam: true,
+    label: { show: false },
+    itemStyle: { areaColor: '#eee', borderColor: '#ccc' },
+    emphasis: { itemStyle: { areaColor: '#ffd54f' } }
+  },
+  visualMap: {
+    min: {{VMIN}},
+    max: {{VMAX}},
+    calculable: true,
+    inRange: { color: ['#50a3ba', '#eac736', '#d94e5d'] },
+    textStyle: { color: '#333' },
+    left: 'left'
+  },
+  series: [{
+    type: 'scatter',
+    coordinateSystem: 'geo',
+    data: convertData(rawData),
+    symbolSize: function(val) { return Math.sqrt(val[2]) / {{SIZE_SCALE}} || 8; },
+    encode: { value: 2 },
+    label: {
+      show: false,
+      formatter: '{b}',
+      position: 'right'
+    },
+    emphasis: {
+      label: { show: true }
+    }
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

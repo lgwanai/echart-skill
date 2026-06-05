@@ -1,0 +1,40 @@
+<!--
+  Template: 3d/globe.html
+  Chart Type: Globe (3D地球)
+  Data Pattern: (texture-based, no data OR scatter overlay)
+  Data Format: { layers?: [...], scatterData?: [[lng, lat, val], ...] }
+  Covers: globe-echarts-gl-hello-world, globe-atmosphere, globe-contour-paint,
+          globe-country-carousel, globe-displacement, globe-layers,
+          globe-moon, globe-with-echarts-surface, animating-contour-on-globe, iron-globe (10 examples)
+  NOTE: Requires echarts-gl extension
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  backgroundColor: '#000',
+  globe: {
+    baseTexture: '{{BASE_TEXTURE}}',
+    heightTexture: '{{HEIGHT_TEXTURE}}',
+    shading: '{{SHADING}}',
+    environment: '{{ENVIRONMENT}}',
+    {{LAYERS}}
+    light: { main: { intensity: 1.2 } },
+    viewControl: { autoRotate: {{AUTO_ROTATE}}, autoRotateSpeed: 0.5 }
+  }
+  {{SCATTER_SERIES}}
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>
