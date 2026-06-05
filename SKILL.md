@@ -581,12 +581,116 @@ LIMIT 10;
 ### Scenario 4: Chart Generation
 **Trigger**: User requests a visualization (bar, pie, line, scatter, map, funnel, 3D charts, Gantt, etc.).
 **Action**:
-1. Do NOT write custom Python scripts from scratch.
-2. We have a powerful template-based rendering engine. Use the built-in `scripts/chart_generator.py` script.
-3. This skill provides **100% support for all ECharts v6.0 chart types**. First, identify the required chart type. Look into `references/prompts/` directory to find the corresponding Prompt skeleton for the exact chart type (e.g., `references/prompts/line/stacked_area.md`). Read the prompt to understand the data structure requirements.
-4. Formulate the SQL query that aggregates the data correctly according to the prompt's requirements.
-5. Generate the `custom_js` and `echarts_option` based on the prompt template.
-6. Construct a JSON configuration file (save it in `outputs/configs/`) matching this structure:
+
+#### 🎯 ECharts 代码生成工作流 — 硬性约束（每次生成图表必须执行，不可跳过任何步骤）
+
+> ⛔ **红线规则：以下 4 步每步都必须执行。漏掉任何一步 = 生成的代码不可用。**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              ECharts 代码生成流程（MANDATORY）                     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ╔═══════════════════════════════════════════════════════════╗  │
+│  ║  Step 1: 双索引检索 — 不可跳过                             ║  │
+│  ╠═══════════════════════════════════════════════════════════╣  │
+│  ║  必须同时检索两个索引：                                     ║  │
+│  ║  ✅ 必读 references/knowledge/INDEX.md → 定位知识文件          ║  │
+│  ║  ✅ 必读 references/knowledge/examples/INDEX.md → 定位案例     ║  │
+│  ╚═══════════════════════════════════════════════════════════╝  │
+│                                                                 │
+│  ╔═══════════════════════════════════════════════════════════╗  │
+│  ║  Step 2: 读取知识片段 — 获取语法约束                        ║  │
+│  ╠═══════════════════════════════════════════════════════════╣  │
+│  ║  根据 Step 1 的 INDEX.md 结果，读取相关文件：               ║  │
+│  ║  ✅ chart-types/*.md → 图表类型配置语法、常见坑             ║  │
+│  ║  ✅ concepts/*.md → 核心概念（dataset/axis/style 等）      ║  │
+│  ║  ✅ patterns/*.md → 最佳实践、安全注意事项                  ║  │
+│  ║  ✅ api/*.md → 需要的方法签名                              ║  │
+│  ╚═══════════════════════════════════════════════════════════╝  │
+│                                                                 │
+│  ╔═══════════════════════════════════════════════════════════╗  │
+│  ║  Step 3: 读取案例代码 — 最关键的一步，绝对不可跳过！         ║  │
+│  ╠═══════════════════════════════════════════════════════════╣  │
+│  ║  根据 Step 1 的 examples/INDEX.md 结果：                   ║  │
+│  ║  ✅ 必须读取至少 1 个匹配案例的完整 main.js                 ║  │
+│  ║  ✅ 路径：/Users/wuliang/workspace/echarts-examples/       ║  │
+│  ║            <案例名>/main.js                                ║  │
+│  ║  ✅ 案例代码 = 可工作的真实配置 → 最可靠的语法参考           ║  │
+│  ║  ⚠️  没有案例参考的图表代码，正确率极低！                   ║  │
+│  ╚═══════════════════════════════════════════════════════════╝  │
+│                                                                 │
+│  ╔═══════════════════════════════════════════════════════════╗  │
+│  ║  Step 4: 聚合生成 — 知识 + 案例必须一起提交                 ║  │
+│  ╠═══════════════════════════════════════════════════════════╣  │
+│  ║  ✅ 知识片段 = 语法约束层（告诉你正确写法和禁止事项）        ║  │
+│  ║  ✅ 案例代码 = 真值参考层（告诉你实际怎么配置跑得通）        ║  │
+│  ║  ✅ 两者缺一不可，必须同时作为上下文                         ║  │
+│  ╚═══════════════════════════════════════════════════════════╝  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 🗺️ 检索决策树
+
+```
+用户请求图表
+    │
+    ├── 图表是什么类型？
+    │   ├── bar/line/pie/scatter → chart-types/0X-*.md
+    │   └── candlestick/radar/gauge/funnel/sankey/treemap/sunburst/
+    │       graph/tree/heatmap/parallel/boxplot/calendar/map/geo/
+    │       pictorialBar/themeRiver/custom → 直接用案例代码作主参考
+    │
+    ├── 需要什么概念？
+    │   ├── 数据绑定 → concepts/01-dataset.md
+    │   ├── 颜色/大小映射 → concepts/02-visual-map.md
+    │   ├── 数据筛选/排序 → concepts/03-data-transform.md
+    │   ├── 样式定制 → concepts/04-style.md
+    │   ├── 点击交互 → concepts/05-event.md
+    │   ├── 坐标轴配置 → concepts/06-axis.md
+    │   ├── 图例配置 → concepts/07-legend.md
+    │   └── 容器/响应式 → concepts/08-chart-size.md
+    │
+    ├── 需要什么模式？
+    │   ├── 渲染器选择 → patterns/01-canvas-vs-svg.md
+    │   ├── 动画效果 → patterns/02-animation.md
+    │   ├── 富文本标签 → patterns/03-rich-text.md
+    │   ├── 异步数据加载 → patterns/04-dynamic-data.md
+    │   ├── 窗口适配 → patterns/05-responsiveness.md
+    │   ├── 用户数据安全 → patterns/06-security.md
+    │   ├── 无障碍 → patterns/07-accessibility.md
+    │   ├── SVG 底图 → patterns/08-svg-base-map.md
+    │   ├── 拖拽交互 → patterns/09-drag-interaction.md
+    │   └── 按需引入 → patterns/10-import-strategy.md
+    │
+    └── 案例匹配（必须做！）
+        └── 查 examples/INDEX.md → 读 <匹配案例>/main.js
+```
+
+### 📂 文件路径速查
+
+| 类别 | 路径 |
+|------|------|
+| 知识库索引 | `references/knowledge/INDEX.md` |
+| 案例索引 | `references/knowledge/examples/INDEX.md` |
+| 概念文件 | `references/knowledge/concepts/` |
+| 图表类型文件 | `references/knowledge/chart-types/` |
+| API 文件 | `references/knowledge/api/` |
+| 模式文件 | `references/knowledge/patterns/` |
+| 案例代码 | `/Users/wuliang/workspace/echarts-examples/<案例名>/main.js` |
+
+> ⚠️ **已废弃**：`references/prompts/` 目录中的旧 Prompt 模板已被上述知识库 + 案例索引方案取代。该目录保留仅用于向后兼容，不再作为图表生成的主要参考源。新图表生成必须使用 `references/knowledge/` + 案例代码。
+
+---
+
+#### 📋 图表配置生成（原有流程）
+
+1. 执行上述 4 步工作流获取语法约束和参考代码。
+2. Do NOT write custom Python scripts from scratch. We have a powerful template-based rendering engine. Use the built-in `scripts/chart_generator.py` script.
+3. Formulate the SQL query that aggregates the data correctly.
+4. Generate the `custom_js` and `echarts_option` based on the knowledge + examples.
+5. Construct a JSON configuration file (save it in `outputs/configs/`) matching this structure:
    ```json
     {
         "db_path": "workspace.duckdb",
@@ -597,8 +701,40 @@ LIMIT 10;
        "custom_js": "..." // Optional JS logic for complex data binding
    }
 ```
-    *Note: All chart JS dependencies (like `echarts.min.js`, `china.js`, `bmap.min.js`) MUST use the local relative paths injected by the Python generator. DO NOT include any `<script src="https://cdn...">` remote links in the generated code to ensure offline support. Output files MUST be stored in the isolated `outputs/html/` directory.*
+    *Note: Output files MUST be stored in the isolated `outputs/html/` directory.*
     
+
+### 🔒 Single File 模式 — 硬性铁律
+
+> ⛔ **绝对禁止使用任何外部 URL 引用！！所有 CSS、JS、字体、地图数据必须内联到单个 HTML 文件中。**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Single File 铁律                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ❌ 禁止: <script src="https://cdn..."></script>                 │
+│  ❌ 禁止: <script src="echarts.min.js"></script>                 │
+│  ❌ 禁止: <link rel="stylesheet" href="...">                     │
+│  ❌ 禁止: <script src="./local-file.js"></script>                │
+│  ❌ 禁止: @import url(...)                                       │
+│  ❌ 禁止: $.get() fetch 远程 GeoJSON                             │
+│                                                                 │
+│  ✅ 必须: <script>/* echarts 完整库代码内联 */</script>          │
+│  ✅ 必须: <style>/* 所有 CSS 样式内联 */</style>                 │
+│  ✅ 必须: 地图数据由 generator 自动内联注入                       │
+│  ✅ 必须: 输出为单个 .html 文件，双击浏览器即可打开              │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**实现方式**：
+- `chart_generator.py` 会自动将 `echarts.min.js`、地图 JS 等依赖内联注入到 HTML 中
+- 生成 ECharts option 时，**不写任何 `<script src=...>` 或 `<link href=...>`**
+- 地图数据（china.js, world.js 等）由 generator 自动处理内联，不在 option 中引用
+- 百度地图 SDK 是唯一例外（必须远程加载），仅在用户配置了 `BAIDU_AK` 且使用 bmap 模式时才允许
+
+### ⚠️ ECharts 关键规则
     **CRITICAL ECHARTS RULES**:
     1. **Pie on Map**: The ECharts `pie` series DOES NOT support `coordinateSystem: 'geo'`. If the user asks to display data on a map, you MUST use `scatter` or `effectScatter` series with bubble sizes representing the values. NEVER attempt to put a pie chart on a geo map directly.
     

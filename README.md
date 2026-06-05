@@ -5,7 +5,7 @@
 ## 项目亮点
 
 - 🛡️ **绝对安全的数据隐私**：本技能要求 Agent 在本地存储数据（DuckDB），并在本地生成代码进行解析和计算。数据绝不出域，最大程度保障企业隐私。
-- 📊 **全量图表支持 (ECharts 6.0)**：内置数百种 ECharts 官方图表 Prompt 模板，**100% 覆盖 ECharts 所有图表类型**，包括 3D 气泡图、关系图、桑基图、漏斗图等。
+- 📊 **27 种图表 + 356 官方案例**：内置完整 ECharts 知识库和 **356 个官方案例索引**，覆盖 **27 种图表类型**（含 3D、地理、关系图、桑基图等），每个案例的 `main.js` 在生成代码时作为实时参考，确保图表配置准确可用。
 - 🧩 **自包含单文件 HTML**：生成的图表为完全自包含的单一 HTML 文件，ECharts 库和所有地图脚本均内联嵌入，离线可用，不受服务端口变化影响。
 - ⚙️ **灵活的服务配置**：本地预览服务默认为关闭状态；可通过 `echart_config.json` 配置启用、自定义输出目录、百度地图 AK 等。
 - 🗺️ **智能地图名称标准化**：自动将数据中的「北京市」「广东省」等全称规范化为地图所需的「北京」「广东」，确保地图渲染一次成功。
@@ -136,6 +136,40 @@
    ```
 
    免费申请地址：[百度地图开放平台](https://lbsyun.baidu.com/index.php?title=jspopularGL/guide/getkey)
+
+---
+
+## ECharts 图表生成工作流 ⛔ 硬性约束
+
+**每次生成 ECharts 图表代码，必须执行以下 4 步，不可跳过任何一步。**
+
+```
+Step 1: 双索引检索（两个索引都必须查）
+  ✅ 必读 references/knowledge/INDEX.md → 定位知识文件
+  ✅ 必读 references/knowledge/examples/INDEX.md → 定位匹配案例
+
+Step 2: 读取知识片段 → 语法约束
+  ✅ 读取对应的 chart-types / concepts / patterns / api 文件
+
+Step 3: 读取案例代码 → 最关键一步，禁止跳过
+  ✅ 必须读取至少 1 个匹配案例的 main.js
+  ⚠️  案例代码 = 真实可工作的配置，是最可靠的语法参考
+
+Step 4: 聚合生成 → 知识 + 案例一起作为上下文提交
+  ✅ 知识 = 语法约束层  |  案例 = 真值参考层  |  缺一不可
+```
+
+### 知识库结构
+
+```
+references/knowledge/                    案例代码（必读）：
+├── INDEX.md              主索引     /Users/wuliang/workspace/
+├── concepts/  8 个概念              echarts-examples/
+├── chart-types/  4 个图表            ├── bar-simple/main.js
+├── api/  6 个 API 参考               ├── line-smooth/main.js
+├── patterns/  10 个模式              ├── pie-doughnut/main.js
+└── examples/INDEX.md  356 个案例     └── ... (共 356 个)
+```
 
 ---
 
