@@ -2,7 +2,7 @@
 Configuration Manager for echart-skill.
 
 Provides centralized config loading with sensible defaults.
-Reads ``echart_config.json`` from the project root; auto-creates it
+Reads ``echart_config.txt`` from the project root; auto-creates it
 with defaults on first use if the file does not exist.
 
 Example:
@@ -15,11 +15,11 @@ Example:
 
 from __future__ import annotations
 
-import json
-import os
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
+
+from scripts.text_config import dump_txt_config, parse_txt_config
 
 
 # ---------------------------------------------------------------------------
@@ -28,7 +28,7 @@ from typing import Optional
 DEFAULT_PORT_RANGE = [8100, 8200]
 DEFAULT_OUTPUT_DIR = "outputs/html"
 
-# Path to the config JSON (project root)
+# Path to the config txt (project root)
 _CONFIG_PATH: Optional[Path] = None
 
 
@@ -57,14 +57,14 @@ class AppConfig:
 
 
 def _get_config_path() -> Path:
-    """Return the absolute path to ``echart_config.json`` in the project root."""
+    """Return the absolute path to ``echart_config.txt`` in the project root."""
     global _CONFIG_PATH
     if _CONFIG_PATH is not None:
         return _CONFIG_PATH
 
     # When imported as a module inside scripts/, the parent is the project root
     project_root = Path(__file__).resolve().parent.parent
-    _CONFIG_PATH = project_root / "echart_config.json"
+    _CONFIG_PATH = project_root / "echart_config.txt"
     return _CONFIG_PATH
 
 
@@ -92,9 +92,8 @@ def _load_raw() -> dict:
         return _default_config()
 
     try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except (json.JSONDecodeError, OSError):
+        data = parse_txt_config(config_path)
+    except (ValueError, OSError):
         # Corrupted file — overwrite with defaults
         _save_raw(_default_config())
         return _default_config()
@@ -112,7 +111,7 @@ def _save_raw(data: dict) -> None:
 
     tmp_path = config_path.with_suffix(".tmp")
     with open(tmp_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+        f.write(dump_txt_config(data))
     tmp_path.replace(config_path)
 
 

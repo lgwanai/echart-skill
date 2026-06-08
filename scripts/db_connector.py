@@ -3,7 +3,7 @@ Database Connector Module.
 
 Provides database connection and query execution for external databases:
 - DatabaseConnector: Abstract base class for database connections
-- SQLConnector: SQLAlchemy-based connector for MySQL, PostgreSQL, SQLite
+- SQLConnector: SQLAlchemy-based connector for MySQL and PostgreSQL
 
 Usage:
     from scripts.db_connector import SQLConnector
@@ -31,19 +31,14 @@ import re
 
 import duckdb
 import pandas as pd
-from sqlalchemy import create_engine, inspect, text
-from sqlalchemy.engine import Engine, Connection
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.pool import QueuePool
-from pymongo import MongoClient
-from pymongo.errors import PyMongoError
-from bson import ObjectId
 
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from logging_config import get_logger
 from scripts.db_config import ConnectionProfile
+from scripts.data_importer import init_meta_table
+from validators import quote_identifier, validate_table_name
 
 logger = get_logger(__name__)
 
@@ -137,7 +132,7 @@ class DatabaseConnector(ABC):
 class SQLConnector(DatabaseConnector):
     """SQLAlchemy-based connector for SQL databases.
     
-    Supports MySQL, PostgreSQL, and SQLite via SQLAlchemy Core.
+    Supports MySQL and PostgreSQL via SQLAlchemy Core.
     Uses connection pooling for efficient query execution.
     """
     
@@ -148,8 +143,8 @@ class SQLConnector(DatabaseConnector):
             config: Connection profile with database credentials
         """
         super().__init__(config)
-        self._engine: Optional[Engine] = None
-        self._connection: Optional[Connection] = None
+        self._engine: Optional[Any] = None
+        self._connection: Optional[Any] = None
         self._connection_string = self._build_connection_string()
     
     def _build_connection_string(self) -> str:
@@ -172,6 +167,10 @@ class SQLConnector(DatabaseConnector):
             return
         
         try:
+            from sqlalchemy import create_engine, text
+            from sqlalchemy.exc import SQLAlchemyError
+            from sqlalchemy.pool import QueuePool
+
             logger.info(
                 "Connecting to database",
                 db_type=self.config.type,
@@ -196,6 +195,10 @@ class SQLConnector(DatabaseConnector):
             self._connected = True
             logger.info("Database connection established", db_type=self.config.type)
             
+        except ImportError as e:
+            raise ImportError("External SQL connections require SQLAlchemy and a database driver. Install requirements-optional.txt.") from e
+        except ImportError as e:
+            raise ImportError("External SQL connections require SQLAlchemy and a database driver. Install requirements-optional.txt.") from e
         except SQLAlchemyError as e:
             error_msg = str(e)
             # Mask any credentials in error message
@@ -226,6 +229,9 @@ class SQLConnector(DatabaseConnector):
             self.connect()
         
         try:
+            from sqlalchemy import text
+            from sqlalchemy.exc import SQLAlchemyError
+
             logger.debug("Executing query", query_preview=query[:100] + "..." if len(query) > 100 else query)
             
             with self._engine.connect() as conn:
@@ -244,6 +250,8 @@ class SQLConnector(DatabaseConnector):
                 logger.info("Query executed", row_count=len(rows))
                 return rows
                 
+        except ImportError as e:
+            raise ImportError("External SQL connections require SQLAlchemy and a database driver. Install requirements-optional.txt.") from e
         except SQLAlchemyError as e:
             error_msg = str(e)
             logger.error("Query execution failed", error=error_msg, query=query[:200])
@@ -271,6 +279,9 @@ class SQLConnector(DatabaseConnector):
             self.connect()
         
         try:
+            from sqlalchemy import text
+            from sqlalchemy.exc import SQLAlchemyError
+
             with self._engine.connect() as conn:
                 # Enable streaming results
                 conn = conn.execution_options(stream_results=True)
@@ -321,6 +332,8 @@ class SQLConnector(DatabaseConnector):
             table_name=table_name,
             source_db=self.config.type
         )
+        table_name = validate_table_name(table_name)
+        table = quote_identifier(table_name)
         
         total_rows = 0
         first_chunk = True
@@ -339,20 +352,20 @@ class SQLConnector(DatabaseConnector):
                 
                 if first_chunk:
                     # Drop existing table
-                    duck_conn.execute(f"DROP TABLE IF EXISTS {table_name}")
+                    duck_conn.execute(f"DROP TABLE IF EXISTS {table}")
                     
                     # Create table from first chunk
                     # Infer schema from first row
                     import pandas as pd
                     df = pd.DataFrame(chunk)
-                    duck_conn.execute(f"CREATE TABLE {table_name} AS SELECT * FROM df")
+                    duck_conn.execute(f"CREATE TABLE {table} AS SELECT * FROM df")
                     first_chunk = False
                     logger.info("Created DuckDB table", table_name=table_name, columns=len(columns))
                 else:
                     # Insert subsequent chunks
                     placeholders = ", ".join(["?" for _ in columns])
                     duck_conn.executemany(
-                        f"INSERT INTO {table_name} VALUES ({placeholders})",
+                        f"INSERT INTO {table} VALUES ({placeholders})",
                         values
                     )
                 
@@ -361,12 +374,13 @@ class SQLConnector(DatabaseConnector):
                 if total_rows % 50000 == 0:
                     logger.info("Import progress", rows_imported=total_rows)
             
+            init_meta_table(duck_conn)
             # Track metadata
             duck_conn.execute("""
                 INSERT OR REPLACE INTO _data_skill_meta 
-                (table_name, source_type, source_path, row_count, created_at)
-                VALUES (?, 'database', ?, ?, CURRENT_TIMESTAMP)
-            """, [table_name, self._connection_string.split("@")[-1] if "@" in self._connection_string else "sqlite", total_rows])
+                (file_name, table_name, import_time, last_used_time, source_type, source_path, row_count, created_at)
+                VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'database', ?, ?, CURRENT_TIMESTAMP)
+            """, [table_name, table_name, self._connection_string.split("@")[-1] if "@" in self._connection_string else self.config.type, total_rows])
             
             logger.info("DuckDB import complete", table_name=table_name, total_rows=total_rows)
             return total_rows
@@ -400,6 +414,7 @@ class SQLConnector(DatabaseConnector):
             if not self._connected or self._engine is None:
                 self.connect()
             
+            from sqlalchemy import text
             with self._engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
             
@@ -409,7 +424,7 @@ class SQLConnector(DatabaseConnector):
             logger.warning("Connection test failed", error=str(e))
             return False
     
-    def get_engine(self) -> Engine:
+    def get_engine(self) -> Any:
         """Get the SQLAlchemy engine.
         
         Creates connection if not already connected.
@@ -428,6 +443,7 @@ class SQLConnector(DatabaseConnector):
             SQLAlchemy Inspector instance
         """
         engine = self.get_engine()
+        from sqlalchemy import inspect
         return inspect(engine)
 
 
@@ -447,7 +463,7 @@ class MongoDBConnector(DatabaseConnector):
             config: Connection profile with MongoDB URI
         """
         super().__init__(config)
-        self._client: Optional[MongoClient] = None
+        self._client: Optional[Any] = None
         self._database_name = self._extract_database_name()
     
     def _extract_database_name(self) -> str:
@@ -477,6 +493,9 @@ class MongoDBConnector(DatabaseConnector):
             return
         
         try:
+            from pymongo import MongoClient
+            from pymongo.errors import PyMongoError
+
             conn_str = self.config.get_connection_string()
             
             timeout_ms = int(self.config.timeout * 1000)
@@ -499,6 +518,8 @@ class MongoDBConnector(DatabaseConnector):
             self._connected = True
             logger.info("MongoDB connection established", database=self._database_name)
             
+        except ImportError as e:
+            raise ImportError("MongoDB connections require pymongo. Install requirements-optional.txt.") from e
         except PyMongoError as e:
             error_msg = str(e)
             logger.error("MongoDB connection failed", error=error_msg)
@@ -532,6 +553,8 @@ class MongoDBConnector(DatabaseConnector):
             filter_dict = query
         
         try:
+            from pymongo.errors import PyMongoError
+
             db = self._client[self._database_name]
             coll = db[collection]
             
@@ -565,6 +588,8 @@ class MongoDBConnector(DatabaseConnector):
         """
         result = {}
         for key, value in doc.items():
+            from bson import ObjectId
+
             if isinstance(value, ObjectId):
                 result[key] = str(value)
             elif isinstance(value, dict):
@@ -636,6 +661,8 @@ class MongoDBConnector(DatabaseConnector):
             collection=collection,
             table_name=table_name
         )
+        table_name = validate_table_name(table_name)
+        table = quote_identifier(table_name)
         
         documents = self.execute_query(query, collection=collection)
         
@@ -653,15 +680,16 @@ class MongoDBConnector(DatabaseConnector):
         duck_conn = duckdb.connect(db_path)
         
         try:
-            duck_conn.execute(f"DROP TABLE IF EXISTS {table_name}")
-            duck_conn.execute(f"CREATE TABLE {table_name} AS SELECT * FROM df")
+            duck_conn.execute(f"DROP TABLE IF EXISTS {table}")
+            duck_conn.execute(f"CREATE TABLE {table} AS SELECT * FROM df")
             
             source_path = f"mongodb://{self._database_name}/{collection}"
+            init_meta_table(duck_conn)
             duck_conn.execute("""
                 INSERT OR REPLACE INTO _data_skill_meta 
-                (table_name, source_type, source_path, row_count, created_at)
-                VALUES (?, 'database', ?, ?, CURRENT_TIMESTAMP)
-            """, [table_name, source_path, len(flattened)])
+                (file_name, table_name, import_time, last_used_time, source_type, source_path, row_count, created_at)
+                VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'database', ?, ?, CURRENT_TIMESTAMP)
+            """, [table_name, table_name, source_path, len(flattened)])
             
             logger.info("MongoDB import complete", table_name=table_name, rows=len(flattened))
             return len(flattened)
@@ -698,7 +726,7 @@ class MongoDBConnector(DatabaseConnector):
             logger.warning("MongoDB connection test failed", error=str(e))
             return False
     
-    def get_client(self) -> MongoClient:
+    def get_client(self) -> Any:
         """Get the MongoClient instance.
         
         Creates connection if not already connected.
@@ -747,7 +775,7 @@ def create_connector(config: ConnectionProfile) -> DatabaseConnector:
     Raises:
         ValueError: If database type is not supported
     """
-    if config.type in ("mysql", "postgresql", "sqlite"):
+    if config.type in ("mysql", "postgresql"):
         return SQLConnector(config)
     elif config.type == "mongodb":
         return MongoDBConnector(config)

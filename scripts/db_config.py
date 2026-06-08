@@ -2,16 +2,15 @@
 Database Configuration Module.
 
 Provides configuration loading and validation for external database connections.
-Supports MySQL, PostgreSQL, SQLite, and MongoDB with secure credential handling.
+Supports MySQL, PostgreSQL, and MongoDB with secure credential handling.
 
 Usage:
     from scripts.db_config import load_config, resolve_env_vars
     
-    config = load_config()  # Auto-discovers db_connections.json
+    config = load_config()  # Auto-discovers db_connections.txt
     profile = config.connections["my_mysql"]
 """
 
-import json
 import os
 import re
 from pathlib import Path
@@ -22,6 +21,7 @@ from pydantic import BaseModel, Field, SecretStr, field_validator
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from logging_config import get_logger
+from scripts.text_config import parse_txt_config
 
 logger = get_logger(__name__)
 
@@ -33,7 +33,7 @@ class ConnectionProfile(BaseModel):
     1. Full connection_string: "mysql://user:pass@host:port/db"
     2. Individual fields: host, port, database, username, password
     """
-    type: Literal["mysql", "postgresql", "sqlite", "mongodb"] = Field(
+    type: Literal["mysql", "postgresql", "mongodb"] = Field(
         description="Database type"
     )
     
@@ -51,7 +51,7 @@ class ConnectionProfile(BaseModel):
     password: Optional[SecretStr] = Field(default=None, description="Password (stored securely)")
     
     # Additional options
-    schema: Optional[str] = Field(default=None, description="Schema name (PostgreSQL)")
+    db_schema: Optional[str] = Field(default=None, description="Schema name (PostgreSQL)")
     timeout: float = Field(default=30.0, ge=1.0, le=300.0, description="Connection timeout in seconds")
     
     # MongoDB-specific
@@ -85,10 +85,6 @@ class ConnectionProfile(BaseModel):
         """Build or return the connection string for this profile."""
         if self.connection_string:
             return self.connection_string
-        
-        if self.type == "sqlite":
-            # SQLite: sqlite:///path/to/file.db
-            return f"sqlite:///{self.database}"
         
         if self.type == "mongodb":
             # MongoDB uses URI
@@ -152,9 +148,9 @@ def resolve_env_vars(value: str) -> str:
 
 
 def load_config(config_path: Optional[str] = None) -> DatabaseConfig:
-    """Load database configuration from JSON file.
+    """Load database configuration from txt file.
     
-    Auto-discovers db_connections.json if no path provided.
+    Auto-discovers db_connections.txt if no path provided.
     Searches current directory and parent directories.
     
     Args:
@@ -175,8 +171,7 @@ def load_config(config_path: Optional[str] = None) -> DatabaseConfig:
     
     logger.info(f"Loading database config from: {config_path}")
     
-    with open(config_path, 'r', encoding='utf-8') as f:
-        raw_data = json.load(f)
+    raw_data = parse_txt_config(config_path)
     
     # Validate with Pydantic
     config = DatabaseConfig(**raw_data)
@@ -190,7 +185,7 @@ def load_config(config_path: Optional[str] = None) -> DatabaseConfig:
 
 
 def _discover_config_file() -> str:
-    """Auto-discover db_connections.json in current or parent directories.
+    """Auto-discover db_connections.txt in current or parent directories.
     
     Returns:
         Path to config file
@@ -198,7 +193,7 @@ def _discover_config_file() -> str:
     Raises:
         FileNotFoundError: If no config file found
     """
-    filename = "db_connections.json"
+    filename = "db_connections.txt"
     
     # Start from current directory
     current = Path.cwd()
@@ -216,7 +211,7 @@ def _discover_config_file() -> str:
     
     raise FileNotFoundError(
         f"Could not find {filename} in current or parent directories. "
-        "Please create a db_connections.json file or specify --config path."
+        "Please create a db_connections.txt file or specify --config path."
     )
 
 

@@ -12,9 +12,9 @@ Each command accepts a config file path and optional flags:
     --theme         ECharts theme (default, dark)
 
 Examples:
-    %(prog)s export-chart chart_config.json
-    %(prog)s export-dashboard dashboard.json --output report.html
-    %(prog)s export-gantt tasks.json --title "Timeline" --theme dark
+    %(prog)s export-chart chart_config.txt
+    %(prog)s export-dashboard dashboard.txt --output report.html
+    %(prog)s export-gantt tasks.txt --title "Timeline" --theme dark
 """
 
 import argparse
@@ -169,9 +169,9 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s export-chart chart_config.json
-  %(prog)s export-dashboard dashboard.json --output report.html
-  %(prog)s export-gantt tasks.json --title "Project Timeline" --theme dark
+  %(prog)s export-chart chart_config.txt
+  %(prog)s export-dashboard dashboard.txt --output report.html
+  %(prog)s export-gantt tasks.txt --title "Project Timeline" --theme dark
 """
     )
     
@@ -179,7 +179,7 @@ Examples:
     
     # export-chart subcommand
     parser_chart = subparsers.add_parser('export-chart', help='Export chart as standalone HTML')
-    parser_chart.add_argument('config', help='Path to chart configuration JSON file')
+    parser_chart.add_argument('config', help='Path to chart configuration txt file')
     parser_chart.add_argument('--output', '-o', help='Output HTML file path (default: generated from title)')
     parser_chart.add_argument('--theme', choices=['default', 'dark'], default='default',
                               help='ECharts theme (default: default)')
@@ -187,7 +187,7 @@ Examples:
     
     # export-dashboard subcommand
     parser_dashboard = subparsers.add_parser('export-dashboard', help='Export dashboard as standalone HTML')
-    parser_dashboard.add_argument('config', help='Path to dashboard configuration JSON file')
+    parser_dashboard.add_argument('config', help='Path to dashboard configuration txt file')
     parser_dashboard.add_argument('--output', '-o', help='Output HTML file path (default: generated from title)')
     parser_dashboard.add_argument('--theme', choices=['default', 'dark'], default='default',
                                   help='ECharts theme (default: default)')
@@ -195,7 +195,7 @@ Examples:
     
     # export-gantt subcommand
     parser_gantt = subparsers.add_parser('export-gantt', help='Export Gantt chart as standalone HTML')
-    parser_gantt.add_argument('config', help='Path to Gantt chart configuration JSON file')
+    parser_gantt.add_argument('config', help='Path to Gantt chart configuration txt file')
     parser_gantt.add_argument('--output', '-o', help='Output HTML file path (default: generated from title)')
     parser_gantt.add_argument('--theme', choices=['default', 'dark'], default='default',
                               help='ECharts theme (default: default)')

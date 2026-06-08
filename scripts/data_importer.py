@@ -13,6 +13,7 @@ from typing import Iterator, List, Any, Optional
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import DatabaseRepository
+from validators import quote_identifier, sanitize_table_name, validate_table_name
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -61,29 +62,25 @@ def init_meta_table(conn):
     ''').fetchall()
     existing_columns = {row[0] for row in rows}
 
-    # Add URL columns if missing
-    url_columns = [
+    # Add missing columns for older or narrower metadata schemas.
+    extra_columns = [
+        ('file_name', 'TEXT'),
+        ('md5_hash', 'TEXT'),
+        ('import_time', 'DATETIME'),
+        ('last_used_time', 'DATETIME'),
         ('source_url', 'TEXT'),
         ('source_format', 'TEXT'),
         ('auth_type', 'TEXT'),
         ('last_refresh_time', 'DATETIME'),
-    ]
-
-    for col_name, col_type in url_columns:
-        if col_name not in existing_columns:
-            try:
-                conn.execute(f'ALTER TABLE _data_skill_meta ADD COLUMN {col_name} {col_type}')
-            except (duckdb.Error, Exception):
-                # Column might already exist from concurrent operation
-                pass
-
-    metadata_columns = [
         ('file_path', 'TEXT'),
         ('row_count', 'INTEGER'),
         ('parent_tables', 'TEXT'),
+        ('source_type', 'TEXT'),
+        ('source_path', 'TEXT'),
+        ('created_at', 'DATETIME'),
     ]
 
-    for col_name, col_type in metadata_columns:
+    for col_name, col_type in extra_columns:
         if col_name not in existing_columns:
             try:
                 conn.execute(f'ALTER TABLE _data_skill_meta ADD COLUMN {col_name} {col_type}')
@@ -226,6 +223,7 @@ def import_excel_streaming(
     db_path: str,
     table_name: str,
     conn,
+    sheet_name: str | int | None = None,
     drop_null_columns: bool = True
 ) -> Iterator[int]:
     """Import Excel using streaming (read_only mode).
@@ -241,7 +239,10 @@ def import_excel_streaming(
 
     # Open workbook in read-only mode for streaming
     wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
-    sheet = wb.active
+    if sheet_name is not None and sheet_name in wb.sheetnames:
+        sheet = wb[sheet_name]
+    else:
+        sheet = wb.active
 
     header: Optional[List[str]] = None
     row_buffer: List[tuple] = []
@@ -313,15 +314,17 @@ def _drop_null_columns(
     if not keep_columns:
         return
 
-    temp_table = f"{table_name}_clean"
+    table = quote_identifier(table_name)
+    temp_table_name = validate_table_name(f"{table_name}_clean")
+    temp_table = quote_identifier(temp_table_name)
     col_defs = ", ".join([f'"{col}" TEXT' for col in keep_columns])
     conn.execute(f"CREATE TABLE {temp_table} ({col_defs})")
 
     cols_str = ", ".join([f'"{col}"' for col in keep_columns])
-    conn.execute(f"INSERT INTO {temp_table} SELECT {cols_str} FROM {table_name}")
+    conn.execute(f"INSERT INTO {temp_table} SELECT {cols_str} FROM {table}")
 
-    conn.execute(f"DROP TABLE {table_name}")
-    conn.execute(f"ALTER TABLE {temp_table} RENAME TO {table_name}")
+    conn.execute(f"DROP TABLE {table}")
+    conn.execute(f"ALTER TABLE {temp_table} RENAME TO {table}")
 
 
 def _insert_chunk(
@@ -332,16 +335,19 @@ def _insert_chunk(
     is_first_chunk: bool
 ) -> None:
     """Insert a chunk of rows into the database."""
-    if is_first_chunk:
-        conn.execute(f"DROP TABLE IF EXISTS {table_name}")
-        col_defs = ", ".join([f'"{col}" TEXT' for col in columns])
-        conn.execute(f"CREATE TABLE {table_name} ({col_defs})")
+    table = quote_identifier(table_name)
+    df = pd.DataFrame(rows, columns=columns)
+    conn.register('_chunk_df', df)
+    try:
+        if is_first_chunk:
+            conn.execute(f"DROP TABLE IF EXISTS {table}")
+            conn.execute(f"CREATE TABLE {table} AS SELECT * FROM _chunk_df")
+        else:
+            conn.execute(f"INSERT INTO {table} SELECT * FROM _chunk_df")
+    finally:
+        conn.unregister('_chunk_df')
 
-    placeholders = ", ".join(["?" for _ in columns])
-    insert_sql = f"INSERT INTO {table_name} VALUES ({placeholders})"
-    conn.executemany(insert_sql, rows)
-
-def import_to_sqlite(file_path, db_path, table_name=None):
+def import_to_duckdb(file_path, db_path, table_name=None):
     """Import CSV/XLSX into DuckDB, handling complex headers and merged cells."""
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
@@ -350,7 +356,9 @@ def import_to_sqlite(file_path, db_path, table_name=None):
     base_name = os.path.splitext(os.path.basename(file_path))[0]
 
     if not table_name:
-        table_name = re.sub(r'\W+', '_', base_name).strip('_')
+        table_name = sanitize_table_name(base_name)
+    else:
+        table_name = validate_table_name(table_name)
 
     repo = DatabaseRepository(db_path)
 
@@ -366,6 +374,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
             return existing_tables
 
         def get_unique_table_name(base_name):
+            base_name = validate_table_name(base_name)
             t_name = base_name
             counter = 1
             while True:
@@ -380,12 +389,15 @@ def import_to_sqlite(file_path, db_path, table_name=None):
 
         def _df_to_duckdb(conn, df, table_name, if_exists='replace'):
             """Write a DataFrame to DuckDB using register + CREATE TABLE AS."""
+            table = quote_identifier(table_name)
             conn.register('_tmp_df', df)
-            if if_exists == 'replace':
-                conn.execute(f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM _tmp_df")
-            elif if_exists == 'append':
-                conn.execute(f"INSERT INTO {table_name} SELECT * FROM _tmp_df")
-            conn.unregister('_tmp_df')
+            try:
+                if if_exists == 'replace':
+                    conn.execute(f"CREATE OR REPLACE TABLE {table} AS SELECT * FROM _tmp_df")
+                elif if_exists == 'append':
+                    conn.execute(f"INSERT INTO {table} SELECT * FROM _tmp_df")
+            finally:
+                conn.unregister('_tmp_df')
 
         imported_tables = []
 
@@ -409,7 +421,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     _df_to_duckdb(conn, chunk, target_table, 'append')
 
             print(f"CSV import completed successfully.")
-            csv_row_count = conn.execute(f"SELECT COUNT(*) FROM {target_table}").fetchone()[0]
+            csv_row_count = conn.execute(f"SELECT COUNT(*) FROM {quote_identifier(target_table)}").fetchone()[0]
             record_import(conn, file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=csv_row_count)
             imported_tables.append(target_table)
 
@@ -428,9 +440,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
 
                 for sheet_name in sheet_names:
                     if len(sheet_names) > 1:
-                        safe_sheet_name = str(sheet_name).strip()
-                        safe_sheet_name = re.sub(r'\W+', '_', safe_sheet_name).strip('_')
-                        base_sheet_table = f"{table_name}_{safe_sheet_name}"
+                        base_sheet_table = sanitize_table_name(f"{table_name}_{sheet_name}")
                     else:
                         base_sheet_table = table_name
 
@@ -448,7 +458,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
 
                     sheet_file_name = f"{file_name}::{sheet_name}" if len(sheet_names) > 1 else file_name
-                    et_row_count = conn.execute(f"SELECT COUNT(*) FROM {target_table}").fetchone()[0]
+                    et_row_count = conn.execute(f"SELECT COUNT(*) FROM {quote_identifier(target_table)}").fetchone()[0]
                     record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=et_row_count)
                     imported_tables.append(target_table)
             else:
@@ -462,9 +472,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
 
                 for sheet_name in sheet_names:
                     if len(sheet_names) > 1:
-                        safe_sheet_name = str(sheet_name).strip()
-                        safe_sheet_name = re.sub(r'\W+', '_', safe_sheet_name).strip('_')
-                        base_sheet_table = f"{table_name}_{safe_sheet_name}"
+                        base_sheet_table = sanitize_table_name(f"{table_name}_{sheet_name}")
                     else:
                         base_sheet_table = table_name
 
@@ -472,7 +480,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                     print(f"Processing Excel sheet '{sheet_name}' to table '{target_table}'...")
 
                     total_rows = 0
-                    for progress in import_excel_streaming(file_path, db_path, target_table, conn):
+                    for progress in import_excel_streaming(file_path, db_path, target_table, conn, sheet_name=sheet_name):
                         total_rows = progress
                         if progress % 50000 == 0:
                             print(f"  Progress: {progress} rows processed...")
@@ -498,9 +506,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
             for sheet in sheets:
                 sheet_name = sheet.name
                 if len(sheets) > 1:
-                    safe_sheet_name = str(sheet_name).strip()
-                    safe_sheet_name = re.sub(r'\W+', '_', safe_sheet_name).strip('_')
-                    base_sheet_table = f"{table_name}_{safe_sheet_name}"
+                    base_sheet_table = sanitize_table_name(f"{table_name}_{sheet_name}")
                 else:
                     base_sheet_table = table_name
 
@@ -532,7 +538,7 @@ def import_to_sqlite(file_path, db_path, table_name=None):
                 print(f"Sheet '{sheet_name}' import completed. Loaded {len(df)} rows.")
 
                 sheet_file_name = f"{file_name}::{sheet_name}" if len(sheets) > 1 else file_name
-                numbers_row_count = conn.execute(f"SELECT COUNT(*) FROM {target_table}").fetchone()[0]
+                numbers_row_count = conn.execute(f"SELECT COUNT(*) FROM {quote_identifier(target_table)}").fetchone()[0]
                 record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=numbers_row_count)
                 imported_tables.append(target_table)
 
@@ -551,6 +557,8 @@ async def import_from_url(
 ) -> str:
     """Import data from URL into DuckDB."""
     from scripts.url_data_source import URLDataSource, URLDataSourceConfig, AuthConfig
+
+    table_name = validate_table_name(table_name)
 
     config = URLDataSourceConfig(
         url=url,
@@ -582,9 +590,12 @@ async def import_from_url(
 
             df = pd.DataFrame(records)
             df.columns = clean_column_names(df.columns.tolist())
+            table = quote_identifier(table_name)
             conn.register('_tmp_df', df)
-            conn.execute(f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM _tmp_df")
-            conn.unregister('_tmp_df')
+            try:
+                conn.execute(f"CREATE OR REPLACE TABLE {table} AS SELECT * FROM _tmp_df")
+            finally:
+                conn.unregister('_tmp_df')
 
             # Record import metadata
             auth_type = None
@@ -634,6 +645,7 @@ async def refresh_url_source(db_path: str, table_name: str) -> bool:
     """
     from scripts.url_data_source import URLDataSource, URLDataSourceConfig
 
+    table_name = validate_table_name(table_name)
     repo = DatabaseRepository(db_path)
 
     with repo.connection() as conn:
@@ -672,9 +684,12 @@ async def refresh_url_source(db_path: str, table_name: str) -> bool:
         # Clear table and re-insert
         df = pd.DataFrame(records)
         df.columns = clean_column_names(df.columns.tolist())
+        table = quote_identifier(table_name)
         conn.register('_tmp_df', df)
-        conn.execute(f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM _tmp_df")
-        conn.unregister('_tmp_df')
+        try:
+            conn.execute(f"CREATE OR REPLACE TABLE {table} AS SELECT * FROM _tmp_df")
+        finally:
+            conn.unregister('_tmp_df')
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         conn.execute('''
@@ -764,7 +779,7 @@ if __name__ == "__main__":  # pragma: no cover
         # Legacy mode: positional argument is input_file
         if hasattr(args, 'input_file') and args.input_file:
             try:
-                final_tables = import_to_sqlite(args.input_file, args.db, getattr(args, 'table', None))
+                final_tables = import_to_duckdb(args.input_file, args.db, getattr(args, 'table', None))
                 if isinstance(final_tables, list):
                     print(f"SUCCESS: Data imported into tables: {', '.join(final_tables)}")
                 else:
@@ -777,7 +792,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     if args.command == "file":
         try:
-            final_tables = import_to_sqlite(args.input_file, args.db, args.table)
+            final_tables = import_to_duckdb(args.input_file, args.db, args.table)
             if isinstance(final_tables, list):
                 print(f"SUCCESS: Data imported into tables: {', '.join(final_tables)}")
             else:
@@ -816,7 +831,7 @@ if __name__ == "__main__":  # pragma: no cover
 
             # Get row count
             conn = duckdb.connect(args.db)
-            row_count = conn.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()[0]
+            row_count = conn.execute(f"SELECT COUNT(*) FROM {quote_identifier(table_name)}").fetchone()[0]
             conn.close()
 
             print(f"Imported {row_count} rows into table '{table_name}' from {args.url}")
@@ -830,7 +845,7 @@ if __name__ == "__main__":  # pragma: no cover
 
             # Get row count
             conn = duckdb.connect(args.db)
-            row_count = conn.execute(f"SELECT COUNT(*) FROM {args.table}").fetchone()[0]
+            row_count = conn.execute(f"SELECT COUNT(*) FROM {quote_identifier(args.table)}").fetchone()[0]
             conn.close()
 
             print(f"Refreshed table '{args.table}' with {row_count} rows")

@@ -1,12 +1,11 @@
 """
-Test cases for DatabaseRepository with connection pooling and WAL mode.
+Test cases for DatabaseRepository with connection pooling and DuckDB settings.
 
 This module tests the DatabaseRepository class that implements connection
-pooling and WAL mode for SQLite databases to support concurrent access.
+pooling for DuckDB databases to support concurrent access.
 """
 
 import pytest
-import sqlite3
 import tempfile
 import os
 import threading
@@ -28,7 +27,7 @@ class TestConnectionPoolSize:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -48,7 +47,7 @@ class TestConnectionPoolSize:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -72,7 +71,7 @@ class TestConnectionContextManager:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -108,7 +107,7 @@ class TestConnectionContextManager:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -130,19 +129,19 @@ class TestConnectionContextManager:
             os.unlink(db_path)
 
 
-class TestWALMode:
-    """Test WAL mode configuration."""
+class TestDuckDBSettings:
+    """Test DuckDB connection configuration."""
 
-    def test_wal_mode_enabled(self):
-        """WAL mode is enabled on all connections.
+    def test_threads_setting_enabled(self):
+        """Parallel execution setting is enabled on all connections.
 
         Expected behavior:
-        - Query PRAGMA journal_mode
-        - Verify returns 'wal' for all connections
+        - Query current_setting('threads')
+        - Verify returns 4 for all connections
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -152,24 +151,24 @@ class TestWALMode:
             for _ in range(3):
                 with repo.connection() as conn:
                     cursor = conn.cursor()
-                    cursor.execute("PRAGMA journal_mode")
+                    cursor.execute("SELECT current_setting('threads')")
                     result = cursor.fetchone()
-                    assert result[0].lower() == 'wal'
+                    assert result[0] == 4
 
             repo.close_all()
         finally:
             os.unlink(db_path)
 
-    def test_synchronous_normal(self):
-        """SYNCHRONOUS is set to NORMAL for better WAL performance.
+    def test_memory_limit_setting(self):
+        """Memory limit is configured on connections.
 
         Expected behavior:
-        - Query PRAGMA synchronous
-        - Verify returns 1 (NORMAL)
+        - Query current_setting('memory_limit')
+        - Verify a bounded memory limit is configured
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -177,10 +176,10 @@ class TestWALMode:
 
             with repo.connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute("PRAGMA synchronous")
+                cursor.execute("SELECT current_setting('memory_limit')")
                 result = cursor.fetchone()
-                # NORMAL = 1
-                assert result[0] == 1
+                assert result[0]
+                assert result[0] != "unlimited"
 
             repo.close_all()
         finally:
@@ -200,7 +199,7 @@ class TestExecuteQuery:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -209,8 +208,8 @@ class TestExecuteQuery:
             # Create test table and insert data
             with repo.connection() as conn:
                 conn.execute("CREATE TABLE test_data (id INTEGER PRIMARY KEY, name TEXT, value REAL)")
-                conn.execute("INSERT INTO test_data (name, value) VALUES ('test1', 100)")
-                conn.execute("INSERT INTO test_data (name, value) VALUES ('test2', 200)")
+                conn.execute("INSERT INTO test_data (id, name, value) VALUES (1, 'test1', 100)")
+                conn.execute("INSERT INTO test_data (id, name, value) VALUES (2, 'test2', 200)")
                 conn.commit()
 
             # Query using execute_query
@@ -237,7 +236,7 @@ class TestExecuteQuery:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -245,9 +244,9 @@ class TestExecuteQuery:
 
             with repo.connection() as conn:
                 conn.execute("CREATE TABLE items (id INTEGER PRIMARY KEY, category TEXT)")
-                conn.execute("INSERT INTO items (category) VALUES ('A')")
-                conn.execute("INSERT INTO items (category) VALUES ('B')")
-                conn.execute("INSERT INTO items (category) VALUES ('A')")
+                conn.execute("INSERT INTO items (id, category) VALUES (1, 'A')")
+                conn.execute("INSERT INTO items (id, category) VALUES (2, 'B')")
+                conn.execute("INSERT INTO items (id, category) VALUES (3, 'A')")
                 conn.commit()
 
             results = repo.execute_query(
@@ -271,7 +270,7 @@ class TestExecuteQuery:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -303,7 +302,7 @@ class TestExecuteMany:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -315,9 +314,9 @@ class TestExecuteMany:
                 conn.commit()
 
             # Insert 100 rows with execute_many
-            rows = [(f"item_{i}", i * 10) for i in range(100)]
+            rows = [(i + 1, f"item_{i}", i * 10) for i in range(100)]
             count = repo.execute_many(
-                "INSERT INTO bulk_data (name, value) VALUES (?, ?)",
+                "INSERT INTO bulk_data (id, name, value) VALUES (?, ?, ?)",
                 rows
             )
 
@@ -341,7 +340,7 @@ class TestExecuteMany:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -386,7 +385,7 @@ class TestConcurrentRead:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -396,7 +395,7 @@ class TestConcurrentRead:
             with repo.connection() as conn:
                 conn.execute("CREATE TABLE concurrent_test (id INTEGER PRIMARY KEY, data TEXT)")
                 for i in range(100):
-                    conn.execute(f"INSERT INTO concurrent_test (data) VALUES ('data_{i}')")
+                    conn.execute(f"INSERT INTO concurrent_test (id, data) VALUES ({i + 1}, 'data_{i}')")
                 conn.commit()
 
             errors = []
@@ -441,7 +440,7 @@ class TestConcurrentRead:
         from database import DatabaseRepository
         import time
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -459,7 +458,7 @@ class TestConcurrentRead:
                 try:
                     for i in range(50):
                         with repo.connection() as conn:
-                            conn.execute(f"INSERT INTO rw_test (value) VALUES ({i})")
+                            conn.execute(f"INSERT INTO rw_test (id, value) VALUES ({i + 1}, {i})")
                             conn.commit()
                         time.sleep(0.001)  # Small delay to allow interleaving
                     write_complete.append(True)
@@ -515,7 +514,7 @@ class TestCloseAll:
         """
         from database import DatabaseRepository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -545,7 +544,7 @@ class TestGetRepository:
         """
         from database import get_repository, _repo
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:
@@ -575,7 +574,7 @@ class TestGetRepository:
         """
         from database import get_repository
 
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
 
         try:

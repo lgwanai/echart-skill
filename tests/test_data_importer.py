@@ -1,13 +1,13 @@
 import pytest
 import os
 import sys
-import sqlite3
+import duckdb
 import pandas as pd
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from scripts.data_importer import (
-    import_to_sqlite,
+    import_to_duckdb,
     clean_column_names,
     find_header_row,
     calculate_md5,
@@ -104,7 +104,7 @@ class TestCalculateMD5:
         assert calculate_md5(str(file1)) != calculate_md5(str(file2))
 
 
-class TestImportToSQLite:
+class TestImportToDuckDB:
     """Test file import functionality."""
 
     def test_csv_import(self, temp_db, tmp_path):
@@ -112,11 +112,11 @@ class TestImportToSQLite:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text("name,age\nAlice,25\nBob,30\n")
 
-        tables = import_to_sqlite(str(csv_file), temp_db)
+        tables = import_to_duckdb(str(csv_file), temp_db)
         assert len(tables) == 1
 
         # Verify data
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         df = pd.read_sql_query("SELECT * FROM test", conn)
         conn.close()
 
@@ -131,11 +131,11 @@ class TestImportToSQLite:
         excel_file = tmp_path / "test.xlsx"
         df.to_excel(str(excel_file), index=False)
 
-        tables = import_to_sqlite(str(excel_file), temp_db)
+        tables = import_to_duckdb(str(excel_file), temp_db)
         assert len(tables) == 1
 
         # Verify data
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         result = pd.read_sql_query("SELECT COUNT(*) as cnt FROM test", conn)
         conn.close()
 
@@ -147,17 +147,39 @@ class TestImportToSQLite:
         csv_file.write_text("name,age\nAlice,25\n")
 
         # First import
-        tables1 = import_to_sqlite(str(csv_file), temp_db)
+        tables1 = import_to_duckdb(str(csv_file), temp_db)
         assert len(tables1) == 1
 
         # Second import (same file)
-        tables2 = import_to_sqlite(str(csv_file), temp_db)
+        tables2 = import_to_duckdb(str(csv_file), temp_db)
         assert len(tables2) == 1  # Returns existing table
 
     def test_nonexistent_file(self, temp_db):
         """Nonexistent file should raise error."""
         with pytest.raises(FileNotFoundError):
-            import_to_sqlite("/nonexistent/file.csv", temp_db)
+            import_to_duckdb("/nonexistent/file.csv", temp_db)
+
+    def test_rejects_malicious_table_name(self, temp_db, tmp_path):
+        """Custom table names should be validated before SQL execution."""
+        csv_file = tmp_path / "malicious.csv"
+        csv_file.write_text("col\n1\n")
+
+        with pytest.raises(ValueError):
+            import_to_duckdb(
+                str(csv_file),
+                temp_db,
+                table_name="evil AS SELECT 1; DROP TABLE test_data;--",
+            )
+
+        conn = duckdb.connect(temp_db)
+        try:
+            exists = conn.execute(
+                "SELECT COUNT(*) FROM information_schema.tables WHERE table_name='test_data'"
+            ).fetchone()[0]
+        finally:
+            conn.close()
+
+        assert exists == 1
 
 
 class TestInitMetaTable:
@@ -165,11 +187,11 @@ class TestInitMetaTable:
 
     def test_meta_table_creation(self, temp_db):
         """Meta table should be created correctly."""
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         init_meta_table(conn)
 
         cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='_data_skill_meta'")
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_name='_data_skill_meta'")
         result = cursor.fetchone()
         conn.close()
 
@@ -182,7 +204,7 @@ class TestCheckDuplicateImport:
 
     def test_no_duplicate(self, temp_db):
         """Should return None for new file."""
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         init_meta_table(conn)
 
         result = check_duplicate_import(conn, "new_md5_hash")
@@ -195,7 +217,7 @@ class TestCheckDuplicateImport:
         import hashlib
         from datetime import datetime
 
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         init_meta_table(conn)
 
         # Insert a record manually
@@ -244,7 +266,7 @@ class TestRecordImport:
         """Record import should create metadata entry."""
         from datetime import datetime
 
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         init_meta_table(conn)
 
         record_import(conn, "test.csv", "test_table", "abc123")
@@ -269,7 +291,7 @@ class TestUnsupportedFormat:
         bad_file.write_text('{"key": "value"}')
 
         with pytest.raises(ValueError, match="Unsupported file format"):
-            import_to_sqlite(str(bad_file), temp_db)
+            import_to_duckdb(str(bad_file), temp_db)
 
 
 class TestImportWithCustomTableName:
@@ -280,13 +302,13 @@ class TestImportWithCustomTableName:
         csv_file = tmp_path / "data.csv"
         csv_file.write_text("col1,col2\n1,2\n")
 
-        tables = import_to_sqlite(str(csv_file), temp_db, table_name="my_custom_table")
+        tables = import_to_duckdb(str(csv_file), temp_db, table_name="my_custom_table")
         assert "my_custom_table" in tables
 
         # Verify table exists
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='my_custom_table'")
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_name='my_custom_table'")
         assert cursor.fetchone() is not None
         conn.close()
 
@@ -302,9 +324,20 @@ class TestMultiSheetExcel:
             pd.DataFrame({"col": ["a"]}).to_excel(writer, sheet_name="Sheet1", index=False)
             pd.DataFrame({"col": ["b"]}).to_excel(writer, sheet_name="Sheet2", index=False)
 
-        tables = import_to_sqlite(str(excel_file), temp_db)
+        tables = import_to_duckdb(str(excel_file), temp_db)
 
         assert len(tables) == 2
+
+        conn = duckdb.connect(temp_db)
+        try:
+            values = [
+                conn.execute(f'SELECT col FROM "{table}"').fetchone()[0]
+                for table in tables
+            ]
+        finally:
+            conn.close()
+
+        assert values == ["a", "b"]
 
 
 class TestExcelEdgeCases:
@@ -319,11 +352,11 @@ class TestExcelEdgeCases:
         })
         df.to_excel(str(excel_file), index=False)
 
-        tables = import_to_sqlite(str(excel_file), temp_db)
+        tables = import_to_duckdb(str(excel_file), temp_db)
         assert len(tables) == 1
 
         # Verify null rows were dropped
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         result = pd.read_sql_query("SELECT COUNT(*) as cnt FROM nulls", conn)
         conn.close()
 
@@ -338,11 +371,11 @@ class TestExcelEdgeCases:
         })
         df.to_excel(str(excel_file), index=False)
 
-        tables = import_to_sqlite(str(excel_file), temp_db)
+        tables = import_to_duckdb(str(excel_file), temp_db)
         assert len(tables) == 1
 
         # Verify null column was dropped
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         result = pd.read_sql_query("SELECT * FROM nullcols LIMIT 1", conn)
         conn.close()
 
@@ -361,10 +394,10 @@ class TestTableNameCollision:
         csv_file2.write_text("col1\nb\n")
 
         # First import
-        tables1 = import_to_sqlite(str(csv_file1), temp_db, table_name="mydata")
+        tables1 = import_to_duckdb(str(csv_file1), temp_db, table_name="mydata")
 
         # Second import with same table name (different content so not duplicate)
-        tables2 = import_to_sqlite(str(csv_file2), temp_db, table_name="mydata")
+        tables2 = import_to_duckdb(str(csv_file2), temp_db, table_name="mydata")
 
         # Should have different table names
         assert "mydata" in tables1
@@ -384,11 +417,11 @@ class TestChunkedCSVImport:
             for i in range(100):
                 f.write(f"{i},{i * 10}\n")
 
-        tables = import_to_sqlite(str(csv_file), temp_db)
+        tables = import_to_duckdb(str(csv_file), temp_db)
         assert len(tables) == 1
 
         # Verify all rows imported
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         result = pd.read_sql_query("SELECT COUNT(*) as cnt FROM large", conn)
         conn.close()
 
@@ -406,7 +439,7 @@ class TestNumbersFileImport:
 
         # This should raise ImportError for missing package or ValueError for invalid file
         with pytest.raises((ImportError, ValueError, Exception)):
-            import_to_sqlite(str(numbers_file), temp_db)
+            import_to_duckdb(str(numbers_file), temp_db)
 
 
 class TestExcelWithFallback:
@@ -420,7 +453,7 @@ class TestExcelWithFallback:
         df.to_excel(str(excel_file), index=False)
 
         # Import should succeed
-        tables = import_to_sqlite(str(excel_file), temp_db)
+        tables = import_to_duckdb(str(excel_file), temp_db)
         assert len(tables) == 1
 
 
@@ -440,7 +473,7 @@ class TestETFileImport:
         import shutil
         shutil.copy(str(xlsx_file), str(et_file))
 
-        tables = import_to_sqlite(str(et_file), temp_db)
+        tables = import_to_duckdb(str(et_file), temp_db)
         assert len(tables) == 1
 
 
@@ -451,7 +484,7 @@ class TestInitMetaTableUrlColumns:
         """Meta table should include URL source columns."""
         from scripts.data_importer import init_meta_table
 
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         init_meta_table(conn)
 
         # Check table structure
@@ -470,7 +503,7 @@ class TestInitMetaTableUrlColumns:
         """Should add URL columns if table exists without them."""
         from scripts.data_importer import init_meta_table
 
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         # Create old-style table without URL columns
         cursor = conn.cursor()
         cursor.execute('''
@@ -503,7 +536,7 @@ class TestImportFromUrl:
 
     @pytest.mark.asyncio
     async def test_import_from_url_json(self, temp_db):
-        """Import JSON data from URL to SQLite table."""
+        """Import JSON data from URL to DuckDB table."""
         import httpx
         import respx
         from scripts.data_importer import import_from_url
@@ -528,7 +561,7 @@ class TestImportFromUrl:
         assert table_name == "users"
 
         # Verify data was imported
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         df = pd.read_sql_query("SELECT * FROM users ORDER BY id", conn)
         conn.close()
 
@@ -538,7 +571,7 @@ class TestImportFromUrl:
 
     @pytest.mark.asyncio
     async def test_import_from_url_csv(self, temp_db):
-        """Import CSV data from URL to SQLite table."""
+        """Import CSV data from URL to DuckDB table."""
         import httpx
         import respx
         from scripts.data_importer import import_from_url
@@ -560,7 +593,7 @@ class TestImportFromUrl:
         assert table_name == "users_csv"
 
         # Verify data was imported
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         df = pd.read_sql_query("SELECT * FROM users_csv ORDER BY id", conn)
         conn.close()
 
@@ -587,7 +620,7 @@ class TestImportFromUrl:
             )
 
         # Verify metadata
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         sources = get_url_sources(conn)
         conn.close()
 
@@ -620,7 +653,7 @@ class TestImportFromUrl:
             )
 
         # Verify data imported
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         df = pd.read_sql_query("SELECT COUNT(*) as cnt FROM protected_data", conn)
         conn.close()
 
@@ -655,7 +688,7 @@ class TestGetUrlSources:
         from scripts.data_importer import init_meta_table, record_import, record_url_import, get_url_sources
         from datetime import datetime
 
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         init_meta_table(conn)
 
         # Add a file import
@@ -675,7 +708,7 @@ class TestGetUrlSources:
         """Should return empty list when no URL sources exist."""
         from scripts.data_importer import init_meta_table, get_url_sources
 
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         init_meta_table(conn)
 
         sources = get_url_sources(conn)
@@ -691,7 +724,7 @@ class TestRecordUrlImport:
         """record_url_import should store URL metadata correctly."""
         from scripts.data_importer import init_meta_table, record_url_import, get_url_sources
 
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         init_meta_table(conn)
 
         record_url_import(
@@ -738,7 +771,7 @@ class TestRefreshUrlSource:
             )
 
         # Verify initial data
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         df = pd.read_sql_query("SELECT COUNT(*) as cnt FROM refresh_test", conn)
         assert df["cnt"][0] == 2
         conn.close()
@@ -758,7 +791,7 @@ class TestRefreshUrlSource:
         assert result is True
 
         # Verify data was replaced
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         df = pd.read_sql_query("SELECT * FROM refresh_test ORDER BY id", conn)
         conn.close()
 
@@ -798,7 +831,7 @@ class TestRefreshUrlSource:
             await refresh_url_source(temp_db, "refresh_meta")
 
         # Verify last_refresh_time was updated
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         cursor = conn.cursor()
         cursor.execute('''
             SELECT import_time, last_refresh_time
@@ -818,7 +851,7 @@ class TestRefreshUrlSource:
         """Refresh should raise ValueError for non-URL table."""
         import httpx
         import respx
-        from scripts.data_importer import import_to_sqlite, refresh_url_source
+        from scripts.data_importer import import_to_duckdb, refresh_url_source
         import tempfile
 
         # Create a CSV file import (not URL)
@@ -827,7 +860,7 @@ class TestRefreshUrlSource:
             csv_path = f.name
 
         try:
-            import_to_sqlite(csv_path, temp_db, table_name="file_table")
+            import_to_duckdb(csv_path, temp_db, table_name="file_table")
 
             with pytest.raises(ValueError, match="not a URL data source"):
                 await refresh_url_source(temp_db, "file_table")

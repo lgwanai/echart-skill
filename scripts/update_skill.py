@@ -19,7 +19,7 @@ from pathlib import Path
 REPO_URL = "https://github.com/lgwanai/echart-skill.git"
 BACKUP_DIR = "backup"
 EXCLUDE_DIRS = {".git", "backup", "dist", "tmp", "outputs", "__pycache__", "node_modules"}
-EXCLUDE_FILES = {"workspace.db", "workspace.duckdb", ".DS_Store", "*.pyc", "*.log", "*.duckdb"}
+EXCLUDE_FILES = {"workspace.duckdb", "echart_config.txt", ".DS_Store", "*.pyc", "*.log", "*.duckdb"}
 
 
 def should_exclude(path: Path) -> bool:

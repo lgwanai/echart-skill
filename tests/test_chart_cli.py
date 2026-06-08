@@ -74,7 +74,7 @@ class TestCLIIntegration:
             "title": "Test Chart",
             "echarts_option": {"series": [{"type": "bar"}]}
         }
-        config_path = tmp_path / "config.json"
+        config_path = tmp_path / "config.txt"
         config_path.write_text(json.dumps(config), encoding='utf-8')
         return str(config_path)
     
@@ -139,7 +139,7 @@ class TestCLIIntegration:
     def test_export_dashboard_success(self, mock_export, tmp_path):
         """Test successful dashboard export."""
         config = {"title": "Test Dashboard", "charts": []}
-        config_path = tmp_path / "dashboard.json"
+        config_path = tmp_path / "dashboard.txt"
         config_path.write_text(json.dumps(config), encoding='utf-8')
         
         output_path = str(tmp_path / "output.html")
@@ -159,7 +159,7 @@ class TestCLIIntegration:
             "title": "Project Timeline",
             "tasks": [{"name": "Task 1", "start": "2024-01-01", "end": "2024-01-10"}]
         }
-        config_path = tmp_path / "gantt.json"
+        config_path = tmp_path / "gantt.txt"
         config_path.write_text(json.dumps(config), encoding='utf-8')
         
         output_path = str(tmp_path / "output.html")

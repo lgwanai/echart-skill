@@ -12,7 +12,8 @@ import json
 import os
 import sys
 import tempfile
-import sqlite3
+from pathlib import Path
+import duckdb
 import pytest
 
 # Mock the server and chart_generator modules before importing dashboard_generator
@@ -25,14 +26,15 @@ sys.modules['chart_generator'].get_baidu_ak = mock.MagicMock(return_value='test_
 
 @pytest.fixture
 def temp_db_with_data():
-    """Create a temporary SQLite database with sample data."""
-    with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+    """Create a temporary DuckDB database with sample data."""
+    with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
         db_path = f.name
+    os.unlink(db_path)
 
-    conn = sqlite3.connect(db_path)
+    conn = duckdb.connect(db_path)
     conn.execute('''
         CREATE TABLE products (
-            id INTEGER PRIMARY KEY,
+            id INTEGER,
             name TEXT,
             category TEXT,
             sales REAL
@@ -40,7 +42,7 @@ def temp_db_with_data():
     ''')
     conn.execute('''
         CREATE TABLE sales (
-            id INTEGER PRIMARY KEY,
+            id INTEGER,
             product_id INTEGER,
             quantity INTEGER,
             date TEXT
@@ -102,8 +104,8 @@ def sample_dashboard_config(temp_db_with_data):
 
 
 def build_config_file(config, temp_dir):
-    """Helper to write config to a temporary JSON file."""
-    config_path = os.path.join(temp_dir, "dashboard_config.json")
+    """Helper to write config to a temporary txt file."""
+    config_path = os.path.join(temp_dir, "dashboard_config.txt")
     with open(config_path, 'w', encoding='utf-8') as f:
         json.dump(config, f, ensure_ascii=False)
     return config_path
@@ -308,8 +310,8 @@ class TestHTMLGeneration:
 
         # The chart ID is passed as argument to IIFE, check for the pattern
         assert "echarts.init(document.getElementById(chartId))" in html
-        assert "'chart_chart1'" in html
-        assert "'chart_chart2'" in html
+        assert '"chart_chart1"' in html
+        assert '"chart_chart2"' in html
 
     def test_resize_handler_present(self, sample_dashboard_config, temp_output_dir):
         """HTML should contain window resize handler."""
@@ -484,7 +486,7 @@ class TestCLI:
              "--config", config_path, "--output", output_path],
             capture_output=True,
             text=True,
-            cwd="/Users/wuliang/workspace/echart-skill"
+            cwd=str(Path(__file__).resolve().parent.parent)
         )
 
         assert result.returncode == 0
@@ -503,7 +505,7 @@ class TestCLI:
              "--config", config_path, "--output", output_path],
             capture_output=True,
             text=True,
-            cwd="/Users/wuliang/workspace/echart-skill"
+            cwd=str(Path(__file__).resolve().parent.parent)
         )
 
         assert result.returncode == 0
@@ -519,10 +521,11 @@ class TestEmptyQueryWarning:
         from scripts.dashboard_schema import DashboardConfig, ChartConfig, ChartPosition
 
         # Create a temp db with no data
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
+        os.unlink(db_path)
 
-        conn = sqlite3.connect(db_path)
+        conn = duckdb.connect(db_path)
         conn.execute('CREATE TABLE empty_table (id INTEGER, name TEXT)')
         conn.commit()
         conn.close()

@@ -76,6 +76,34 @@ def test_api_key_fallback_to_config(monkeypatch, tmp_path):
         assert "已弃用" in str(w[0].message)
 
 
+def test_app_config_txt_roundtrip(monkeypatch, tmp_path):
+    """App config should read and write echart_config.txt."""
+    import scripts.config_manager as cm
+
+    config_file = tmp_path / "echart_config.txt"
+    monkeypatch.setattr(cm, "_CONFIG_PATH", config_file)
+    monkeypatch.setattr(cm, "_config_cache", None)
+
+    cfg = cm.get_config(reload=True)
+    assert config_file.exists()
+    assert cfg.server.enabled is False
+    assert cfg.server.port_range == [8100, 8200]
+
+    config_file.write_text(
+        "server.enabled=true\n"
+        "server.port_range=8201,8210\n"
+        "output.dir=custom/html\n"
+        "baidu_ak=abc123\n",
+        encoding="utf-8",
+    )
+
+    cfg = cm.get_config(reload=True)
+    assert cfg.server.enabled is True
+    assert cfg.server.port_range == [8201, 8210]
+    assert cfg.output.dir == "custom/html"
+    assert cfg.baidu_ak == "abc123"
+
+
 def test_api_key_missing(monkeypatch):
     """Missing API key should return None."""
     # Ensure no env var and no config

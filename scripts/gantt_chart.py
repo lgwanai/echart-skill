@@ -331,7 +331,7 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument(
         "--config",
         required=True,
-        help="JSON string or path to JSON file containing Gantt configuration",
+        help="JSON string or path to .txt file containing Gantt configuration",
     )
 
     args = parser.parse_args()

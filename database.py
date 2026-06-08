@@ -11,11 +11,15 @@ Features:
 - High-level methods for common operations
 """
 
-import duckdb
-import threading
 import atexit
+import os
+import queue
+import threading
 from contextlib import contextmanager
-from typing import Iterator, Any, Optional
+from pathlib import Path
+from typing import Iterator, Optional
+
+import duckdb
 
 
 class DatabaseRepository:
@@ -46,7 +50,7 @@ class DatabaseRepository:
             pool_size: Number of connections in the pool (default: 5).
         """
         self._db_path = db_path
-        self._pool: list[duckdb.DuckDBPyConnection] = []
+        self._pool: queue.Queue[duckdb.DuckDBPyConnection] = queue.Queue()
         self._lock = threading.Lock()
         self._initialize_pool(pool_size)
 
@@ -62,7 +66,7 @@ class DatabaseRepository:
         """
         for _ in range(size):
             conn = self._create_connection()
-            self._pool.append(conn)
+            self._pool.put(conn)
 
     def _create_connection(self) -> duckdb.DuckDBPyConnection:
         """Create a single DuckDB connection with optimal settings.
@@ -70,10 +74,23 @@ class DatabaseRepository:
         Returns:
             duckdb.DuckDBPyConnection: A configured DuckDB connection.
         """
+        self._prepare_database_path()
         conn = duckdb.connect(self._db_path)
         conn.execute("SET threads=4")
         conn.execute("SET memory_limit='2GB'")
         return conn
+
+    def _prepare_database_path(self) -> None:
+        """Ensure DuckDB can create or open the configured database file."""
+        if self._db_path == ":memory:":
+            return
+
+        db_path = Path(self._db_path)
+        if db_path.parent and str(db_path.parent) != ".":
+            db_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if db_path.exists() and db_path.is_file() and db_path.stat().st_size == 0:
+            db_path.unlink()
 
     @contextmanager
     def connection(self) -> Iterator[duckdb.DuckDBPyConnection]:
@@ -89,16 +106,14 @@ class DatabaseRepository:
             >>> with repo.connection() as conn:
             ...     conn.execute("SELECT 1")
         """
-        with self._lock:
-            if self._pool:
-                conn = self._pool.pop()
-            else:
-                conn = duckdb.connect(self.db_path)
+        try:
+            conn = self._pool.get_nowait()
+        except queue.Empty:
+            conn = self._create_connection()
         try:
             yield conn
         finally:
-            with self._lock:
-                self._pool.append(conn)
+            self._pool.put(conn)
 
     def execute_query(self, query: str, params: tuple = ()) -> list[dict]:
         """Execute a parameterized SELECT query and return results.
@@ -146,7 +161,7 @@ class DatabaseRepository:
         """
         with self.connection() as conn:
             conn.executemany(query, params_list)
-            return conn.rowcount
+            return conn.rowcount if conn.rowcount != -1 else len(params_list)
 
     def close_all(self) -> None:
         """Close all connections in the pool.
@@ -155,13 +170,14 @@ class DatabaseRepository:
         needed to release database resources.
         """
         with self._lock:
-            for conn in self._pool:
+            while not self._pool.empty():
+                conn = self._pool.get_nowait()
                 conn.close()
-            self._pool.clear()
 
 
-# Module-level singleton for backward compatibility
+# Module-level repositories keyed by DuckDB path.
 _repo: Optional[DatabaseRepository] = None
+_repositories: dict[str, DatabaseRepository] = {}
 _get_repo_lock = threading.Lock()
 
 
@@ -183,17 +199,21 @@ def get_repository(db_path: str = "workspace.duckdb") -> DatabaseRepository:
         ...     conn.execute("SELECT 1")
     """
     global _repo
-    if _repo is None:
+    key = os.path.abspath(db_path) if db_path != ":memory:" else db_path
+
+    if key not in _repositories:
         with _get_repo_lock:
-            if _repo is None:
-                _repo = DatabaseRepository(db_path)
+            if key not in _repositories:
+                _repositories[key] = DatabaseRepository(db_path)
+                _repo = _repositories[key]
                 atexit.register(_cleanup_repo)
-    return _repo
+    return _repositories[key]
 
 
 def _cleanup_repo() -> None:
     """Cleanup function registered with atexit."""
     global _repo
-    if _repo is not None:
-        _repo.close_all()
-        _repo = None
+    for repo in list(_repositories.values()):
+        repo.close_all()
+    _repositories.clear()
+    _repo = None

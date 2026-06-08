@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 from typing import Final
 
 TABLE_NAME_PATTERN: Final = re.compile(r'^[a-zA-Z][a-zA-Z0-9_]*$')
@@ -42,6 +43,30 @@ def validate_table_name(table_name: str) -> str:
         raise ValueError(f"'{table_name}' 是 SQL 保留字，不能作为表名")
 
     return table_name
+
+
+def sanitize_table_name(name: str, default: str = "data") -> str:
+    """Convert arbitrary text into a safe DuckDB table name."""
+    stem = Path(str(name)).stem
+    sanitized = re.sub(r'\W+', '_', stem).strip('_')
+
+    if not sanitized:
+        sanitized = default
+
+    if not sanitized[0].isalpha():
+        sanitized = f"{default}_{sanitized}"
+
+    sanitized = sanitized[:MAX_TABLE_NAME_LENGTH].rstrip('_') or default
+
+    if sanitized.lower() in SQL_RESERVED_WORDS:
+        sanitized = f"{sanitized}_table"
+
+    return validate_table_name(sanitized)
+
+
+def quote_identifier(identifier: str) -> str:
+    """Validate and quote a SQL identifier for DuckDB."""
+    return f'"{validate_table_name(identifier)}"'
 
 
 def validate_file_path(

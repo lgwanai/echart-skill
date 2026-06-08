@@ -221,6 +221,32 @@ class TestURLDataSourceConfig:
                 timeout=0.5
             )
 
+    def test_config_rejects_invalid_table_name(self):
+        """Table names should be validated at config boundaries."""
+        from scripts.url_data_source import URLDataSourceConfig
+
+        with pytest.raises(ValidationError):
+            URLDataSourceConfig(
+                url="https://example.com/data",
+                format="json",
+                table_name="evil; DROP TABLE users;--",
+            )
+
+    @pytest.mark.asyncio
+    async def test_fetch_rejects_private_network_url(self):
+        """Private network URLs should be blocked by default."""
+        from scripts.url_data_source import URLDataSource, URLDataSourceConfig
+
+        config = URLDataSourceConfig(
+            url="http://127.0.0.1/data",
+            format="json",
+            table_name="test_table",
+        )
+
+        source = URLDataSource(config)
+        with pytest.raises(ValueError, match="Private or localhost"):
+            await source.fetch()
+
         # Above maximum
         with pytest.raises(ValidationError):
             URLDataSourceConfig(
@@ -644,9 +670,9 @@ class TestURLDataSourceParse:
         assert records[0]["age"] == 30
         assert records[1]["city"] == "Shanghai"
 
-    def test_infer_schema_returns_sqlite_types(self):
+    def test_infer_schema_returns_duckdb_types(self):
         """
-        Test that infer_schema_from_json returns SQLite types.
+        Test that infer_schema_from_json returns DuckDB-compatible types.
 
         Expected behavior:
         - int64 -> INTEGER

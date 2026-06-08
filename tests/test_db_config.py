@@ -1,6 +1,4 @@
 """Tests for database configuration module."""
-
-import json
 import os
 import tempfile
 from pathlib import Path
@@ -59,12 +57,6 @@ class TestResolveEnvVars:
 class TestConnectionProfile:
     """Tests for ConnectionProfile model."""
     
-    def test_sqlite_with_path(self):
-        """SQLite profile with database path."""
-        profile = ConnectionProfile(type="sqlite", database="/path/to/db.sqlite")
-        assert profile.type == "sqlite"
-        assert profile.database == "/path/to/db.sqlite"
-    
     def test_mysql_with_individual_fields(self):
         """MySQL profile with host, port, username, password."""
         profile = ConnectionProfile(
@@ -115,12 +107,6 @@ class TestConnectionProfile:
         # str() should not reveal password
         assert "secret" not in str(profile)
     
-    def test_get_connection_string_sqlite(self):
-        """Build SQLite connection string."""
-        profile = ConnectionProfile(type="sqlite", database="/tmp/test.db")
-        conn_str = profile.get_connection_string()
-        assert conn_str == "sqlite:////tmp/test.db"
-    
     def test_get_connection_string_mysql(self):
         """Build MySQL connection string with pymysql driver."""
         profile = ConnectionProfile(
@@ -159,7 +145,7 @@ class TestConnectionProfile:
     
     def test_default_timeout(self):
         """Default timeout is 30 seconds."""
-        profile = ConnectionProfile(type="sqlite", database=":memory:")
+        profile = ConnectionProfile(type="mysql", host="localhost", database="test")
         assert profile.timeout == 30.0
     
     def test_invalid_type_rejected(self):
@@ -170,7 +156,7 @@ class TestConnectionProfile:
     def test_extra_fields_rejected(self):
         """Extra fields are rejected."""
         with pytest.raises(Exception):  # Pydantic validation error
-            ConnectionProfile(type="sqlite", database="db", unknown_field="value")
+            ConnectionProfile(type="mysql", database="db", unknown_field="value")
 
 
 class TestDatabaseConfig:
@@ -185,27 +171,27 @@ class TestDatabaseConfig:
         """Config with single connection."""
         config = DatabaseConfig(
             connections={
-                "main": ConnectionProfile(type="sqlite", database="main.db")
+                "main": ConnectionProfile(type="mysql", host="localhost", database="main")
             }
         )
         assert "main" in config.connections
-        assert config.connections["main"].type == "sqlite"
+        assert config.connections["main"].type == "mysql"
     
     def test_multiple_connections(self):
         """Config with multiple connections."""
         config = DatabaseConfig(
             connections={
-                "sqlite_local": ConnectionProfile(type="sqlite", database="local.db"),
                 "mysql_prod": ConnectionProfile(
                     type="mysql",
                     host="prod.example.com",
                     database="production"
-                )
+                ),
+                "mongo_logs": ConnectionProfile(type="mongodb", uri="mongodb://localhost:27017/logs")
             }
         )
         assert len(config.connections) == 2
-        assert "sqlite_local" in config.connections
         assert "mysql_prod" in config.connections
+        assert "mongo_logs" in config.connections
 
 
 class TestLoadConfig:
@@ -213,36 +199,33 @@ class TestLoadConfig:
     
     def test_load_valid_config(self, tmp_path):
         """Load a valid config file."""
-        config_file = tmp_path / "db_connections.json"
-        config_file.write_text(json.dumps({
-            "connections": {
-                "test_db": {
-                    "type": "sqlite",
-                    "database": "/tmp/test.db"
-                }
-            }
-        }))
+        config_file = tmp_path / "db_connections.txt"
+        config_file.write_text(
+            "[connections.test_db]\n"
+            "type=mysql\n"
+            "host=localhost\n"
+            "database=test\n",
+            encoding="utf-8",
+        )
         
         config = load_config(str(config_file))
         assert "test_db" in config.connections
-        assert config.connections["test_db"].type == "sqlite"
+        assert config.connections["test_db"].type == "mysql"
     
     def test_load_config_with_env_vars(self, tmp_path, monkeypatch):
         """Config with ${VAR} placeholders are resolved."""
         monkeypatch.setenv("DB_PASSWORD", "secret123")
         
-        config_file = tmp_path / "db_connections.json"
-        config_file.write_text(json.dumps({
-            "connections": {
-                "mysql_prod": {
-                    "type": "mysql",
-                    "host": "localhost",
-                    "database": "production",
-                    "username": "app",
-                    "password": "${DB_PASSWORD}"
-                }
-            }
-        }))
+        config_file = tmp_path / "db_connections.txt"
+        config_file.write_text(
+            "[connections.mysql_prod]\n"
+            "type=mysql\n"
+            "host=localhost\n"
+            "database=production\n"
+            "username=app\n"
+            "password=${DB_PASSWORD}\n",
+            encoding="utf-8",
+        )
         
         config = load_config(str(config_file))
         assert config.connections["mysql_prod"].password.get_secret_value() == "secret123"
@@ -250,27 +233,25 @@ class TestLoadConfig:
     def test_file_not_found(self):
         """Raises FileNotFoundError for missing file."""
         with pytest.raises(FileNotFoundError):
-            load_config("/nonexistent/path/config.json")
+            load_config("/nonexistent/path/config.txt")
     
-    def test_invalid_json(self, tmp_path):
-        """Raises error for invalid JSON."""
-        config_file = tmp_path / "db_connections.json"
-        config_file.write_text("{ invalid json }")
+    def test_invalid_txt(self, tmp_path):
+        """Raises error for invalid txt config."""
+        config_file = tmp_path / "db_connections.txt"
+        config_file.write_text("invalid line", encoding="utf-8")
         
         with pytest.raises(Exception):
             load_config(str(config_file))
     
     def test_auto_discovery(self, tmp_path, monkeypatch):
         """Auto-discover config in current directory."""
-        config_file = tmp_path / "db_connections.json"
-        config_file.write_text(json.dumps({
-            "connections": {
-                "auto_found": {
-                    "type": "sqlite",
-                    "database": ":memory:"
-                }
-            }
-        }))
+        config_file = tmp_path / "db_connections.txt"
+        config_file.write_text(
+            "[connections.auto_found]\n"
+            "type=mongodb\n"
+            "uri=mongodb://localhost:27017/test\n",
+            encoding="utf-8",
+        )
         
         # Change to temp directory
         original_cwd = Path.cwd()
@@ -304,7 +285,7 @@ class TestMaskConnectionString:
     
     def test_no_password(self):
         """Connection string without password."""
-        conn_str = "sqlite:////path/to/file.db"
+        conn_str = "mongodb://localhost:27017/db"
         masked = _mask_connection_string(conn_str)
         assert masked == conn_str
 
@@ -314,23 +295,22 @@ class TestGetConnection:
     
     def test_get_existing_connection(self, tmp_path):
         """Get an existing connection profile."""
-        config_file = tmp_path / "db_connections.json"
-        config_file.write_text(json.dumps({
-            "connections": {
-                "my_sqlite": {
-                    "type": "sqlite",
-                    "database": "/tmp/test.db"
-                }
-            }
-        }))
+        config_file = tmp_path / "db_connections.txt"
+        config_file.write_text(
+            "[connections.my_mysql]\n"
+            "type=mysql\n"
+            "host=localhost\n"
+            "database=test\n",
+            encoding="utf-8",
+        )
         
-        profile = get_connection("my_sqlite", str(config_file))
-        assert profile.type == "sqlite"
+        profile = get_connection("my_mysql", str(config_file))
+        assert profile.type == "mysql"
     
     def test_get_nonexistent_connection(self, tmp_path):
         """Raise KeyError for nonexistent profile."""
-        config_file = tmp_path / "db_connections.json"
-        config_file.write_text(json.dumps({"connections": {}}))
+        config_file = tmp_path / "db_connections.txt"
+        config_file.write_text("", encoding="utf-8")
         
         with pytest.raises(KeyError) as exc_info:
             get_connection("nonexistent", str(config_file))

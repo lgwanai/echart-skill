@@ -1,7 +1,7 @@
 import pytest
 import os
 import sys
-import sqlite3
+import duckdb
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -12,7 +12,7 @@ import unittest.mock as mock
 sys.modules['server'] = mock.MagicMock()
 sys.modules['server'].ensure_server_running = mock.MagicMock(return_value='http://localhost:8080')
 
-from scripts.data_importer import import_to_sqlite
+from scripts.data_importer import import_to_duckdb
 from scripts.data_exporter import export_data
 from scripts.chart_generator import generate_chart
 from scripts.data_cleaner import clean_old_data
@@ -29,10 +29,10 @@ class TestImportExportWorkflow:
         source_csv.write_text(source_data, encoding='utf-8')
 
         # Create temp database
-        db_path = tmp_path / "test.db"
+        db_path = tmp_path / "test.duckdb"
 
         # Import
-        tables = import_to_sqlite(str(source_csv), str(db_path))
+        tables = import_to_duckdb(str(source_csv), str(db_path))
         assert len(tables) == 1
         table_name = tables[0]
 
@@ -58,10 +58,10 @@ class TestImportExportWorkflow:
         df.to_excel(str(excel_file), index=False)
 
         # Create temp database
-        db_path = tmp_path / "chart.db"
+        db_path = tmp_path / "chart.duckdb"
 
         # Import
-        tables = import_to_sqlite(str(excel_file), str(db_path))
+        tables = import_to_duckdb(str(excel_file), str(db_path))
         assert len(tables) == 1
 
         # Generate chart
@@ -97,14 +97,14 @@ class TestMetadataWorkflow:
         """Import should create metadata entries."""
         csv_file = tmp_path / "data.csv"
         csv_file.write_text("col1,col2\n1,2\n")
-        db_path = tmp_path / "meta.db"
+        db_path = tmp_path / "meta.duckdb"
 
-        import_to_sqlite(str(csv_file), str(db_path))
+        import_to_duckdb(str(csv_file), str(db_path))
 
         # Check metadata table
-        conn = sqlite3.connect(str(db_path))
+        conn = duckdb.connect(str(db_path))
         cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='_data_skill_meta'")
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_name='_data_skill_meta'")
         assert cursor.fetchone() is not None
 
         cursor.execute("SELECT COUNT(*) FROM _data_skill_meta")
@@ -117,12 +117,12 @@ class TestMetadataWorkflow:
         """Re-importing same file should update last_used_time."""
         csv_file = tmp_path / "data.csv"
         csv_file.write_text("col1,col2\n1,2\n")
-        db_path = tmp_path / "dup.db"
+        db_path = tmp_path / "dup.duckdb"
 
         # First import
-        import_to_sqlite(str(csv_file), str(db_path))
+        import_to_duckdb(str(csv_file), str(db_path))
 
-        conn = sqlite3.connect(str(db_path))
+        conn = duckdb.connect(str(db_path))
         cursor = conn.cursor()
         cursor.execute("SELECT last_used_time FROM _data_skill_meta")
         time1 = cursor.fetchone()[0]
@@ -132,7 +132,7 @@ class TestMetadataWorkflow:
         time.sleep(1)
 
         # Second import (same file)
-        import_to_sqlite(str(csv_file), str(db_path))
+        import_to_duckdb(str(csv_file), str(db_path))
 
         cursor.execute("SELECT last_used_time FROM _data_skill_meta")
         time2 = cursor.fetchone()[0]
@@ -149,13 +149,13 @@ class TestCleanupWorkflow:
         """Clean old data should remove stale tables."""
         csv_file = tmp_path / "old_data.csv"
         csv_file.write_text("col1,col2\n1,2\n")
-        db_path = tmp_path / "clean.db"
+        db_path = tmp_path / "clean.duckdb"
 
         # Import data
-        import_to_sqlite(str(csv_file), str(db_path))
+        import_to_duckdb(str(csv_file), str(db_path))
 
         # Manually set old timestamp
-        conn = sqlite3.connect(str(db_path))
+        conn = duckdb.connect(str(db_path))
         conn.execute('''
             UPDATE _data_skill_meta
             SET last_used_time = '2000-01-01 00:00:00'
@@ -167,9 +167,9 @@ class TestCleanupWorkflow:
         clean_old_data(str(db_path), days=30)
 
         # Verify table was removed
-        conn = sqlite3.connect(str(db_path))
+        conn = duckdb.connect(str(db_path))
         cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='old_data'")
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_name='old_data'")
         result = cursor.fetchone()
         conn.close()
 
@@ -183,9 +183,9 @@ class TestSecurityIntegration:
         """SQL injection should be blocked in export."""
         csv_file = tmp_path / "safe.csv"
         csv_file.write_text("name,value\ntest,1\n")
-        db_path = tmp_path / "sec.db"
+        db_path = tmp_path / "sec.duckdb"
 
-        import_to_sqlite(str(csv_file), str(db_path))
+        import_to_duckdb(str(csv_file), str(db_path))
 
         export_path = tmp_path / "output.csv"
 

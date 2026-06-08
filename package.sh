@@ -54,13 +54,13 @@ EXCLUDES=(
     "*.DS_Store"
     "idea.md"
     "package.sh"
-    "workspace.db"
     "workspace.duckdb"
     "dist/*"
     "tmp/*"
     "outputs/*"
     "logs/*"
     "config.txt"
+    "echart_config.txt"
     "*.skill"
 )
 

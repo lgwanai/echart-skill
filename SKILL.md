@@ -35,7 +35,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | `/help` | `/?`, `/帮助` | 显示帮助 | `/help` |
 | `/clean` | `/清理` | 清理旧数据 | `/clean --days 30` |
 | `/poll` | `/轮询` | 轮询管理 | `/poll status` |
-| `/dashboard` | `/db`, `/仪表盘` | 生成仪表盘 | `/dashboard config.json` |
+| `/dashboard` | `/db`, `/仪表盘` | 生成仪表盘 | `/dashboard config.txt` |
 | `/start` | `/server`, `/启动服务` | 启动本地服务 | `/start` |
 | `/stop` | `/停止服务` | 停止本地服务 | `/stop` |
 | `/status` | `/状态` | 查看服务状态和链接 | `/status` |
@@ -614,7 +614,7 @@ LIMIT 10;
 │  ╠═══════════════════════════════════════════════════════════╣  │
 │  ║  根据 Step 1 的 examples/INDEX.md 结果：                   ║  │
 │  ║  ✅ 必须读取至少 1 个匹配案例的完整 main.js                 ║  │
-│  ║  ✅ 路径：/Users/wuliang/workspace/echarts-examples/       ║  │
+│  ║  ✅ 路径：<你的工作区>/echarts-examples/                  ║  │
 │  ║            <案例名>/main.js                                ║  │
 │  ║  ✅ 案例代码 = 可工作的真实配置 → 最可靠的语法参考           ║  │
 │  ║  ⚠️  没有案例参考的图表代码，正确率极低！                   ║  │
@@ -796,7 +796,7 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 | 图表类型文件 | `references/knowledge/chart-types/` |
 | API 文件 | `references/knowledge/api/` |
 | 模式文件 | `references/knowledge/patterns/` |
-| 案例代码 | `/Users/wuliang/workspace/echarts-examples/<案例名>/main.js` |
+| 案例代码 | `<你的工作区>/echarts-examples/<案例名>/main.js` |
 
 > ⚠️ **已废弃**：`references/prompts/` 目录中的旧 Prompt 模板已被上述知识库 + 案例索引方案取代。该目录保留仅用于向后兼容，不再作为图表生成的主要参考源。新图表生成必须使用 `references/knowledge/` + 案例代码。
 
@@ -814,7 +814,7 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
         "db_path": "workspace.duckdb",
        "query": "SELECT category, SUM(value) as val FROM table GROUP BY category",
        "title": "Chart Title",
-       "output_path": "/Users/wuliang/workspace/echart-skill/outputs/html/output_chart.html",
+       "output_path": "<echart-skill路径>/outputs/html/output_chart.html",
        "echarts_option": { ... }, // Generated option from prompt
        "custom_js": "..." // Optional JS logic for complex data binding
    }
@@ -886,7 +886,7 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
     4. **Gantt Chart**: Uses a dedicated simplified API (see Scenario 9) rather than the template-based approach. Use `scripts/gantt_chart.py` for timeline visualizations.
  7. Execute the command:
     ```bash
-    python scripts/chart_generator.py --config outputs/configs/your_config.json
+    python scripts/chart_generator.py --config outputs/configs/your_config.txt
     ```
 
  8. **[CRITICAL] Return Chart Access**: After generating the chart, check the server configuration:
@@ -904,7 +904,7 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
     📂 可在浏览器中直接打开: file:///absolute/path/to/outputs/html/sales_chart.html
     ```
 
-    **If server is enabled** (user has set `"server.enabled": true` in `echart_config.json`):
+    **If server is enabled** (user has set `server.enabled=true` in `echart_config.txt`):
     - Start or check the server:
       ```bash
       python scripts/server_cli.py status
@@ -1044,7 +1044,7 @@ export_standalone_chart(config, "sales_chart.html", theme="default")
 ```python
 from scripts.dashboard_generator import export_standalone_dashboard
 
-export_standalone_dashboard("dashboard_config.json", "my_dashboard.html")
+export_standalone_dashboard("dashboard_config.txt", "my_dashboard.html")
 ```
 
 **Export Gantt Chart:**
@@ -1075,30 +1075,30 @@ export_standalone_gantt(config, "project_timeline.html", theme="dark")
 **Export Chart:**
 ```bash
 # Basic usage (auto-generates filename with timestamp)
-python scripts/chart_cli.py export-chart config.json
+python scripts/chart_cli.py export-chart config.txt
 
 # Specify output path
-python scripts/chart_cli.py export-chart config.json --output reports/sales.html
+python scripts/chart_cli.py export-chart config.txt --output reports/sales.html
 
 # Use dark theme
-python scripts/chart_cli.py export-chart config.json --theme dark
+python scripts/chart_cli.py export-chart config.txt --theme dark
 ```
 
 **Export Dashboard:**
 ```bash
-python scripts/chart_cli.py export-dashboard dashboard_config.json
+python scripts/chart_cli.py export-dashboard dashboard_config.txt
 
 # With custom output
-python scripts/chart_cli.py export-dashboard dashboard_config.json --output monthly_report.html --theme dark
+python scripts/chart_cli.py export-dashboard dashboard_config.txt --output monthly_report.html --theme dark
 ```
 
 **Export Gantt Chart:**
 ```bash
 # Gantt chart config is a JSON array of tasks
-python scripts/chart_cli.py export-gantt tasks.json --title "项目进度"
+python scripts/chart_cli.py export-gantt tasks.txt --title "项目进度"
 
 # With output path
-python scripts/chart_cli.py export-gantt tasks.json --title "Project Timeline" --output timeline.html
+python scripts/chart_cli.py export-gantt tasks.txt --title "Project Timeline" --output timeline.html
 ```
 
 **Config File Format (for export-chart):**
@@ -1125,7 +1125,7 @@ python scripts/chart_cli.py export-gantt tasks.json --title "Project Timeline" -
 ```
 
 **Command Parameters:**
-- `<config>`: Config file path (JSON format)
+- `<config>`: Config file path (`.txt`; complex chart payloads may use JSON content)
 - `--output`, `-o`: Output HTML path (optional, default: `{title}_{timestamp}.html`)
 - `--theme`: Chart theme (`default` or `dark`, default: `default`)
 - `--title`: Gantt chart title (export-gantt only)
@@ -1144,7 +1144,7 @@ for config in outputs/configs/*.json; do
 done
 
 # Automated daily report
-python scripts/chart_cli.py export-dashboard daily_dashboard.json \
+python scripts/chart_cli.py export-dashboard daily_dashboard.txt \
     --output "reports/report_$(date +%Y%m%d).html"
 ```
 
@@ -1155,39 +1155,30 @@ python scripts/chart_cli.py export-dashboard daily_dashboard.json \
 - Generated filename format: `{sanitized_title}_{YYYYMMDD_HHMMSS}.html`
 
 ### Scenario 13: External Database Connections
-**Trigger**: User needs to query data from MySQL, PostgreSQL, MongoDB, or SQLite databases.
+**Trigger**: User needs to query data from MySQL, PostgreSQL, or MongoDB databases.
 
 **Action:**
 
-**1. Configure Connections (db_connections.json):**
-```json
-{
-    "connections": {
-        "mysql_prod": {
-            "type": "mysql",
-            "host": "localhost",
-            "port": 3306,
-            "database": "production",
-            "username": "admin",
-            "password": "${MYSQL_PASSWORD}"
-        },
-        "postgres_analytics": {
-            "type": "postgresql",
-            "host": "analytics-db.internal",
-            "database": "analytics",
-            "username": "reader",
-            "password": "${PG_PASSWORD}"
-        },
-        "mongo_docs": {
-            "type": "mongodb",
-            "connection_string": "${MONGODB_URI}"
-        },
-        "sqlite_local": {
-            "type": "sqlite",
-            "database": "/path/to/local.db"
-        }
-    }
-}
+**1. Configure Connections (db_connections.txt):**
+```ini
+[connections.mysql_prod]
+type=mysql
+host=localhost
+port=3306
+database=production
+username=admin
+password=${MYSQL_PASSWORD}
+
+[connections.postgres_analytics]
+type=postgresql
+host=analytics-db.internal
+database=analytics
+username=reader
+password=${PG_PASSWORD}
+
+[connections.mongo_docs]
+type=mongodb
+connection_string=${MONGODB_URI}
 ```
 
 **2. Set Environment Variables for Secrets:**
@@ -1262,7 +1253,7 @@ python scripts/db_cli.py import mongo_docs '{}' --collection users --table-name 
 - Query results automatically import to DuckDB with `import` command
 - Large results (>10K rows) are streamed
 - Metadata tracked in `_data_skill_meta` table
-- Support for MySQL, PostgreSQL, SQLite (via SQLAlchemy), and MongoDB (via PyMongo)
+- Support for MySQL, PostgreSQL (via SQLAlchemy), and MongoDB (via PyMongo)
 
 **Notes:**
 - Default connection timeout: 30 seconds (override with `--timeout`)
@@ -1419,37 +1410,31 @@ For complex dashboards requiring full control, use JSON config:
 
 Generate:
 ```bash
-python scripts/dashboard_generator.py --config config.json --output dashboard.html
+python scripts/dashboard_generator.py --config config.txt --output dashboard.html
 ```
 **Trigger**: User needs to automatically refresh data from HTTP APIs or databases on a schedule.
 
 **Action:**
 
-**1. Create Polling Configuration (polling_config.json):**
-```json
-{
-    "jobs": [
-        {
-            "source_type": "http",
-            "source_name": "sales_api",
-            "interval_seconds": 300,
-            "table_name": "live_sales",
-            "http_config": {
-                "url": "https://api.example.com/sales",
-                "format": "json",
-                "auth": {"type": "bearer", "token": "${API_TOKEN}"}
-            }
-        },
-        {
-            "source_type": "database",
-            "source_name": "production_db",
-            "interval_seconds": 600,
-            "table_name": "live_orders",
-            "db_profile": "mysql_prod",
-            "query": "SELECT * FROM orders WHERE created_at > NOW() - INTERVAL 1 HOUR"
-        }
-    ]
-}
+**1. Create Polling Configuration (polling_config.txt):**
+```ini
+[jobs.sales_api]
+source_type=http
+source_name=sales_api
+interval_seconds=300
+table_name=live_sales
+http_config.url=https://api.example.com/sales
+http_config.format=json
+http_config.auth.type=bearer
+http_config.auth.token=${API_TOKEN}
+
+[jobs.production_db]
+source_type=database
+source_name=production_db
+interval_seconds=600
+table_name=live_orders
+db_profile=mysql_prod
+query=SELECT * FROM orders WHERE created_at > NOW() - INTERVAL 1 HOUR
 ```
 
 **2. Manage Polling Jobs:**
@@ -1489,7 +1474,7 @@ python scripts/polling_cli.py remove <job_id>
 **Key Features:**
 - APScheduler-based background polling
 - HTTP sources with all auth types (Basic, Bearer, API Key, OAuth2)
-- Database polling for MySQL, PostgreSQL, MongoDB, SQLite
+- Database polling for MySQL, PostgreSQL, MongoDB
 - Automatic DuckDB table updates
 - Last refresh timestamp tracked in `_data_skill_meta`
 - Manual refresh on-demand

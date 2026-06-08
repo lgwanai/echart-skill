@@ -8,7 +8,7 @@ This module tests the data merger functionality including:
 """
 
 import pytest
-import sqlite3
+import duckdb
 import tempfile
 import os
 import sys
@@ -71,16 +71,16 @@ class TestMergeConfig:
         )
         assert config.source_tables == ["table1", "table2"]
         assert config.target_table == "merged_table"
-        assert config.db_path == "workspace.db"
+        assert config.db_path == "workspace.duckdb"
 
     def test_accepts_custom_db_path(self):
         """MergeConfig should accept custom db_path."""
         config = MergeConfig(
             source_tables=["table1", "table2"],
             target_table="merged_table",
-            db_path="custom.db"
+            db_path="custom.duckdb"
         )
-        assert config.db_path == "custom.db"
+        assert config.db_path == "custom.duckdb"
 
 
 class TestDataMerger:
@@ -89,10 +89,11 @@ class TestDataMerger:
     @pytest.fixture
     def temp_db_with_tables(self):
         """Create a temporary database with test tables."""
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
+        os.unlink(db_path)
 
-        conn = sqlite3.connect(db_path)
+        conn = duckdb.connect(db_path)
 
         # Create test tables
         conn.execute('''
@@ -102,8 +103,8 @@ class TestDataMerger:
                 city TEXT
             )
         ''')
-        conn.execute("INSERT INTO customers (name, city) VALUES ('Alice', 'Beijing')")
-        conn.execute("INSERT INTO customers (name, city) VALUES ('Bob', 'Shanghai')")
+        conn.execute("INSERT INTO customers (id, name, city) VALUES (1, 'Alice', 'Beijing')")
+        conn.execute("INSERT INTO customers (id, name, city) VALUES (2, 'Bob', 'Shanghai')")
 
         conn.execute('''
             CREATE TABLE orders (
@@ -112,8 +113,8 @@ class TestDataMerger:
                 amount REAL
             )
         ''')
-        conn.execute("INSERT INTO orders (product, amount) VALUES ('Widget', 99.99)")
-        conn.execute("INSERT INTO orders (product, amount) VALUES ('Gadget', 149.99)")
+        conn.execute("INSERT INTO orders (id, product, amount) VALUES (1, 'Widget', 99.99)")
+        conn.execute("INSERT INTO orders (id, product, amount) VALUES (2, 'Gadget', 149.99)")
 
         conn.commit()
         conn.close()
@@ -179,7 +180,7 @@ class TestDataMerger:
         merger.save_to_database(merged)
 
         # Verify table exists and has correct data
-        conn = sqlite3.connect(temp_db_with_tables)
+        conn = duckdb.connect(temp_db_with_tables)
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM merged_data")
         count = cursor.fetchone()[0]
@@ -194,10 +195,11 @@ class TestExport:
     @pytest.fixture
     def temp_db_with_tables(self):
         """Create a temporary database with test tables."""
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
+        os.unlink(db_path)
 
-        conn = sqlite3.connect(db_path)
+        conn = duckdb.connect(db_path)
 
         # Create test tables
         conn.execute('''
@@ -207,8 +209,8 @@ class TestExport:
                 city TEXT
             )
         ''')
-        conn.execute("INSERT INTO customers (name, city) VALUES ('Alice', 'Beijing')")
-        conn.execute("INSERT INTO customers (name, city) VALUES ('Bob', 'Shanghai')")
+        conn.execute("INSERT INTO customers (id, name, city) VALUES (1, 'Alice', 'Beijing')")
+        conn.execute("INSERT INTO customers (id, name, city) VALUES (2, 'Bob', 'Shanghai')")
 
         conn.execute('''
             CREATE TABLE orders (
@@ -217,8 +219,8 @@ class TestExport:
                 amount REAL
             )
         ''')
-        conn.execute("INSERT INTO orders (product, amount) VALUES ('Widget', 99.99)")
-        conn.execute("INSERT INTO orders (product, amount) VALUES ('Gadget', 149.99)")
+        conn.execute("INSERT INTO orders (id, product, amount) VALUES (1, 'Widget', 99.99)")
+        conn.execute("INSERT INTO orders (id, product, amount) VALUES (2, 'Gadget', 149.99)")
 
         conn.commit()
         conn.close()
@@ -280,10 +282,11 @@ class TestCLI:
     @pytest.fixture
     def temp_db_with_tables(self):
         """Create a temporary database with test tables."""
-        with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
             db_path = f.name
+        os.unlink(db_path)
 
-        conn = sqlite3.connect(db_path)
+        conn = duckdb.connect(db_path)
 
         conn.execute('''
             CREATE TABLE customers (
@@ -292,8 +295,8 @@ class TestCLI:
                 city TEXT
             )
         ''')
-        conn.execute("INSERT INTO customers (name, city) VALUES ('Alice', 'Beijing')")
-        conn.execute("INSERT INTO customers (name, city) VALUES ('Bob', 'Shanghai')")
+        conn.execute("INSERT INTO customers (id, name, city) VALUES (1, 'Alice', 'Beijing')")
+        conn.execute("INSERT INTO customers (id, name, city) VALUES (2, 'Bob', 'Shanghai')")
 
         conn.execute('''
             CREATE TABLE orders (
@@ -302,8 +305,8 @@ class TestCLI:
                 amount REAL
             )
         ''')
-        conn.execute("INSERT INTO orders (product, amount) VALUES ('Widget', 99.99)")
-        conn.execute("INSERT INTO orders (product, amount) VALUES ('Gadget', 149.99)")
+        conn.execute("INSERT INTO orders (id, product, amount) VALUES (1, 'Widget', 99.99)")
+        conn.execute("INSERT INTO orders (id, product, amount) VALUES (2, 'Gadget', 149.99)")
 
         conn.commit()
         conn.close()
@@ -329,7 +332,7 @@ class TestCLI:
         assert '合并完成' in result.stdout
 
         # Verify table was created
-        conn = sqlite3.connect(temp_db_with_tables)
+        conn = duckdb.connect(temp_db_with_tables)
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM merged_cli_test")
         count = cursor.fetchone()[0]

@@ -1,7 +1,7 @@
 import pytest
 import os
 import sys
-import sqlite3
+import duckdb
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from scripts.data_cleaner import clean_old_data
@@ -10,7 +10,7 @@ from scripts.data_cleaner import clean_old_data
 def test_clean_with_valid_tables(temp_db):
     """Clean with valid table names should succeed."""
     # Add metadata entry with old date
-    conn = sqlite3.connect(temp_db)
+    conn = duckdb.connect(temp_db)
     conn.execute('''
         CREATE TABLE IF NOT EXISTS _data_skill_meta (
             table_name TEXT PRIMARY KEY,
@@ -36,7 +36,7 @@ def test_clean_blocks_sql_injection(temp_db, caplog):
     import logging
     caplog.set_level(logging.WARNING)
 
-    conn = sqlite3.connect(temp_db)
+    conn = duckdb.connect(temp_db)
     conn.execute('''
         CREATE TABLE IF NOT EXISTS _data_skill_meta (
             table_name TEXT PRIMARY KEY,
@@ -58,9 +58,9 @@ def test_clean_blocks_sql_injection(temp_db, caplog):
     clean_old_data(temp_db, days=30)
 
     # Verify the test_data table still exists (wasn't dropped by injection)
-    conn = sqlite3.connect(temp_db)
+    conn = duckdb.connect(temp_db)
     cursor = conn.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='test_data'")
+    cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_name='test_data'")
     assert cursor.fetchone() is not None, "test_data table should still exist (injection blocked)"
     conn.close()
 

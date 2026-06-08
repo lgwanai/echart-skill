@@ -137,11 +137,11 @@ def normalize_map_data(data: list, name_key: str = "name") -> list:
 
 def get_baidu_ak():
     """
-    Retrieve Baidu AK from config file, environment variable, or legacy config.txt.
+    Retrieve Baidu AK from environment, echart_config.txt, or legacy config.txt.
 
     Priority:
     1. BAIDU_AK environment variable
-    2. echart_config.json baidu_ak field
+    2. echart_config.txt baidu_ak field
     3. config.txt (deprecated, shows warning)
     """
     import warnings
@@ -151,7 +151,7 @@ def get_baidu_ak():
     if ak:
         return ak
 
-    # Secondary: echart_config.json
+    # Secondary: echart_config.txt
     try:
         cfg = get_config()
         if cfg.baidu_ak:
@@ -170,7 +170,7 @@ def get_baidu_ak():
                     ak = line.strip().split('=', 1)[1]
                     if ak:
                         warnings.warn(
-                            "从 config.txt 读取 BAIDU_AK 已弃用，请设置环境变量 BAIDU_AK 或在 echart_config.json 中配置",
+                            "从 config.txt 读取 BAIDU_AK 已弃用，请设置环境变量 BAIDU_AK 或在 echart_config.txt 中配置",
                             DeprecationWarning,
                             stacklevel=2
                         )
@@ -179,7 +179,7 @@ def get_baidu_ak():
     # If not found or empty
     logger.warning(
         "使用 ECharts 地图功能需要百度地图 AK",
-        action="请设置环境变量 BAIDU_AK 或在 echart_config.json 中配置 baidu_ak",
+        action="请设置环境变量 BAIDU_AK 或在 echart_config.txt 中配置 baidu_ak",
         url="https://lbsyun.baidu.com/apiconsole/key"
     )
     return None
@@ -664,7 +664,7 @@ def generate_chart(config):
     """
     Universal Chart Generator
     config = {
-        "db_path": "workspace.db",
+        "db_path": "workspace.duckdb",
         "query": "SELECT category, SUM(value) as val FROM table GROUP BY category",
         "chart_type": "bar" | "pie" | "line" | "scatter" | "map",
         "x_col": "category",
@@ -676,7 +676,7 @@ def generate_chart(config):
         "show_labels": True
     }
     """
-    db_path = config.get("db_path", "workspace.db")
+    db_path = config.get("db_path", "workspace.duckdb")
     query = config.get("query")
 
     if not query:
@@ -708,8 +708,8 @@ def generate_chart(config):
     return generate_echarts_html(df, config, output_path)
 
 if __name__ == "__main__":  # pragma: no cover
-    parser = argparse.ArgumentParser(description="Universal Chart Generator from SQLite")
-    parser.add_argument("--config", required=True, help="JSON string or path to JSON file containing chart configuration")
+    parser = argparse.ArgumentParser(description="Universal Chart Generator from DuckDB")
+    parser.add_argument("--config", required=True, help="JSON string or path to .txt file containing chart configuration")
 
     args = parser.parse_args()
 

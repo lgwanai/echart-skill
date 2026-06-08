@@ -6,7 +6,7 @@ import sys
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_repository
-from validators import validate_table_name
+from validators import quote_identifier, validate_table_name
 from logging_config import get_logger, configure_logging
 
 # Initialize logging
@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 
 def export_data(db_path, output_path, table_name=None, query=None):
     """
-    Export data from SQLite to a CSV or Excel file.
+    Export data from DuckDB to a CSV or Excel file.
     Either table_name or query must be provided.
     """
     if not os.path.exists(db_path):
@@ -35,7 +35,7 @@ def export_data(db_path, output_path, table_name=None, query=None):
                 # Validate table name to prevent SQL injection
                 table_name = validate_table_name(table_name)
                 logger.info("读取表", table_name=table_name)
-                df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
+                df = pd.read_sql_query(f"SELECT * FROM {quote_identifier(table_name)}", conn)
 
         # Determine export format based on file extension
         ext = os.path.splitext(output_path)[1].lower()
@@ -62,9 +62,9 @@ def export_data(db_path, output_path, table_name=None, query=None):
         sys.exit(1)
 
 if __name__ == "__main__":  # pragma: no cover
-    parser = argparse.ArgumentParser(description="Export data from SQLite to CSV or Excel")
+    parser = argparse.ArgumentParser(description="Export data from DuckDB to CSV or Excel")
     parser.add_argument("output_path", help="Path to save the output file (.csv or .xlsx)")
-    parser.add_argument("--db", default="workspace.db", help="Path to SQLite database file")
+    parser.add_argument("--db", default="workspace.duckdb", help="Path to DuckDB database file")
     parser.add_argument("--table", help="Name of the table to export")
     parser.add_argument("--query", help="SQL query to execute and export")
 

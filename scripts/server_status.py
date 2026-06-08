@@ -16,6 +16,10 @@ import sys
 from typing import List, Dict, Any
 
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+STATUS_FILE = PROJECT_ROOT / "outputs" / ".server_status.json"
+
+
 def get_chart_links(html_dir: str = "outputs/html", port: int | None = None) -> List[Dict[str, Any]]:
     """
     Scan html_dir for all .html files and generate accessible chart links.
@@ -37,10 +41,9 @@ def get_chart_links(html_dir: str = "outputs/html", port: int | None = None) -> 
     """
     # Determine port
     if port is None:
-        status_file = Path("outputs/.server_status.json")
-        if status_file.exists():
+        if STATUS_FILE.exists():
             try:
-                status_data = json.loads(status_file.read_text())
+                status_data = json.loads(STATUS_FILE.read_text())
                 port = status_data.get("port", 8100)
             except (json.JSONDecodeError, OSError):
                 port = 8100
@@ -49,6 +52,8 @@ def get_chart_links(html_dir: str = "outputs/html", port: int | None = None) -> 
     
     # Scan HTML directory
     html_path = Path(html_dir)
+    if not html_path.is_absolute():
+        html_path = PROJECT_ROOT / html_path
     if not html_path.exists():
         return []
     
@@ -60,7 +65,7 @@ def get_chart_links(html_dir: str = "outputs/html", port: int | None = None) -> 
                 stat = file.stat()
                 # Build URL relative to project root so the path matches the
                 # server's document root.  e.g. outputs/html/bar_chart.html
-                rel_path = str(file).replace('\\', '/')
+                rel_path = str(file.relative_to(PROJECT_ROOT)).replace('\\', '/')
                 charts.append({
                     "filename": file.name,
                     "url": f"http://127.0.0.1:{port}/{rel_path}",
@@ -220,12 +225,11 @@ def main():
     
     elif args.command == "report":
         # Try to read server status
-        status_file = Path("outputs/.server_status.json")
         status_dict = {}
         
-        if status_file.exists():
+        if STATUS_FILE.exists():
             try:
-                status_dict = json.loads(status_file.read_text())
+                status_dict = json.loads(STATUS_FILE.read_text())
             except (json.JSONDecodeError, OSError):
                 status_dict = {"status": "未知", "running": False}
         else:

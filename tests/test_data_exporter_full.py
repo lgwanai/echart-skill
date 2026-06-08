@@ -1,7 +1,7 @@
 import pytest
 import os
 import sys
-import sqlite3
+import duckdb
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from scripts.data_exporter import export_data
@@ -13,8 +13,8 @@ class TestExporterFull:
     def test_export_to_excel(self, tmp_path):
         """Export to Excel format should work."""
         # Create test database
-        db_path = tmp_path / "test.db"
-        conn = sqlite3.connect(str(db_path))
+        db_path = tmp_path / "test.duckdb"
+        conn = duckdb.connect(str(db_path))
         conn.execute("CREATE TABLE data (name TEXT, value INTEGER)")
         conn.execute("INSERT INTO data VALUES ('test', 1)")
         conn.commit()
@@ -28,8 +28,8 @@ class TestExporterFull:
 
     def test_export_unsupported_format(self, tmp_path):
         """Unsupported format should raise error."""
-        db_path = tmp_path / "test.db"
-        conn = sqlite3.connect(str(db_path))
+        db_path = tmp_path / "test.duckdb"
+        conn = duckdb.connect(str(db_path))
         conn.execute("CREATE TABLE data (name TEXT)")
         conn.commit()
         conn.close()
@@ -48,8 +48,8 @@ class TestExporterFull:
 
     def test_export_with_query(self, tmp_path):
         """Export with custom query should work."""
-        db_path = tmp_path / "test.db"
-        conn = sqlite3.connect(str(db_path))
+        db_path = tmp_path / "test.duckdb"
+        conn = duckdb.connect(str(db_path))
         conn.execute("CREATE TABLE items (name TEXT, qty INTEGER)")
         conn.execute("INSERT INTO items VALUES ('a', 10)")
         conn.execute("INSERT INTO items VALUES ('b', 20)")
@@ -67,8 +67,8 @@ class TestExporterFull:
 
     def test_export_neither_table_nor_query(self, tmp_path):
         """Export without table_name or query should raise error."""
-        db_path = tmp_path / "test.db"
-        conn = sqlite3.connect(str(db_path))
+        db_path = tmp_path / "test.duckdb"
+        conn = duckdb.connect(str(db_path))
         conn.execute("CREATE TABLE data (name TEXT)")
         conn.commit()
         conn.close()

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_repository
-from validators import validate_table_name
+from validators import quote_identifier, validate_table_name
 from logging_config import get_logger, configure_logging
 
 # Initialize logging
@@ -56,7 +56,7 @@ def clean_old_data(db_path, days=30):
                 continue
 
             # Drop the actual table
-            conn.execute(f"DROP TABLE IF EXISTS {validated_name}")
+            conn.execute(f"DROP TABLE IF EXISTS {quote_identifier(validated_name)}")
 
             # Remove from metadata
             conn.execute("DELETE FROM _data_skill_meta WHERE table_name = ?", [table_name])

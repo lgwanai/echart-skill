@@ -21,6 +21,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from logging_config import get_logger
+from validators import quote_identifier
 
 if TYPE_CHECKING:
     from scripts.db_connector import SQLConnector
@@ -93,13 +94,13 @@ def list_schemas(connector: "SQLConnector") -> List[str]:
     """List all schemas in the database.
     
     PostgreSQL and some databases support multiple schemas.
-    MySQL and SQLite return empty list (single schema).
+    MySQL returns an empty list (single schema).
     
     Args:
         connector: SQLConnector instance (must be connected)
         
     Returns:
-        List of schema names (empty for MySQL/SQLite)
+        List of schema names (empty for MySQL)
     """
     inspector = connector.get_inspector()
     
@@ -149,7 +150,6 @@ def get_table_row_count(
     Uses database-specific methods for efficiency:
     - PostgreSQL: pg_class.reltuples (approximate)
     - MySQL: information_schema.tables.table_rows
-    - SQLite: SELECT COUNT(*) (exact, slower)
     
     Args:
         connector: SQLConnector instance
@@ -164,28 +164,28 @@ def get_table_row_count(
     try:
         if db_type == "postgresql":
             schema_val = schema or "public"
-            query = f"""
+            query = """
                 SELECT reltuples::bigint AS estimate 
                 FROM pg_class 
-                WHERE relname = '{table_name}'
+                WHERE relname = :table_name
                 AND relnamespace = (
-                    SELECT oid FROM pg_namespace WHERE nspname = '{schema_val}'
+                    SELECT oid FROM pg_namespace WHERE nspname = :schema_name
                 )
             """
-            result = connector.execute_query(query)
+            result = connector.execute_query(query, {"table_name": table_name, "schema_name": schema_val})
             return result[0].get("estimate", 0) if result else 0
             
         elif db_type == "mysql":
-            query = f"""
+            query = """
                 SELECT table_rows 
                 FROM information_schema.tables 
-                WHERE table_name = '{table_name}'
+                WHERE table_name = :table_name
             """
-            result = connector.execute_query(query)
+            result = connector.execute_query(query, {"table_name": table_name})
             return result[0].get("table_rows", 0) if result else 0
             
         else:
-            query = f"SELECT COUNT(*) as count FROM {table_name}"
+            query = f"SELECT COUNT(*) as count FROM {quote_identifier(table_name)}"
             result = connector.execute_query(query)
             return result[0].get("count", 0) if result else 0
             

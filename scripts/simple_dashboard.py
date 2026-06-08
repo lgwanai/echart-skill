@@ -190,7 +190,13 @@ class SimpleDashboard:
         
         repo = get_repository(self.db_path)
         with repo.connection() as conn:
-            tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+            tables = conn.execute("""
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema = 'main'
+                  AND table_name != '_data_skill_meta'
+                ORDER BY table_name
+            """).fetchall()
             
         if not tables:
             raise ValueError("No tables found in database")

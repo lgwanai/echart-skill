@@ -10,11 +10,23 @@ import urllib.request
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
+def require_loopback_socket():
+    """Skip tests that need local socket permissions when sandbox blocks them."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.bind(('127.0.0.1', 0))
+    except PermissionError:
+        pytest.skip("Loopback socket operations are blocked in this sandbox")
+    finally:
+        sock.close()
+
+
 class TestServerFunctions:
     """Tests for server module functions."""
 
     def test_find_free_port(self):
         """find_free_port should return a valid port."""
+        require_loopback_socket()
         from scripts.server import find_free_port
 
         port = find_free_port(19000, 19100)
@@ -22,6 +34,7 @@ class TestServerFunctions:
 
     def test_check_server_running_none(self):
         """check_server_running should return None when no server."""
+        require_loopback_socket()
         from scripts.server import check_server_running
 
         result = check_server_running(19999, 20000)
@@ -43,6 +56,7 @@ class TestServerFunctions:
 
     def test_check_server_running_detects_server(self):
         """check_server_running should detect running server."""
+        require_loopback_socket()
         from scripts.server import check_server_running, CustomHTTPRequestHandler
         import http.server
         import socketserver
@@ -68,11 +82,12 @@ class TestServerFunctions:
         server_started.wait(timeout=2)
 
         # Check if our server is detected
-        result = check_server_running(test_port, test_port + 1)
+        result = check_server_running(test_port, test_port)
         assert result == test_port
 
     def test_no_free_port_raises_error(self):
         """find_free_port should raise when no ports available."""
+        require_loopback_socket()
         from scripts.server import find_free_port
 
         # Bind all ports in range to force error
@@ -95,6 +110,7 @@ class TestCustomHandler:
 
     def test_health_endpoint_returns_ok(self):
         """Health endpoint should return OK status."""
+        require_loopback_socket()
         from scripts.server import CustomHTTPRequestHandler
         import socketserver
 
@@ -125,6 +141,7 @@ class TestCustomHandler:
 
     def test_path_traversal_blocked(self):
         """Path traversal attempts should be blocked."""
+        require_loopback_socket()
         from scripts.server import CustomHTTPRequestHandler
         import socketserver
 

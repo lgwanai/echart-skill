@@ -9,16 +9,15 @@ idea.md
 package.sh
 RELEASE_NOTE.md
 
-# 忽略本地 SQLite/DuckDB 数据库文件（避免上传敏感数据）
-workspace.db
+# 忽略本地 DuckDB 数据库文件（避免上传敏感数据）
 *.db
-*.sqlite
-*.sqlite3
+*.db-shm
+*.db-wal
 *.duckdb
 
 # 忽略本地敏感配置文件
 config.txt
-echart_config.json
+echart_config.txt
 
 # 忽略打包生成的 skill 产物
 *.skill
@@ -37,7 +36,3 @@ logs/
 .pytest_cache/
 .ruff_cache/
 test/
-test_dashboard.db-shm
-test_dashboard.db-wal
-workspace.db-shm
-workspace.db-wal

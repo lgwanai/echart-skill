@@ -1,5 +1,5 @@
 import pytest
-import sqlite3
+import duckdb
 import tempfile
 import os
 from pathlib import Path
@@ -9,18 +9,19 @@ from pathlib import Path
 def reset_database_singleton():
     """Reset database singleton before and after each test."""
     import database
-    database._repo = None
+    database._cleanup_repo()
     yield
-    database._repo = None
+    database._cleanup_repo()
 
 
 @pytest.fixture
 def temp_db():
-    """Create a temporary SQLite database for testing."""
-    with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+    """Create a temporary DuckDB database for testing."""
+    with tempfile.NamedTemporaryFile(suffix='.duckdb', delete=False) as f:
         db_path = f.name
 
-    conn = sqlite3.connect(db_path)
+    os.unlink(db_path)
+    conn = duckdb.connect(db_path)
     conn.execute('''
         CREATE TABLE test_data (
             id INTEGER PRIMARY KEY,
@@ -28,8 +29,8 @@ def temp_db():
             value REAL
         )
     ''')
-    conn.execute("INSERT INTO test_data (name, value) VALUES ('test1', 100)")
-    conn.execute("INSERT INTO test_data (name, value) VALUES ('test2', 200)")
+    conn.execute("INSERT INTO test_data (id, name, value) VALUES (1, 'test1', 100)")
+    conn.execute("INSERT INTO test_data (id, name, value) VALUES (2, 'test2', 200)")
     conn.commit()
     conn.close()
 
@@ -49,7 +50,7 @@ def temp_output_dir():
 def sample_config():
     """Sample chart configuration for testing."""
     return {
-        "db_path": "workspace.db",
+        "db_path": "workspace.duckdb",
         "query": "SELECT name, value FROM test_data",
         "title": "Test Chart",
         "output_path": "tmp/test_chart.html"

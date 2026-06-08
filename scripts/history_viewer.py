@@ -15,6 +15,7 @@ import structlog
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import DatabaseRepository
+from validators import quote_identifier, validate_table_name
 
 logger = structlog.get_logger(__name__)
 
@@ -189,6 +190,7 @@ def view_table_structure(db_path: str = "workspace.duckdb", table_name: Optional
 
 def _show_single_table_structure(conn, table_name: str) -> str:
     """Show structure for a single table."""
+    table_name = validate_table_name(table_name)
     # Check if table exists
     exists = conn.execute(
         "SELECT table_name FROM information_schema.tables WHERE table_name = ? AND table_schema = 'main'",
@@ -210,7 +212,7 @@ def _show_single_table_structure(conn, table_name: str) -> str:
     ).fetchall()
 
     # Get row count
-    row_count = conn.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()[0]
+    row_count = conn.execute(f"SELECT COUNT(*) FROM {quote_identifier(table_name)}").fetchone()[0]
 
     headers = ["列名", "类型", "可空"]
     data_rows = []

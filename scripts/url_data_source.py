@@ -24,6 +24,7 @@ Usage:
 """
 
 import time
+import ipaddress
 from typing import Literal, Optional, Union
 from urllib.parse import urlencode, urlparse, parse_qs, urlunparse
 
@@ -31,6 +32,11 @@ from pydantic import BaseModel, Field, SecretStr, field_validator
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import structlog
+import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from validators import validate_table_name
 
 logger = structlog.get_logger(__name__)
 
@@ -177,6 +183,10 @@ class URLDataSourceConfig(BaseModel):
     format: Literal["json", "csv"] = Field(description="Data format")
     table_name: str = Field(description="Target table name")
     auth: Optional[AuthConfig] = Field(default=None, description="Authentication config")
+    allow_private_networks: bool = Field(
+        default=False,
+        description="Allow localhost/private/link-local IP targets"
+    )
     timeout: float = Field(
         default=30.0,
         ge=1.0,
@@ -187,9 +197,17 @@ class URLDataSourceConfig(BaseModel):
     @field_validator('url')
     @classmethod
     def validate_url(cls, v: str) -> str:
-        if not v.startswith(('http://', 'https://')):
+        parsed = urlparse(v)
+        if parsed.scheme not in ("http", "https"):
             raise ValueError("URL must start with http:// or https://")
+        if not parsed.hostname:
+            raise ValueError("URL must include a hostname")
         return v
+
+    @field_validator('table_name')
+    @classmethod
+    def validate_target_table(cls, v: str) -> str:
+        return validate_table_name(v)
     
     @field_validator('auth', mode='before')
     @classmethod
@@ -259,17 +277,6 @@ class URLDataSource:
         return headers
     
     def _build_url_with_auth(self) -> str:
-        if not isinstance(self.config.auth, APIKeyQueryParamAuthConfig):
-            return self.config.url
-        
-        parsed = urlparse(self.config.url)
-        query_params = parse_qs(parsed.query)
-        query_params[self.config.auth.param_name] = [self.config.auth.key.get_secret_value()]
-        
-        new_query = urlencode(query_params, doseq=True)
-        return urlunparse(parsed._replace(query=new_query))
-
-    def _build_url_with_auth(self) -> str:
         """Build URL with query params for API Key auth.
         
         Returns:
@@ -284,6 +291,39 @@ class URLDataSource:
         
         return self.config.url
 
+    def _validate_request_url(self, url: str) -> None:
+        if self.config.allow_private_networks:
+            return
+
+        parsed = urlparse(url)
+        host = parsed.hostname
+        if not host:
+            raise ValueError("URL must include a hostname")
+
+        normalized_host = host.strip("[]").lower()
+        if normalized_host in {"localhost", "localhost.localdomain"} or normalized_host.endswith(".localhost"):
+            raise ValueError("Private or localhost URLs are not allowed")
+
+        try:
+            ip = ipaddress.ip_address(normalized_host)
+        except ValueError:
+            return
+
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast or ip.is_unspecified:
+            raise ValueError("Private or localhost URLs are not allowed")
+
+    def _validate_response_size(self, response: httpx.Response) -> None:
+        content_length = response.headers.get('content-length')
+        if content_length and int(content_length) > MAX_RESPONSE_SIZE:
+            raise ValueError(
+                f"Response too large: {int(content_length) / 1024 / 1024:.1f}MB > 100MB limit"
+            )
+
+        if len(response.content) > MAX_RESPONSE_SIZE:
+            raise ValueError(
+                f"Response too large: {len(response.content) / 1024 / 1024:.1f}MB > 100MB limit"
+            )
+
     @retry(
         stop=stop_after_attempt(MAX_RETRIES),
         wait=wait_exponential(multiplier=1, min=1, max=4),
@@ -294,6 +334,7 @@ class URLDataSource:
         timeout = httpx.Timeout(self.config.timeout)
         
         url = self._build_url_with_auth()
+        self._validate_request_url(url)
         headers = self._build_headers()
         
         if self._oauth2_manager:
@@ -306,12 +347,14 @@ class URLDataSource:
                 auth=self._build_auth(),
                 headers=headers
             )
+            self._validate_request_url(str(response.url))
             
             if response.status_code == 401 and self._oauth2_manager:
                 self._oauth2_manager.invalidate()
                 token = await self._oauth2_manager.get_token()
                 headers["Authorization"] = f"Bearer {token}"
                 response = await client.get(url, auth=self._build_auth(), headers=headers)
+                self._validate_request_url(str(response.url))
 
             if response.status_code >= 500:
                 raise ServerError(
@@ -320,11 +363,7 @@ class URLDataSource:
 
             response.raise_for_status()
 
-            content_length = response.headers.get('content-length')
-            if content_length and int(content_length) > MAX_RESPONSE_SIZE:
-                raise ValueError(
-                    f"Response too large: {int(content_length) / 1024 / 1024:.1f}MB > 100MB limit"
-                )
+            self._validate_response_size(response)
 
             return response.text
 
@@ -370,6 +409,7 @@ class URLDataSource:
         """
         timeout = httpx.Timeout(self.config.timeout)
         url = self._build_url_with_auth()
+        self._validate_request_url(url)
         headers = self._build_headers()
         headers["Content-Type"] = "application/json"
         
@@ -385,12 +425,14 @@ class URLDataSource:
                 headers=headers,
                 json=data
             )
+            self._validate_request_url(str(response.url))
             
             if response.status_code == 401 and self._oauth2_manager:
                 self._oauth2_manager.invalidate()
                 token = await self._oauth2_manager.get_token()
                 headers["Authorization"] = f"Bearer {token}"
                 response = await client.request(method, url, auth=self._build_auth(), headers=headers, json=data)
+                self._validate_request_url(str(response.url))
 
             if response.status_code >= 500:
                 raise ServerError(
@@ -399,11 +441,7 @@ class URLDataSource:
 
             response.raise_for_status()
 
-            content_length = response.headers.get('content-length')
-            if content_length and int(content_length) > MAX_RESPONSE_SIZE:
-                raise ValueError(
-                    f"Response too large: {int(content_length) / 1024 / 1024:.1f}MB > 100MB limit"
-                )
+            self._validate_response_size(response)
 
             return response.text
 

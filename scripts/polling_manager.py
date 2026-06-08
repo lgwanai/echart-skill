@@ -23,18 +23,19 @@ Usage:
     job_id = manager.add_job(config)
 """
 
-import json
 import os
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
-from apscheduler.schedulers.background import BackgroundScheduler
+from pydantic import BaseModel, Field, field_validator
 
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from logging_config import get_logger
+from scripts.data_importer import init_meta_table
+from scripts.text_config import parse_txt_config
+from validators import quote_identifier, validate_table_name
 
 logger = get_logger(__name__)
 
@@ -52,6 +53,11 @@ class PollingConfig(BaseModel):
     collection: Optional[str] = None
     table_name: str
     duckdb_path: str = Field(default="workspace.duckdb")
+
+    @field_validator("table_name")
+    @classmethod
+    def validate_target_table(cls, value: str) -> str:
+        return validate_table_name(value)
 
 
 class PollingJob:
@@ -85,13 +91,18 @@ class PollingManager:
     def __init__(self, db_path: str = "workspace.duckdb"):
         self.db_path = db_path
         self._jobs: Dict[str, PollingJob] = {}
-        self._scheduler: Optional[BackgroundScheduler] = None
+        self._scheduler = None
         self._running = False
     
     def start(self) -> None:
         if self._running:
             return
         
+        try:
+            from apscheduler.schedulers.background import BackgroundScheduler
+        except ImportError as e:
+            raise ImportError("Polling requires apscheduler. Install requirements-optional.txt.") from e
+
         self._scheduler = BackgroundScheduler()
         self._scheduler.start()
         self._running = True
@@ -238,17 +249,20 @@ class PollingManager:
         
         import pandas as pd
         df = pd.DataFrame(records)
+        table_name = validate_table_name(table_name)
+        table = quote_identifier(table_name)
         
         conn = duckdb.connect(db_path)
         try:
-            conn.execute(f"DROP TABLE IF EXISTS {table_name}")
-            conn.execute(f"CREATE TABLE {table_name} AS SELECT * FROM df")
+            conn.execute(f"DROP TABLE IF EXISTS {table}")
+            conn.execute(f"CREATE TABLE {table} AS SELECT * FROM df")
+            init_meta_table(conn)
             
             conn.execute("""
                 INSERT OR REPLACE INTO _data_skill_meta 
-                (table_name, source_type, source_path, row_count, created_at)
-                VALUES (?, 'polling', ?, ?, CURRENT_TIMESTAMP)
-            """, [table_name, "polling", len(records)])
+                (file_name, table_name, import_time, last_used_time, source_type, source_path, row_count, created_at)
+                VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'polling', ?, ?, CURRENT_TIMESTAMP)
+            """, [table_name, table_name, "polling", len(records)])
             
             return len(records)
         finally:
@@ -263,12 +277,14 @@ class PollingManager:
         return True
 
 
-def load_polling_config(config_path: str = "polling_config.json") -> List[PollingConfig]:
-    """Load polling configuration from JSON file."""
+def load_polling_config(config_path: str = "polling_config.txt") -> List[PollingConfig]:
+    """Load polling configuration from txt file."""
     if not Path(config_path).exists():
         return []
     
-    with open(config_path, 'r') as f:
-        data = json.load(f)
+    data = parse_txt_config(config_path)
     
-    return [PollingConfig(**item) for item in data.get("jobs", [])]
+    jobs = data.get("jobs", [])
+    if isinstance(jobs, dict):
+        jobs = list(jobs.values())
+    return [PollingConfig(**item) for item in jobs]

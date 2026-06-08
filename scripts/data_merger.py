@@ -19,17 +19,10 @@ from pydantic import BaseModel, Field, field_validator
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database import get_repository
+from scripts.data_importer import init_meta_table
+from validators import quote_identifier, validate_table_name
 
 logger = structlog.get_logger(__name__)
-
-# SQL reserved words that should not be used as table names
-SQL_RESERVED_WORDS = {
-    'select', 'from', 'where', 'insert', 'update', 'delete', 'create', 'drop',
-    'table', 'index', 'view', 'join', 'inner', 'outer', 'left', 'right',
-    'on', 'and', 'or', 'not', 'null', 'true', 'false', 'order', 'by',
-    'group', 'having', 'union', 'except', 'intersect', 'as', 'distinct'
-}
-
 
 def record_merge(conn, source_tables: list[str], target_table: str, row_count: int):
     """Record merge operation metadata with parent table relationships."""
@@ -70,16 +63,12 @@ class MergeConfig(BaseModel):
     @classmethod
     def validate_table_names(cls, v: list[str]) -> list[str]:
         """Validate each table name is valid."""
-        for table in v:
-            # Check for valid identifier pattern
-            if not table or not table[0].isalpha() and table[0] != '_':
-                raise ValueError(f"Invalid table name '{table}': must start with letter or underscore")
-            if not all(c.isalnum() or c == '_' for c in table):
-                raise ValueError(f"Invalid table name '{table}': contains invalid characters")
-            # Check for SQL reserved words
-            if table.lower() in SQL_RESERVED_WORDS:
-                raise ValueError(f"Invalid table name '{table}': SQL reserved word")
-        return v
+        return [validate_table_name(table) for table in v]
+
+    @field_validator('target_table')
+    @classmethod
+    def validate_target_table(cls, v: str) -> str:
+        return validate_table_name(v)
 
 
 class DataMerger:
@@ -120,7 +109,7 @@ class DataMerger:
 
         for table in self.config.source_tables:
             with self.repo.connection() as conn:
-                df = pd.read_sql_query(f"SELECT * FROM {table}", conn)
+                df = pd.read_sql_query(f"SELECT * FROM {quote_identifier(table)}", conn)
                 df['_source_table'] = table
                 dfs.append(df)
                 logger.info("读取源表", table=table, rows=len(df))
@@ -138,7 +127,13 @@ class DataMerger:
             df: DataFrame to save
         """
         with self.repo.connection() as conn:
-            df.to_sql(self.config.target_table, conn, index=False, if_exists='replace')
+            target_table = quote_identifier(self.config.target_table)
+            conn.register("_merged_df", df)
+            try:
+                conn.execute(f"CREATE OR REPLACE TABLE {target_table} AS SELECT * FROM _merged_df")
+            finally:
+                conn.unregister("_merged_df")
+            init_meta_table(conn)
             record_merge(conn, self.config.source_tables, self.config.target_table, len(df))
             logger.info("保存到数据库", table=self.config.target_table, rows=len(df))
 

@@ -1,14 +1,15 @@
 import os
 import re
 import json
+from pathlib import Path
 
-base_dir = "/Users/wuliang/workspace/data-skill"
-support_file = os.path.join(base_dir, "support.md")
-template_dir = os.path.join(base_dir, "references", "echarts_templates")
+base_dir = Path(__file__).resolve().parents[2]
+support_file = base_dir / "support.md"
+template_dir = base_dir / "references" / "echarts_templates"
 
 os.makedirs(template_dir, exist_ok=True)
 
-with open(support_file, "r", encoding="utf-8") as f:
+with support_file.open("r", encoding="utf-8") as f:
     lines = f.readlines()
 
 types = set()
@@ -27,11 +28,11 @@ cartesian_types = {'scatter', 'candlestick', 'boxplot', 'heatmap', 'pictorialBar
 generated_count = 0
 
 for t in types:
-    tmpl_path = os.path.join(template_dir, t, "basic.json")
-    if os.path.exists(tmpl_path):
+    tmpl_path = template_dir / t / "basic.json"
+    if tmpl_path.exists():
         continue
         
-    os.makedirs(os.path.dirname(tmpl_path), exist_ok=True)
+    tmpl_path.parent.mkdir(parents=True, exist_ok=True)
     
     option = {
         "title": {"text": "{title}", "left": "center"},

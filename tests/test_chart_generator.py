@@ -1,7 +1,7 @@
 import pytest
 import os
 import sys
-import sqlite3
+import duckdb
 import json
 
 # Mock the server module before importing chart_generator
@@ -188,10 +188,10 @@ class TestGenerateChart:
     @pytest.fixture
     def populated_db(self, temp_db):
         """Create a database with test data."""
-        conn = sqlite3.connect(temp_db)
+        conn = duckdb.connect(temp_db)
         conn.execute('''
             CREATE TABLE sales (
-                id INTEGER PRIMARY KEY,
+                id INTEGER,
                 category TEXT,
                 amount REAL
             )
@@ -240,7 +240,7 @@ class TestGenerateChart:
     def test_generate_chart_missing_query(self, temp_output_dir):
         """Missing query should raise error."""
         config = {
-            "db_path": "test.db",
+            "db_path": "test.duckdb",
             "title": "No Query",
             "output_path": os.path.join(temp_output_dir, "no_query.html"),
         }
@@ -251,13 +251,13 @@ class TestGenerateChart:
     def test_generate_chart_missing_db(self, temp_output_dir):
         """Missing database should be handled."""
         config = {
-            "db_path": "/nonexistent/path.db",
+            "db_path": "/nonexistent/path.duckdb",
             "query": "SELECT 1",
             "title": "Missing DB",
             "output_path": os.path.join(temp_output_dir, "missing_db.html"),
         }
 
-        with pytest.raises(Exception):  # sqlite3.OperationalError
+        with pytest.raises(Exception):  # DuckDB error
             generate_chart(config)
 
     def test_generate_chart_default_output_path(self, populated_db):

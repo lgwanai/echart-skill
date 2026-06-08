@@ -98,7 +98,8 @@ except ImportError:
     from server import check_server_running, find_free_port, ServerLifecycle
 
 # Constants
-STATUS_FILE = Path("outputs/.server_status.json")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+STATUS_FILE = PROJECT_ROOT / "outputs" / ".server_status.json"
 STATUS_DIR = STATUS_FILE.parent
 SERVER_START_TIMEOUT = 2.0  # seconds
 SERVER_STOP_TIMEOUT = 1.0  # seconds
@@ -146,7 +147,9 @@ def start_server(port: int | None = None, force_restart: bool = False) -> dict:
     lock_path = STATUS_DIR / ".start_server.lock"
     STATUS_DIR.mkdir(parents=True, exist_ok=True)
     # Open in binary mode – required by msvcrt on Windows, harmless on Unix
-    lock_fd = open(str(lock_path), 'wb')
+    lock_fd = open(str(lock_path), 'w+b')
+    lock_fd.write(b"\0")
+    lock_fd.flush()
     if not _acquire_file_lock(lock_fd):
         lock_fd.close()
         return {
@@ -167,7 +170,7 @@ def start_server(port: int | None = None, force_restart: bool = False) -> dict:
             # Also scan ALL ports in range for orphan servers not tracked by
             # the status file (e.g. stale PID file from previous run).
             for p in range(DEFAULT_PORT_RANGE[0], DEFAULT_PORT_RANGE[1] + 1):
-                if check_server_running(p, p + 1):
+                if check_server_running(p, p):
                     lifecycle = ServerLifecycle(p)
                     # Try PID-based kill first
                     pid = lifecycle.read_pid()
@@ -247,7 +250,7 @@ def start_server(port: int | None = None, force_restart: bool = False) -> dict:
             start_time = time.time()
             while time.time() - start_time < SERVER_START_TIMEOUT:
                 time.sleep(0.1)
-                if check_server_running(port, port + 1):
+                if check_server_running(port, port):
                     break
             else:
                 return {
@@ -297,7 +300,7 @@ def stop_server() -> dict:
     if pid is None:
         # No PID recorded, check if server is actually running
         port = status.get("port")
-        if port and check_server_running(port, port + 1):
+        if port and check_server_running(port, port):
             # Server running but no PID - try to find and kill it
             lifecycle = ServerLifecycle(port)
             pid = lifecycle.read_pid()
@@ -385,7 +388,7 @@ def get_status() -> dict:
         # Check if port is responding
         port_responding = False
         if port:
-            port_responding = bool(check_server_running(port, port + 1))
+            port_responding = bool(check_server_running(port, port))
         
         # Update status if server is dead
         if not process_alive and not port_responding:

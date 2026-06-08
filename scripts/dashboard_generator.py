@@ -4,14 +4,14 @@ Dashboard Generator.
 Generates multi-chart HTML dashboards with CSS Grid layout.
 
 Features:
-- Load dashboard configuration from JSON file
-- Fetch data for each chart from SQLite database
+- Load dashboard configuration from txt file
+- Fetch data for each chart from DuckDB database
 - Aggregate map scripts from all charts
 - Generate single HTML with CSS Grid layout
 - CLI interface with --config and --output flags
 
 Usage:
-    python scripts/dashboard_generator.py --config dashboard_config.json --output output.html
+    python scripts/dashboard_generator.py --config dashboard_config.txt --output output.html
 """
 import argparse
 import html as html_mod
@@ -35,10 +35,10 @@ logger = get_logger(__name__)
 
 
 def load_dashboard_config(config_path: str) -> DashboardConfig:
-    """Load and validate dashboard configuration from JSON file.
+    """Load and validate dashboard configuration from txt file.
 
     Args:
-        config_path: Path to JSON configuration file.
+        config_path: Path to txt configuration file.
 
     Returns:
         Validated DashboardConfig object.
@@ -67,7 +67,7 @@ def fetch_chart_data(chart: ChartConfig, db_path: str) -> pd.DataFrame:
 
     Args:
         chart: Chart configuration.
-        db_path: Path to SQLite database.
+        db_path: Path to DuckDB database.
 
     Returns:
         DataFrame with query results (may be empty).
@@ -165,10 +165,14 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
     Returns:
         Path to generated HTML file.
     """
-    base_url = ensure_server_running()
+    try:
+        base_url = ensure_server_running()
+    except OSError as e:
+        logger.warning("Server unavailable, using relative paths as fallback", error=str(e))
+        base_url = None
     if base_url is None:
         logger.warning("Server failed to start, using relative paths as fallback")
-        base_url = "http://127.0.0.1:8100"
+        base_url = "."
     
     # Ensure dashboard assets directory exists
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -234,7 +238,8 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
         # Build chart init script
         chart_init = f"""
     (function() {{
-        var chart = echarts.init(document.getElementById({json.dumps('chart_' + chart.id)}));
+        var chartId = {json.dumps('chart_' + chart.id)};
+        var chart = echarts.init(document.getElementById(chartId));
         var option = {option_json};
         {custom_js}
         chart.setOption(option);
@@ -324,7 +329,7 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
 
         <!-- Dashboard Body -->
         <main class="dashboard-body">
-            <div class="dashboard-grid" style="--grid-columns: {config.columns}; --row-height: {config.row_height}px;">
+            <div class="dashboard-grid" style="--grid-columns: {config.columns}; --row-height: {config.row_height}px; grid-template-columns: repeat({config.columns}, 1fr); grid-auto-rows: {config.row_height}px; gap: {config.gap}px;">
 {chart_cards_html}
             </div>
         </main>
@@ -354,6 +359,12 @@ def generate_dashboard_html(config: DashboardConfig, output_path: str) -> str:
         // Chart filter
         document.getElementById('chart-filter').addEventListener('input', function(e) {{
             dashboard.filterCharts(e.target.value);
+        }});
+
+        window.addEventListener('resize', function() {{
+            charts.forEach(function(chart) {{
+                chart.resize();
+            }});
         }});
     </script>
     <script src="{js_url_escaped}"></script>
@@ -387,7 +398,7 @@ def export_standalone_dashboard(config_path: str, output_path: str, theme: str =
     library embedded, suitable for offline sharing.
     
     Args:
-        config_path: Path to dashboard configuration JSON file
+        config_path: Path to dashboard configuration txt file
         output_path: Output HTML file path
         theme: ECharts theme (default, dark, etc.)
         
@@ -498,7 +509,7 @@ def generate_dashboard(config_path: str, output_path: str | None = None) -> str:
     Main entry point for dashboard generation.
 
     Args:
-        config_path: Path to JSON configuration file.
+        config_path: Path to txt configuration file.
         output_path: Optional output path. Defaults to outputs/html/dashboards/{title}.html.
 
     Returns:
@@ -515,7 +526,7 @@ def generate_dashboard(config_path: str, output_path: str | None = None) -> str:
 
 if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Dashboard Generator")
-    parser.add_argument("--config", required=True, help="Path to dashboard configuration JSON file")
+    parser.add_argument("--config", required=True, help="Path to dashboard configuration txt file")
     parser.add_argument("--output", help="Output HTML file path (optional)")
 
     args = parser.parse_args()

@@ -6,7 +6,7 @@ Per locked decision "始终使用流式导入", ALL Excel files must use streami
 import pytest
 import os
 import sys
-import sqlite3
+import duckdb
 import tempfile
 import pandas as pd
 from unittest.mock import patch, MagicMock, call
@@ -24,7 +24,7 @@ class TestStreamingAlwaysUsedForExcel:
         This test verifies that streaming is ALWAYS used, regardless of file size.
         Per the locked decision "始终使用流式导入" (always use streaming).
         """
-        from scripts.data_importer import import_to_sqlite
+        from scripts.data_importer import import_to_duckdb
 
         # Create a small Excel file (even 1KB should trigger streaming)
         excel_file = tmp_path / "small.xlsx"
@@ -35,7 +35,7 @@ class TestStreamingAlwaysUsedForExcel:
         df.to_excel(str(excel_file), index=False)
 
         # Create temp database
-        db_file = tmp_path / "test.db"
+        db_file = tmp_path / "test.duckdb"
 
         # Mock import_excel_streaming to verify it's called
         with patch('scripts.data_importer.import_excel_streaming') as mock_streaming:
@@ -45,7 +45,7 @@ class TestStreamingAlwaysUsedForExcel:
             # Mock getsize to return a small file size
             with patch('os.path.getsize', return_value=1024):  # 1KB file
                 try:
-                    import_to_sqlite(str(excel_file), str(db_file))
+                    import_to_duckdb(str(excel_file), str(db_file))
                 except Exception:
                     pass  # May fail due to mocking, that's OK
 
@@ -69,8 +69,8 @@ class TestStreamingReadsInChunks:
         df.to_excel(str(excel_file), index=False)
 
         # Create temp database
-        db_file = tmp_path / "test_chunks.db"
-        conn = sqlite3.connect(str(db_file))
+        db_file = tmp_path / "test_chunks.duckdb"
+        conn = duckdb.connect(str(db_file))
 
         # Temporarily set chunk size to 10 for testing via module patch
         import scripts.data_importer as importer_module
@@ -120,8 +120,8 @@ class TestStreamingInsertsAllRows:
         df.to_excel(str(excel_file), index=False)
 
         # Create temp database
-        db_file = tmp_path / "test_data.db"
-        conn = sqlite3.connect(str(db_file))
+        db_file = tmp_path / "test_data.duckdb"
+        conn = duckdb.connect(str(db_file))
 
         try:
             # Run streaming import
@@ -159,8 +159,8 @@ class TestLargeFileSizeValidation:
         df = pd.DataFrame({"col": ["data"]})
         df.to_excel(str(excel_file), index=False)
 
-        db_file = tmp_path / "test.db"
-        conn = sqlite3.connect(str(db_file))
+        db_file = tmp_path / "test.duckdb"
+        conn = duckdb.connect(str(db_file))
 
         # Mock getsize to return > 100MB - patch at module level
         import scripts.data_importer as importer_module

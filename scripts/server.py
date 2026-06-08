@@ -24,7 +24,8 @@ configure_logging()
 logger = get_logger(__name__)
 
 # Server lifecycle configuration
-PID_DIR = Path("outputs/pids")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PID_DIR = PROJECT_ROOT / "outputs" / "pids"
 SERVER_TIMEOUT_MINUTES = 5
 
 
@@ -129,7 +130,7 @@ class ServerLifecycle:
             return False
 
 def find_free_port(start_port=8100, max_port=8200):
-    for port in range(start_port, max_port):
+    for port in range(start_port, max_port + 1):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 s.bind(('', port))
@@ -140,7 +141,7 @@ def find_free_port(start_port=8100, max_port=8200):
 
 def check_server_running(start_port=8100, max_port=8200):
     """Check if the data-skill server is already running by probing ports."""
-    for port in range(start_port, max_port):
+    for port in range(start_port, max_port + 1):
         is_open = False
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(0.1)
@@ -183,7 +184,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         # URL-decode the path to catch encoded traversal attempts
         decoded_path = urllib.parse.unquote(self.path)
-        requested_path = os.path.join(base_dir, decoded_path.lstrip('/'))
+        requested_path = os.path.join(base_dir, decoded_path.lstrip('/\\'))
 
         try:
             # Validate path is within base directory
@@ -280,7 +281,7 @@ def ensure_server_running():
         started = False
         for _ in range(10):
             time.sleep(0.2)
-            if check_server_running(port, port + 1):
+            if check_server_running(port, port):
                 started = True
                 break
         

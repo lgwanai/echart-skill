@@ -88,7 +88,7 @@ def get_profile(config_path: Optional[str], profile_name: str) -> ConnectionProf
         return config.connections[profile_name]
     except FileNotFoundError as e:
         print(f"Error: {e}")
-        print("Create db_connections.json or specify --config path.")
+        print("Create db_connections.txt or specify --config path.")
         sys.exit(1)
 
 
@@ -249,18 +249,13 @@ def ensure_duckdb_meta_table(db_path: str) -> None:
         db_path: Path to DuckDB database
     """
     import duckdb
+    from scripts.data_importer import init_meta_table
     
     conn = duckdb.connect(db_path)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS _data_skill_meta (
-            table_name VARCHAR PRIMARY KEY,
-            source_type VARCHAR,
-            source_path VARCHAR,
-            row_count INTEGER,
-            created_at TIMESTAMP
-        )
-    """)
-    conn.close()
+    try:
+        init_meta_table(conn)
+    finally:
+        conn.close()
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -272,7 +267,7 @@ def create_parser() -> argparse.ArgumentParser:
     
     parser.add_argument(
         "--config",
-        help="Path to db_connections.json (auto-discovered if not specified)"
+        help="Path to db_connections.txt (auto-discovered if not specified)"
     )
     
     subparsers = parser.add_subparsers(dest="command", help="Commands")
