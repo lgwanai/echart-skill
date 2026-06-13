@@ -1,30 +1,12 @@
-# 双数值轴折线图 / Line Chart in Cartesian Coordinate System
+# 双数值轴折线图
 
-**Category:** `line`
-**Example dir:** `line-in-cartesian-coordinate-system`
-
-## Template
-- **line/xy.html** — Cartesian Line
-Data format: `[[x, y], [x, y], ...]`
+**Category:** line
+**Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-in-cartesian-coordinate-system
+**Template:** line/xy.html
 
 ## Option Code
-```javascript
-option = {
-  xAxis: {},
-  yAxis: {},
-  series: [
-    {
-      data: [
-        [10, 40],
-        [50, 100],
-        [40, 20]
-      ],
-      type: 'line'
-    }
-  ]
-};
-```
 
-## Key Points
-- Generate via: `scripts/build_template.py line/xy.html -d data.json`
-- Validate: `scripts/validate_chart.py <output.html>`
+
+## Usage
+- Build: 
+- Validate: 

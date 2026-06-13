@@ -1,37 +1,12 @@
-# 基础面积图 / Basic area chart
+# 基础面积图
 
-**Category:** `line`
-**Example dir:** `area-basic`
-
-## Template
-- **line/basic.html** — Stacked Line / Area
-Data format: `{ categories: string[], series: [{name: string, stack: string, data: number[]}, ...] }`
+**Category:** line
+**Official:** https://echarts.apache.org/examples/zh/editor.html?c=area-basic
+**Template:** line/basic.html
 
 ## Option Code
-```javascript
-option = {
-  xAxis: {
-    type: 'category',
-    boundaryGap: false,
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-  },
-  yAxis: {
-    type: 'value'
-  },
-  series: [
-    {
-      data: [820, 932, 901, 934, 1290, 1330, 1320],
-      type: 'line',
-      areaStyle: {}
-    }
-  ]
-};
-```
 
-## Important
-- Area chart = line chart with `AREA_STYLE: true`
-- Use `line/basic.html` template
 
-## Key Points
-- Generate via: `scripts/build_template.py line/stack.html -d data.json`
-- Validate: `scripts/validate_chart.py <output.html>`
+## Usage
+- Build: 
+- Validate: 

@@ -1,31 +1,12 @@
-# 基础柱状图 / Basic Bar
+# 基础柱状图
 
-**Category:** `bar`
-**Example dir:** `bar-simple`
-
-## Template
-- **bar/basic.html** — Bar
-Data format: `{ categories: string[], values: number[] }`
+**Category:** bar
+**Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-simple
+**Template:** bar/basic.html
 
 ## Option Code
-```javascript
-option = {
-  xAxis: {
-    type: 'category',
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-  },
-  yAxis: {
-    type: 'value'
-  },
-  series: [
-    {
-      data: [120, 200, 150, 80, 70, 110, 130],
-      type: 'bar'
-    }
-  ]
-};
-```
 
-## Key Points
-- Generate via: `scripts/build_template.py bar/basic.html -d data.json`
-- Validate: `scripts/validate_chart.py <output.html>`
+
+## Usage
+- Build: 
+- Validate: 

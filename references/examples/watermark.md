@@ -1,117 +1,12 @@
-# 水印 - ECharts 下载统计 / Watermark - ECharts Download
+# 水印 - ECharts 下载统计
 
-**Category:** `bar`
-**Example dir:** `watermark`
-
-## Template
-⚠️ No template — use knowledge base
-Data format: `N/A`
+**Category:** bar
+**Official:** https://echarts.apache.org/examples/zh/editor.html?c=watermark
+**Template:** NONE
 
 ## Option Code
-```javascript
-const builderJson = {
-  all: 10887,
-  charts: {
-    map: 3237,
-    lines: 2164,
-    bar: 7561,
-    line: 7778,
-    pie: 7355,
-    scatter: 2405,
-    candlestick: 1842,
-    radar: 2090,
-    heatmap: 1762,
-    treemap: 1593,
-    graph: 2060,
-    boxplot: 1537,
-    parallel: 1908,
-    gauge: 2107,
-    funnel: 1692,
-    sankey: 1568
-  },
-  components: {
-    geo: 2788,
-    title: 9575,
-    legend: 9400,
-    tooltip: 9466,
-    grid: 9266,
-    markPoint: 3419,
-    markLine: 2984,
-    timeline: 2739,
-    dataZoom: 2744,
-    visualMap: 2466,
-    toolbox: 3034,
-    polar: 1945
-  },
-  ie: 9743
-};
-const downloadJson = {
-  'echarts.min.js': 17365,
-  'echarts.simple.min.js': 4079,
-  'echarts.common.min.js': 6929,
-  'echarts.js': 14890
-};
-const themeJson = {
-  'dark.js': 1594,
-  'infographic.js': 925,
-  'shine.js': 1608,
-  'roma.js': 721,
-  'macarons.js': 2179,
-  'vintage.js': 1982
-};
-const waterMarkText = 'ECHARTS';
-const canvas = document.createElement('canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = canvas.height = 100;
-ctx.textAlign = 'center';
-ctx.textBaseline = 'middle';
-ctx.globalAlpha = 0.08;
-ctx.font = '20px Microsoft Yahei';
-ctx.translate(50, 50);
-ctx.rotate(-Math.PI / 4);
-ctx.fillText(waterMarkText, 0, 0);
-option = {
-  backgroundColor: {
-    type: 'pattern',
-    image: canvas,
-    repeat: 'repeat'
-  },
-  tooltip: {},
-  title: [
-    {
-      text: '在线构建',
-      subtext: '总计 ' + builderJson.all,
-      left: '25%',
-      textAlign: 'center'
-    },
-    {
-      text: '各版本下载',
-      subtext:
-        '总计 ' +
-        Object.keys(downloadJson).reduce(function (all, key) {
-          return all + downloadJson[key];
-        }, 0),
-      left: '75%',
-      textAlign: 'center'
-    },
-    {
-      text: '主题下载',
-      subtext:
-        '总计 ' +
-        Object.keys(themeJson).reduce(function (all, key) {
-          return all + themeJson[key];
-        }, 0),
-      left: '75%',
-      top: '50%',
-      textAlign: 'center'
-    }
-  ],
-  grid: [
-    {
-      top: 50,
-      width: '50
-```
 
-## Key Points
-- Generate via: `scripts/build_template.py  -d data.json`
-- Validate: `scripts/validate_chart.py <output.html>`
+
+## Usage
+- Build: 
+- Validate: 

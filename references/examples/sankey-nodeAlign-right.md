@@ -1,47 +1,12 @@
-# 桑基图右对齐布局 / Node Align Right in Sankey
+# 桑基图右对齐布局
 
-**Category:** `sankey`
-**Example dir:** `sankey-nodeAlign-right`
-
-## Template
-- **sankey/basic.html** — Sankey
-Data format: `{ nodes: [{name: string, itemStyle?: {}}, ...], links: [{source: string, target: string, value: number}, ...] }`
+**Category:** sankey
+**Official:** https://echarts.apache.org/examples/zh/editor.html?c=sankey-nodeAlign-right
+**Template:** sankey/basic.html
 
 ## Option Code
-```javascript
-myChart.showLoading();
-$.get(ROOT_PATH + '/data/asset/data/energy.json', function (data) {
-  myChart.hideLoading();
-  myChart.setOption(
-    (option = {
-      title: {
-        text: 'Node Align Right'
-      },
-      tooltip: {
-        trigger: 'item',
-        triggerOn: 'mousemove'
-      },
-      animation: false,
-      series: [
-        {
-          type: 'sankey',
-          emphasis: {
-            focus: 'adjacency'
-          },
-          nodeAlign: 'right',
-          data: data.nodes,
-          links: data.links,
-          lineStyle: {
-            color: 'source',
-            curveness: 0.5
-          }
-        }
-      ]
-    })
-  );
-});
-```
 
-## Key Points
-- Generate via: `scripts/build_template.py sankey/basic.html -d data.json`
-- Validate: `scripts/validate_chart.py <output.html>`
+
+## Usage
+- Build: 
+- Validate: 

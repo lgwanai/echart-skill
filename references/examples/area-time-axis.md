@@ -1,77 +1,12 @@
-# 时间轴折线图 / Area Chart with Time Axis
+# 时间轴折线图
 
-**Category:** `line`
-**Example dir:** `area-time-axis`
-
-## Template
-- **line/basic.html** — Stacked Line / Area
-Data format: `{ categories: string[], series: [{name: string, stack: string, data: number[]}, ...] }`
+**Category:** line
+**Official:** https://echarts.apache.org/examples/zh/editor.html?c=area-time-axis
+**Template:** line/basic.html
 
 ## Option Code
-```javascript
-let base = +new Date(1988, 9, 3);
-let oneDay = 24 * 3600 * 1000;
-let data = [[base, Math.random() * 300]];
-for (let i = 1; i < 20000; i++) {
-  let now = new Date((base += oneDay));
-  data.push([+now, Math.round((Math.random() - 0.5) * 20 + data[i - 1][1])]);
-}
-option = {
-  tooltip: {
-    trigger: 'axis',
-    position: function (pt) {
-      return [pt[0], '10%'];
-    }
-  },
-  title: {
-    left: 'center',
-    text: 'Large Ara Chart'
-  },
-  toolbox: {
-    feature: {
-      dataZoom: {
-        yAxisIndex: 'none'
-      },
-      restore: {},
-      saveAsImage: {}
-    }
-  },
-  xAxis: {
-    type: 'time',
-    boundaryGap: false
-  },
-  yAxis: {
-    type: 'value',
-    boundaryGap: [0, '100%']
-  },
-  dataZoom: [
-    {
-      type: 'inside',
-      start: 0,
-      end: 20
-    },
-    {
-      start: 0,
-      end: 20
-    }
-  ],
-  series: [
-    {
-      name: 'Fake Data',
-      type: 'line',
-      smooth: true,
-      symbol: 'none',
-      areaStyle: {},
-      data: data
-    }
-  ]
-};
-```
 
-## Important
-- Area chart = line chart with `AREA_STYLE: true`
-- Use `line/basic.html` template
 
-## Key Points
-- Generate via: `scripts/build_template.py line/stack.html -d data.json`
-- Validate: `scripts/validate_chart.py <output.html>`
+## Usage
+- Build: 
+- Validate: 

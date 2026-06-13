@@ -1,74 +1,12 @@
-# Flights on Geo3D / Flights on Geo3D
+# Flights on Geo3D
 
-**Category:** `lines3D`
-**Example dir:** `lines3d-flights-on-geo3d`
-
-## Template
-- **3d/lines3d.html** — Lines3D
-Data format: `{ geoCoordMap: {"name": [lng, lat]}, flights: [[fromName, toName], ...] }`
+**Category:** lines3D
+**Official:** https://echarts.apache.org/examples/zh/editor.html?c=lines3d-flights-on-geo3d
+**Template:** 3d/lines3d.html
 
 ## Option Code
-```javascript
-$.getJSON(ROOT_PATH + '/data-gl/asset/data/flights.json', function (data) {
-  function getAirportCoord(idx) {
-    return [data.airports[idx][3], data.airports[idx][4]];
-  }
-  var routes = data.routes.map(function (airline) {
-    return [getAirportCoord(airline[1]), getAirportCoord(airline[2])];
-  });
-  myChart.setOption({
-    geo3D: {
-      map: 'world',
-      shading: 'color',
-      environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
-      silent: true,
-      groundPlane: {
-        show: false
-      },
-      light: {
-        main: {
-          intensity: 0
-        },
-        ambient: {
-          intensity: 0
-        }
-      },
-      viewControl: {
-        distance: 50
-      },
-      itemStyle: {
-        color: '#111'
-      },
-      boxHeight: 0.5
-    },
-    series: [
-      {
-        type: 'lines3D',
-        coordinateSystem: 'geo3D',
-        effect: {
-          show: true,
-          trailWidth: 2,
-          trailLength: 0.2
-        },
-        blendMode: 'lighter',
-        lineStyle: {
-          width: 0,
-          color: 'rgb(50, 50, 150)',
-          opacity: 0.2
-        },
-        data: routes
-      }
-    ]
-  });
-});
-window.addEventListener('keydown', function () {
-  myChart.dispatchAction({
-    type: 'lines3DToggleEffect',
-    seriesIndex: 0
-  });
-});
-```
 
-## Key Points
-- Generate via: `scripts/build_template.py 3d/lines3d.html -d data.json`
-- Validate: `scripts/validate_chart.py <output.html>`
+
+## Usage
+- Build: 
+- Validate: 
