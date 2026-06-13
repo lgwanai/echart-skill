@@ -80,13 +80,14 @@ var option = {
     },
     {
       type: 'custom', name: 'error',
+      color: '#e54035',
       itemStyle: { borderWidth: 1.5 },
       renderItem: function(params, api) {
         var xValue = api.value(0);
         var highPoint = api.coord([xValue, api.value(1)]);
         var lowPoint = api.coord([xValue, api.value(2)]);
         var halfWidth = api.size([1, 0])[0] * 0.1;
-        var style = api.style({ stroke: api.visual('color'), fill: undefined });
+        var style = api.style({ stroke: '#e54035', fill: undefined });
         return {
           type: 'group',
           children: [
