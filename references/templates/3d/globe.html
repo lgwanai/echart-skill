@@ -1,7 +1,7 @@
 <!--
   Template: 3d/globe.html
-  Chart Type: Globe (3D地球 with scatter)
-  Data Format: [[name, lat, lng, value], ...]
+  Chart Type: Globe (3D地球 + scatter points)
+  Data Format: [[lat, lng, value], ...]
   NOTE: Requires echarts-gl extension
 -->
 <!DOCTYPE html>
@@ -21,6 +21,7 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   backgroundColor: '#000',
   globe: {
+    baseTexture: {{BASE_TEXTURE}},
     shading: {{SHADING}},
     environment: {{ENVIRONMENT}}
   },
