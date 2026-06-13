@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>18-Candlestick</title>
+    <title>18_Candlestick</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "dt", "y": "open"}}], "dataset": {"source": [["dt", "open", "close", "low", "high"], ["1日", 20.0, 34.0, 10.0, 38.0], ["2日", 40.0, 35.0, 30.0, 50.0], ["3日", 31.0, 38.0, 33.0, 44.0], ["4日", 38.0, 15.0, 5.0, 42.0], ["5日", 11.0, 35.0, 8.0, 35.0], ["6日", 29.0, 43.0, 20.0, 49.0], ["7日", 41.0, 26.0, 18.0, 42.0]]}};
-            var rawData = [{"dt": "1日", "open": 20.0, "close": 34.0, "low": 10.0, "high": 38.0}, {"dt": "2日", "open": 40.0, "close": 35.0, "low": 30.0, "high": 50.0}, {"dt": "3日", "open": 31.0, "close": 38.0, "low": 33.0, "high": 44.0}, {"dt": "4日", "open": 38.0, "close": 15.0, "low": 5.0, "high": 42.0}, {"dt": "5日", "open": 11.0, "close": 35.0, "low": 8.0, "high": 35.0}, {"dt": "6日", "open": 29.0, "close": 43.0, "low": 20.0, "high": 49.0}, {"dt": "7日", "open": 41.0, "close": 26.0, "low": 18.0, "high": 42.0}];
+            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "candlestick", "encode": {"x": "d", "y": ["lo", "hi", "o", "cl"]}}], "dataset": {"source": [["d", "o", "cl", "lo", "hi"], ["1日", 20.0, 34.0, 10.0, 38.0], ["2日", 40.0, 35.0, 30.0, 50.0], ["3日", 31.0, 38.0, 33.0, 44.0], ["4日", 38.0, 15.0, 5.0, 42.0], ["5日", 11.0, 35.0, 8.0, 35.0], ["6日", 29.0, 43.0, 20.0, 49.0], ["7日", 41.0, 26.0, 18.0, 42.0]]}};
+            var rawData = [{"d": "1日", "o": 20.0, "cl": 34.0, "lo": 10.0, "hi": 38.0}, {"d": "2日", "o": 40.0, "cl": 35.0, "lo": 30.0, "hi": 50.0}, {"d": "3日", "o": 31.0, "cl": 38.0, "lo": 33.0, "hi": 44.0}, {"d": "4日", "o": 38.0, "cl": 15.0, "lo": 5.0, "hi": 42.0}, {"d": "5日", "o": 11.0, "cl": 35.0, "lo": 8.0, "hi": 35.0}, {"d": "6日", "o": 29.0, "cl": 43.0, "lo": 20.0, "hi": 49.0}, {"d": "7日", "o": 41.0, "cl": 26.0, "lo": 18.0, "hi": 42.0}];
 
             
 

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>23-Tree</title>
+    <title>23_Tree</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "id", "y": "name"}}], "dataset": {"source": [["id", "name", "parent_id"], ["1", "CEO", "0"], ["2", "CTO", "1"], ["3", "CFO", "1"], ["4", "工程师A", "2"], ["5", "工程师B", "2"], ["6", "会计A", "3"]]}};
-            var rawData = [{"id": "1", "name": "CEO", "parent_id": "0"}, {"id": "2", "name": "CTO", "parent_id": "1"}, {"id": "3", "name": "CFO", "parent_id": "1"}, {"id": "4", "name": "工程师A", "parent_id": "2"}, {"id": "5", "name": "工程师B", "parent_id": "2"}, {"id": "6", "name": "会计A", "parent_id": "3"}];
+            var option = {"series": [{"type": "tree", "data": [{"name": "CEO", "children": [{"name": "CTO", "children": [{"name": "工程师A"}, {"name": "工程师B"}]}, {"name": "CFO", "children": [{"name": "会计A"}]}]}]}], "dataset": {"source": [["id", "n", "pid"], ["1", "CEO", "0"], ["2", "CTO", "1"], ["3", "CFO", "1"], ["4", "工程师A", "2"], ["5", "工程师B", "2"], ["6", "会计A", "3"]]}, "xAxis": {"type": "category"}, "yAxis": {"type": "value"}};
+            var rawData = [{"id": "1", "n": "CEO", "pid": "0"}, {"id": "2", "n": "CTO", "pid": "1"}, {"id": "3", "n": "CFO", "pid": "1"}, {"id": "4", "n": "工程师A", "pid": "2"}, {"id": "5", "n": "工程师B", "pid": "2"}, {"id": "6", "n": "会计A", "pid": "3"}];
 
             
 

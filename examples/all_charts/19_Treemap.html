@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>19-Treemap</title>
+    <title>19_Treemap</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "name", "y": "val"}}], "dataset": {"source": [["name", "val", "parent"], ["手机", 6000.0, "电子产品"], ["电脑", 4000.0, "电子产品"], ["平板", 2000.0, "电子产品"], ["家具", 3000.0, "家居"], ["灯具", 2000.0, "家居"], ["园艺", 1000.0, "家居"], ["电子产品", 0.0, ""], ["家居", 0.0, ""]]}};
-            var rawData = [{"name": "手机", "val": 6000.0, "parent": "电子产品"}, {"name": "电脑", "val": 4000.0, "parent": "电子产品"}, {"name": "平板", "val": 2000.0, "parent": "电子产品"}, {"name": "家具", "val": 3000.0, "parent": "家居"}, {"name": "灯具", "val": 2000.0, "parent": "家居"}, {"name": "园艺", "val": 1000.0, "parent": "家居"}, {"name": "电子产品", "val": 0.0, "parent": ""}, {"name": "家居", "val": 0.0, "parent": ""}];
+            var option = {"series": [{"type": "treemap", "data": [{"name": "电子产品", "children": [{"name": "手机", "value": 6000}, {"name": "电脑", "value": 4000}, {"name": "平板", "value": 2000}]}, {"name": "家居", "children": [{"name": "家具", "value": 3000}, {"name": "灯具", "value": 2000}, {"name": "园艺", "value": 1000}]}]}], "dataset": {"source": [["n", "v"], ["电子产品", 0.0], ["手机", 6000.0], ["电脑", 4000.0], ["平板", 2000.0], ["家居", 0.0], ["家具", 3000.0], ["灯具", 2000.0], ["园艺", 1000.0]]}, "xAxis": {"type": "category"}, "yAxis": {"type": "value"}};
+            var rawData = [{"n": "电子产品", "v": 0.0}, {"n": "手机", "v": 6000.0}, {"n": "电脑", "v": 4000.0}, {"n": "平板", "v": 2000.0}, {"n": "家居", "v": 0.0}, {"n": "家具", "v": 3000.0}, {"n": "灯具", "v": 2000.0}, {"n": "园艺", "v": 1000.0}];
 
             
 

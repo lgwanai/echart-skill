@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>06-Line Basic</title>
+    <title>06_Line_Basic</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "line", "encode": {"x": "name", "y": "value"}}], "dataset": {"source": [["name", "value"], ["2024-01-01", "820"], ["2024-02-01", "932"], ["2024-03-01", "901"], ["2024-04-01", "1290"], ["2024-05-01", "1330"], ["2024-06-01", "1420"], ["2024-07-01", "1560"], ["2024-08-01", "1480"], ["2024-09-01", "1620"], ["2024-10-01", "1720"], ["2024-11-01", "1680"], ["2024-12-01", "1890"]]}};
-            var rawData = [{"name": "2024-01-01", "value": "820"}, {"name": "2024-02-01", "value": "932"}, {"name": "2024-03-01", "value": "901"}, {"name": "2024-04-01", "value": "1290"}, {"name": "2024-05-01", "value": "1330"}, {"name": "2024-06-01", "value": "1420"}, {"name": "2024-07-01", "value": "1560"}, {"name": "2024-08-01", "value": "1480"}, {"name": "2024-09-01", "value": "1620"}, {"name": "2024-10-01", "value": "1720"}, {"name": "2024-11-01", "value": "1680"}, {"name": "2024-12-01", "value": "1890"}];
+            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "line", "encode": {"x": "d", "y": "v"}, "smooth": true}], "dataset": {"source": [["d", "v"], ["Jan", "820"], ["Feb", "932"], ["Mar", "901"], ["Apr", "1290"], ["May", "1330"], ["Jun", "1420"], ["Jul", "1560"], ["Aug", "1480"], ["Sep", "1620"], ["Oct", "1720"], ["Nov", "1680"], ["Dec", "1890"]]}};
+            var rawData = [{"d": "Jan", "v": "820"}, {"d": "Feb", "v": "932"}, {"d": "Mar", "v": "901"}, {"d": "Apr", "v": "1290"}, {"d": "May", "v": "1330"}, {"d": "Jun", "v": "1420"}, {"d": "Jul", "v": "1560"}, {"d": "Aug", "v": "1480"}, {"d": "Sep", "v": "1620"}, {"d": "Oct", "v": "1720"}, {"d": "Nov", "v": "1680"}, {"d": "Dec", "v": "1890"}];
 
             
 

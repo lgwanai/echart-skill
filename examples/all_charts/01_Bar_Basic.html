@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>01-Bar Basic</title>
+    <title>01_Bar_Basic</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "name", "y": "value"}}], "dataset": {"source": [["name", "value"], ["产品A", "820"], ["产品B", "932"], ["产品C", "901"], ["产品D", "934"], ["产品E", "1290"], ["产品F", "1330"], ["产品G", "1320"]]}};
-            var rawData = [{"name": "产品A", "value": "820"}, {"name": "产品B", "value": "932"}, {"name": "产品C", "value": "901"}, {"name": "产品D", "value": "934"}, {"name": "产品E", "value": "1290"}, {"name": "产品F", "value": "1330"}, {"name": "产品G", "value": "1320"}];
+            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "cat", "y": "val"}}], "dataset": {"source": [["cat", "val"], ["Mon", 120.0], ["Tue", 200.0], ["Wed", 150.0], ["Thu", 80.0], ["Fri", 70.0], ["Sat", 110.0], ["Sun", 130.0]]}};
+            var rawData = [{"cat": "Mon", "val": 120.0}, {"cat": "Tue", "val": 200.0}, {"cat": "Wed", "val": 150.0}, {"cat": "Thu", "val": 80.0}, {"cat": "Fri", "val": 70.0}, {"cat": "Sat", "val": 110.0}, {"cat": "Sun", "val": 130.0}];
 
             
 

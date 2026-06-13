@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>30-EffectScatter</title>
+    <title>30_EffectScatter</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -126,8 +126,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "value"}, "yAxis": {"type": "value"}, "series": [{"type": "scatter", "encode": {"x": "x", "y": "y"}}], "dataset": {"source": [["x", "y", "name"], [20.0, 50.0, "北京"], [30.0, 80.0, "上海"], [50.0, 40.0, "广州"], [70.0, 70.0, "深圳"], [60.0, 30.0, "成都"], [80.0, 60.0, "杭州"]]}};
-            var rawData = [{"x": 20.0, "y": 50.0, "name": "北京"}, {"x": 30.0, "y": 80.0, "name": "上海"}, {"x": 50.0, "y": 40.0, "name": "广州"}, {"x": 70.0, "y": 70.0, "name": "深圳"}, {"x": 60.0, "y": 30.0, "name": "成都"}, {"x": 80.0, "y": 60.0, "name": "杭州"}];
+            var option = {"xAxis": {"type": "value"}, "yAxis": {"type": "value"}, "series": [{"type": "effectScatter", "encode": {"x": "x", "y": "y"}}], "dataset": {"source": [["x", "y", "n"], [20.0, 50.0, "北京"], [30.0, 80.0, "上海"], [50.0, 40.0, "广州"], [70.0, 70.0, "深圳"], [60.0, 30.0, "成都"], [80.0, 60.0, "杭州"]]}};
+            var rawData = [{"x": 20.0, "y": 50.0, "n": "北京"}, {"x": 30.0, "y": 80.0, "n": "上海"}, {"x": 50.0, "y": 40.0, "n": "广州"}, {"x": 70.0, "y": 70.0, "n": "深圳"}, {"x": 60.0, "y": 30.0, "n": "成都"}, {"x": 80.0, "y": 60.0, "n": "杭州"}];
 
             
 

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>07-Line Stacked</title>
+    <title>07_Line_Stacked</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "line", "encode": {"x": "dt", "y": "email"}}], "dataset": {"source": [["dt", "email", "union_ads", "video_ads"], ["1月", "120", "220", "150"], ["2月", "132", "182", "232"], ["3月", "101", "191", "201"], ["4月", "134", "234", "154"], ["5月", "90", "290", "190"], ["6月", "230", "330", "330"]]}};
-            var rawData = [{"dt": "1月", "email": "120", "union_ads": "220", "video_ads": "150"}, {"dt": "2月", "email": "132", "union_ads": "182", "video_ads": "232"}, {"dt": "3月", "email": "101", "union_ads": "191", "video_ads": "201"}, {"dt": "4月", "email": "134", "union_ads": "234", "video_ads": "154"}, {"dt": "5月", "email": "90", "union_ads": "290", "video_ads": "190"}, {"dt": "6月", "email": "230", "union_ads": "330", "video_ads": "330"}];
+            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "line", "stack": "x", "encode": {"x": "d", "y": "email"}}, {"type": "line", "stack": "x", "encode": {"x": "d", "y": "ads"}}, {"type": "line", "stack": "x", "encode": {"x": "d", "y": "video"}}], "dataset": {"source": [["d", "email", "ads", "video"], ["Jan", "120", "220", "150"], ["Feb", "132", "182", "232"], ["Mar", "101", "191", "201"], ["Apr", "134", "234", "154"], ["May", "90", "290", "190"], ["Jun", "230", "330", "330"]]}};
+            var rawData = [{"d": "Jan", "email": "120", "ads": "220", "video": "150"}, {"d": "Feb", "email": "132", "ads": "182", "video": "232"}, {"d": "Mar", "email": "101", "ads": "191", "video": "201"}, {"d": "Apr", "email": "134", "ads": "234", "video": "154"}, {"d": "May", "email": "90", "ads": "290", "video": "190"}, {"d": "Jun", "email": "230", "ads": "330", "video": "330"}];
 
             
 

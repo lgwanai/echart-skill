@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>22-Graph Force</title>
+    <title>22_Graph_Force</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "id", "y": "name"}}], "dataset": {"source": [["id", "name", "category"], ["0", "节点A", "0"], ["1", "节点B", "0"], ["2", "节点C", "1"], ["3", "节点D", "1"], ["4", "节点E", "2"]]}};
-            var rawData = [{"id": "0", "name": "节点A", "category": "0"}, {"id": "1", "name": "节点B", "category": "0"}, {"id": "2", "name": "节点C", "category": "1"}, {"id": "3", "name": "节点D", "category": "1"}, {"id": "4", "name": "节点E", "category": "2"}];
+            var option = {"series": [{"type": "graph", "layout": "force", "roam": true, "data": [{"name": "A", "category": 0}, {"name": "B", "category": 0}, {"name": "C", "category": 1}, {"name": "D", "category": 1}, {"name": "E", "category": 2}], "links": [{"source": "A", "target": "B"}, {"source": "A", "target": "C"}, {"source": "B", "target": "D"}, {"source": "C", "target": "D"}, {"source": "C", "target": "E"}, {"source": "D", "target": "E"}], "categories": [{"name": "一类"}, {"name": "二类"}, {"name": "三类"}]}], "dataset": {"source": [["n", "c"], ["A", "0"], ["B", "0"], ["C", "1"], ["D", "1"], ["E", "2"]]}, "xAxis": {"type": "category"}, "yAxis": {"type": "value"}};
+            var rawData = [{"n": "A", "c": "0"}, {"n": "B", "c": "0"}, {"n": "C", "c": "1"}, {"n": "D", "c": "1"}, {"n": "E", "c": "2"}];
 
             
 

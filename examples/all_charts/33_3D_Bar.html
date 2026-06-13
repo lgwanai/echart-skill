@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>33-3D Bar</title>
+    <title>33_3D_Bar</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,7 +61,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "x", "y": "y"}}], "dataset": {"source": [["x", "y", "z"], ["A", "Q1", 120.0], ["A", "Q2", 200.0], ["A", "Q3", 150.0], ["A", "Q4", 180.0], ["B", "Q1", 90.0], ["B", "Q2", 130.0], ["B", "Q3", 110.0], ["B", "Q4", 100.0], ["C", "Q1", 160.0], ["C", "Q2", 220.0], ["C", "Q3", 190.0], ["C", "Q4", 210.0]]}};
+            var option = {"xAxis3D": {"type": "category"}, "yAxis3D": {"type": "category"}, "zAxis3D": {"type": "value"}, "series": [{"type": "bar3D", "encode": {"x": "x", "y": "y", "z": "z"}}], "dataset": {"source": [["x", "y", "z"], ["A", "Q1", 120.0], ["A", "Q2", 200.0], ["A", "Q3", 150.0], ["A", "Q4", 180.0], ["B", "Q1", 90.0], ["B", "Q2", 130.0], ["B", "Q3", 110.0], ["B", "Q4", 100.0], ["C", "Q1", 160.0], ["C", "Q2", 220.0], ["C", "Q3", 190.0], ["C", "Q4", 210.0]]}, "xAxis": {"type": "category"}, "yAxis": {"type": "value"}};
             var rawData = [{"x": "A", "y": "Q1", "z": 120.0}, {"x": "A", "y": "Q2", "z": 200.0}, {"x": "A", "y": "Q3", "z": 150.0}, {"x": "A", "y": "Q4", "z": 180.0}, {"x": "B", "y": "Q1", "z": 90.0}, {"x": "B", "y": "Q2", "z": 130.0}, {"x": "B", "y": "Q3", "z": 110.0}, {"x": "B", "y": "Q4", "z": 100.0}, {"x": "C", "y": "Q1", "z": 160.0}, {"x": "C", "y": "Q2", "z": 220.0}, {"x": "C", "y": "Q3", "z": 190.0}, {"x": "C", "y": "Q4", "z": 210.0}];
 
             

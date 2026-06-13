@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>24-Boxplot</title>
+    <title>24_Boxplot</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "name", "y": "value"}}], "dataset": {"source": [["name", "value"], ["A", 850.0], ["A", 740.0], ["A", 900.0], ["A", 1070.0], ["A", 930.0], ["A", 850.0], ["A", 950.0], ["A", 980.0], ["A", 980.0], ["A", 880.0], ["A", 1000.0], ["A", 980.0], ["B", 960.0], ["B", 940.0], ["B", 960.0], ["B", 940.0], ["B", 880.0], ["B", 800.0], ["B", 850.0], ["B", 880.0], ["B", 900.0], ["B", 840.0], ["B", 830.0]]}};
-            var rawData = [{"name": "A", "value": 850.0}, {"name": "A", "value": 740.0}, {"name": "A", "value": 900.0}, {"name": "A", "value": 1070.0}, {"name": "A", "value": 930.0}, {"name": "A", "value": 850.0}, {"name": "A", "value": 950.0}, {"name": "A", "value": 980.0}, {"name": "A", "value": 980.0}, {"name": "A", "value": 880.0}, {"name": "A", "value": 1000.0}, {"name": "A", "value": 980.0}, {"name": "B", "value": 960.0}, {"name": "B", "value": 940.0}, {"name": "B", "value": 960.0}, {"name": "B", "value": 940.0}, {"name": "B", "value": 880.0}, {"name": "B", "value": 800.0}, {"name": "B", "value": 850.0}, {"name": "B", "value": 880.0}, {"name": "B", "value": 900.0}, {"name": "B", "value": 840.0}, {"name": "B", "value": 830.0}];
+            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "boxplot", "encode": {"x": "c", "y": "v"}}], "dataset": {"source": [["c", "v"], ["A", 850.0], ["A", 740.0], ["A", 900.0], ["A", 1070.0], ["A", 930.0], ["A", 850.0], ["A", 950.0], ["A", 980.0], ["A", 980.0], ["A", 880.0], ["A", 1000.0], ["A", 980.0], ["B", 960.0], ["B", 940.0], ["B", 960.0], ["B", 940.0], ["B", 880.0], ["B", 800.0], ["B", 850.0], ["B", 880.0], ["B", 900.0], ["B", 840.0], ["B", 830.0]]}};
+            var rawData = [{"c": "A", "v": 850.0}, {"c": "A", "v": 740.0}, {"c": "A", "v": 900.0}, {"c": "A", "v": 1070.0}, {"c": "A", "v": 930.0}, {"c": "A", "v": 850.0}, {"c": "A", "v": 950.0}, {"c": "A", "v": 980.0}, {"c": "A", "v": 980.0}, {"c": "A", "v": 880.0}, {"c": "A", "v": 1000.0}, {"c": "A", "v": 980.0}, {"c": "B", "v": 960.0}, {"c": "B", "v": 940.0}, {"c": "B", "v": 960.0}, {"c": "B", "v": 940.0}, {"c": "B", "v": 880.0}, {"c": "B", "v": 800.0}, {"c": "B", "v": 850.0}, {"c": "B", "v": 880.0}, {"c": "B", "v": 900.0}, {"c": "B", "v": 840.0}, {"c": "B", "v": 830.0}];
 
             
 

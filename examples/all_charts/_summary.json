@@ -1,207 +1,207 @@
 [
   {
     "status": "✅",
-    "title": "01-Bar Basic",
-    "detail": "1118411 bytes"
+    "title": "01_Bar_Basic",
+    "detail": "1118374 bytes"
   },
   {
     "status": "✅",
-    "title": "02-Bar Horizontal",
-    "detail": "1162566 bytes"
+    "title": "02_Bar_Horizontal",
+    "detail": "1162517 bytes"
   },
   {
     "status": "✅",
-    "title": "03-Bar Stacked",
-    "detail": "1119165 bytes"
+    "title": "03_Bar_Stacked",
+    "detail": "1119340 bytes"
   },
   {
     "status": "✅",
-    "title": "04-Bar Waterfall",
-    "detail": "1118395 bytes"
+    "title": "04_Bar_Waterfall",
+    "detail": "1118332 bytes"
   },
   {
     "status": "✅",
-    "title": "05-Bar Race",
-    "detail": "1163600 bytes"
+    "title": "05_Bar_Race",
+    "detail": "1163448 bytes"
   },
   {
     "status": "✅",
-    "title": "06-Line Basic",
-    "detail": "1118838 bytes"
+    "title": "06_Line_Basic",
+    "detail": "1118588 bytes"
   },
   {
     "status": "✅",
-    "title": "07-Line Stacked",
-    "detail": "1118680 bytes"
+    "title": "07_Line_Stacked",
+    "detail": "1118762 bytes"
   },
   {
     "status": "✅",
-    "title": "08-Line XY",
-    "detail": "1118455 bytes"
+    "title": "08_Line_XY",
+    "detail": "1118452 bytes"
   },
   {
     "status": "✅",
-    "title": "09-Pie Basic",
-    "detail": "1118297 bytes"
+    "title": "09_Pie_Basic",
+    "detail": "1118228 bytes"
   },
   {
     "status": "✅",
-    "title": "10-Scatter Basic",
-    "detail": "1118667 bytes"
+    "title": "38_Pie_Rose",
+    "detail": "1118333 bytes"
   },
   {
     "status": "✅",
-    "title": "11-Scatter Bubble",
-    "detail": "1154410 bytes"
+    "title": "10_Scatter_Basic",
+    "detail": "1118461 bytes"
   },
   {
     "status": "✅",
-    "title": "12-Scatter Geo",
-    "detail": "1154343 bytes"
+    "title": "11_Scatter_Bubble",
+    "detail": "1154416 bytes"
   },
   {
     "status": "✅",
-    "title": "13-Map China",
-    "detail": "2487403 bytes"
+    "title": "12_Scatter_Geo",
+    "detail": "1198669 bytes"
   },
   {
     "status": "✅",
-    "title": "14-Radar Basic",
+    "title": "30_EffectScatter",
+    "detail": "1154245 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "13_Map_China",
+    "detail": "2486344 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "14_Radar_Basic",
+    "detail": "1118487 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "15_Gauge",
+    "detail": "1118109 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "16_Funnel",
+    "detail": "1118335 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "17_Heatmap",
+    "detail": "1119332 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "18_Candlestick",
+    "detail": "1118736 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "19_Treemap",
+    "detail": "1118604 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "20_Sunburst",
+    "detail": "1118882 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "21_Sankey",
+    "detail": "1119078 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "22_Graph_Force",
+    "detail": "1118650 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "23_Tree",
+    "detail": "1118516 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "24_Boxplot",
+    "detail": "1118928 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "25_Parallel",
+    "detail": "1118843 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "26_Calendar",
+    "detail": "1118858 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "27_ThemeRiver",
+    "detail": "1118893 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "28_PictorialBar",
+    "detail": "1118272 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "29_Chord",
+    "detail": "1154781 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "31_Lines_Flights",
+    "detail": "1199241 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "32_Mix_Line_Bar",
+    "detail": "1118640 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "33_3D_Bar",
+    "detail": "1118816 bytes"
+  },
+  {
+    "status": "✅",
+    "title": "34_3D_Scatter",
     "detail": "1118515 bytes"
   },
   {
     "status": "✅",
-    "title": "15-Gauge",
-    "detail": "1118105 bytes"
+    "title": "35_3D_Surface",
+    "detail": "1118948 bytes"
   },
   {
     "status": "✅",
-    "title": "16-Funnel",
-    "detail": "1118306 bytes"
+    "title": "36_3D_Globe",
+    "detail": "1118098 bytes"
   },
   {
     "status": "✅",
-    "title": "17-Heatmap",
-    "detail": "1119515 bytes"
+    "title": "37_3D_Lines3D",
+    "detail": "1118429 bytes"
   },
   {
     "status": "✅",
-    "title": "18-Candlestick",
-    "detail": "1118792 bytes"
+    "title": "39_Custom_Error_Bar",
+    "detail": "1118463 bytes"
   },
   {
     "status": "✅",
-    "title": "19-Treemap",
-    "detail": "1118614 bytes"
+    "title": "40_Geo_Lines",
+    "detail": "1198663 bytes"
   },
   {
     "status": "✅",
-    "title": "20-Sunburst",
-    "detail": "1118709 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "21-Sankey",
-    "detail": "1118608 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "22-Graph Force",
-    "detail": "1118390 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "23-Tree",
-    "detail": "1118458 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "24-Boxplot",
-    "detail": "1119099 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "25-Parallel",
-    "detail": "1118608 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "26-Calendar",
-    "detail": "1119567 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "27-ThemeRiver",
-    "detail": "1118932 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "28-PictorialBar",
-    "detail": "1118312 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "29-Chord",
-    "detail": "1154391 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "30-EffectScatter",
-    "detail": "1154260 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "31-Lines Flights",
-    "detail": "1154652 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "32-Mix Line-Bar",
-    "detail": "1118515 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "33-3D Bar",
-    "detail": "1118708 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "34-3D Scatter",
-    "detail": "1118428 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "35-3D Surface",
-    "detail": "1118870 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "36-3D Globe",
-    "detail": "1141076 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "37-3D Lines3D",
-    "detail": "1118356 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "38-Pie Rose",
-    "detail": "1118447 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "39-Custom Error-Bar",
-    "detail": "1118515 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "40-Geo Lines",
-    "detail": "1154011 bytes"
-  },
-  {
-    "status": "✅",
-    "title": "41-Mix Timeline",
-    "detail": "1118656 bytes"
+    "title": "41_Mix_Timeline",
+    "detail": "1118776 bytes"
   }
 ]

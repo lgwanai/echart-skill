@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>27-ThemeRiver</title>
+    <title>27_ThemeRiver</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "dt", "y": "cat"}}], "dataset": {"source": [["dt", "cat", "val"], ["1月", "A", 30.0], ["1月", "B", 20.0], ["1月", "C", 15.0], ["2月", "A", 35.0], ["2月", "B", 25.0], ["2月", "C", 18.0], ["3月", "A", 40.0], ["3月", "B", 30.0], ["3月", "C", 22.0], ["4月", "A", 38.0], ["4月", "B", 28.0], ["4月", "C", 20.0], ["5月", "A", 45.0], ["5月", "B", 35.0], ["5月", "C", 25.0]]}};
-            var rawData = [{"dt": "1月", "cat": "A", "val": 30.0}, {"dt": "1月", "cat": "B", "val": 20.0}, {"dt": "1月", "cat": "C", "val": 15.0}, {"dt": "2月", "cat": "A", "val": 35.0}, {"dt": "2月", "cat": "B", "val": 25.0}, {"dt": "2月", "cat": "C", "val": 18.0}, {"dt": "3月", "cat": "A", "val": 40.0}, {"dt": "3月", "cat": "B", "val": 30.0}, {"dt": "3月", "cat": "C", "val": 22.0}, {"dt": "4月", "cat": "A", "val": 38.0}, {"dt": "4月", "cat": "B", "val": 28.0}, {"dt": "4月", "cat": "C", "val": 20.0}, {"dt": "5月", "cat": "A", "val": 45.0}, {"dt": "5月", "cat": "B", "val": 35.0}, {"dt": "5月", "cat": "C", "val": 25.0}];
+            var option = {"series": [{"type": "themeRiver", "encode": {"time": "d", "value": "v"}}], "dataset": {"source": [["d", "c", "v"], ["Jan", "A", 30.0], ["Jan", "B", 20.0], ["Jan", "C", 15.0], ["Feb", "A", 35.0], ["Feb", "B", 25.0], ["Feb", "C", 18.0], ["Mar", "A", 40.0], ["Mar", "B", 30.0], ["Mar", "C", 22.0], ["Apr", "A", 38.0], ["Apr", "B", 28.0], ["Apr", "C", 20.0], ["May", "A", 45.0], ["May", "B", 35.0], ["May", "C", 25.0]]}, "xAxis": {"type": "category"}, "yAxis": {"type": "value"}};
+            var rawData = [{"d": "Jan", "c": "A", "v": 30.0}, {"d": "Jan", "c": "B", "v": 20.0}, {"d": "Jan", "c": "C", "v": 15.0}, {"d": "Feb", "c": "A", "v": 35.0}, {"d": "Feb", "c": "B", "v": 25.0}, {"d": "Feb", "c": "C", "v": 18.0}, {"d": "Mar", "c": "A", "v": 40.0}, {"d": "Mar", "c": "B", "v": 30.0}, {"d": "Mar", "c": "C", "v": 22.0}, {"d": "Apr", "c": "A", "v": 38.0}, {"d": "Apr", "c": "B", "v": 28.0}, {"d": "Apr", "c": "C", "v": 20.0}, {"d": "May", "c": "A", "v": 45.0}, {"d": "May", "c": "B", "v": 35.0}, {"d": "May", "c": "C", "v": 25.0}];
 
             
 

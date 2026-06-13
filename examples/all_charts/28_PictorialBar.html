@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>28-PictorialBar</title>
+    <title>28_PictorialBar</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "name", "y": "value"}}], "dataset": {"source": [["name", "value"], ["大象", 6500.0], ["犀牛", 3500.0], ["河马", 3000.0], ["水牛", 2000.0], ["长颈鹿", 1800.0]]}};
-            var rawData = [{"name": "大象", "value": 6500.0}, {"name": "犀牛", "value": 3500.0}, {"name": "河马", "value": 3000.0}, {"name": "水牛", "value": 2000.0}, {"name": "长颈鹿", "value": 1800.0}];
+            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "pictorialBar", "encode": {"x": "c", "y": "v"}}], "dataset": {"source": [["c", "v"], ["大象", 6500.0], ["犀牛", 3500.0], ["河马", 3000.0], ["水牛", 2000.0], ["长颈鹿", 1800.0]]}};
+            var rawData = [{"c": "大象", "v": 6500.0}, {"c": "犀牛", "v": 3500.0}, {"c": "河马", "v": 3000.0}, {"c": "水牛", "v": 2000.0}, {"c": "长颈鹿", "v": 1800.0}];
 
             
 

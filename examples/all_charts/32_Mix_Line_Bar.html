@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>32-Mix Line-Bar</title>
+    <title>32_Mix_Line_Bar</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "dt", "y": "bar_val"}}], "dataset": {"source": [["dt", "bar_val", "line_val"], ["1月", 320.0, 220.0], ["2月", 332.0, 182.0], ["3月", 301.0, 191.0], ["4月", 334.0, 234.0], ["5月", 390.0, 290.0], ["6月", 330.0, 310.0]]}};
-            var rawData = [{"dt": "1月", "bar_val": 320.0, "line_val": 220.0}, {"dt": "2月", "bar_val": 332.0, "line_val": 182.0}, {"dt": "3月", "bar_val": 301.0, "line_val": 191.0}, {"dt": "4月", "bar_val": 334.0, "line_val": 234.0}, {"dt": "5月", "bar_val": 390.0, "line_val": 290.0}, {"dt": "6月", "bar_val": 330.0, "line_val": 310.0}];
+            var option = {"xAxis": {"type": "category"}, "yAxis": [{"type": "value", "name": "柱"}, {"type": "value", "name": "线"}], "series": [{"type": "bar", "encode": {"x": "d", "y": "bar_val"}}, {"type": "line", "yAxisIndex": 1, "encode": {"x": "d", "y": "line_val"}}], "dataset": {"source": [["d", "bar_val", "line_val"], ["Jan", 320.0, 220.0], ["Feb", 332.0, 182.0], ["Mar", 301.0, 191.0], ["Apr", 334.0, 234.0], ["May", 390.0, 290.0], ["Jun", 330.0, 310.0]]}};
+            var rawData = [{"d": "Jan", "bar_val": 320.0, "line_val": 220.0}, {"d": "Feb", "bar_val": 332.0, "line_val": 182.0}, {"d": "Mar", "bar_val": 301.0, "line_val": 191.0}, {"d": "Apr", "bar_val": 334.0, "line_val": 234.0}, {"d": "May", "bar_val": 390.0, "line_val": 290.0}, {"d": "Jun", "bar_val": 330.0, "line_val": 310.0}];
 
             
 

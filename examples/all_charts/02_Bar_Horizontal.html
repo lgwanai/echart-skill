@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>02-Bar Horizontal</title>
+    <title>02_Bar_Horizontal</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -107,8 +107,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "name", "y": "value"}}], "dataset": {"source": [["name", "value"], ["巴西", "18203"], ["印尼", "23490"], ["美国", "29034"], ["印度", "104970"], ["中国", "131744"]]}};
-            var rawData = [{"name": "巴西", "value": "18203"}, {"name": "印尼", "value": "23490"}, {"name": "美国", "value": "29034"}, {"name": "印度", "value": "104970"}, {"name": "中国", "value": "131744"}];
+            var option = {"yAxis": {"type": "category"}, "xAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "v", "y": "c"}}], "dataset": {"source": [["c", "v"], ["巴西", 18203.0], ["印尼", 23490.0], ["美国", 29034.0], ["印度", 104970.0], ["中国", 131744.0]]}};
+            var rawData = [{"c": "巴西", "v": 18203.0}, {"c": "印尼", "v": 23490.0}, {"c": "美国", "v": 29034.0}, {"c": "印度", "v": 104970.0}, {"c": "中国", "v": 131744.0}];
 
             
 

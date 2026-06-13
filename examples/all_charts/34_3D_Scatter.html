@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>34-3D Scatter</title>
+    <title>34_3D_Scatter</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "value"}, "yAxis": {"type": "value"}, "series": [{"type": "scatter", "encode": {"x": "x", "y": "y"}}], "dataset": {"source": [["x", "y", "z", "name"], [10.0, 20.0, 30.0, "A"], [20.0, 10.0, 40.0, "B"], [30.0, 30.0, 20.0, "C"], [15.0, 25.0, 35.0, "D"], [25.0, 15.0, 25.0, "E"]]}};
-            var rawData = [{"x": 10.0, "y": 20.0, "z": 30.0, "name": "A"}, {"x": 20.0, "y": 10.0, "z": 40.0, "name": "B"}, {"x": 30.0, "y": 30.0, "z": 20.0, "name": "C"}, {"x": 15.0, "y": 25.0, "z": 35.0, "name": "D"}, {"x": 25.0, "y": 15.0, "z": 25.0, "name": "E"}];
+            var option = {"xAxis3D": {"type": "value"}, "yAxis3D": {"type": "value"}, "zAxis3D": {"type": "value"}, "series": [{"type": "scatter3D", "encode": {"x": "x", "y": "y", "z": "z"}}], "dataset": {"source": [["x", "y", "z", "n"], [10.0, 20.0, 30.0, "A"], [20.0, 10.0, 40.0, "B"], [30.0, 30.0, 20.0, "C"], [15.0, 25.0, 35.0, "D"], [25.0, 15.0, 25.0, "E"]]}, "xAxis": {"type": "category"}, "yAxis": {"type": "value"}};
+            var rawData = [{"x": 10.0, "y": 20.0, "z": 30.0, "n": "A"}, {"x": 20.0, "y": 10.0, "z": 40.0, "n": "B"}, {"x": 30.0, "y": 30.0, "z": 20.0, "n": "C"}, {"x": 15.0, "y": 25.0, "z": 35.0, "n": "D"}, {"x": 25.0, "y": 15.0, "z": 25.0, "n": "E"}];
 
             
 

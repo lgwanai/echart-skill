@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>04-Bar Waterfall</title>
+    <title>04_Bar_Waterfall</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "name", "y": "value"}}], "dataset": {"source": [["name", "value"], ["启动", "120"], ["研发", "200"], ["营销", "150"], ["运维", "80"], ["销售", "-110"], ["利润", "-60"], ["结算", "260"]]}};
-            var rawData = [{"name": "启动", "value": "120"}, {"name": "研发", "value": "200"}, {"name": "营销", "value": "150"}, {"name": "运维", "value": "80"}, {"name": "销售", "value": "-110"}, {"name": "利润", "value": "-60"}, {"name": "结算", "value": "260"}];
+            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "d", "y": "v"}}], "dataset": {"source": [["d", "v"], ["启动", 120.0], ["研发", 200.0], ["营销", 150.0], ["运维", 80.0], ["销售", -110.0], ["利润", -60.0], ["结算", 260.0]]}};
+            var rawData = [{"d": "启动", "v": 120.0}, {"d": "研发", "v": 200.0}, {"d": "营销", "v": 150.0}, {"d": "运维", "v": 80.0}, {"d": "销售", "v": -110.0}, {"d": "利润", "v": -60.0}, {"d": "结算", "v": 260.0}];
 
             
 

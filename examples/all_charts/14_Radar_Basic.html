@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>14-Radar Basic</title>
+    <title>14_Radar_Basic</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"radar": {"indicator": [{"name": "budget", "max": 100}, {"name": "spending", "max": 100}, {"name": "sales", "max": 100}, {"name": "profit", "max": 100}]}, "series": [{"type": "radar", "encode": {"itemName": "name", "value": ["budget", "spending", "sales", "profit"]}}], "dataset": {"source": [["name", "budget", "spending", "sales", "profit"], ["预算分配", "4200", "3000", "20000", "35000"], ["实际支出", "5000", "14000", "28000", "26000"]]}};
-            var rawData = [{"name": "预算分配", "budget": "4200", "spending": "3000", "sales": "20000", "profit": "35000"}, {"name": "实际支出", "budget": "5000", "spending": "14000", "sales": "28000", "profit": "26000"}];
+            var option = {"radar": {"indicator": [{"name": "预算分配", "max": 5000}, {"name": "支出", "max": 15000}, {"name": "销售", "max": 30000}, {"name": "利润", "max": 40000}]}, "series": [{"type": "radar", "encode": {"itemName": "n", "value": ["budget", "spending", "sales", "profit"]}}], "dataset": {"source": [["n", "budget", "spending", "sales", "profit"], ["预算", "4200", "3000", "20000", "35000"], ["实际", "5000", "14000", "28000", "26000"]]}};
+            var rawData = [{"n": "预算", "budget": "4200", "spending": "3000", "sales": "20000", "profit": "35000"}, {"n": "实际", "budget": "5000", "spending": "14000", "sales": "28000", "profit": "26000"}];
 
             
 

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>15-Gauge</title>
+    <title>15_Gauge</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "name", "y": "value"}}], "dataset": {"source": [["name", "value"], ["完成率", 78.5]]}};
-            var rawData = [{"name": "完成率", "value": 78.5}];
+            var option = {"series": [{"type": "gauge", "data": [{"value": 78.5, "name": "完成率"}], "detail": {"formatter": "{value}%"}}], "dataset": {"source": [["v"], [78.5]]}, "xAxis": {"type": "category"}, "yAxis": {"type": "value"}};
+            var rawData = [{"v": 78.5}];
 
             
 

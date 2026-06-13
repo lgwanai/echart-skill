@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>03-Bar Stacked</title>
+    <title>03_Bar_Stacked</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "name", "y": "email"}}], "dataset": {"source": [["name", "email", "union_ads", "video_ads", "direct", "search"], ["Mon", "120", "220", "150", "320", "180"], ["Tue", "132", "182", "232", "332", "200"], ["Wed", "101", "191", "201", "301", "165"], ["Thu", "134", "234", "154", "334", "190"], ["Fri", "90", "290", "190", "330", "210"], ["Sat", "230", "330", "330", "380", "250"], ["Sun", "210", "310", "290", "410", "280"]]}};
-            var rawData = [{"name": "Mon", "email": "120", "union_ads": "220", "video_ads": "150", "direct": "320", "search": "180"}, {"name": "Tue", "email": "132", "union_ads": "182", "video_ads": "232", "direct": "332", "search": "200"}, {"name": "Wed", "email": "101", "union_ads": "191", "video_ads": "201", "direct": "301", "search": "165"}, {"name": "Thu", "email": "134", "union_ads": "234", "video_ads": "154", "direct": "334", "search": "190"}, {"name": "Fri", "email": "90", "union_ads": "290", "video_ads": "190", "direct": "330", "search": "210"}, {"name": "Sat", "email": "230", "union_ads": "330", "video_ads": "330", "direct": "380", "search": "250"}, {"name": "Sun", "email": "210", "union_ads": "310", "video_ads": "290", "direct": "410", "search": "280"}];
+            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "stack": "x", "encode": {"x": "d", "y": "email"}}, {"type": "bar", "stack": "x", "encode": {"x": "d", "y": "ads"}}, {"type": "bar", "stack": "x", "encode": {"x": "d", "y": "video"}}, {"type": "bar", "stack": "x", "encode": {"x": "d", "y": "direct"}}, {"type": "bar", "stack": "x", "encode": {"x": "d", "y": "search"}}], "dataset": {"source": [["d", "email", "ads", "video", "direct", "search"], ["Mon", "120", "220", "150", "320", "180"], ["Tue", "132", "182", "232", "332", "200"], ["Wed", "101", "191", "201", "301", "165"], ["Thu", "134", "234", "154", "334", "190"], ["Fri", "90", "290", "190", "330", "210"], ["Sat", "230", "330", "330", "380", "250"], ["Sun", "210", "310", "290", "410", "280"]]}};
+            var rawData = [{"d": "Mon", "email": "120", "ads": "220", "video": "150", "direct": "320", "search": "180"}, {"d": "Tue", "email": "132", "ads": "182", "video": "232", "direct": "332", "search": "200"}, {"d": "Wed", "email": "101", "ads": "191", "video": "201", "direct": "301", "search": "165"}, {"d": "Thu", "email": "134", "ads": "234", "video": "154", "direct": "334", "search": "190"}, {"d": "Fri", "email": "90", "ads": "290", "video": "190", "direct": "330", "search": "210"}, {"d": "Sat", "email": "230", "ads": "330", "video": "330", "direct": "380", "search": "250"}, {"d": "Sun", "email": "210", "ads": "310", "video": "290", "direct": "410", "search": "280"}];
 
             
 
