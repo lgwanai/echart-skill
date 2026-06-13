@@ -231,4 +231,12 @@
 - **现象**：31_Lines_Flights 空白，修复后线宽 80-100px
 - **根因**：(1) FLIGHTS 格式错误——传入对象 `{fromName,...}` 而非数组 `[from,to,val]`，模板 `item[0]` 取到 undefined；(2) GEO_COORD_MAP 为空 `{}`；(3) 线宽公式 `value/LINE_SCALE` 用 LINE_SCALE=1 导致 80-100px 宽
 - **修复**：(1) FLIGHTS 改为 `[["北京","上海",100],...]`；(2) GEO_COORD_MAP 提供真实坐标；(3) `lineStyle.width` 固定为 `1`，删掉动态计算
+
+---
+
+## #27 — 3D Bar 空白：GL_INLINE + coordinateSystem + zAxis3D 配置错误
+- **日期**：2026-06-13
+- **现象**：33_3D_Bar 一片空白
+- **根因**：(1) `GL_INLINE: ""` 破坏 echarts-gl 注入（同 #18）；(2) `coordinateSystem: 'cartesian3D'` + `zAxis3D: {type:'value'}` + `shading:'realistic'` 不是官方推荐的配置组合；(3) 官方示例用 `zAxis3D: {}`（空对象）、无 `coordinateSystem`、`shading: 'lambert'`
+- **修复**：模板改为与 ECharts 官方 bar3D 示例完全一致的配置：`grid3D: {}`、`zAxis3D: {}`、`shading: 'lambert'`、无 `coordinateSystem`、无 `barSize`
 | effectScatter | `series.data` | — |
