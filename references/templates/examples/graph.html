@@ -1,0 +1,55 @@
+<!-- graph — https://echarts.apache.org/examples/zh/editor.html?c=graph -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+    title: {
+      text: 'Les Miserables',
+      subtext: 'Default layout',
+      top: 'bottom',
+      left: 'right'
+    },
+    tooltip: {},
+    legend: [
+      {
+        // selectedMode: 'single',
+        data: graph.categories.map(function (a) {
+          return a.name;
+        })
+      }
+    ],
+    animationDuration: 1500,
+    animationEasingUpdate: 'quinticInOut',
+    series: [
+      {
+        name: 'Les Miserables',
+        type: 'graph',
+        legendHoverLink: false,
+        layout: 'none',
+        data: graph.nodes,
+        links: graph.links,
+        categories: graph.categories,
+        roam: true,
+        label: {
+          position: 'right',
+          formatter: '{b}'
+        },
+        lineStyle: {
+          color: 'source',
+          curveness: 0.3
+        },
+        emphasis: {
+          focus: 'adjacency',
+          lineStyle: {
+            width: 10
+          }
+        }
+      }
+    ]
+  });
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

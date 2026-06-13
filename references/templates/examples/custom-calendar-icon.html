@@ -1,0 +1,95 @@
+<!-- custom-calendar-icon — https://echarts.apache.org/examples/zh/editor.html?c=custom-calendar-icon -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  tooltip: {},
+  calendar: [
+    {
+      left: 'center',
+      top: 'middle',
+      cellSize: [70, 70],
+      yearLabel: { show: false },
+      orient: 'vertical',
+      dayLabel: {
+        firstDay: 1,
+        nameMap: 'cn'
+      },
+      monthLabel: {
+        show: false
+      },
+      range: '2017-03'
+    }
+  ],
+  series: [
+    {
+      type: 'custom',
+      coordinateSystem: 'calendar',
+      renderItem: function (params, api) {
+        const cellPoint = api.coord(api.value(0));
+        const cellWidth = params.coordSys.cellWidth;
+        const cellHeight = params.coordSys.cellHeight;
+        const value = api.value(1);
+        const events = value && value.split('|');
+        if (isNaN(cellPoint[0]) || isNaN(cellPoint[1])) {
+          return;
+        }
+        const group = {
+          type: 'group',
+          children:
+            (layouts[events.length - 1] || []).map(function (
+              itemLayout,
+              index
+            ) {
+              return {
+                type: 'path',
+                shape: {
+                  pathData: pathes[+events[index]],
+                  x: -8,
+                  y: -8,
+                  width: 16,
+                  height: 16
+                },
+                position: [
+                  cellPoint[0] +
+                    echarts.number.linearMap(
+                      itemLayout[0],
+                      [-0.5, 0.5],
+                      [-cellWidth / 2, cellWidth / 2]
+                    ),
+                  cellPoint[1] +
+                    echarts.number.linearMap(
+                      itemLayout[1],
+                      [-0.5, 0.5],
+                      [-cellHeight / 2 + 20, cellHeight / 2]
+                    )
+                ],
+                style: api.style({
+                  fill: colors[+events[index]]
+                })
+              };
+            }) || []
+        };
+        group.children.push({
+          type: 'text',
+          style: {
+            x: cellPoint[0],
+            y: cellPoint[1] - cellHeight / 2 + 15,
+            text: echarts.format.formatTime('dd', api.value(0)),
+            fill: '#777',
+            textFont: api.font({ fontSize: 14 })
+          }
+        });
+        return group;
+      },
+      dimensions: [undefined, { type: 'ordinal' }],
+      data: getVirtulData('2017')
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

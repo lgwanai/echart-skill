@@ -1,0 +1,116 @@
+<!-- confidence-band — https://echarts.apache.org/examples/zh/editor.html?c=confidence-band -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+      title: {
+        text: 'Confidence Band',
+        subtext: 'Example in MetricsGraphics.js',
+        left: 'center'
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'cross',
+          animation: false,
+          label: {
+            backgroundColor: '#ccc',
+            borderColor: '#aaa',
+            borderWidth: 1,
+            shadowBlur: 0,
+            shadowOffsetX: 0,
+            shadowOffsetY: 0,
+            color: '#222'
+          }
+        },
+        formatter: function (params) {
+          return (
+            params[2].name +
+            '<br />' +
+            ((params[2].value - base) * 100).toFixed(1) +
+            '%'
+          );
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: data.map(function (item) {
+          return item.date;
+        }),
+        axisLabel: {
+          formatter: function (value, idx) {
+            var date = new Date(value);
+            return idx === 0
+              ? value
+              : [date.getMonth() + 1, date.getDate()].join('-');
+          }
+        },
+        boundaryGap: false
+      },
+      yAxis: {
+        axisLabel: {
+          formatter: function (val) {
+            return (val - base) * 100 + '%';
+          }
+        },
+        axisPointer: {
+          label: {
+            formatter: function (params) {
+              return ((params.value - base) * 100).toFixed(1) + '%';
+            }
+          }
+        },
+        splitNumber: 3
+      },
+      series: [
+        {
+          name: 'L',
+          type: 'line',
+          data: data.map(function (item) {
+            return item.l + base;
+          }),
+          lineStyle: {
+            opacity: 0
+          },
+          stack: 'confidence-band',
+          symbol: 'none'
+        },
+        {
+          name: 'U',
+          type: 'line',
+          data: data.map(function (item) {
+            return item.u - item.l;
+          }),
+          lineStyle: {
+            opacity: 0
+          },
+          areaStyle: {
+            color: '#ccc'
+          },
+          stack: 'confidence-band',
+          symbol: 'none'
+        },
+        {
+          type: 'line',
+          data: data.map(function (item) {
+            return item.value + base;
+          }),
+          itemStyle: {
+            color: '#333'
+          },
+          showSymbol: false
+        }
+      ]
+    });
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

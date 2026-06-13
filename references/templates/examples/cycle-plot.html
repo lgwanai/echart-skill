@@ -1,0 +1,65 @@
+<!-- cycle-plot — https://echarts.apache.org/examples/zh/editor.html?c=cycle-plot -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  tooltip: {},
+  title: {
+    text: 'Sales Trends by Year within Each Month',
+    subtext: 'Sample of Cycle Plot',
+    left: 'center'
+  },
+  legend: {
+    top: 70,
+    data: ['Trend by year (2002 - 2012)', 'Average']
+  },
+  dataZoom: [
+    {
+      type: 'slider',
+      labelFormatter: ''
+    },
+    {
+      type: 'inside'
+    }
+  ],
+  grid: {
+    bottom: 70,
+    top: 120
+  },
+  xAxis: {
+    data: months
+  },
+  yAxis: {
+    boundaryGap: [0, '20%']
+  },
+  series: [
+    {
+      type: 'custom',
+      name: 'Average',
+      renderItem: renderAverageItem,
+      encode: {
+        x: 0,
+        y: 1
+      },
+      data: averageByMonth
+    },
+    {
+      type: 'custom',
+      name: 'Trend by year (2002 - 2012)',
+      renderItem: renderTrendItem,
+      encode: {
+        x: 0,
+        y: rawData.map(function (entry, index) {
+          return index + 1;
+        })
+      },
+      data: dataByMonth
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

@@ -1,0 +1,92 @@
+<!-- custom-hexbin — https://echarts.apache.org/examples/zh/editor.html?c=custom-hexbin -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+    backgroundColor: backgroundColor,
+    tooltip: {
+      backgroundColor: 'rgba(255,255,255,0.9)',
+      textStyle: {
+        color: '#333'
+      }
+    },
+    animation: false,
+    title: {
+      text: 'Some Player',
+      subtext: 'Regular Season',
+      backgroundColor: backgroundColor,
+      top: 10,
+      left: 10,
+      textStyle: {
+        color: '#eee'
+      }
+    },
+    legend: {
+      data: ['bar', 'error']
+    },
+    geo: {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      roam: true,
+      silent: true,
+      itemStyle: {
+        color: backgroundColor,
+        borderWidth: 0
+      },
+      map: 'nbaCourt'
+    },
+    visualMap: {
+      type: 'continuous',
+      orient: 'horizontal',
+      right: 30,
+      top: 40,
+      min: 0,
+      max: 100,
+      align: 'bottom',
+      text: [null, 'FG:   '],
+      dimension: 3,
+      calculable: true,
+      textStyle: {
+        color: '#eee'
+      },
+      formatter: '{value} %',
+      inRange: {
+        // color: ['rgba(241,222,158, 0.3)', 'rgba(241,222,158, 1)']
+        color: ['green', 'yellow']
+      }
+    },
+    series: [
+      {
+        type: 'custom',
+        coordinateSystem: 'geo',
+        geoIndex: 0,
+        renderItem: renderItemHexBin,
+        dimensions: [
+          null,
+          null,
+          'Field Goals Attempted (hexagon size)',
+          'Field Goal Percentage (color)'
+        ],
+        encode: {
+          tooltip: [2, 3]
+        },
+        data: data
+      },
+      {
+        coordinateSystem: 'geo',
+        type: 'custom',
+        geoIndex: 0,
+        renderItem: renderItemNBACourt,
+        silent: true,
+        data: [0]
+      }
+    ]
+  });
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

@@ -1,0 +1,110 @@
+<!-- parallel-aqi — https://echarts.apache.org/examples/zh/editor.html?c=parallel-aqi -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  backgroundColor: '#333',
+  legend: {
+    bottom: 30,
+    data: ['Beijing', 'Shanghai', 'Guangzhou'],
+    itemGap: 20,
+    textStyle: {
+      color: '#fff',
+      fontSize: 14
+    }
+  },
+  tooltip: {
+    padding: 10,
+    backgroundColor: '#222',
+    borderColor: '#777',
+    borderWidth: 1
+  },
+  parallelAxis: [
+    {
+      dim: 0,
+      name: schema[0].text,
+      inverse: true,
+      max: 31,
+      nameLocation: 'start'
+    },
+    { dim: 1, name: schema[1].text },
+    { dim: 2, name: schema[2].text },
+    { dim: 3, name: schema[3].text },
+    { dim: 4, name: schema[4].text },
+    { dim: 5, name: schema[5].text },
+    { dim: 6, name: schema[6].text },
+    {
+      dim: 7,
+      name: schema[7].text,
+      type: 'category',
+      data: ['优', '良', '轻度污染', '中度污染', '重度污染', '严重污染']
+    }
+  ],
+  visualMap: {
+    show: true,
+    min: 0,
+    max: 150,
+    dimension: 2,
+    inRange: {
+      color: ['#d94e5d', '#eac736', '#50a3ba'].reverse()
+      // colorAlpha: [0, 1]
+    }
+  },
+  parallel: {
+    left: '5%',
+    right: '18%',
+    bottom: 100,
+    parallelAxisDefault: {
+      type: 'value',
+      name: 'AQI指数',
+      nameLocation: 'end',
+      nameGap: 20,
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 12
+      },
+      axisLine: {
+        lineStyle: {
+          color: '#aaa'
+        }
+      },
+      axisTick: {
+        lineStyle: {
+          color: '#777'
+        }
+      },
+      splitLine: {
+        show: false
+      },
+      axisLabel: {
+        color: '#fff'
+      }
+    }
+  },
+  series: [
+    {
+      name: 'Beijing',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataBJ
+    },
+    {
+      name: 'Shanghai',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataSH
+    },
+    {
+      name: 'Guangzhou',
+      type: 'parallel',
+      lineStyle: lineStyle,
+      data: dataGZ
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

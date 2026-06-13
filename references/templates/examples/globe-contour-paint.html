@@ -1,0 +1,58 @@
+<!-- globe-contour-paint — https://echarts.apache.org/examples/zh/editor.html?c=globe-contour-paint -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<!-- {{GL_INLINE}} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+      backgroundColor: '#000',
+      globe: {
+        environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
+        heightTexture:
+          ROOT_PATH + '/data-gl/asset/bathymetry_bw_composite_4k.jpg',
+        displacementScale: 0.05,
+        displacementQuality: 'high',
+        baseColor: '#111',
+        shading: 'realistic',
+        realisticMaterial: {
+          roughness: 0.2,
+          metalness: 0
+        },
+        postEffect: {
+          enable: true,
+          depthOfField: {
+            // enable: true
+          }
+        },
+        light: {
+          ambient: {
+            intensity: 0
+          },
+          main: {
+            intensity: 0.1,
+            shadow: false
+          },
+          ambientCubemap: {
+            texture: ROOT_PATH + '/data-gl/asset/lake.hdr',
+            exposure: 1,
+            diffuseIntensity: 0.5,
+            specularIntensity: 2
+          }
+        },
+        viewControl: {
+          autoRotate: false
+        },
+        layers: [
+          {
+            type: 'blend',
+            blendTo: 'albedo',
+            texture: contourChart,
+            intensity: 50
+          }
+        ]
+      }
+    });
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

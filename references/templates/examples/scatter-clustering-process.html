@@ -1,0 +1,49 @@
+<!-- scatter-clustering-process — https://echarts.apache.org/examples/zh/editor.html?c=scatter-clustering-process -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  timeline: {
+    top: 'center',
+    right: 50,
+    height: 300,
+    width: 10,
+    inverse: true,
+    autoPlay: false,
+    playInterval: 2500,
+    symbol: 'none',
+    orient: 'vertical',
+    axisType: 'category',
+    label: {
+      formatter: 'step {value}',
+      position: 10
+    },
+    checkpointStyle: {
+      animationDuration: ANIMATION_DURATION_UPDATE
+    },
+    data: []
+  },
+  baseOption: {
+    animationDurationUpdate: ANIMATION_DURATION_UPDATE,
+    transition: ['shape'],
+    tooltip: {},
+    xAxis: {
+      type: 'value'
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [
+      {
+        type: 'scatter'
+      }
+    ]
+  },
+  options: []
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

@@ -1,0 +1,63 @@
+<!-- gauge-stage — https://echarts.apache.org/examples/zh/editor.html?c=gauge-stage -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  series: [
+    {
+      type: 'gauge',
+      axisLine: {
+        lineStyle: {
+          width: 30,
+          color: [
+            [0.3, '#67e0e3'],
+            [0.7, '#37a2da'],
+            [1, '#fd666d']
+          ]
+        }
+      },
+      pointer: {
+        itemStyle: {
+          color: 'auto'
+        }
+      },
+      axisTick: {
+        distance: -30,
+        length: 8,
+        lineStyle: {
+          color: '#fff',
+          width: 2
+        }
+      },
+      splitLine: {
+        distance: -30,
+        length: 30,
+        lineStyle: {
+          color: '#fff',
+          width: 4
+        }
+      },
+      axisLabel: {
+        color: 'inherit',
+        distance: 40,
+        fontSize: 20
+      },
+      detail: {
+        valueAnimation: true,
+        formatter: '{value} km/h',
+        color: 'inherit'
+      },
+      data: [
+        {
+          value: 70
+        }
+      ]
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

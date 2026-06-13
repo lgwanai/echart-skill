@@ -1,0 +1,70 @@
+<!-- bar-brush — https://echarts.apache.org/examples/zh/editor.html?c=bar-brush -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  legend: {
+    data: ['bar', 'bar2', 'bar3', 'bar4'],
+    left: '10%'
+  },
+  brush: {
+    toolbox: ['rect', 'polygon', 'lineX', 'lineY', 'keep', 'clear'],
+    xAxisIndex: 0
+  },
+  toolbox: {
+    feature: {
+      magicType: {
+        type: ['stack']
+      },
+      dataView: {}
+    }
+  },
+  tooltip: {},
+  xAxis: {
+    data: xAxisData,
+    name: 'X Axis',
+    axisLine: { onZero: true },
+    splitLine: { show: false },
+    splitArea: { show: false }
+  },
+  yAxis: {},
+  grid: {
+    bottom: 100
+  },
+  series: [
+    {
+      name: 'bar',
+      type: 'bar',
+      stack: 'one',
+      emphasis: emphasisStyle,
+      data: data1
+    },
+    {
+      name: 'bar2',
+      type: 'bar',
+      stack: 'one',
+      emphasis: emphasisStyle,
+      data: data2
+    },
+    {
+      name: 'bar3',
+      type: 'bar',
+      stack: 'two',
+      emphasis: emphasisStyle,
+      data: data3
+    },
+    {
+      name: 'bar4',
+      type: 'bar',
+      stack: 'two',
+      emphasis: emphasisStyle,
+      data: data4
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

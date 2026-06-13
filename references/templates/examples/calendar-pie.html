@@ -1,0 +1,54 @@
+<!-- calendar-pie — https://echarts.apache.org/examples/zh/editor.html?c=calendar-pie -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  tooltip: {},
+  legend: {
+    data: ['Work', 'Entertainment', 'Sleep'],
+    bottom: 20
+  },
+  calendar: {
+    top: 'middle',
+    left: 'center',
+    orient: 'vertical',
+    cellSize: cellSize,
+    yearLabel: {
+      show: false,
+      fontSize: 30
+    },
+    dayLabel: {
+      margin: 20,
+      firstDay: 1,
+      nameMap: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    },
+    monthLabel: {
+      show: false
+    },
+    range: ['2017-02']
+  },
+  series: [
+    {
+      id: 'label',
+      type: 'scatter',
+      coordinateSystem: 'calendar',
+      symbolSize: 0,
+      label: {
+        show: true,
+        formatter: function (params) {
+          return echarts.time.format(params.value[0], '{dd}', false);
+        },
+        offset: [-cellSize[0] / 2 + 10, -cellSize[1] / 2 + 10],
+        fontSize: 14
+      },
+      data: scatterData
+    },
+    ...pieSeries
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

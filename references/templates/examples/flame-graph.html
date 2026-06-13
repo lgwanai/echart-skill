@@ -1,0 +1,76 @@
+<!-- flame-graph — https://echarts.apache.org/examples/zh/editor.html?c=flame-graph -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+    backgroundColor: {
+      type: 'linear',
+      x: 0,
+      y: 0,
+      x2: 0,
+      y2: 1,
+      colorStops: [
+        {
+          offset: 0.05,
+          color: '#eee'
+        },
+        {
+          offset: 0.95,
+          color: '#eeeeb0'
+        }
+      ]
+    },
+    tooltip: {
+      formatter: (params) => {
+        const samples = params.value[2] - params.value[1];
+        return `${params.marker} ${
+          params.value[3]
+        }: (${echarts.format.addCommas(
+          samples
+        )} samples, ${+params.value[4].toFixed(2)}%)`;
+      }
+    },
+    title: [
+      {
+        text: 'Flame Graph',
+        left: 'center',
+        top: 10,
+        textStyle: {
+          fontFamily: 'Verdana',
+          fontWeight: 'normal',
+          fontSize: 20
+        }
+      }
+    ],
+    toolbox: {
+      feature: {
+        restore: {}
+      },
+      right: 20,
+      top: 10
+    },
+    xAxis: {
+      show: false
+    },
+    yAxis: {
+      show: false,
+      max: levelOfOriginalJson
+    },
+    series: [
+      {
+        type: 'custom',
+        renderItem,
+        encode: {
+          x: [0, 1, 2],
+          y: 0
+        },
+        data: recursionJson(stackTrace)
+      }
+    ]
+  });
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

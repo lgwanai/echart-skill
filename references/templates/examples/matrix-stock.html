@@ -1,0 +1,431 @@
+<!-- matrix-stock — https://echarts.apache.org/examples/zh/editor.html?c=matrix-stock -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  title: titles,
+  xAxis: [
+    {
+      type: 'time',
+      show: false,
+      breaks: [
+        {
+          start: breakStartTime,
+          end: breakEndTime,
+          gap: 0
+        }
+      ]
+    },
+    {
+      type: 'time',
+      gridIndex: 1,
+      show: false,
+      breaks: [
+        {
+          start: breakStartTime,
+          end: breakEndTime,
+          gap: 0
+        }
+      ]
+    },
+    {
+      type: 'time',
+      gridIndex: 2,
+      show: false,
+      breaks: [
+        {
+          start: breakStartTime,
+          end: breakEndTime,
+          gap: 0
+        }
+      ]
+    },
+    {
+      type: 'value',
+      gridIndex: 3,
+      show: false,
+      max: 'dataMax'
+    },
+    {
+      type: 'category',
+      gridIndex: 4,
+      show: false,
+      boundaryGap: false,
+      data: Array.from({ length: depthCount * 2 }, (_, i) => i + '')
+    }
+  ],
+  yAxis: [
+    {
+      type: 'value',
+      show: false,
+      // Value should be symmetric around zero
+      min: lastClose - maxAbs,
+      max: lastClose + maxAbs
+    },
+    {
+      type: 'value',
+      gridIndex: 1,
+      show: false
+    },
+    {
+      type: 'value',
+      gridIndex: 2,
+      show: false
+    },
+    {
+      type: 'category',
+      gridIndex: 3,
+      show: false
+    },
+    {
+      type: 'value',
+      gridIndex: 4,
+      show: false,
+      max: 'dataMax',
+      min: 'dataMin'
+    }
+  ],
+  grid: [
+    {
+      coordinateSystem: 'matrix',
+      coord: [0, 0],
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0
+    },
+    {
+      coordinateSystem: 'matrix',
+      coord: [0, 5],
+      top: 20,
+      bottom: 0,
+      left: 0,
+      right: 0
+    },
+    {
+      coordinateSystem: 'matrix',
+      coord: [0, 4],
+      top: 20,
+      bottom: 0,
+      left: 0,
+      right: 0
+    },
+    {
+      coordinateSystem: 'matrix',
+      coord: [4, 0],
+      top: 15,
+      bottom: 2,
+      left: 2,
+      right: 2
+    },
+    {
+      coordinateSystem: 'matrix',
+      coord: [4, 4],
+      top: 15,
+      bottom: 0,
+      left: 0,
+      right: 0
+    }
+  ],
+  series: [
+    {
+      type: 'line',
+      symbolSize: 0,
+      data: priceData,
+      markPoint: {
+        symbolSize: 0,
+        symbol: 'circle',
+        data: [
+          {
+            relativeTo: 'coordinate',
+            x: 0,
+            y: 0,
+            name: 'max',
+            type: 'max',
+            label: {
+              align: 'left',
+              verticalAlign: 'top',
+              formatter: priceFormatter(lastClose + maxAbs),
+              color: getPriceColor(lastClose + maxAbs)
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: 0,
+            y: '50%',
+            name: lastClose + '',
+            label: {
+              align: 'left',
+              verticalAlign: 'middle',
+              formatter: priceFormatter(lastClose),
+              color: getPriceColor(lastClose)
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: 0,
+            y: '100%',
+            name: 'min',
+            type: 'min',
+            label: {
+              align: 'left',
+              verticalAlign: 'bottom',
+              formatter: priceFormatter(lastClose - maxAbs),
+              color: getPriceColor(lastClose - maxAbs)
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: '100%',
+            y: 0,
+            name: priceFormatter((maxAbs / lastClose) * 100) + '%',
+            label: {
+              align: 'right',
+              verticalAlign: 'top',
+              color: colorRed,
+              formatter: '{b}'
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: '100%',
+            y: '50%',
+            name: '0%',
+            label: {
+              align: 'right',
+              verticalAlign: 'middle',
+              color: colorGray,
+              formatter: '{b}'
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: '100%',
+            y: '100%',
+            name: '-' + priceFormatter((maxAbs / lastClose) * 100) + '%',
+            label: {
+              align: 'right',
+              verticalAlign: 'bottom',
+              color: colorGreen,
+              formatter: '{b}'
+            }
+          }
+        ]
+      }
+    },
+    {
+      type: 'line',
+      symbolSize: 0,
+      data: averageData,
+      xAxisIndex: 0,
+      yAxisIndex: 0
+    },
+    {
+      type: 'line',
+      symbolSize: 0,
+      data: averageData,
+      xAxisIndex: 0,
+      yAxisIndex: 0,
+      lineStyle: {
+        color: '#FFC458',
+        width: 1
+      }
+    },
+    {
+      name: 'Volume',
+      type: 'bar',
+      xAxisIndex: 1,
+      yAxisIndex: 1,
+      data: volumeData.map((item, index) => {
+        // Compare current price with previous price to determine color
+        let color = colorGray;
+        if (index > 0) {
+          const currentPrice = priceData[index][1];
+          const prevPrice = priceData[index - 1][1];
+          color = currentPrice > prevPrice ? colorRed : colorGreen;
+        }
+        return {
+          value: [item[0], item[1]],
+          itemStyle: {
+            color: color
+          }
+        };
+      })
+    },
+    {
+      name: 'MACD',
+      type: 'bar',
+      xAxisIndex: 2,
+      yAxisIndex: 2,
+      data: macdData,
+      barWidth: '70%' // Set bar width to 70% of coordinate area
+    },
+    {
+      name: 'DIF',
+      type: 'line',
+      xAxisIndex: 2,
+      yAxisIndex: 2,
+      data: macdLineData,
+      lineStyle: {
+        color: '#FFC458',
+        width: 1
+      },
+      symbol: 'none'
+    },
+    {
+      name: 'DEA',
+      type: 'line',
+      xAxisIndex: 2,
+      yAxisIndex: 2,
+      data: signalLineData,
+      lineStyle: {
+        color: '#333',
+        width: 1
+      },
+      symbol: 'none'
+    },
+    {
+      name: 'Order Book',
+      type: 'bar',
+      xAxisIndex: 3,
+      yAxisIndex: 3,
+      data: orderData,
+      barWidth: '90%',
+      label: {
+        show: true,
+        position: 'insideLeft'
+      }
+    },
+    {
+      name: 'Depth High',
+      type: 'line',
+      xAxisIndex: 4,
+      yAxisIndex: 4,
+      data: depthHighData,
+      step: 'end',
+      lineStyle: {
+        color: colorRed,
+        width: 2
+      },
+      areaStyle: {
+        color: colorRedOpacity,
+        opacity: 1
+      },
+      symbol: 'none'
+    },
+    {
+      name: 'Depth Low',
+      type: 'line',
+      xAxisIndex: 4,
+      yAxisIndex: 4,
+      data: depthLowData,
+      step: 'end',
+      lineStyle: {
+        color: colorGreen,
+        width: 2
+      },
+      areaStyle: {
+        color: colorGreenOpacity,
+        opacity: 1
+      },
+      symbol: 'none'
+    }
+  ],
+  matrix: {
+    left: matrixMargin,
+    right: matrixMargin,
+    top: matrixMargin,
+    bottom: matrixMargin,
+    x: {
+      show: false,
+      data: Array(5).fill(null)
+    },
+    y: {
+      show: false,
+      data: Array(6).fill(null)
+    },
+    body: {
+      data: [
+        {
+          coord: [
+            [0, 3],
+            [0, 3]
+          ],
+          mergeCells: true
+        },
+        {
+          coord: [
+            [0, 3],
+            [5, 5]
+          ],
+          mergeCells: true
+        },
+        {
+          coord: [
+            [0, 3],
+            [4, 4]
+          ],
+          mergeCells: true
+        },
+        {
+          coord: [
+            [4, 4],
+            [0, 3]
+          ],
+          mergeCells: true
+        },
+        {
+          coord: [
+            [4, 4],
+            [4, 5]
+          ],
+          mergeCells: true
+        }
+      ]
+    }
+  },
+  graphic: {
+    elements: Array.from({ length: 3 }, (_, i) => {
+      const lineWidth = 1;
+      return {
+        type: 'line',
+        shape: {
+          x1: matrixMargin + lineWidth,
+          y1: (matrixHeight / 6) * (i + 1),
+          x2: (matrixWidth / 5) * 4 + matrixMargin,
+          y2: (matrixHeight / 6) * (i + 1)
+        },
+        style: {
+          stroke: i === 1 ? '#bbb' : '#eee',
+          lineWidth,
+          lineDash: i == 1 ? 'dashed' : false
+        }
+      };
+    }).concat(
+      Array.from({ length: 3 }, (_, i) => {
+        const lineWidth = 1;
+        const matrixWidth = chartWidth - matrixMargin * 2;
+        return {
+          type: 'line',
+          shape: {
+            x1: (matrixWidth / 5) * (i + 1) + matrixMargin,
+            y1: matrixMargin + lineWidth,
+            x2: (matrixWidth / 5) * (i + 1) + matrixMargin,
+            y2: chartHeight - matrixMargin
+          },
+          style: {
+            stroke: '#eee',
+            lineDash: false,
+            lineWidth
+          }
+        };
+      })
+    )
+  }
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

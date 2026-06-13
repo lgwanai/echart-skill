@@ -1,0 +1,107 @@
+<!-- scatter-matrix — https://echarts.apache.org/examples/zh/editor.html?c=scatter-matrix -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  animation: false,
+  brush: {
+    brushLink: 'all',
+    xAxisIndex: gridOption.xAxis.map(function (_, idx) {
+      return idx;
+    }),
+    yAxisIndex: gridOption.yAxis.map(function (_, idx) {
+      return idx;
+    }),
+    inBrush: {
+      opacity: 1
+    }
+  },
+  visualMap: {
+    type: 'piecewise',
+    categories: ['北京', '上海', '广州'],
+    dimension: CATEGORY_DIM,
+    orient: 'horizontal',
+    top: 0,
+    left: 'center',
+    inRange: {
+      color: ['#51689b', '#ce5c5c', '#fbc357']
+    },
+    outOfRange: {
+      color: '#ddd'
+    },
+    seriesIndex: gridOption.series.map(function (_, idx) {
+      return idx;
+    })
+  },
+  tooltip: {
+    trigger: 'item'
+  },
+  parallelAxis: [
+    { dim: 0, name: schema[0].text },
+    { dim: 1, name: schema[1].text },
+    { dim: 2, name: schema[2].text },
+    { dim: 3, name: schema[3].text },
+    { dim: 4, name: schema[4].text },
+    { dim: 5, name: schema[5].text },
+    {
+      dim: 6,
+      name: schema[6].text,
+      type: 'category',
+      data: ['优', '良', '轻度', '中度', '重度', '严重']
+    }
+  ],
+  parallel: {
+    bottom: '5%',
+    left: '2%',
+    height: '30%',
+    width: '55%',
+    parallelAxisDefault: {
+      type: 'value',
+      name: 'AQI指数',
+      nameLocation: 'end',
+      nameGap: 20,
+      splitNumber: 3,
+      nameTextStyle: {
+        fontSize: 14
+      },
+      axisLine: {
+        lineStyle: {
+          color: '#555'
+        }
+      },
+      axisTick: {
+        lineStyle: {
+          color: '#555'
+        }
+      },
+      splitLine: {
+        show: false
+      },
+      axisLabel: {
+        color: '#555'
+      }
+    }
+  },
+  xAxis: gridOption.xAxis,
+  yAxis: gridOption.yAxis,
+  grid: gridOption.grid,
+  series: [
+    {
+      name: 'parallel',
+      type: 'parallel',
+      smooth: true,
+      lineStyle: {
+        width: 1,
+        opacity: 0.3
+      },
+      data: rawData
+    },
+    ...gridOption.series
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

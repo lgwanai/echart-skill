@@ -1,0 +1,54 @@
+<!-- scatter-nutrients-matrix — https://echarts.apache.org/examples/zh/editor.html?c=scatter-nutrients-matrix -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+        xAxis: [
+          {
+            name: app.config.xAxisLeft
+          },
+          {
+            name: app.config.xAxisLeft
+          },
+          {
+            name: app.config.xAxisRight
+          },
+          {
+            name: app.config.xAxisRight
+          }
+        ],
+        yAxis: [
+          {
+            name: app.config.yAxisTop
+          },
+          {
+            name: app.config.yAxisBottom
+          },
+          {
+            name: app.config.yAxisTop
+          },
+          {
+            name: app.config.yAxisBottom
+          }
+        ],
+        series: [
+          {
+            data: makeSeriesData('xAxisLeft', 'yAxisTop')
+          },
+          {
+            data: makeSeriesData('xAxisLeft', 'yAxisBottom')
+          },
+          {
+            data: makeSeriesData('xAxisRight', 'yAxisTop')
+          },
+          {
+            data: makeSeriesData('xAxisRight', 'yAxisBottom')
+          }
+        ]
+      });
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

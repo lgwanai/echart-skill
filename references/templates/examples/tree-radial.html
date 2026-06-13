@@ -1,0 +1,32 @@
+<!-- tree-radial — https://echarts.apache.org/examples/zh/editor.html?c=tree-radial -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+      tooltip: {
+        trigger: 'item',
+        triggerOn: 'mousemove'
+      },
+      series: [
+        {
+          type: 'tree',
+          data: [data],
+          top: '18%',
+          bottom: '14%',
+          layout: 'radial',
+          symbol: 'emptyCircle',
+          symbolSize: 7,
+          initialTreeDepth: 3,
+          animationDurationUpdate: 750,
+          emphasis: {
+            focus: 'descendant'
+          }
+        }
+      ]
+    });
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

@@ -1,0 +1,47 @@
+<!-- line-markline — https://echarts.apache.org/examples/zh/editor.html?c=line-markline -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  animation: false,
+  textStyle: {
+    fontSize: 14
+  },
+  xAxis: {
+    data: ['A', 'B', 'C', 'D', 'E'],
+    boundaryGap: true,
+    splitArea: {
+      show: true
+    }
+  },
+  yAxis: {
+    max: 2
+  },
+  series: [
+    {
+      name: 'line',
+      type: 'line',
+      stack: 'all',
+      symbolSize: 6,
+      data: [0.3, 1.4, 1.2, 1, 0.6],
+      markLine: {
+        data: markLine,
+        label: {
+          distance: [20, 8]
+        }
+      }
+    }
+  ],
+  grid: {
+    top: 30,
+    left: 60,
+    right: 60,
+    bottom: 40
+  }
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

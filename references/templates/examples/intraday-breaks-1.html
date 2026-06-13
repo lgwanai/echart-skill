@@ -1,0 +1,83 @@
+<!-- intraday-breaks-1 — https://echarts.apache.org/examples/zh/editor.html?c=intraday-breaks-1 -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  // Choose axis ticks based on UTC time.
+  useUTC: true,
+  title: {
+    text: 'Intraday Chart with Breaks (Multiple Days)',
+    left: 'center'
+  },
+  tooltip: {
+    show: true,
+    trigger: 'axis'
+  },
+  grid: {
+    outerBounds: {
+      top: '20%',
+      bottom: '30%'
+    }
+  },
+  xAxis: [
+    {
+      type: 'time',
+      interval: 1000 * 60 * 30,
+      axisLabel: {
+        showMinLabel: true,
+        showMaxLabel: true,
+        formatter(timestamp, _, opt) {
+          if (opt.break) {
+            // The third parameter is `useUTC: true`.
+            return formatTime(timestamp, '{HH}:{mm}\n{weak|{dd}d}', true);
+          }
+          return formatTime(timestamp, '{HH}:{mm}', true);
+        },
+        rich: {
+          weak: {
+            color: '#999'
+          }
+        }
+      },
+      breaks: _data.breaks,
+      breakArea: {
+        expandOnClick: false,
+        zigzagAmplitude: 0,
+        zigzagZ: 200,
+        itemStyle: {
+          borderColor: 'none',
+          opacity: 0
+        }
+      }
+    }
+  ],
+  yAxis: {
+    type: 'value',
+    min: 'dataMin'
+  },
+  dataZoom: [
+    {
+      type: 'inside',
+      minValueSpan: DATA_ZOOM_MIN_VALUE_SPAN
+    },
+    {
+      type: 'slider',
+      top: '73%',
+      minValueSpan: DATA_ZOOM_MIN_VALUE_SPAN
+    }
+  ],
+  series: [
+    {
+      type: 'line',
+      symbolSize: 0,
+      areaStyle: {},
+      data: _data.seriesData
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

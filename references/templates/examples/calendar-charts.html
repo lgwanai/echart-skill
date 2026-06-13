@@ -1,0 +1,146 @@
+<!-- calendar-charts — https://echarts.apache.org/examples/zh/editor.html?c=calendar-charts -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  tooltip: {
+    position: 'top'
+  },
+  visualMap: [
+    {
+      min: 0,
+      max: 1000,
+      calculable: true,
+      seriesIndex: [2, 3, 4],
+      orient: 'horizontal',
+      left: '55%',
+      bottom: 20
+    },
+    {
+      min: 0,
+      max: 1000,
+      inRange: {
+        color: ['grey'],
+        opacity: [0, 0.3]
+      },
+      controller: {
+        inRange: {
+          opacity: [0.3, 0.6]
+        },
+        outOfRange: {
+          color: '#ccc'
+        }
+      },
+      seriesIndex: [1],
+      orient: 'horizontal',
+      left: '10%',
+      bottom: 20
+    }
+  ],
+  calendar: [
+    {
+      orient: 'vertical',
+      yearLabel: {
+        margin: 40
+      },
+      monthLabel: {
+        nameMap: 'cn',
+        margin: 20
+      },
+      dayLabel: {
+        firstDay: 1,
+        nameMap: 'cn'
+      },
+      cellSize: 40,
+      range: '2017-02'
+    },
+    {
+      orient: 'vertical',
+      yearLabel: {
+        margin: 40
+      },
+      monthLabel: {
+        margin: 20
+      },
+      cellSize: 40,
+      left: 460,
+      range: '2017-01'
+    },
+    {
+      orient: 'vertical',
+      yearLabel: {
+        margin: 40
+      },
+      monthLabel: {
+        margin: 20
+      },
+      cellSize: 40,
+      top: 350,
+      range: '2017-03'
+    },
+    {
+      orient: 'vertical',
+      yearLabel: {
+        margin: 40
+      },
+      dayLabel: {
+        firstDay: 1,
+        nameMap: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+      },
+      monthLabel: {
+        nameMap: 'cn',
+        margin: 20
+      },
+      cellSize: 40,
+      top: 350,
+      left: 460,
+      range: '2017-04'
+    }
+  ],
+  series: [
+    {
+      type: 'graph',
+      edgeSymbol: ['none', 'arrow'],
+      coordinateSystem: 'calendar',
+      links: links,
+      symbolSize: 10,
+      calendarIndex: 0,
+      data: graphData
+    },
+    {
+      type: 'heatmap',
+      coordinateSystem: 'calendar',
+      data: getVirtualData('2017')
+    },
+    {
+      type: 'effectScatter',
+      coordinateSystem: 'calendar',
+      calendarIndex: 1,
+      symbolSize: function (val) {
+        return val[1] / 40;
+      },
+      data: getVirtualData('2017')
+    },
+    {
+      type: 'scatter',
+      coordinateSystem: 'calendar',
+      calendarIndex: 2,
+      symbolSize: function (val) {
+        return val[1] / 60;
+      },
+      data: getVirtualData('2017')
+    },
+    {
+      type: 'heatmap',
+      coordinateSystem: 'calendar',
+      calendarIndex: 3,
+      data: getVirtualData('2017')
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

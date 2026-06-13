@@ -1,0 +1,74 @@
+<!-- custom-wind — https://echarts.apache.org/examples/zh/editor.html?c=custom-wind -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+      backgroundColor: '#333',
+      visualMap: {
+        left: 'center',
+        min: minMag,
+        max: maxMag,
+        dimension: 4,
+        inRange: {
+          // prettier-ignore
+          color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+        },
+        calculable: true,
+        textStyle: {
+          color: '#fff'
+        },
+        orient: 'horizontal'
+      },
+      geo: {
+        map: 'world',
+        left: 0,
+        right: 0,
+        top: 0,
+        zoom: 1,
+        silent: true,
+        roam: true,
+        itemStyle: {
+          areaColor: '#323c48',
+          borderColor: '#111'
+        }
+      },
+      series: {
+        type: 'custom',
+        coordinateSystem: 'geo',
+        data: data,
+        encode: {
+          x: 0,
+          y: 0
+        },
+        renderItem: function (params, api) {
+          const x = api.value(0);
+          const y = api.value(1);
+          const dx = api.value(2);
+          const dy = api.value(3);
+          const start = api.coord([
+            Math.max(x - dx / 5, -180),
+            Math.max(y - dy / 5, -90)
+          ]);
+          const end = api.coord([
+            Math.min(x + dx / 5, 180),
+            Math.min(y + dy / 5, 90)
+          ]);
+          return {
+            type: 'line',
+            shape: {
+              x1: start[0],
+              y1: start[1],
+              x2: end[0],
+              y2: end[1]
+            },
+            style: {
+              lineWidth: 0.5,
+              stroke: api.visual('color')
+            }
+          });
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

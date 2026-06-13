@@ -1,0 +1,130 @@
+<!-- pictorialBar-body-fill — https://echarts.apache.org/examples/zh/editor.html?c=pictorialBar-body-fill -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  tooltip: {},
+  legend: {
+    data: ['typeA', 'typeB'],
+    selectedMode: 'single'
+  },
+  xAxis: {
+    data: ['a', 'b', 'c', 'd', 'e'],
+    axisTick: { show: false },
+    axisLine: { show: false },
+    axisLabel: { show: false }
+  },
+  yAxis: {
+    max: bodyMax,
+    offset: 20,
+    splitLine: { show: false }
+  },
+  grid: {
+    top: 'center',
+    height: 230
+  },
+  markLine: {
+    z: -100
+  },
+  series: [
+    {
+      name: 'typeA',
+      type: 'pictorialBar',
+      symbolClip: true,
+      symbolBoundingData: bodyMax,
+      label: labelSetting,
+      data: [
+        {
+          value: 123,
+          symbol: symbols[0]
+        },
+        {
+          value: 34,
+          symbol: symbols[1]
+        },
+        {
+          value: 101,
+          symbol: symbols[2]
+        },
+        {
+          value: 89,
+          symbol: symbols[3]
+        },
+        {
+          value: 72,
+          symbol: symbols[4]
+        }
+      ],
+      markLine: markLineSetting,
+      z: 10
+    },
+    {
+      name: 'typeB',
+      type: 'pictorialBar',
+      symbolClip: true,
+      symbolBoundingData: bodyMax,
+      label: labelSetting,
+      data: [
+        {
+          value: 12,
+          symbol: symbols[0]
+        },
+        {
+          value: 44,
+          symbol: symbols[1]
+        },
+        {
+          value: 131,
+          symbol: symbols[2]
+        },
+        {
+          value: 33,
+          symbol: symbols[3]
+        },
+        {
+          value: 142,
+          symbol: symbols[4]
+        }
+      ],
+      markLine: markLineSetting,
+      z: 10
+    },
+    {
+      name: 'full',
+      type: 'pictorialBar',
+      symbolBoundingData: bodyMax,
+      animationDuration: 0,
+      itemStyle: {
+        color: '#ccc'
+      },
+      data: [
+        {
+          value: 1,
+          symbol: symbols[0]
+        },
+        {
+          value: 1,
+          symbol: symbols[1]
+        },
+        {
+          value: 1,
+          symbol: symbols[2]
+        },
+        {
+          value: 1,
+          symbol: symbols[3]
+        },
+        {
+          value: 1,
+          symbol: symbols[4]
+        }
+      ]
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

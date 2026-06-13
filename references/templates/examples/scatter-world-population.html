@@ -1,0 +1,84 @@
+<!-- scatter-world-population — https://echarts.apache.org/examples/zh/editor.html?c=scatter-world-population -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  backgroundColor: '#404a59',
+  title: {
+    text: 'World Population (2011)',
+    subtext: 'From Gapminder',
+    left: 'center',
+    top: 'top',
+    textStyle: {
+      color: '#fff'
+    }
+  },
+  tooltip: {
+    trigger: 'item',
+    formatter: function (params) {
+      var value = (params.value + '').split('.');
+      value =
+        value[0].replace(/(\d{1,3})(?=(?:\d{3})+(?!\d))/g, '$1,') +
+        '.' +
+        value[1];
+      return params.seriesName + '<br/>' + params.name + ' : ' + value;
+    }
+  },
+  visualMap: {
+    show: false,
+    min: 0,
+    max: max,
+    inRange: {
+      symbolSize: [6, 60]
+    }
+  },
+  geo: {
+    name: 'World Population (2010)',
+    type: 'map',
+    map: 'world',
+    roam: true,
+    emphasis: {
+      label: {
+        show: false
+      },
+      itemStyle: {
+        areaColor: '#2a333d'
+      }
+    },
+    itemStyle: {
+      areaColor: '#323c48',
+      borderColor: '#111'
+    }
+  },
+  series: [
+    {
+      type: 'scatter',
+      coordinateSystem: 'geo',
+      data: mapData.map(function (itemOpt) {
+        return {
+          name: itemOpt.name,
+          value: [
+            latlong[itemOpt.code].longitude,
+            latlong[itemOpt.code].latitude,
+            itemOpt.value
+          ],
+          emphasis: {
+            label: {
+              position: 'right',
+              show: true
+            }
+          },
+          itemStyle: {
+            color: itemOpt.color
+          }
+        };
+      })
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

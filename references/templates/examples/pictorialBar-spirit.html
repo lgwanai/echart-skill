@@ -1,0 +1,100 @@
+<!-- pictorialBar-spirit — https://echarts.apache.org/examples/zh/editor.html?c=pictorialBar-spirit -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  tooltip: {},
+  xAxis: {
+    max: maxData,
+    splitLine: { show: false },
+    offset: 10,
+    axisLine: {
+      lineStyle: {
+        color: '#999'
+      }
+    },
+    axisLabel: {
+      margin: 10
+    }
+  },
+  yAxis: {
+    data: ['2013', '2014', '2015', '2016'],
+    inverse: true,
+    axisTick: { show: false },
+    axisLine: { show: false },
+    axisLabel: {
+      margin: 10,
+      color: '#999',
+      fontSize: 16
+    }
+  },
+  grid: {
+    top: 'center',
+    height: 200,
+    left: 70,
+    right: 100
+  },
+  series: [
+    {
+      // current data
+      type: 'pictorialBar',
+      symbol: spirit,
+      symbolRepeat: 'fixed',
+      symbolMargin: '5%',
+      symbolClip: true,
+      symbolSize: 30,
+      symbolBoundingData: maxData,
+      data: [891, 1220, 660, 1670],
+      markLine: {
+        symbol: 'none',
+        label: {
+          formatter: 'max: {c}',
+          position: 'start'
+        },
+        lineStyle: {
+          color: 'green',
+          type: 'dotted',
+          opacity: 0.2,
+          width: 2
+        },
+        data: [
+          {
+            type: 'max'
+          }
+        ]
+      },
+      z: 10
+    },
+    {
+      // full data
+      type: 'pictorialBar',
+      itemStyle: {
+        opacity: 0.2
+      },
+      label: {
+        show: true,
+        formatter: function (params) {
+          return ((params.value / maxData) * 100).toFixed(1) + ' %';
+        },
+        position: 'right',
+        offset: [10, 0],
+        color: 'green',
+        fontSize: 18
+      },
+      animationDuration: 0,
+      symbolRepeat: 'fixed',
+      symbolMargin: '5%',
+      symbol: spirit,
+      symbolSize: 30,
+      symbolBoundingData: maxData,
+      data: [891, 1220, 660, 1670],
+      z: 5
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

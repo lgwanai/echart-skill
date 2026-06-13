@@ -115,8 +115,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
-var geoCoordMap = {"\u5317\u4eac": [116.46, 39.92], "\u4e0a\u6d77": [121.48, 31.22], "\u5e7f\u5dde": [113.23, 23.16]} || {};
-var rawData = [{"name": "\u5317\u4eac", "value": 100}, {"name": "\u4e0a\u6d77", "value": 95}, {"name": "\u5e7f\u5dde", "value": 80}];
+var geoCoordMap = {"\u5317\u4eac": [116.46, 39.92], "\u4e0a\u6d77": [121.48, 31.22], "\u5e7f\u5dde": [113.23, 23.16], "\u6df1\u5733": [114.07, 22.62], "\u6210\u90fd": [104.06, 30.67]} || {};
+var rawData = [{"name": "\u5317\u4eac", "value": 100}, {"name": "\u4e0a\u6d77", "value": 95}, {"name": "\u5e7f\u5dde", "value": 80}, {"name": "\u6df1\u5733", "value": 90}, {"name": "\u6210\u90fd", "value": 70}];
 function convertData(data) {
   return data.map(function(item) {
     var result = { name: item.name, value: geoCoordMap[item.name] ? geoCoordMap[item.name].concat(item.value) : [0,0,item.value] }; if (item.itemStyle) result.itemStyle = item.itemStyle; return result;

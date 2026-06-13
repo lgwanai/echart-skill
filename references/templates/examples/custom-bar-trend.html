@@ -1,0 +1,91 @@
+<!-- custom-bar-trend — https://echarts.apache.org/examples/zh/editor.html?c=custom-bar-trend -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  tooltip: {
+    trigger: 'axis'
+  },
+  legend: {
+    data: legendData,
+    top: 20
+  },
+  dataZoom: [
+    {
+      type: 'slider',
+      start: 50,
+      end: 70
+    },
+    {
+      type: 'inside',
+      start: 50,
+      end: 70
+    }
+  ],
+  xAxis: {
+    data: xAxisData
+  },
+  yAxis: {},
+  series: [
+    {
+      type: 'custom',
+      name: 'trend',
+      renderItem: function (params, api) {
+        var xValue = api.value(0);
+        var currentSeriesIndices = api.currentSeriesIndices();
+        var barLayout = api.barLayout({
+          barGap: '30%',
+          barCategoryGap: '20%',
+          count: currentSeriesIndices.length - 1
+        });
+        var points = [];
+        for (var i = 0; i < currentSeriesIndices.length; i++) {
+          var seriesIndex = currentSeriesIndices[i];
+          if (seriesIndex !== params.seriesIndex) {
+            var point = api.coord([xValue, api.value(seriesIndex)]);
+            point[0] += barLayout[i - 1].offsetCenter;
+            point[1] -= 20;
+            points.push(point);
+          }
+        }
+        var style = api.style({
+          stroke: api.visual('color'),
+          fill: 'none'
+        });
+        return {
+          type: 'polyline',
+          shape: {
+            points: points
+          },
+          style: style
+        };
+      },
+      itemStyle: {
+        borderWidth: 2
+      },
+      encode: {
+        x: 0,
+        y: encodeY
+      },
+      data: customData,
+      z: 100
+    },
+    ...dataList.map(function (data, index) {
+      return {
+        type: 'bar',
+        animation: false,
+        name: legendData[index + 1],
+        itemStyle: {
+          opacity: 0.5
+        },
+        data: data
+      };
+    })
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

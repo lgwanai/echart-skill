@@ -1,0 +1,54 @@
+<!-- treemap-drill-down — https://echarts.apache.org/examples/zh/editor.html?c=treemap-drill-down -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+      title: {
+        text: 'ECharts Options',
+        subtext: '2016/04',
+        left: 'leafDepth'
+      },
+      tooltip: {},
+      series: [
+        {
+          name: 'option',
+          type: 'treemap',
+          visibleMin: 300,
+          data: data.children,
+          leafDepth: 2,
+          levels: [
+            {
+              itemStyle: {
+                borderColor: '#555',
+                borderWidth: 4,
+                gapWidth: 4
+              }
+            },
+            {
+              colorSaturation: [0.3, 0.6],
+              itemStyle: {
+                borderColorSaturation: 0.7,
+                gapWidth: 2,
+                borderWidth: 2
+              }
+            },
+            {
+              colorSaturation: [0.3, 0.5],
+              itemStyle: {
+                borderColorSaturation: 0.6,
+                gapWidth: 1
+              }
+            },
+            {
+              colorSaturation: [0.3, 0.5]
+            }
+          ]
+        }
+      ]
+    });
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

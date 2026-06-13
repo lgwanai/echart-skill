@@ -1,0 +1,60 @@
+<!-- calendar-horizontal — https://echarts.apache.org/examples/zh/editor.html?c=calendar-horizontal -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  tooltip: {
+    position: 'top'
+  },
+  visualMap: {
+    min: 0,
+    max: 1000,
+    calculable: true,
+    orient: 'horizontal',
+    left: 'center',
+    top: 'top'
+  },
+  calendar: [
+    {
+      range: '2017',
+      cellSize: ['auto', 20]
+    },
+    {
+      top: 260,
+      range: '2016',
+      cellSize: ['auto', 20]
+    },
+    {
+      top: 450,
+      range: '2015',
+      cellSize: ['auto', 20],
+      right: 5
+    }
+  ],
+  series: [
+    {
+      type: 'heatmap',
+      coordinateSystem: 'calendar',
+      calendarIndex: 0,
+      data: getVirtualData('2017')
+    },
+    {
+      type: 'heatmap',
+      coordinateSystem: 'calendar',
+      calendarIndex: 1,
+      data: getVirtualData('2016')
+    },
+    {
+      type: 'heatmap',
+      coordinateSystem: 'calendar',
+      calendarIndex: 2,
+      data: getVirtualData('2015')
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

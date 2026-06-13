@@ -1,0 +1,57 @@
+<!-- pie-pattern — https://echarts.apache.org/examples/zh/editor.html?c=pie-pattern -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  backgroundColor: {
+    image: bgPatternImg,
+    repeat: 'repeat'
+  },
+  title: {
+    text: '饼图纹理',
+    textStyle: {
+      color: '#235894'
+    }
+  },
+  tooltip: {},
+  series: [
+    {
+      name: 'pie',
+      type: 'pie',
+      selectedMode: 'single',
+      selectedOffset: 30,
+      clockwise: true,
+      label: {
+        fontSize: 18,
+        color: '#235894'
+      },
+      labelLine: {
+        lineStyle: {
+          color: '#235894'
+        }
+      },
+      data: [
+        { value: 1048, name: 'Search Engine' },
+        { value: 735, name: 'Direct' },
+        { value: 580, name: 'Email' },
+        { value: 484, name: 'Union Ads' },
+        { value: 300, name: 'Video Ads' }
+      ],
+      itemStyle: {
+        opacity: 0.7,
+        color: {
+          image: piePatternImg,
+          repeat: 'repeat'
+        },
+        borderWidth: 3,
+        borderColor: '#235894'
+      }
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

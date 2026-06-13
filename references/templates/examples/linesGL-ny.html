@@ -1,0 +1,43 @@
+<!-- linesGL-ny — https://echarts.apache.org/examples/zh/editor.html?c=linesGL-ny -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  progressive: 20000,
+  backgroundColor: '#111',
+  geo: {
+    center: [-74.04327099998152, 40.86737600240287],
+    zoom: 360,
+    map: 'world',
+    roam: true,
+    silent: true,
+    itemStyle: {
+      normal: {
+        color: 'transparent',
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1
+      }
+    }
+  },
+  series: [
+    {
+      type: 'linesGL',
+      coordinateSystem: 'geo',
+      blendMode: 'lighter',
+      dimensions: ['value'],
+      data: new Float64Array(),
+      polyline: true,
+      large: true,
+      lineStyle: {
+        color: 'orange',
+        opacity: 0.3
+      }
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

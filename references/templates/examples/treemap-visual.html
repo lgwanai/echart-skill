@@ -1,0 +1,74 @@
+<!-- treemap-visual — https://echarts.apache.org/examples/zh/editor.html?c=treemap-visual -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+        title: {
+          left: 'center',
+          text: 'Gradient Mapping',
+          subtext: 'Growth > 0: green; Growth < 0: red; Growth = 0: grey'
+        },
+        tooltip: {
+          formatter: function (info) {
+            let value = info.value;
+            let amount = value[0];
+            amount = isValidNumber(amount)
+              ? echarts.format.addCommas(amount * 1000) + '$'
+              : '-';
+            let amount2011 = value[1];
+            amount2011 = isValidNumber(amount2011)
+              ? echarts.format.addCommas(amount2011 * 1000) + '$'
+              : '-';
+            let change = value[2];
+            change = isValidNumber(change) ? change.toFixed(2) + '%' : '-';
+            return [
+              '<div class="tooltip-title">' +
+                echarts.format.encodeHTML(info.name) +
+                '</div>',
+              '2012 Amount: &nbsp;&nbsp;' + amount + '<br>',
+              '2011 Amount: &nbsp;&nbsp;' + amount2011 + '<br>',
+              'Change From 2011: &nbsp;&nbsp;' + change
+            ].join('');
+          }
+        },
+        series: [
+          {
+            name: 'ALL',
+            top: 80,
+            type: 'treemap',
+            label: {
+              show: true,
+              formatter: '{b}'
+            },
+            itemStyle: {
+              borderColor: 'black'
+            },
+            visualMin: visualMin,
+            visualMax: visualMax,
+            visualDimension: 3,
+            levels: [
+              {
+                itemStyle: {
+                  borderWidth: 3,
+                  borderColor: '#333',
+                  gapWidth: 3
+                }
+              },
+              {
+                color: ['#942e38', '#aaa', '#269f3c'],
+                colorMappingBy: 'value',
+                itemStyle: {
+                  gapWidth: 1
+                }
+              }
+            ],
+            data: obama_budget_2012
+          }
+        ]
+      });
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

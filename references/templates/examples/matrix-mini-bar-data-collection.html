@@ -1,0 +1,57 @@
+<!-- matrix-mini-bar-data-collection — https://echarts.apache.org/examples/zh/editor.html?c=matrix-mini-bar-data-collection -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  dataset: {
+    source: [
+      ['2021-02-01', 'amount', 1212, 'file', 2321, 'Q', 1412],
+      ['2021-02-02', 'amount', 7181, 'file', 2114, 'Q', 1402],
+      ['2021-02-03', 'amount', 2763, 'file', 4212, 'Q', 8172],
+      ['2021-02-04', 'amount', 6122, 'file', 2942, 'Q', 6121],
+      ['2021-02-05', 'amount', 4221, 'file', 3411, 'Q', 1987],
+      ['2021-02-06', 'amount', 7221, 'file', 5121, 'Q', 1303],
+      ['2021-02-07', 'amount', 5121, 'file', 4121, 'Q', 1819],
+      ['2021-02-08', 'amount', 6121, 'file', 3121, 'Q', 2303],
+      ['2021-02-09', 'amount', 7121, 'file', 2121, 'Q', 3303],
+      ['2021-02-10', 'amount', 8121, 'file', 1121, 'Q', 4303]
+    ]
+  },
+  matrix: {
+    // matrix.x/y.data is not specified, which means they will be collected from
+    // `dataset.source` (or `series.data`, if any).
+    // All of values under the dimensions specified by `series.encode.x/y` will be
+    // auto-collected as `matrix.x/y.data`.
+    x: {
+      levelSize: 50,
+      itemStyle: { color: '#f0f8ff' },
+      label: { fontWeight: 'bold' }
+    }
+  },
+  series: [
+    {
+      type: 'custom',
+      coordinateSystem: 'matrix',
+      encode: { x: 1, y: 0 },
+      renderItem: makeRenderItem(1, 0, 2, _dataExtent)
+    },
+    {
+      type: 'custom',
+      coordinateSystem: 'matrix',
+      encode: { x: 3, y: 0 },
+      renderItem: makeRenderItem(3, 0, 4, _dataExtent)
+    },
+    {
+      type: 'custom',
+      coordinateSystem: 'matrix',
+      encode: { x: 5, y: 0 },
+      renderItem: makeRenderItem(5, 0, 6, _dataExtent)
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

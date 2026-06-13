@@ -1,0 +1,131 @@
+<!-- pictorialBar-hill — https://echarts.apache.org/examples/zh/editor.html?c=pictorialBar-hill -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  backgroundColor: '#0f375f',
+  tooltip: {},
+  legend: {
+    textStyle: { color: '#ddd' }
+  },
+  xAxis: [
+    {
+      data: ['Christmas Wish List', '', 'Qomolangma', 'Kilimanjaro'],
+      axisTick: { show: false },
+      axisLine: { show: false },
+      axisLabel: {
+        margin: 20,
+        color: '#ddd',
+        fontSize: 14
+      }
+    }
+  ],
+  yAxis: {
+    splitLine: { show: false },
+    axisTick: { show: false },
+    axisLine: { show: false },
+    axisLabel: { show: false }
+  },
+  markLine: {
+    z: -1
+  },
+  animationEasing: 'elasticOut',
+  series: [
+    {
+      type: 'pictorialBar',
+      name: 'All',
+      emphasis: {
+        scale: true
+      },
+      label: {
+        show: true,
+        position: 'top',
+        formatter: '{c} m',
+        fontSize: 16,
+        color: '#e54035'
+      },
+      data: [
+        {
+          value: 13000,
+          symbol: 'image://' + paperDataURI,
+          symbolRepeat: true,
+          symbolSize: ['130%', '20%'],
+          symbolOffset: [0, 10],
+          symbolMargin: '-30%',
+          animationDelay: function (dataIndex, params) {
+            return params.index * 30;
+          }
+        },
+        {
+          value: '-',
+          symbol: 'none'
+        },
+        {
+          value: 8844,
+          symbol:
+            'image://' + ROOT_PATH + '/data/asset/img/hill-Qomolangma.png',
+          symbolSize: ['200%', '105%'],
+          symbolPosition: 'end',
+          z: 10
+        },
+        {
+          value: 5895,
+          symbol:
+            'image://' + ROOT_PATH + '/data/asset/img/hill-Kilimanjaro.png',
+          symbolSize: ['200%', '105%'],
+          symbolPosition: 'end'
+        }
+      ],
+      markLine: {
+        symbol: ['none', 'none'],
+        label: {
+          show: false
+        },
+        lineStyle: {
+          color: '#e54035',
+          width: 2
+        },
+        data: [
+          {
+            yAxis: 8844
+          }
+        ]
+      }
+    },
+    {
+      name: 'All',
+      type: 'pictorialBar',
+      barGap: '-100%',
+      symbol: 'circle',
+      itemStyle: {
+        color: '#185491'
+      },
+      silent: true,
+      symbolOffset: [0, '50%'],
+      z: -10,
+      data: [
+        {
+          value: 1,
+          symbolSize: ['150%', 50]
+        },
+        {
+          value: '-'
+        },
+        {
+          value: 1,
+          symbolSize: ['200%', 50]
+        },
+        {
+          value: 1,
+          symbolSize: ['200%', 50]
+        }
+      ]
+    }
+  ]
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

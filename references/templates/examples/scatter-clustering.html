@@ -1,0 +1,55 @@
+<!-- scatter-clustering — https://echarts.apache.org/examples/zh/editor.html?c=scatter-clustering -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
+chart.setOption({
+  dataset: [
+    {
+      source: data
+    },
+    {
+      transform: {
+        type: 'ecStat:clustering',
+        // print: true,
+        config: {
+          clusterCount: CLUSTER_COUNT,
+          outputType: 'single',
+          outputClusterIndexDimension: DIENSIION_CLUSTER_INDEX
+        }
+      }
+    }
+  ],
+  tooltip: {
+    position: 'top'
+  },
+  visualMap: {
+    type: 'piecewise',
+    top: 'middle',
+    min: 0,
+    max: CLUSTER_COUNT,
+    left: 10,
+    splitNumber: CLUSTER_COUNT,
+    dimension: DIENSIION_CLUSTER_INDEX,
+    pieces: pieces
+  },
+  grid: {
+    left: 120
+  },
+  xAxis: {},
+  yAxis: {},
+  series: {
+    type: 'scatter',
+    encode: { tooltip: [0, 1] },
+    symbolSize: 15,
+    itemStyle: {
+      borderColor: '#555'
+    },
+    datasetIndex: 1
+  }
+});
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
