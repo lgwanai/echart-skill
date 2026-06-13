@@ -62,6 +62,9 @@ def _json_safe(value):
         # JS keywords — return bare
         if stripped in ("true", "false", "null", "undefined"):
             return stripped
+        # JS function / arrow function — return raw
+        if stripped.startswith("function") or stripped.startswith("("):
+            return stripped
         # Already valid JSON array/object → raw JS expression
         if (stripped.startswith("[") and stripped.endswith("]")) or \
            (stripped.startswith("{") and stripped.endswith("}")):

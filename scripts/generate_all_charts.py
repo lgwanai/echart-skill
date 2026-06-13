@@ -220,7 +220,7 @@ CHARTS.append(("34_3D_Scatter", "3d/scatter3d.html", {
 
 CHARTS.append(("35_3D_Surface", "3d/surface.html", {
     "TITLE":"35 3D曲面","PROJECTION":"perspective","WIREFRAME":"false","COLOR":"#5470c6",
-    "DATA_OR_EQUATION":"function(x,y){return Math.sin(x)*Math.cos(y)}","PARAMETRIC":"false"}))
+    "DATA_OR_EQUATION":"function(x,y){ return Math.sin(x*Math.PI)*Math.sin(y*Math.PI); }","PARAMETRIC":"false"}))
 
 CHARTS.append(("36_3D_Globe", "3d/globe.html", {
     "TITLE":"36 3D地球","AUTO_ROTATE":"true","SHADING":"lambert","ENVIRONMENT":"","BASE_TEXTURE":"","HEIGHT_TEXTURE":"",
