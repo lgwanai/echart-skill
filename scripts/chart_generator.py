@@ -544,6 +544,24 @@ CHART_REQUIREMENTS = {
 }
 
 
+def _df_to_json_safe(df: "pd.DataFrame") -> None:
+    """Convert non-JSON-serializable columns to string in-place.
+
+    DuckDB returns Python date/datetime objects which json.dumps cannot handle.
+    """
+    from datetime import date, datetime
+    import numpy as np
+    for col in df.columns:
+        # Check pandas datetime types
+        if pd.api.types.is_datetime64_any_dtype(df[col]):
+            df[col] = df[col].astype(str)
+            continue
+        # Check object columns containing date/datetime
+        sample = df[col].dropna()
+        if len(sample) > 0 and isinstance(sample.iloc[0], (date, datetime)):
+            df[col] = df[col].astype(str)
+
+
 def _validate_and_fix_option(option: dict, chart_type: str, df_columns: list) -> dict:
     """Hard guarantee: option MUST have everything needed to render.
 
@@ -627,6 +645,13 @@ def generate_echarts_html(df, config, output_path):
     option = config.get("echarts_option", {})
     chart_type = config.get("chart_type", "")
 
+    # Convert any non-JSON-serializable columns BEFORE building option/dataset
+    for col in df.columns:
+        try:
+            json.dumps(df[col].iloc[0] if len(df) > 0 else None)
+        except (TypeError, ValueError):
+            df[col] = df[col].astype(str)
+
     # 0. Auto-build option from chart_type when no explicit echarts_option
     if not option and chart_type:
         option = _auto_build_option(chart_type, df)
@@ -636,9 +661,9 @@ def generate_echarts_html(df, config, output_path):
         dataset_source = [df.columns.tolist()] + df.values.tolist()
         option['dataset'] = {'source': dataset_source}
 
-    raw_data_json = json.dumps(df.to_dict(orient='records'), ensure_ascii=False)
+    raw_data_json = json.dumps(df.to_dict(orient='records'), ensure_ascii=False, default=str)
     dataset_source_json = json.dumps(
-        [df.columns.tolist()] + df.values.tolist(), ensure_ascii=False
+        [df.columns.tolist()] + df.values.tolist(), ensure_ascii=False, default=str
     )
     custom_js = (
         f"var rawData = {raw_data_json};\n"
@@ -676,9 +701,9 @@ def generate_echarts_html(df, config, output_path):
                 )
 
     # Rebuild JSON strings from (possibly normalized) data
-    raw_data_json = json.dumps(df.to_dict(orient='records'), ensure_ascii=False)
+    raw_data_json = json.dumps(df.to_dict(orient='records'), ensure_ascii=False, default=str)
     dataset_source_json = json.dumps(
-        [df.columns.tolist()] + df.values.tolist(), ensure_ascii=False
+        [df.columns.tolist()] + df.values.tolist(), ensure_ascii=False, default=str
     )
     custom_js = (
         f"var rawData = {raw_data_json};\n"
