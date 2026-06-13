@@ -263,4 +263,12 @@
 - **现象**：36_3D_Globe 显示为纯蓝/黄色球，无地球纹理
 - **根因**：未提供 `baseTexture`，ECharts globe 渲染为无纹理球体
 - **修复**：下载 ECharts 官方示例的 1.3MB JPG 地球纹理（`echarts.apache.org/examples/data-gl/asset/world.topo.bathy.200401.jpg`），base64 嵌入为 `baseTexture`
+
+---
+
+## #31 — Lines3D 空白：GEO_COORD_MAP 为空 + BASE_TEXTURE 缺失
+- **日期**：2026-06-13
+- **现象**：37_3D_Lines3D 一片空白
+- **根因**：(1) `GEO_COORD_MAP: "{}"` 空对象，FLIGHTS 使用不存在的地名 "A/B/C"；(2) `BASE_TEXTURE: ""` 无地球纹理；(3) GL_INLINE 破坏注入（同 #18）
+- **修复**：(1) GEO_COORD_MAP 提供真实城市经纬度；(2) FLIGHTS 改用真实城市名 `[["北京","上海"],...]`；(3) BASE_TEXTURE 使用真实地球纹理；(4) **模板守卫**：`geoCoordMap || {}`
 | effectScatter | `series.data` | — |
