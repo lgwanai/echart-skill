@@ -71,11 +71,11 @@ var option = {
     title: { text: '41 时间轴' },
     tooltip: {},
     grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-    xAxis: { type: 'category', data: ["大象", "犀牛", "河马", "水牛", "长颈鹿"] },
+    xAxis: { type: 'category', data: ["A", "B", "C"] },
     yAxis: { type: 'value' },
-    series: [{"name": "A", "type": "bar", "data": [120, 145, 170]}, {"name": "B", "type": "bar", "data": [90, 110, 130]}, {"name": "C", "type": "bar", "data": [70, 85, 100]}]
+    series: [{"name": "sales", "type": "bar"}]
   },
-  options: []
+  options: [{"series": [{"data": [120, 90, 70]}]}, {"series": [{"data": [145, 110, 85]}]}, {"series": [{"data": [170, 130, 100]}]}]
 };
 chart.setOption(option);
 window.addEventListener('resize', function() { chart.resize(); });

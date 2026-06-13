@@ -201,11 +201,11 @@ CHARTS.append(("32_Mix_Line_Bar", "mix/line-bar.html", {
     "LINE_DATA":D([220,182,191,234,290,310])}))
 
 CHARTS.append(("41_Mix_Timeline", "mix/timeline.html", {
-    "OPTIONS":"[]",
     "TITLE":"41 时间轴",
     "TIMELINE":D([2020,2021,2022]),
-    "CATEGORIES":["大象", "犀牛", "河马", "水牛", "长颈鹿"],
-    "SERIES":D([{"name":"A","type":"bar","data":[120,145,170]},{"name":"B","type":"bar","data":[90,110,130]},{"name":"C","type":"bar","data":[70,85,100]}])}))
+    "CATEGORIES":D(["A","B","C"]),
+    "SERIES":D([{"name":"sales","type":"bar"}]),
+    "OPTIONS":D([{"series":[{"data":[120,90,70]}]},{"series":[{"data":[145,110,85]}]},{"series":[{"data":[170,130,100]}]}])}))
 
 # ═══ 3D ═══
 CHARTS.append(("33_3D_Bar", "3d/bar3d.html", {
