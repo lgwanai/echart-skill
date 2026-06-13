@@ -22,7 +22,7 @@ var option = {
   tooltip: { trigger: 'item', triggerOn: 'mousemove' },
   series: [{
     type: 'tree',
-    data: {{DATA}},
+    data: [].concat({{DATA}}),
     orient: {{ORIENT}},         // 'LR' | 'RL' | 'TB' | 'BT'
     layout: {{LAYOUT}},         // 'orthogonal' | 'radial'
     roam: true,
