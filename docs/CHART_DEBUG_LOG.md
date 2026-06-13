@@ -223,4 +223,12 @@
 - **现象**：30_EffectScatter 一片空白，修复后各城市同色
 - **根因**：(1) `GEO_COORD_MAP: "{}"` 空对象，`MAP_NAME: ""` 空地图名 → 无地图；(2) `convertData()` 只复制 `name`/`value`，丢弃 `itemStyle`
 - **修复**：(1) 提供真实 GEO_COORD_MAP + MAP_NAME="china"；(2) `convertData` 保留 `itemStyle`；(3) 每城市设不同颜色 `itemStyle.color`；(4) **模板守卫**：`geoCoordMap || {}`，`map || "china"`
+
+---
+
+## #26 — Lines/Flights 空白 + 线宽过粗
+- **日期**：2026-06-13
+- **现象**：31_Lines_Flights 空白，修复后线宽 80-100px
+- **根因**：(1) FLIGHTS 格式错误——传入对象 `{fromName,...}` 而非数组 `[from,to,val]`，模板 `item[0]` 取到 undefined；(2) GEO_COORD_MAP 为空 `{}`；(3) 线宽公式 `value/LINE_SCALE` 用 LINE_SCALE=1 导致 80-100px 宽
+- **修复**：(1) FLIGHTS 改为 `[["北京","上海",100],...]`；(2) GEO_COORD_MAP 提供真实坐标；(3) `lineStyle.width` 固定为 `1`，删掉动态计算
 | effectScatter | `series.data` | — |
