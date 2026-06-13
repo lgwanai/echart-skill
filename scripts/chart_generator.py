@@ -460,15 +460,25 @@ def _auto_build_option(chart_type: str, df: "pd.DataFrame") -> dict:
             "series": [{"type": "scatter", "encode": {"x": first_col, "y": second_col}}],
         }
     elif ct == "map":
-        # Map charts MUST use data array (not dataset+encode) for reliable rendering.
-        # ECharts dataset+encode is unstable for map type — data values may not bind.
+        # Map charts MUST use data array (not dataset+encode) for reliable
+        # rendering. visualMap is REQUIRED to show value-based coloring.
         map_name = "china"
         data = []
+        values = []
         for _, row in df.iterrows():
             name_val = str(row[first_col]) if row[first_col] is not None else ""
             num_val = float(row[second_col]) if row[second_col] is not None else 0
             data.append({"name": name_val, "value": num_val})
+            values.append(num_val)
         return {
+            "visualMap": {
+                "min": min(values) if values else 0,
+                "max": max(values) if values else 100,
+                "text": ["高", "低"],
+                "realtime": False,
+                "calculable": True,
+                "inRange": {"color": ["#e0f3f8", "#abd9e9", "#74add1", "#4575b4", "#313695"]},
+            },
             "series": [{"type": "map", "map": map_name, "data": data}],
         }
     elif ct == "radar":
