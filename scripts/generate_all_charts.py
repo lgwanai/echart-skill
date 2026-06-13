@@ -58,11 +58,11 @@ CHARTS.append(("08_Line_XY", "line/xy.html", {
 
 # ═══ Pie ═══
 CHARTS.append(("09_Pie_Basic", "pie/basic.html", {
-    "TITLE":"09 基础饼图","ROSE_TYPE":"","LABEL_SHOW":"true","RADIUS":"['40%','70%']",
+    "TITLE":"09 基础饼图","ROSE_TYPE":"false","LABEL_SHOW":"true","RADIUS":D(["40%","70%"]),
     "DATA":D([{"name":"搜索","value":1048},{"name":"直接","value":735},{"name":"邮件","value":580},{"name":"联盟","value":484},{"name":"视频","value":300}])}))
 
 CHARTS.append(("38_Pie_Rose", "pie/basic.html", {
-    "TITLE":"38 玫瑰图","ROSE_TYPE":"area","LABEL_SHOW":"true","RADIUS":"['20%','80%']",
+    "TITLE":"38 玫瑰图","ROSE_TYPE":"area","LABEL_SHOW":"true","RADIUS":D(["20%","80%"]),
     "DATA":D([{"name":"A","value":40},{"name":"B","value":38},{"name":"C","value":32},{"name":"D","value":30},{"name":"E","value":28},{"name":"F","value":26},{"name":"G","value":22},{"name":"H","value":18}])}))
 
 # ═══ Scatter ═══
