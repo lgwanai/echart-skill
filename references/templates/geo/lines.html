@@ -1,7 +1,8 @@
 <!--
   Template: geo/lines.html
-  Chart Type: Geo Lines / Flights (地理飞线图)
-  Data Format: { geoCoordMap: {"name": [lng,lat]}, flights: [[fromName, toName, value?], ...] }
+  Chart Type: Geo Lines (地理飞线图)
+  Data Format: [[[lng1,lat1],[lng2,lat2]], ...] — direct coordinate pairs
+  Matches official ECharts lines-airline example
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -10,43 +11,28 @@
 <title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
 <!-- {{MAP_INLINE}} -->
-<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+<style>body{margin:0;padding:0;background:#003;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
-var geoCoordMap = {{GEO_COORD_MAP}} || {};
-var rawFlights = {{FLIGHTS}};
-
-function convertFlights(flights) {
-  return flights.map(function(item) {
-    return {
-      fromName: item[0], toName: item[1], value: item[2] || 1,
-      coords: [geoCoordMap[item[0]], geoCoordMap[item[1]]]
-    };
-  });
-}
-
 var option = {
-  tooltip: { trigger: 'item', formatter: function(p) { return p.data ? p.data.fromName + ' -> ' + p.data.toName : ''; } },
+  backgroundColor: '#003',
+  title: { text: {{TITLE}}, left: 'center', textStyle: { color: '#eee' } },
+  tooltip: { formatter: function(p) { return 'Line ' + p.dataIndex; } },
   geo: {
-    map: {{MAP_NAME}} || 'china', roam: true,
-    label: { show: true, color: '#333' },
-    itemStyle: { areaColor: '#f5f5f5', borderColor: '#999' },
-    emphasis: { itemStyle: { areaColor: '#ffd54f' } }
+    map: {{MAP_NAME}} || 'china', roam: true, silent: true,
+    itemStyle: { borderColor: '#003', color: '#005' }
   },
-  series: [
-    {
-      type: 'lines',
-      coordinateSystem: 'geo',
-      polyline: false,
-      effect: { show: true, period: 6, trailLength: 0.7, symbolSize: 3 },
-      lineStyle: { width: 2, color: '#ff6b35', opacity: 0.8, curveness: 0.2 },
-      data: convertFlights(rawFlights)
-    }
-  ]
+  series: [{
+    type: 'lines',
+    coordinateSystem: 'geo',
+    data: {{DATA}},
+    large: true,
+    lineStyle: { opacity: 0.2, width: 1, curveness: 0.3 },
+    blendMode: 'lighter'
+  }]
 };
 chart.setOption(option);
 window.addEventListener('resize', function() { chart.resize(); });
