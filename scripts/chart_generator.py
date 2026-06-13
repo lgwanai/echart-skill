@@ -757,6 +757,12 @@ def generate_echarts_html(df, config, output_path):
                 gl_js = "<script>\n" + gf.read() + "\n</script>"
             logger.info("echarts-gl 已内联", gl_types=series_types & gl_types)
 
+    # Ensure tooltip is enabled — off by default in some ECharts modes
+    if "tooltip" not in option:
+        option["tooltip"] = {}
+    if "toolbox" not in option:
+        option["toolbox"] = {"feature": {"saveAsImage": {}, "dataView": {"readOnly": False}}}
+
     # Hard guarantee: option MUST have a renderable series type
     option = _validate_and_fix_option(option, chart_type, df.columns)
 
