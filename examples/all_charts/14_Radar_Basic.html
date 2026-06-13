@@ -62,7 +62,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"radar": {"indicator": [{"name": "预算分配", "max": 5000}, {"name": "支出", "max": 15000}, {"name": "销售", "max": 30000}, {"name": "利润", "max": 40000}]}, "series": [{"type": "radar", "encode": {"itemName": "n", "value": ["budget", "spending", "sales", "profit"]}, "data": [{"name": "预算", "value": "4200"}, {"name": "实际", "value": "5000"}]}], "tooltip": {}, "toolbox": {"feature": {"saveAsImage": {}, "dataView": {"readOnly": false}}}};
+            var option = {"radar": {"indicator": [{"name": "预算分配", "max": 5000}, {"name": "支出", "max": 15000}, {"name": "销售", "max": 30000}, {"name": "利润", "max": 40000}]}, "series": [{"type": "radar", "encode": {"itemName": "n", "value": ["budget", "spending", "sales", "profit"]}, "data": [{"name": "预算", "value": [4200.0, 3000.0, 20000.0, 35000.0]}, {"name": "实际", "value": [5000.0, 14000.0, 28000.0, 26000.0]}]}], "tooltip": {}, "toolbox": {"feature": {"saveAsImage": {}, "dataView": {"readOnly": false}}}};
             var rawData = [{"n": "预算", "budget": "4200", "spending": "3000", "sales": "20000", "profit": "35000"}, {"n": "实际", "budget": "5000", "spending": "14000", "sales": "28000", "profit": "26000"}];
 
             

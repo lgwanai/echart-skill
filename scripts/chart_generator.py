@@ -676,12 +676,15 @@ def generate_echarts_html(df, config, output_path):
            or is_geo_scatter:
             if not series_has_data and len(cols) >= 2:
                 data = []
+                multi_dim = stype in ("radar", "parallel")  # value = array of dimensions
                 for row in rows:
-                    item = {"name": str(row[0]), "value": row[1] if row[1] is not None else 0}
-                    # For geo scatter with lat/lng
-                    if is_geo_scatter and len(row) >= 4:
-                        item["value"] = [row[1], row[2], row[0]] if len(row) == 3 else row[3]
-                    data.append(item)
+                    if multi_dim and len(row) > 2:
+                        v = [float(x) if x is not None else 0 for x in row[1:]]
+                    elif is_geo_scatter and len(row) >= 4:
+                        v = [row[2], row[1], row[3]] if len(row) >= 4 else row[1]  # [lng, lat, val]
+                    else:
+                        v = row[1] if row[1] is not None else 0
+                    data.append({"name": str(row[0]), "value": v})
                 option.setdefault("series", [{}])[0]["data"] = data
         else:
             # Types that support dataset+encode: bar, line, scatter(cartesian), candlestick, boxplot, heatmap
