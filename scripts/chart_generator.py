@@ -790,7 +790,7 @@ def generate_echarts_html(df, config, output_path):
                         num = v[2] if isinstance(v, list) and len(v) >= 3 else (v if isinstance(v, (int, float)) else 1)
                         d["symbolSize"] = round(8 + (num - mn) / rng * 40, 1)
                     s.pop("symbolSize", None)
-                    s.pop("encode", None)       # data-array format: encode dims don't exist
+                    s["encode"] = {"lng": 0, "lat": 1, "value": 2}  # numeric idx: [lng,lat,val]
             # Convert string symbolSize → encode.z (dimension reference)
             if isinstance(s.get("symbolSize"), str) and "z" not in s.get("encode", {}):
                 s.setdefault("encode", {})["z"] = s.pop("symbolSize")
