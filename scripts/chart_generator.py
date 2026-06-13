@@ -772,24 +772,24 @@ def generate_echarts_html(df, config, output_path):
     # Fix scatter bubble: encode.z needs visualMap for symbol size variation
     for s in option.get("series", []):
         if s.get("type") == "scatter":
-            # Geo scatter: compute symbolSize from value in custom JS
+            # Geo scatter: compute per-point symbolSize in Python, apply as data item property
             if s.get("coordinateSystem") == "geo" and "symbolSize" not in s:
-                config["custom_js"] = config.get("custom_js", "") + """
-            // Vary symbol size by data value for geo scatter
-            var geoData = option.series[0].data;
-            var vals = geoData.map(function(d){
-                var v = d.value;
-                return Array.isArray(v) ? v[v.length-1] : (v || 1);
-            });
-            var minVal = Math.min.apply(null, vals);
-            var maxVal = Math.max.apply(null, vals);
-            var range = maxVal - minVal || 1;
-            option.series[0].symbolSize = function(dataItem) {
-                var v = dataItem.value;
-                var num = Array.isArray(v) ? v[v.length-1] : (v || 1);
-                return 8 + (num - minVal) / range * 40;
-            };
-"""
+                sd = s.get("data", [])
+                all_vals = []
+                for d in sd:
+                    v = d.get("value", 0)
+                    if isinstance(v, list) and len(v) >= 3:
+                        all_vals.append(v[2])
+                    elif isinstance(v, (int, float)):
+                        all_vals.append(v)
+                if all_vals:
+                    mn, mx = min(all_vals), max(all_vals)
+                    rng = mx - mn if mx != mn else 1
+                    for d in sd:
+                        v = d.get("value", 0)
+                        num = v[2] if isinstance(v, list) and len(v) >= 3 else (v if isinstance(v, (int, float)) else 1)
+                        d["symbolSize"] = round(8 + (num - mn) / rng * 40, 1)
+                    s.pop("symbolSize", None)  # remove series-level, use per-point
             # Convert string symbolSize → encode.z (dimension reference)
             if isinstance(s.get("symbolSize"), str) and "z" not in s.get("encode", {}):
                 s.setdefault("encode", {})["z"] = s.pop("symbolSize")
