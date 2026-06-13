@@ -2,37 +2,37 @@
   {
     "status": "✅",
     "name": "01_Bar_Basic",
-    "detail": "1119321 bytes"
+    "detail": "1125737 bytes"
   },
   {
     "status": "✅",
     "name": "02_Bar_Horizontal",
-    "detail": "1119322 bytes"
+    "detail": "1125703 bytes"
   },
   {
     "status": "✅",
     "name": "03_Bar_Stacked",
-    "detail": "1119531 bytes"
+    "detail": "1119535 bytes"
   },
   {
     "status": "✅",
     "name": "04_Bar_Waterfall",
-    "detail": "1120450 bytes"
+    "detail": "1120391 bytes"
   },
   {
     "status": "✅",
     "name": "05_Bar_Race",
-    "detail": "1119534 bytes"
+    "detail": "1125950 bytes"
   },
   {
     "status": "✅",
     "name": "06_Line_Basic",
-    "detail": "1119440 bytes"
+    "detail": "1125785 bytes"
   },
   {
     "status": "✅",
     "name": "07_Line_Stacked",
-    "detail": "1119487 bytes"
+    "detail": "1119498 bytes"
   },
   {
     "status": "✅",
@@ -117,7 +117,7 @@
   {
     "status": "✅",
     "name": "22_Graph_Force",
-    "detail": "1120007 bytes"
+    "detail": "1119982 bytes"
   },
   {
     "status": "✅",
@@ -127,7 +127,7 @@
   {
     "status": "✅",
     "name": "24_Boxplot",
-    "detail": "1119203 bytes"
+    "detail": "1119246 bytes"
   },
   {
     "status": "✅",
@@ -145,9 +145,9 @@
     "detail": "1119247 bytes"
   },
   {
-    "status": "✅",
+    "status": "❌",
     "name": "28_PictorialBar",
-    "detail": "1120884 bytes"
+    "detail": "missing keys: {'SYMBOL'}"
   },
   {
     "status": "✅",
@@ -162,12 +162,12 @@
   {
     "status": "✅",
     "name": "32_Mix_Line_Bar",
-    "detail": "1119521 bytes"
+    "detail": "1119532 bytes"
   },
   {
     "status": "✅",
     "name": "41_Mix_Timeline",
-    "detail": "1119326 bytes"
+    "detail": "1119364 bytes"
   },
   {
     "status": "✅",
@@ -197,7 +197,7 @@
   {
     "status": "✅",
     "name": "39_Custom_Error_Bar",
-    "detail": "1119555 bytes"
+    "detail": "1119583 bytes"
   },
   {
     "status": "✅",
