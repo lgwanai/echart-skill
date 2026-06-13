@@ -1,0 +1,40 @@
+<!--
+  Template: 3d/globe.html
+  Chart Type: Globe (3D地球 + scatter points)
+  Data Format: [[lat, lng, value], ...]
+  NOTE: Requires echarts-gl extension
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
+<!-- {{GL_INLINE}} -->
+<style>body{margin:0;background:#000;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px;color:#fff;position:absolute;top:10px;width:100%">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  backgroundColor: '#000',
+  globe: {
+    baseTexture: {{BASE_TEXTURE}},
+    shading: {{SHADING}},
+    environment: {{ENVIRONMENT}}
+  },
+  series: [{
+    type: 'scatter3D',
+    coordinateSystem: 'globe',
+    symbolSize: 6,
+    itemStyle: { color: '#ffd54f' },
+    data: {{DATA}}
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

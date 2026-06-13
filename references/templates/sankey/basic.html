@@ -1,0 +1,40 @@
+<!--
+  Template: sankey/basic.html
+  Chart Type: Sankey (桑基图)
+  Data Pattern: NODES_LINKS
+  Data Format: { nodes: [{name: string, itemStyle?: {}}, ...], links: [{source: string, target: string, value: number}, ...] }
+  Covers: sankey-simple, sankey-energy, sankey-levels, sankey-itemstyle, sankey-nodeAlign-*, sankey-vertical (7 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: { trigger: 'item', triggerOn: 'mousemove' },
+  series: [{
+    type: 'sankey',
+    layout: 'none',
+    orient: {{ORIENT}},          // 'horizontal' | 'vertical'
+    nodeAlign: {{NODE_ALIGN}},   // 'left' | 'right' | 'justify'
+    emphasis: { focus: 'adjacency' },
+    nodeWidth: 20, nodeGap: 8,
+    label: { show: true, position: {{LABEL_POS}} },
+    lineStyle: { color: 'gradient', curveness: 0.5 },
+    data: {{NODES}},
+    links: {{LINKS}}
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

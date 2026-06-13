@@ -1,0 +1,43 @@
+<!--
+  Template: heatmap/basic.html
+  Chart Type: Heatmap (热力图)
+  Data Pattern: XYZ_TRIPLES
+  Data Format: { xLabels: string[], yLabels: string[], data: [[xIdx, yIdx, value], ...] }
+  Covers: heatmap-cartesian, heatmap-large, heatmap-large-piecewise, heatmap-map, heatmap-bmap (5 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: { position: 'top' },
+  grid: { height: '60%', top: '10%' },
+  xAxis: { type: 'category', data: {{X_LABELS}}, splitArea: { show: true } },
+  yAxis: { type: 'category', data: {{Y_LABELS}}, splitArea: { show: true } },
+  visualMap: {
+    min: {{VMIN}}, max: {{VMAX}},
+    calculable: true, orient: 'horizontal',
+    left: 'center', bottom: '5%',
+    inRange: { color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#fee090', '#fdae61', '#f46d43', '#d73027'] }
+  },
+  series: [{
+    type: 'heatmap',
+    data: {{DATA}},
+    label: { show: {{LABEL_SHOW}} },
+    emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

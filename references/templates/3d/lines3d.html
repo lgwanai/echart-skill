@@ -1,0 +1,48 @@
+<!--
+  Template: 3d/lines3d.html
+  Chart Type: Lines3D (3D飞线图)
+  Data Pattern: LINES_COORDS (3D version: coords are [lng, lat, height])
+  Data Format: { geoCoordMap: {"name": [lng, lat]}, flights: [[fromName, toName], ...] }
+  Covers: lines3d-flights, lines3d-flights-gl, lines3d-airline-on-globe,
+          lines3d-flights-on-geo3d, line3d-orthographic, linesGL-ny (6 examples)
+  NOTE: Requires echarts-gl extension
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
+<!-- {{GL_INLINE}} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var geoCoordMap = {{GEO_COORD_MAP}} || {};
+var flights = {{FLIGHTS}};
+var seriesData = flights.map(function(item) {
+  return { coords: [geoCoordMap[item[0]], geoCoordMap[item[1]]] };
+});
+var option = {
+  globe: {
+    baseTexture: {{BASE_TEXTURE}},
+    shading: 'color', environment: {{ENVIRONMENT}},
+    viewControl: { autoRotate: {{AUTO_ROTATE}} }
+  },
+  series: [{
+    type: 'lines3D',
+    coordinateSystem: 'globe',
+    effect: { show: true, period: 4, trailLength: 0.2, constantSpeed: 30 },
+    lineStyle: { width: 1, color: {{LINE_COLOR}}, opacity: 0.6 },
+    blendMode: 'lighter',
+    data: seriesData
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

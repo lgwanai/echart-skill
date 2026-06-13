@@ -1,0 +1,37 @@
+<!--
+  Template: mix/timeline.html
+  Chart Type: Timeline (时间轴多图表切换)
+  Data Pattern: TIMELINE_OPTIONS
+  Data Format: { timeline: [period1, ...], options: [{series:[{data}]}, ...] }
+  Covers: mix-timeline-finance (1 example)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  baseOption: {
+    timeline: { axisType: 'category', autoPlay: true, playInterval: 1000, data: {{TIMELINE}} },
+    title: { text: {{TITLE}} },
+    tooltip: {},
+    grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+    xAxis: { type: 'category', data: {{CATEGORIES}} },
+    yAxis: { type: 'value', max: 200 },
+    series: {{SERIES}}
+  },
+  options: {{OPTIONS}}
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

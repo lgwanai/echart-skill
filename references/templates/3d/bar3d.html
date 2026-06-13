@@ -1,0 +1,38 @@
+<!--
+  Template: 3d/bar3d.html
+  Chart Type: Bar3D (3D柱状图)
+  Data Format: [[x, y, z], ...]
+  NOTE: Requires echarts-gl extension
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
+<!-- {{GL_INLINE}} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: {},
+  visualMap: { max: {{VMAX}}, inRange: { color: ['#313695', '#4575b4', '#74add1', '#fee090', '#f46d43', '#d73027'] } },
+  grid3D: {},
+  xAxis3D: { type: 'category' },
+  yAxis3D: { type: 'category' },
+  zAxis3D: {},
+  series: [{
+    type: 'bar3D',
+    shading: 'lambert',
+    data: {{DATA}}
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

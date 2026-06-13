@@ -1,0 +1,37 @@
+<!--
+  Template: candlestick/basic.html
+  Chart Type: Candlestick (K线图)
+  Data Pattern: OHLC
+  Data Format: { dates: string[], values: [[open, close, low, high], ...] }
+  Covers: candlestick-simple, candlestick-sh, candlestick-sh-2015, candlestick-brush,
+          candlestick-large, candlestick-touch (6 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+  grid: { left: '10%', right: '10%', bottom: '10%' },
+  xAxis: { type: 'category', data: {{DATES}}, boundaryGap: true },
+  yAxis: { type: 'value', scale: true },
+  series: [{
+    type: 'candlestick',
+    data: {{DATA}},
+    itemStyle: { color: '#ef5350', color0: '#26a69a', borderColor: '#ef5350', borderColor0: '#26a69a' }
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!--
+  Template: mix/line-bar.html
+  Chart Type: Line + Bar Combo (折线柱状混合图)
+  Data Pattern: FLAT_ARRAY (dual yAxis: bar on left, line on right)
+  Data Format: { categories: string[], barData: number[], lineData: number[] }
+  Covers: mix-line-bar, mix-zoom-on-value (2 examples)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var option = {
+  tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+  legend: { data: [{{BAR_NAME}}, {{LINE_NAME}}] },
+  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+  xAxis: { type: 'category', data: {{CATEGORIES}} },
+  yAxis: [
+    { type: 'value', name: {{BAR_NAME}}, position: 'left' },
+    { type: 'value', name: {{LINE_NAME}}, position: 'right' }
+  ],
+  series: [
+    { name: {{BAR_NAME}}, type: 'bar', data: {{BAR_DATA}}, itemStyle: { borderRadius: [4,4,0,0] } },
+    { name: {{LINE_NAME}}, type: 'line', yAxisIndex: 1, data: {{LINE_DATA}}, smooth: true,
+      symbol: 'circle', symbolSize: 8 }
+  ]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!--
+  Template: custom/error-bar.html
+  Chart Type: Error Bar (柱状图 + 自定义误差线)
+  Data Format: [[xIdx, val, lowVal, highVal], ...]
+  Uses official ECharts custom series renderItem for error bars
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">{{TITLE}}</div>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+var rawData = {{DATA}};
+var barData = rawData.map(function(d){return d[1]});
+var errorData = rawData.map(function(d,i){return [i, d[2], d[3]]});
+var cats = rawData.map(function(d){return d[0]});
+var option = {
+  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+  xAxis: { data: cats },
+  yAxis: {},
+  series: [
+    {
+      type: 'bar', name: 'value',
+      data: barData,
+      itemStyle: { color: '#5470c6' }
+    },
+    {
+      type: 'custom', name: 'error',
+      color: '#e54035',
+      itemStyle: { borderWidth: 1.5 },
+      renderItem: function(params, api) {
+        var xValue = api.value(0);
+        var highPoint = api.coord([xValue, api.value(1)]);
+        var lowPoint = api.coord([xValue, api.value(2)]);
+        var halfWidth = api.size([1, 0])[0] * 0.1;
+        var style = api.style({ stroke: '#e54035', fill: undefined });
+        return {
+          type: 'group',
+          children: [
+            { type: 'line', shape: { x1: highPoint[0] - halfWidth, y1: highPoint[1], x2: highPoint[0] + halfWidth, y2: highPoint[1] }, style: style },
+            { type: 'line', shape: { x1: highPoint[0], y1: highPoint[1], x2: lowPoint[0], y2: lowPoint[1] }, style: style },
+            { type: 'line', shape: { x1: lowPoint[0] - halfWidth, y1: lowPoint[1], x2: lowPoint[0] + halfWidth, y2: lowPoint[1] }, style: style }
+          ]
+        };
+      },
+      encode: { x: 0, y: [1, 2] },
+      data: errorData,
+      z: 100
+    }
+  ]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>
