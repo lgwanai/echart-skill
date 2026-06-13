@@ -1,16 +1,17 @@
 <!--
-  Template: scatter/basic.html
-  Chart Type: Scatter (散点图)
-  Data Pattern: XY_PAIRS
-  Data Format: [[x, y], [x, y], ...]
-  Covers: scatter-simple, scatter-effect, scatter-clustering, scatter-weight,
-          scatter-anscombe-quartet, scatter-linear-regression, scatter-aggregate-bar (10 examples)
+  Template: pie/basic.html
+  Chart Type: Pie (饼图)
+  Data Pattern: NAMED_VALUE
+  Data Format: [{name: string, value: number}, ...]
+  Covers: pie-simple, pie-borderRadius, pie-padAngle, pie-rich-text, pie-legend,
+          pie-nest (outer), pie-custom, pie-alignTo, pie-labelLine-adjust, pie-pattern,
+          pie-parliament-transition (15 examples)
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>scatter-simple</title>
+<title>pie-legend</title>
 <script>
 
 /*
@@ -62,19 +63,22 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">scatter-simple</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">pie-legend</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  tooltip: { trigger: 'item', formatter: function(p) { return '(' + p.value[0] + ', ' + p.value[1] + ')'; } },
-  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'value' },
-  yAxis: { type: 'value' },
+  tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+  legend: { orient: 'vertical', right: 10, top: 'center' },
   series: [{
-    type: 'scatter',
-    symbolSize: 10,     // number | function
-    data: [[10, 8.04], [8, 6.95], [13, 7.58], [9, 8.81], [11, 8.33], [14, 9.96], [6, 7.24], [4, 4.26], [12, 10.84]]
+    type: 'pie',
+    radius: ["40%", "70%"],       // '60%' for pie, ['40%','70%'] for doughnut
+    roseType: false || false,     // false | 'radius' | 'area'
+    center: ['50%', '50%'],
+    itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
+    label: { show: true },      // true | false
+    emphasis: { label: { show: true, fontSize: 20, fontWeight: 'bold' } },
+    data: [{"name": "\u641c\u7d22", "value": 1048}, {"name": "\u76f4\u63a5", "value": 735}, {"name": "\u90ae\u4ef6", "value": 580}, {"name": "\u8054\u76df", "value": 484}, {"name": "\u89c6\u9891", "value": 300}]
   }]
 };
 chart.setOption(option);

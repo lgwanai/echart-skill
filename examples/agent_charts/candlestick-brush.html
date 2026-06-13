@@ -1,16 +1,16 @@
 <!--
-  Template: scatter/basic.html
-  Chart Type: Scatter (散点图)
-  Data Pattern: XY_PAIRS
-  Data Format: [[x, y], [x, y], ...]
-  Covers: scatter-simple, scatter-effect, scatter-clustering, scatter-weight,
-          scatter-anscombe-quartet, scatter-linear-regression, scatter-aggregate-bar (10 examples)
+  Template: candlestick/basic.html
+  Chart Type: Candlestick (K线图)
+  Data Pattern: OHLC
+  Data Format: { dates: string[], values: [[open, close, low, high], ...] }
+  Covers: candlestick-simple, candlestick-sh, candlestick-sh-2015, candlestick-brush,
+          candlestick-large, candlestick-touch (6 examples)
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>scatter-simple</title>
+<title>candlestick-brush</title>
 <script>
 
 /*
@@ -62,19 +62,19 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">scatter-simple</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">candlestick-brush</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  tooltip: { trigger: 'item', formatter: function(p) { return '(' + p.value[0] + ', ' + p.value[1] + ')'; } },
-  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'value' },
-  yAxis: { type: 'value' },
+  tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+  grid: { left: '10%', right: '10%', bottom: '10%' },
+  xAxis: { type: 'category', data: ["1\u65e5", "2\u65e5", "3\u65e5", "4\u65e5", "5\u65e5"], boundaryGap: true },
+  yAxis: { type: 'value', scale: true },
   series: [{
-    type: 'scatter',
-    symbolSize: 10,     // number | function
-    data: [[10, 8.04], [8, 6.95], [13, 7.58], [9, 8.81], [11, 8.33], [14, 9.96], [6, 7.24], [4, 4.26], [12, 10.84]]
+    type: 'candlestick',
+    data: [[20, 34, 10, 38], [40, 35, 30, 50], [31, 38, 33, 44], [38, 15, 5, 42], [11, 35, 8, 35]],
+    itemStyle: { color: '#ef5350', color0: '#26a69a', borderColor: '#ef5350', borderColor0: '#26a69a' }
   }]
 };
 chart.setOption(option);

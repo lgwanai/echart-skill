@@ -1,16 +1,15 @@
 <!--
-  Template: scatter/basic.html
-  Chart Type: Scatter (散点图)
-  Data Pattern: XY_PAIRS
-  Data Format: [[x, y], [x, y], ...]
-  Covers: scatter-simple, scatter-effect, scatter-clustering, scatter-weight,
-          scatter-anscombe-quartet, scatter-linear-regression, scatter-aggregate-bar (10 examples)
+  Template: radar/basic.html
+  Chart Type: Radar (雷达图)
+  Data Pattern: RADAR_VALUE
+  Data Format: { indicators: [{name: string, max: number}, ...], series: [{name: string, value: number[]}, ...] }
+  Covers: radar, radar2, radar-aqi, radar-custom, radar-multiple (5 examples)
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>scatter-simple</title>
+<title>radar2</title>
 <script>
 
 /*
@@ -62,19 +61,21 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">scatter-simple</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">radar2</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  tooltip: { trigger: 'item', formatter: function(p) { return '(' + p.value[0] + ', ' + p.value[1] + ')'; } },
-  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'value' },
-  yAxis: { type: 'value' },
+  legend: { data: ["\u9884\u7b97", "\u5b9e\u9645"] },
+  radar: {
+    indicator: [{"name": "budget", "max": 6000.0}, {"name": "spending", "max": 16800.0}, {"name": "sales", "max": 33600.0}, {"name": "profit", "max": 42000.0}],
+    shape: 'polygon',        // 'polygon' | 'circle'
+    center: ['50%', '50%'],
+    radius: '65%'
+  },
   series: [{
-    type: 'scatter',
-    symbolSize: 10,     // number | function
-    data: [[10, 8.04], [8, 6.95], [13, 7.58], [9, 8.81], [11, 8.33], [14, 9.96], [6, 7.24], [4, 4.26], [12, 10.84]]
+    type: 'radar',
+    data: [{"name": "\u9884\u7b97", "value": [4200, 3000, 20000, 35000]}, {"name": "\u5b9e\u9645", "value": [5000, 14000, 28000, 26000]}]
   }]
 };
 chart.setOption(option);

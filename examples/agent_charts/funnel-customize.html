@@ -1,16 +1,15 @@
 <!--
-  Template: scatter/basic.html
-  Chart Type: Scatter (散点图)
-  Data Pattern: XY_PAIRS
-  Data Format: [[x, y], [x, y], ...]
-  Covers: scatter-simple, scatter-effect, scatter-clustering, scatter-weight,
-          scatter-anscombe-quartet, scatter-linear-regression, scatter-aggregate-bar (10 examples)
+  Template: funnel/basic.html
+  Chart Type: Funnel (漏斗图)
+  Data Pattern: NAMED_VALUE
+  Data Format: [{name: string, value: number}, ...]
+  Covers: funnel, funnel-align, funnel-customize, funnel-mutiple (4 examples)
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>scatter-simple</title>
+<title>funnel-customize</title>
 <script>
 
 /*
@@ -62,19 +61,23 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">scatter-simple</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">funnel-customize</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  tooltip: { trigger: 'item', formatter: function(p) { return '(' + p.value[0] + ', ' + p.value[1] + ')'; } },
-  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'value' },
-  yAxis: { type: 'value' },
+  tooltip: { trigger: 'item', formatter: '{a}<br/>{b}: {c}' },
+  legend: { top: '5%', left: 'center' },
   series: [{
-    type: 'scatter',
-    symbolSize: 10,     // number | function
-    data: [[10, 8.04], [8, 6.95], [13, 7.58], [9, 8.81], [11, 8.33], [14, 9.96], [6, 7.24], [4, 4.26], [12, 10.84]]
+    type: 'funnel',
+    left: '10%', top: 60, bottom: 60, width: '80%',
+    min: 1800,            // 0
+    max: 10000,            // 100
+    sort: 'descending',             // 'descending' | 'ascending' | 'none'
+    gap: 2,
+    label: { show: true, position: 'inside' },    // 'inside' | 'outside'
+    emphasis: { label: { fontSize: 20 } },
+    data: [{"name": "\u8bbf\u95ee", "value": 10000}, {"name": "\u6ce8\u518c", "value": 6500}, {"name": "\u6fc0\u6d3b", "value": 4200}, {"name": "\u4e0b\u5355", "value": 2800}, {"name": "\u652f\u4ed8", "value": 1800}]
   }]
 };
 chart.setOption(option);
