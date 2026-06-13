@@ -3,7 +3,7 @@
   Chart Type: Line (折线图)
   Data Pattern: FLAT_ARRAY
   Data Format: { categories: string[], values: number[] }
-  Covers: line-simple, line-smooth, line-style, line-marker, line-markline,
+  Covers: area-basic, area-simple, area-pieces, area-rainfall, area-time-axis, line-simple, line-smooth, line-style, line-marker, line-markline,
           line-sections, line-log, line-y-category, line-graphic (14 examples)
 -->
 <!DOCTYPE html>
@@ -69,7 +69,7 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis' },
   grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'category', data: ["Q1", "Q2", "Q3", "Q4"], boundaryGap: false },
+  xAxis: { type: 'category', data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], boundaryGap: false },
   yAxis: { type: 'value' },
   series: [{
     type: 'line',
@@ -78,7 +78,7 @@ var option = {
     areaStyle: true, // null | {}
     symbol: 'circle',
     symbolSize: 6,
-    data: [300, 500, 400, 600]
+    data: [820, 932, 901, 934, 1290, 1330, 1320]
   }]
 };
 chart.setOption(option);

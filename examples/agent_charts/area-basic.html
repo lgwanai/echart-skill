@@ -3,7 +3,7 @@
   Chart Type: Line (折线图)
   Data Pattern: FLAT_ARRAY
   Data Format: { categories: string[], values: number[] }
-  Covers: line-simple, line-smooth, line-style, line-marker, line-markline,
+  Covers: area-basic, area-simple, area-pieces, area-rainfall, area-time-axis, line-simple, line-smooth, line-style, line-marker, line-markline,
           line-sections, line-log, line-y-category, line-graphic (14 examples)
 -->
 <!DOCTYPE html>
@@ -78,7 +78,7 @@ var option = {
     areaStyle: true, // null | {}
     symbol: 'circle',
     symbolSize: 6,
-    data: [820, 932, 901, 1290, 1330, 1420, 1560]
+    data: [820, 932, 901, 934, 1290, 1330, 1320]
   }]
 };
 chart.setOption(option);
