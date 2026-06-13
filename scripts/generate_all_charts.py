@@ -223,7 +223,7 @@ CHARTS.append(("35_3D_Surface", "3d/surface.html", {
     "DATA_OR_EQUATION":"function(x,y){ return Math.sin(x*Math.PI)*Math.sin(y*Math.PI); }","PARAMETRIC":"false"}))
 
 CHARTS.append(("36_3D_Globe", "3d/globe.html", {
-    "TITLE":"36 3D地球","SHADING":"lambert","ENVIRONMENT":"",
+    "TITLE":"36 3D地球","SHADING":"lambert","ENVIRONMENT":"","BASE_TEXTURE":'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
     "DATA":D([[39.9,116.4,100],[31.2,121.5,95],[40.7,-74.0,200],[51.5,-0.1,150],[35.7,139.7,180]]),
     "SCATTER_SERIES":"[]"}))
 
