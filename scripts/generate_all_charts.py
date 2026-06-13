@@ -76,7 +76,7 @@ CHARTS.append(("11_Scatter_Bubble", "scatter/bubble.html", {
     "SMOOTH":"false","AREA_STYLE":"false","STEP":"false"}))
 
 CHARTS.append(("12_Scatter_Geo", "scatter/geo.html", {
-    "TITLE":"12 地理散点","MAP_NAME":"china","VMIN":0,"VMAX":100,"SIZE_SCALE":"1",
+    "TITLE":"12 地理散点","MAP_NAME":"china","VMIN":0,"VMAX":100,"SIZE_SCALE":"5",
     "GEO_COORD_MAP":D({"北京":[116.46,39.92],"上海":[121.48,31.22],"广州":[113.23,23.16],"深圳":[114.07,22.62],"成都":[104.06,30.67]}),
     "DATA":D([{"name":"北京","value":100},{"name":"上海","value":95},{"name":"广州","value":80},{"name":"深圳","value":90},{"name":"成都","value":70}])}))
 

@@ -55,7 +55,7 @@ var option = {
     type: 'scatter',
     coordinateSystem: 'geo',
     data: convertData(rawData),
-    symbolSize: function(val) { return Math.sqrt(val[2]) / {{SIZE_SCALE}} || 8; },
+    symbolSize: function(val) { return val[2] / {{SIZE_SCALE}} || 8; },
     encode: { value: 2 },
     label: {
       show: false,
