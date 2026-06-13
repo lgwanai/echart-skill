@@ -127,4 +127,28 @@
 | chord | `series.data + series.links` | — |
 | boxplot | `dataset.source + encode` | — |
 | calendar | `calendar + visualMap` | — |
+
+---
+
+## #14 — Line XY 数据未排序导致折线锯齿
+- **日期**：2026-06-13
+- **现象**：08_Line_XY 折线来回穿梭，线条混乱
+- **根因**：XY 折线图数据 `[[x,y],...]` 中 x 值未排序。ECharts line chart 按数组顺序连接点，不按 x 值排序
+- **修复**：(1) 数据按 x 排序；(2) **模板 `line/xy.html` 新增 `data.sort()` 自动排序**，确保无论输入数据是否有序都能正确渲染
+
+---
+
+## #15 — 模板 {{PLACEHOLDER}} 未提供导致 JS 语法错误
+- **日期**：2026-06-13
+- **现象**：38/41 图表 JS 中出现 `var data = {{INCREASE}}` 等未替换占位符
+- **根因**：`build_template.py` 对数据 dict 中不存在的 key 保留原文 `{{KEY}}`
+- **修复**：生成前读取每个模板的全部 `{{PLACEHOLDER}}`，验证数据 dict 所有 key 都存在后才调用 `build()`；生成后检查无残留占位符
+
+---
+
+## #16 — Stacked bar/line 模板 series 缺少 type 字段
+- **日期**：2026-06-13
+- **现象**：03_Bar_Stacked、07_Line_Stacked 无数据
+- **根因**：`bar/stack.html` 和 `line/stack.html` 使用 `{{SERIES}}` 替换整个 series 数组，每个 series 对象必须带 `type: "bar"/"line"`。ECharts 没有默认 series type
+- **修复**：数据 dict 中 series 对象添加 `"type": "bar"` 或 `"type": "line"`
 | effectScatter | `series.data` | — |

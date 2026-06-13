@@ -28,7 +28,7 @@ var option = {
     type: 'line',
     smooth: {{SMOOTH}},
     showSymbol: false,
-    data: {{DATA}}
+    data: {{DATA}}.sort(function(a,b){ return a[0]-b[0]; })
   }]
 };
 chart.setOption(option);
