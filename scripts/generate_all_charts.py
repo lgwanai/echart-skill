@@ -176,7 +176,7 @@ CHARTS.append(("27_ThemeRiver", "themeRiver/basic.html", {
 
 # ═══ PictorialBar ═══
 CHARTS.append(("28_PictorialBar", "pictorialBar/basic.html", {
-    "TITLE":"28 象形柱图","SYMBOL":"rect","SYMBOL_SIZE":30,"SYMBOL_MARGIN":"5%","SYMBOL_CLIP":"false",
+    "TITLE":"28 象形柱图","SYMBOL":"diamond","SYMBOL_SIZE":28,"SYMBOL_MARGIN":"5%","SYMBOL_CLIP":"false",
     "SYMBOL_BOUNDING":1000,"SYMBOL_REPEAT":"true","SYMBOL_POS":"start","COLOR":"#5470c6","LABEL_SHOW":"true",
     "CATEGORIES":D(["大象","犀牛","河马","水牛","长颈鹿"]),
     "VALUES":D([6500,3500,3000,2000,1800])}))
