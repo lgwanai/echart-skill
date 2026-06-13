@@ -210,7 +210,7 @@ CHARTS.append(("41_Mix_Timeline", "mix/timeline.html", {
 # ═══ 3D ═══
 CHARTS.append(("33_3D_Bar", "3d/bar3d.html", {
     "DATA":D([["A","Q1",120],["A","Q2",200],["B","Q1",90],["B","Q2",130],["C","Q1",160],["C","Q2",220]]),
-    "TITLE":"33 3D柱状","VMAX":250,"COORD_SYSTEM":"cartesian3D","BAR_SIZE":0.3,
+    "TITLE":"33 3D柱状","VMAX":250,"BAR_SIZE":0.3,
     "AXIS_3D":"xAxis3D: {type: \"category\", data: [\"A\",\"B\",\"C\"]}, yAxis3D: {type: \"category\", data: [\"Q1\",\"Q2\",\"Q3\",\"Q4\"]}, zAxis3D: {type: \"value\"},"}))
 
 CHARTS.append(("34_3D_Scatter", "3d/scatter3d.html", {

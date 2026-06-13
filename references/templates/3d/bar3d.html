@@ -1,11 +1,7 @@
 <!--
   Template: 3d/bar3d.html
   Chart Type: Bar3D (3D柱状图)
-  Data Pattern: XYZ_TRIPLES or DATASET_SOURCE
-  Data Format: [[x, y, z], ...] or dataset.source: [[x, y, z], ...]
-  Covers: bar3d-dataset, bar3d-global-population, bar3d-myth, bar3d-punch-card,
-          bar3d-simplex-noise, bar3d-voxelize-image, image-to-bar3d, metal-bar3d,
-          stacked-bar3d, transparent-bar3d, bar3d-noise-modified-from-marpi-demo (11 examples)
+  Data Format: [[x, y, z], ...]
   NOTE: Requires echarts-gl extension
 -->
 <!DOCTYPE html>
@@ -25,10 +21,12 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: {},
   visualMap: { max: {{VMAX}}, inRange: { color: ['#313695', '#4575b4', '#74add1', '#fee090', '#f46d43', '#d73027'] } },
-  {{AXIS_3D}}
+  xAxis3D: { type: 'category' },
+  yAxis3D: { type: 'category' },
+  zAxis3D: { type: 'value' },
   series: [{
     type: 'bar3D',
-    {{COORD_SYSTEM}}
+    coordinateSystem: 'cartesian3D',
     shading: 'realistic',
     barSize: {{BAR_SIZE}},
     data: {{DATA}}
