@@ -66,8 +66,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
-	var rawData = [[28604, 77, 17096869], [31163, 77.4, 27662440], [1516, 68, 1154605773], [13670, 74.7, 10582082]];
-	var vmMin = 10000000, vmMax = 1200000000;
+	var rawData = [[28604, 77, 80], [31163, 77.4, 90], [1516, 68, 15], [13670, 74.7, 40], [28599, 75, 60], [29476, 77.1, 70], [31476, 75.4, 85], [28666, 78.1, 50], [12124, 72.6, 25], [11173, 72.8, 100]];
+	var vmMin = 0, vmMax = 100;
 	if (vmMin === 0 && vmMax === 100) {
 	  var vals = rawData.map(function(d){ return d[2] || 1; });
 	  vmMin = Math.min.apply(null, vals);
@@ -80,7 +80,7 @@ var option = {
   },
   grid: { left: '5%', right: '10%', bottom: '10%', top: '10%' },
   xAxis: { type: 'value', name: 'GDP' },
-  yAxis: { type: 'value', name: 'Life' },
+  yAxis: { type: 'value', name: 'Life Expectancy' },
   visualMap: {
     dimension: 2,
     min: vmMin, max: vmMax,
@@ -88,7 +88,7 @@ var option = {
   },
   series: [{
     type: 'scatter',
-    data: [[28604, 77, 17096869], [31163, 77.4, 27662440], [1516, 68, 1154605773], [13670, 74.7, 10582082]],
+    data: [[28604, 77, 80], [31163, 77.4, 90], [1516, 68, 15], [13670, 74.7, 40], [28599, 75, 60], [29476, 77.1, 70], [31476, 75.4, 85], [28666, 78.1, 50], [12124, 72.6, 25], [11173, 72.8, 100]],
     emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
   }]
 };
