@@ -74,7 +74,7 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: {},
   visualMap: { max: 250, inRange: { color: ['#313695', '#4575b4', '#74add1', '#fee090', '#f46d43', '#d73027'] } },
-  [{"name": "X", "data": ["A", "B", "C"]}, {"name": "Y", "data": ["Q1", "Q2", "Q3", "Q4"]}, {"name": "Z"}]
+  'xAxis3D: {type: "category", data: ["A","B","C"]}, yAxis3D: {type: "category", data: ["Q1","Q2","Q3","Q4"]}, zAxis3D: {type: "value"},'
   series: [{
     type: 'bar3D',
     'cartesian3D'

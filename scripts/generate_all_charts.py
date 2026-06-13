@@ -210,25 +210,25 @@ CHARTS.append(("41_Mix_Timeline", "mix/timeline.html", {
 # ═══ 3D ═══
 CHARTS.append(("33_3D_Bar", "3d/bar3d.html", {
     "DATA":D([["A","Q1",120],["A","Q2",200],["B","Q1",90],["B","Q2",130],["C","Q1",160],["C","Q2",220]]),
-    "TITLE":"33 3D柱状","GL_INLINE":"","VMAX":250,"COORD_SYSTEM":"cartesian3D","BAR_SIZE":0.3,
-    "AXIS_3D":D([{"name":"X","data":["A","B","C"]},{"name":"Y","data":["Q1","Q2","Q3","Q4"]},{"name":"Z"}])}))
+    "TITLE":"33 3D柱状","VMAX":250,"COORD_SYSTEM":"cartesian3D","BAR_SIZE":0.3,
+    "AXIS_3D":"xAxis3D: {type: \"category\", data: [\"A\",\"B\",\"C\"]}, yAxis3D: {type: \"category\", data: [\"Q1\",\"Q2\",\"Q3\",\"Q4\"]}, zAxis3D: {type: \"value\"},"}))
 
 CHARTS.append(("34_3D_Scatter", "3d/scatter3d.html", {
     "DATA":D([[10,20,30],[20,10,40],[30,30,20],[15,25,35],[25,15,25]]),
-    "TITLE":"34 3D散点","GL_INLINE":"","SYMBOL_SIZE":10,
-    "AXIS_3D":D([{"name":"X"},{"name":"Y"},{"name":"Z"}])}))
+    "TITLE":"34 3D散点","SYMBOL_SIZE":10,
+    "AXIS_3D":"xAxis3D: {type: \"value\"}, yAxis3D: {type: \"value\"}, zAxis3D: {type: \"value\"},"}))
 
 CHARTS.append(("35_3D_Surface", "3d/surface.html", {
-    "TITLE":"35 3D曲面","GL_INLINE":"","PROJECTION":"perspective","WIREFRAME":"false","COLOR":"#5470c6",
+    "TITLE":"35 3D曲面","PROJECTION":"perspective","WIREFRAME":"false","COLOR":"#5470c6",
     "DATA_OR_EQUATION":"function(x,y){return Math.sin(x)*Math.cos(y)}","PARAMETRIC":"false"}))
 
 CHARTS.append(("36_3D_Globe", "3d/globe.html", {
-    "TITLE":"36 3D地球","GL_INLINE":"","AUTO_ROTATE":"true","SHADING":"lambert","ENVIRONMENT":"","BASE_TEXTURE":"","HEIGHT_TEXTURE":"",
+    "TITLE":"36 3D地球","AUTO_ROTATE":"true","SHADING":"lambert","ENVIRONMENT":"","BASE_TEXTURE":"","HEIGHT_TEXTURE":"",
     "SCATTER_SERIES":"[]","LAYERS":"[]"}))
 
 CHARTS.append(("37_3D_Lines3D", "3d/lines3d.html", {
     "GEO_COORD_MAP":"{}",
-    "TITLE":"37 3D折线","GL_INLINE":"","AUTO_ROTATE":"false","ENVIRONMENT":"","BASE_TEXTURE":"","LINE_COLOR":"#ff6600",
+    "TITLE":"37 3D折线","AUTO_ROTATE":"false","ENVIRONMENT":"","BASE_TEXTURE":"","LINE_COLOR":"#ff6600",
     "FLIGHTS":D([{"fromName":"A","toName":"B","coords":[[0,0,0],[10,10,10]]},
                  {"fromName":"B","toName":"C","coords":[[10,10,10],[20,20,30]]}])}))
 
