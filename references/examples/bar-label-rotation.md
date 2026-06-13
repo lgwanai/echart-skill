@@ -1,13 +1,16 @@
-# 柱状图标签旋转
+# 柱状图标签旋转 / Bar Label Rotation
 
 **Category:** `bar`
+**Difficulty:** 3
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-label-rotation
 **Template:** examples/bar-label-rotation.html
-**Data Format:** `{ categories: string[], values: number[] }`
-**Features:** emphasis/hover effects, labels displayed
+
+## Important
+- **Multi-data complex chart** — 4 series + toolbox + 13 label positions
+- Template keeps FULL official option (app.config + app.configParameters NOT included — static display only)
+- Data arrays MUST NOT be replaced with single placeholder (would break xAxis/series/label data)
 
 ## Official Option Code
-
 ```javascript
 /*
 title: Bar Label Rotation
@@ -182,7 +185,9 @@ option = {
 };
 ```
 
-## Usage
+## Key Points
+- 4 series: Forest/Steppe/Desert/Wetland with individual data
+- Toolbox: mark/dataView/magicType/restore/saveAsImage
+- Rich label text with rotate/align/position/distance
 - Build: `scripts/build_template.py examples/bar-label-rotation.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
