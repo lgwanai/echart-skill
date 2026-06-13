@@ -1,0 +1,25 @@
+2026-06-13 17:26:50 [info     ] 开始预测                           method=ensemble metric=金额 table=订单详情表
+Traceback (most recent call last):
+  File "/Users/wuliang/workspace/echart-skill/scripts/forecast_engine.py", line 516, in <module>
+    main()
+  File "/Users/wuliang/workspace/echart-skill/scripts/forecast_engine.py", line 488, in main
+    result = engine.forecast(
+             ^^^^^^^^^^^^^^^^
+  File "/Users/wuliang/workspace/echart-skill/scripts/forecast_engine.py", line 160, in forecast
+    historical = self._get_time_series(table, date_column, metric, granularity, filter_sql)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/wuliang/workspace/echart-skill/scripts/forecast_engine.py", line 414, in _get_time_series
+    return self.repo.execute_query(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/wuliang/workspace/echart-skill/database.py", line 138, in execute_query
+    conn.execute(query)
+_duckdb.BinderException: Binder Error: No function matches the given name and argument types 'date_trunc(STRING_LITERAL, VARCHAR)'. You might need to add explicit type casts.
+	Candidate functions:
+	date_trunc(VARCHAR, DATE) -> TIMESTAMP
+	date_trunc(VARCHAR, INTERVAL) -> INTERVAL
+	date_trunc(VARCHAR, TIMESTAMP) -> TIMESTAMP
+	date_trunc(VARCHAR, TIMESTAMP WITH TIME ZONE) -> TIMESTAMP WITH TIME ZONE
+
+
+LINE 7:             GROUP BY DATE_TRUNC('month', "交易时间")
+                             ^

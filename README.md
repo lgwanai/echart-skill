@@ -29,6 +29,26 @@
 
 ---
 
+## 📂 示例输出
+
+`examples/` 目录包含基于「订单详情表」的 9 个完整案例：
+
+| Case | 文件 | 说明 | 指令 |
+|------|------|------|------|
+| 1 | `case1_bar.html` | 各省份销售额柱状图 | `/chart bar` |
+| 2 | `case2_pie.html` | 商品分类占比饼图 | `/chart pie` |
+| 3 | `case3_line.html` | 渠道订单数折线图 | `/chart line` |
+| 4 | `case4_map.html` | 全国销售分布地图 | `/chart map` |
+| 5 | `case5_scatter.html` | 单价vs数量散点图 | `/chart scatter` |
+| 6 | `case6_radar.html` | 渠道综合指标雷达图 | `/chart radar` |
+| 7 | `case7_dashboard.html` | 订单数据分析仪表盘 | `/dashboard` |
+| 8 | `case8_forecast.txt` | 销售额趋势预测 | `/forecast` |
+| 9 | `case9_attribution.txt` | 销售额变化归因分析 | `/why` |
+
+所有 HTML 文件均为自包含单文件，双击即可在浏览器打开。数据源：`examples/订单详情表.csv`（86 行 × 17 列）。
+
+---
+
 ## 快速开始
 
 ### 环境要求
