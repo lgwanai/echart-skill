@@ -120,9 +120,13 @@ CHARTS.append(("18_Candlestick", "candlestick/basic.html", {
 
 # ═══ Treemap ═══
 CHARTS.append(("19_Treemap", "treemap/basic.html", {
-    "TITLE":"19 矩形树图","NODE_CLICK":"false","UPPER_LABEL_SHOW":"false","BREADCRUMB_SHOW":"true",
-    "DATA":D([{"name":"电子","value":10000,"children":[{"name":"手机","value":6000},{"name":"电脑","value":4000}]},
-              {"name":"家居","value":5000,"children":[{"name":"家具","value":3000},{"name":"灯具","value":2000}]}])}))
+    "TITLE":"19 矩形树图","NODE_CLICK":"false","UPPER_LABEL_SHOW":"true","BREADCRUMB_SHOW":"true",
+    "DATA":D([{"name":"电子产品","value":20000,"children":[
+        {"name":"手机","value":8000},{"name":"电脑","value":6000},{"name":"平板","value":4000},{"name":"耳机","value":2000}]},
+      {"name":"家居用品","value":12000,"children":[
+        {"name":"家具","value":5000},{"name":"灯具","value":3000},{"name":"厨具","value":2500},{"name":"园艺","value":1500}]},
+      {"name":"服装鞋帽","value":8000,"children":[
+        {"name":"男装","value":3500},{"name":"女装","value":3000},{"name":"童装","value":1500}]}])}))
 
 # ═══ Sunburst ═══
 CHARTS.append(("20_Sunburst", "sunburst/basic.html", {
