@@ -76,18 +76,18 @@ CHARTS.append(("11_Scatter_Bubble", "scatter/bubble.html", {
     "SMOOTH":"false","AREA_STYLE":"false","STEP":"false"}))
 
 CHARTS.append(("12_Scatter_Geo", "scatter/geo.html", {
-    "TITLE":"12 地理散点","MAP_NAME":"china","MAP_INLINE":"","VMIN":0,"VMAX":100,"SIZE_SCALE":"1",
+    "TITLE":"12 地理散点","MAP_NAME":"china","VMIN":0,"VMAX":100,"SIZE_SCALE":"1",
     "GEO_COORD_MAP":D({"北京":[116.46,39.92],"上海":[121.48,31.22],"广州":[113.23,23.16],"深圳":[114.07,22.62],"成都":[104.06,30.67]}),
     "DATA":D([{"name":"北京","value":100},{"name":"上海","value":95},{"name":"广州","value":80},{"name":"深圳","value":90},{"name":"成都","value":70}])}))
 
 CHARTS.append(("30_EffectScatter", "effectScatter/basic.html", {
     "GEO_COORD_MAP":"{}",
-    "TITLE":"30 涟漪散点","SIZE_SCALE":"1","MAP_NAME":"","MAP_INLINE":"",
+    "TITLE":"30 涟漪散点","SIZE_SCALE":"1","MAP_NAME":"",
     "DATA":D([[20,50],[30,80],[50,40],[70,70],[60,30],[80,60]])}))
 
 # ═══ Map ═══
 CHARTS.append(("13_Map_China", "map/basic.html", {
-    "TITLE":"13 中国地图","MAP_NAME":"china","MAP_INLINE":"","VMIN":98,"VMAX":38072,"LABEL_SHOW":"false",
+    "TITLE":"13 中国地图","MAP_NAME":"china","VMIN":98,"VMAX":38072,"LABEL_SHOW":"false",
     "DATA":D([{"name":"广东","value":38072},{"name":"北京","value":26593},{"name":"上海","value":21073},{"name":"江苏","value":18296},{"name":"浙江","value":16976},{"name":"山东","value":14386},{"name":"四川","value":12852},{"name":"福建","value":12359},{"name":"湖北","value":10388}])}))
 
 # ═══ Radar ═══
@@ -186,7 +186,7 @@ CHARTS.append(("29_Chord", "chord/basic.html", {
 # ═══ Lines (flights) ═══
 CHARTS.append(("31_Lines_Flights", "lines/flights.html", {
     "GEO_COORD_MAP":D({}),
-    "TITLE":"31 航班线路","MAP_NAME":"china","MAP_INLINE":"","LINE_SCALE":"1",
+    "TITLE":"31 航班线路","MAP_NAME":"china","LINE_SCALE":"1",
     "FLIGHTS":D([{"fromName":"北京","toName":"上海","coords":[[116.46,39.92],[121.48,31.22]]},
                  {"fromName":"北京","toName":"广州","coords":[[116.46,39.92],[113.23,23.16]]},
                  {"fromName":"上海","toName":"深圳","coords":[[121.48,31.22],[114.07,22.62]]}])}))
@@ -238,7 +238,7 @@ CHARTS.append(("39_Custom_Error_Bar", "custom/error-bar.html", {
 
 CHARTS.append(("40_Geo_Lines", "geo/lines.html", {
     "GEO_COORD_MAP":D({"北京":[116.4,39.9],"上海":[121.5,31.2],"广州":[113.3,23.1]}),
-    "TITLE":"40 全国线路","MAP_NAME":"china","MAP_INLINE":"","SIZE_SCALE":"1","EFFECT_DATA":"[]",
+    "TITLE":"40 全国线路","MAP_NAME":"china","SIZE_SCALE":"1","EFFECT_DATA":"[]",
     "FLIGHTS":D([{"fromName":"北京","toName":"上海","coords":[[116.4,39.9],[121.5,31.2]]},
                  {"fromName":"上海","toName":"广州","coords":[[121.5,31.2],[113.3,23.1]]}])}))
 
@@ -254,7 +254,7 @@ for name, tpl_rel, data in CHARTS:
     # Check placeholder coverage
     with open(tpl_path) as f:
         tpl_content = f.read()
-    needed = set(re.findall(r'\{\{(\w+)\}\}', tpl_content)) - {'ECHARTS_INLINE'}
+    needed = set(re.findall(r'\{\{(\w+)\}\}', tpl_content)) - {'ECHARTS_INLINE','MAP_INLINE','GL_INLINE'}
     missing = needed - set(data.keys())
     if missing:
         results.append(("❌", name, f"missing keys: {missing}"))

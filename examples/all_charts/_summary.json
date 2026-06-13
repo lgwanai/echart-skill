@@ -62,17 +62,17 @@
   {
     "status": "✅",
     "name": "12_Scatter_Geo",
-    "detail": "1120405 bytes"
+    "detail": "1183326 bytes"
   },
   {
     "status": "✅",
     "name": "30_EffectScatter",
-    "detail": "1119725 bytes"
+    "detail": "1182646 bytes"
   },
   {
     "status": "✅",
     "name": "13_Map_China",
-    "detail": "1119780 bytes"
+    "detail": "1182701 bytes"
   },
   {
     "status": "✅",
@@ -157,7 +157,7 @@
   {
     "status": "✅",
     "name": "31_Lines_Flights",
-    "detail": "1120235 bytes"
+    "detail": "1183156 bytes"
   },
   {
     "status": "✅",
@@ -202,6 +202,6 @@
   {
     "status": "✅",
     "name": "40_Geo_Lines",
-    "detail": "1120485 bytes"
+    "detail": "1183406 bytes"
   }
 ]
