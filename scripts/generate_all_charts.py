@@ -189,7 +189,7 @@ CHARTS.append(("29_Chord", "chord/basic.html", {
 
 # ═══ Lines (flights) ═══
 CHARTS.append(("31_Lines_Flights", "lines/flights.html", {
-    "TITLE":"31 航班线路","MAP_NAME":"china","LINE_SCALE":"1","MAP_INLINE":"",
+    "TITLE":"31 航班线路","MAP_NAME":"china","LINE_SCALE":"1",
     "GEO_COORD_MAP":D({"北京":[116.46,39.92],"上海":[121.48,31.22],"广州":[113.23,23.16],"深圳":[114.07,22.62]}),
     "FLIGHTS":D([["北京","上海",100],["北京","广州",80],["上海","深圳",90]])}))
 
