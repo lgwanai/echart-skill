@@ -74,8 +74,8 @@ var option = {
   yAxis: { type: 'value', splitLine: { show: false }, axisLabel: { show: false }, axisTick: { show: false } },
   series: [{
     type: 'pictorialBar',
-    symbol: 'diamond',          // 'path://...' | 'image://...' | 'circle' | 'rect'
-    symbolSize: 28,    // [width, height] | number
+    symbol: 'path://M12,2 C8,2 3,4 3,10 C3,14 5,18 3,22 L1,26 L5,26 L6,24 L8,26 L14,26 L16,24 L17,26 L21,26 L19,22 C17,18 19,14 19,10 C19,4 16,2 12,2 Z M8,28 L8,30 L14,30 L14,28 Z M8,10 C9,10 10,11 10,12 C10,13 9,14 8,14 C7,14 6,13 6,12 C6,11 7,10 8,10 Z M14,10 C15,10 16,11 16,12 C16,13 15,14 14,14 C13,14 12,13 12,12 C12,11 13,10 14,10 Z',          // 'path://...' | 'image://...' | 'circle' | 'rect'
+    symbolSize: [40, 40],    // [width, height] | number
     symbolRepeat: true !== false,  // 'fixed' | true
     symbolBoundingData: 1000 || 1000,  // number (unit value per symbol)
     symbolClip: false,    // true | false
