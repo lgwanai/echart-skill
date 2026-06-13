@@ -271,4 +271,12 @@
 - **现象**：37_3D_Lines3D 一片空白
 - **根因**：(1) `GEO_COORD_MAP: "{}"` 空对象，FLIGHTS 使用不存在的地名 "A/B/C"；(2) `BASE_TEXTURE: ""` 无地球纹理；(3) GL_INLINE 破坏注入（同 #18）
 - **修复**：(1) GEO_COORD_MAP 提供真实城市经纬度；(2) FLIGHTS 改用真实城市名 `[["北京","上海"],...]`；(3) BASE_TEXTURE 使用真实地球纹理；(4) **模板守卫**：`geoCoordMap || {}`
+
+---
+
+## #32 — Error Bar 空白：custom renderItem 函数无法通过占位符传递
+- **日期**：2026-06-13
+- **现象**：39_Custom_Error_Bar 空白
+- **根因**：(1) `RENDER_ITEM: "false"` → 无渲染函数，custom 类型不知道该画什么；(2) 多行 JS 函数无法通过 Python 字符串占位符传递（换行导致语法错误）
+- **修复**：(1) `renderItem` 直接硬编码在模板中（官方示例的 custom error bar 实现）；(2) 模板简化为只需 `DATA` 占位符；(3) 误差线红色 `#e54035`，柱体蓝色 `#5470c6`
 | effectScatter | `series.data` | — |
