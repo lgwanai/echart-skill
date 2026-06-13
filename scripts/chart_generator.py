@@ -681,7 +681,10 @@ def generate_echarts_html(df, config, output_path):
                     if multi_dim and len(row) > 2:
                         v = [float(x) if x is not None else 0 for x in row[1:]]
                     elif is_geo_scatter and len(row) >= 4:
-                        v = [row[2], row[1], row[3]] if len(row) >= 4 else row[1]  # [lng, lat, val]
+                        # Column order: name, val, lat, lng → data needs [lng, lat, val]
+                        v = [row[3], row[2], row[1]] if len(row) >= 4 else row[1]
+                    elif is_geo_scatter and len(row) == 3:
+                        v = row[1]  # name, lat, lng → [lat, lng]? use as-is
                     else:
                         v = row[1] if row[1] is not None else 0
                     data.append({"name": str(row[0]), "value": v})
