@@ -23,7 +23,7 @@ var geoCoordMap = {{GEO_COORD_MAP}} || {};
 var rawData = {{DATA}};
 function convertData(data) {
   return data.map(function(item) {
-    return { name: item.name, value: geoCoordMap[item.name] ? geoCoordMap[item.name].concat(item.value) : [0,0,item.value] };
+    var result = { name: item.name, value: geoCoordMap[item.name] ? geoCoordMap[item.name].concat(item.value) : [0,0,item.value] }; if (item.itemStyle) result.itemStyle = item.itemStyle; return result;
   });
 }
 var option = {
