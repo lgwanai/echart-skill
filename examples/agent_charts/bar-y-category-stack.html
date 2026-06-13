@@ -9,7 +9,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>堆叠条形图</title>
+<title>bar-y-category-stack</title>
 <script>
 
 /*
@@ -61,7 +61,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">堆叠条形图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">bar-y-category-stack</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -69,12 +69,12 @@ var option = {
   tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
   grid: { left: '3%', right: '10%', bottom: '3%', containLabel: true },
   xAxis: { type: 'value' },
-  yAxis: { type: 'category', data: ["A", "B", "C", "D", "E"], inverse: true },
+  yAxis: { type: 'category', data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], inverse: true },
   series: [{
     type: 'bar',
     itemStyle: { borderRadius: [0, 4, 4, 0] },
     label: { show: true, position: 'right' },
-    data: [120, 200, 150, 80, 70]
+    data: [320, 302, 301, 334, 390, 330, 320]
   }]
 };
 chart.setOption(option);

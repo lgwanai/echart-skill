@@ -9,7 +9,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>多漏斗图</title>
+<title>funnel-mutiple</title>
 <script>
 
 /*
@@ -61,7 +61,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">多漏斗图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">funnel-mutiple</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -71,13 +71,13 @@ var option = {
   series: [{
     type: 'funnel',
     left: '10%', top: 60, bottom: 60, width: '80%',
-    min: 0,            // 0
-    max: 0,            // 100
+    min: {{MIN_VALUE}},            // 0
+    max: {{MAX_VALUE}},            // 100
     sort: 'descending',             // 'descending' | 'ascending' | 'none'
     gap: 2,
     label: { show: true, position: '""' },    // 'inside' | 'outside'
     emphasis: { label: { fontSize: 20 } },
-    data: [["A", 120], ["B", 200], ["C", 150], ["D", 80], ["E", 70]]
+    data: []
   }]
 };
 chart.setOption(option);

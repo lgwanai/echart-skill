@@ -8,7 +8,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>ä¸ç»´æ£ç¹å¾ - æ­£äº¤æå½±</title>
+<title>scatter3d-orthographic</title>
 <script>
 
 /*
@@ -63,7 +63,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">ä¸ç»´æ£ç¹å¾ - æ­£äº¤æå½±</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">scatter3d-orthographic</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -76,7 +76,7 @@ var option = {
   series: [{
     type: 'scatter3D',
     symbolSize: 10,
-    data: [["A", 120], ["B", 200], ["C", 150], ["D", 80], ["E", 70]]
+    data: [[0.5, 15.0], [0.2, 1.0]]
   }]
 };
 chart.setOption(option);

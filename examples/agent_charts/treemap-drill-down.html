@@ -10,7 +10,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>ECharts 配置项查询分布</title>
+<title>treemap-drill-down</title>
 <script>
 
 /*
@@ -62,7 +62,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">ECharts 配置项查询分布</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">treemap-drill-down</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -81,7 +81,7 @@ var option = {
       itemStyle: { borderWidth: 3, borderColor: '#fff', gapBorderWidth: 1 },
       upperLabel: { show: true }
     }],
-    data: [["A", 120], ["B", 200], ["C", 150], ["D", 80], ["E", 70]]
+    data: [[0.3, 0.6], [0.3, 0.5], [0.3, 0.5]]
   }]
 };
 chart.setOption(option);

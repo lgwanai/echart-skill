@@ -10,7 +10,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>关系图自动隐藏重叠标签</title>
+<title>graph-label-overlap</title>
 <script>
 
 /*
@@ -62,17 +62,17 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">关系图自动隐藏重叠标签</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">graph-label-overlap</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  title: { text: '关系图自动隐藏重叠标签', left: 'center' },
+  title: { text: 'graph-label-overlap', left: 'center' },
   tooltip: {},
   legend: false,
   series: [{
     type: 'graph',
-    layout: '"default"',          // 'force' | 'circular' | 'none'
+    layout: '""',          // 'force' | 'circular' | 'none'
     roam: true,
     draggable: true,
     symbolSize: 10,   // number | function

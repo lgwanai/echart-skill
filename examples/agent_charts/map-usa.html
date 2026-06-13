@@ -10,7 +10,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>2012 年美国人口统计</title>
+<title>map-usa</title>
 <script>
 
 /*
@@ -112,7 +112,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">2012 年美国人口统计</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">map-usa</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -133,7 +133,7 @@ var option = {
     roam: true,
     label: { show: false, fontSize: 10 },
     emphasis: { label: { show: true } },
-    data: [["A", 120], ["B", 200], ["C", 150], ["D", 80], ["E", 70]]
+    data: []
   }]
 };
 chart.setOption(option);

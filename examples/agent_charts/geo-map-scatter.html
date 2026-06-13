@@ -6,7 +6,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>map and scatter share a geo</title>
+<title>geo-map-scatter</title>
 <script>
 
 /*
@@ -124,7 +124,7 @@ var convertData = function(data) {
 var seriesData = convertData(rawData);
 var option = {
   backgroundColor: '#404a59',
-  title: { text: 'map and scatter share a geo', left: 'center', textStyle: { color: '#fff' } },
+  title: { text: 'geo-map-scatter', left: 'center', textStyle: { color: '#fff' } },
   tooltip: { trigger: 'item', formatter: function(p) { return p.data ? p.data.fromName + ' → ' + p.data.toName : ''; } },
   geo: { map: '""' || 'china', roam: true, label: { show: false },
     itemStyle: { areaColor: '#323c48', borderColor: '#404a59' },

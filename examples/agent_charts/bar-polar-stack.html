@@ -11,7 +11,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>极坐标系下的堆叠柱状图</title>
+<title>bar-polar-stack</title>
 <script>
 
 /*
@@ -63,19 +63,19 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">极坐标系下的堆叠柱状图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">bar-polar-stack</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis' },
   grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'category', data: ["A", "B", "C", "D", "E"], axisLabel: { rotate: false } },
+  xAxis: { type: 'category', data: ["Mon", "Tue", "Wed", "Thu"], axisLabel: { rotate: false } },
   yAxis: { type: 'value' },
   series: [{
     type: 'bar',
     itemStyle: { borderRadius: [4, 4, 0, 0] },
-    data: [120, 200, 150, 80, 70]
+    data: [1, 2, 3, 4]
   }]
 };
 chart.setOption(option);
