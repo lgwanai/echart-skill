@@ -460,13 +460,16 @@ def _auto_build_option(chart_type: str, df: "pd.DataFrame") -> dict:
             "series": [{"type": "scatter", "encode": {"x": first_col, "y": second_col}}],
         }
     elif ct == "map":
-        # Auto-detect map level from column name / data
+        # Map charts MUST use data array (not dataset+encode) for reliable rendering.
+        # ECharts dataset+encode is unstable for map type — data values may not bind.
         map_name = "china"
-        if any("市" in str(v) or "city" in str(v).lower() for v in df[first_col].head(3)):
-            map_name = "china"
+        data = []
+        for _, row in df.iterrows():
+            name_val = str(row[first_col]) if row[first_col] is not None else ""
+            num_val = float(row[second_col]) if row[second_col] is not None else 0
+            data.append({"name": name_val, "value": num_val})
         return {
-            "series": [{"type": "map", "map": map_name,
-                        "encode": {"itemName": first_col, "value": second_col}}],
+            "series": [{"type": "map", "map": map_name, "data": data}],
         }
     elif ct == "radar":
         # Build radar indicators from remaining columns
