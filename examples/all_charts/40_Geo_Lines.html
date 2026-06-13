@@ -1,14 +1,12 @@
 <!--
-  Template: geo/lines.html
-  Chart Type: Geo Lines (地理飞线图)
-  Data Format: [[[lng1,lat1],[lng2,lat2]], ...] — direct coordinate pairs
-  Matches official ECharts lines-airline example
+  Template: geo/lines.html — matches official ECharts Migration example
+  Data Format: GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>40 全国线路</title>
+<title>40 模拟迁徙</title>
 <script>
 
 /*
@@ -107,27 +105,41 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 }));
 
 </script>
-<style>body{margin:0;padding:0;background:#003;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
+<style>body{margin:0;padding:0;background:#404a59}#main{width:100%;height:700px}</style>
 </head>
 <body>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
+var geoCoordMap = {"\u5317\u4eac": [116.46, 39.92], "\u4e0a\u6d77": [121.48, 31.22], "\u5e7f\u5dde": [113.51, 23.22], "\u6df1\u5733": [114.07, 22.62], "\u6210\u90fd": [104.06, 30.67], "\u91cd\u5e86": [107.75, 30.19], "\u6b66\u6c49": [114.39, 30.66], "\u676d\u5dde": [119.53, 29.88]} || {};
+var rawData = [["\u5317\u4eac", "\u4e0a\u6d77", 95], ["\u5317\u4eac", "\u5e7f\u5dde", 90], ["\u5317\u4eac", "\u6df1\u5733", 80], ["\u5317\u4eac", "\u6210\u90fd", 70], ["\u5317\u4eac", "\u6b66\u6c49", 60], ["\u5317\u4eac", "\u676d\u5dde", 50], ["\u4e0a\u6d77", "\u5e7f\u5dde", 85], ["\u4e0a\u6d77", "\u6df1\u5733", 75], ["\u4e0a\u6d77", "\u6210\u90fd", 65], ["\u5e7f\u5dde", "\u6df1\u5733", 95], ["\u5e7f\u5dde", "\u6210\u90fd", 80], ["\u5e7f\u5dde", "\u91cd\u5e86", 70], ["\u5e7f\u5dde", "\u6b66\u6c49", 60], ["\u6df1\u5733", "\u6210\u90fd", 75], ["\u6df1\u5733", "\u676d\u5dde", 65], ["\u6210\u90fd", "\u91cd\u5e86", 90], ["\u6210\u90fd", "\u6b66\u6c49", 70], ["\u6b66\u6c49", "\u676d\u5dde", 80]];
+var planePath = 'path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z';
+
+var convertData = function(data) {
+  return data.map(function(item) {
+    var fc = geoCoordMap[item[0]], tc = geoCoordMap[item[1]];
+    return fc && tc ? { fromName: item[0], toName: item[1], coords: [fc, tc] } : null;
+  }).filter(Boolean);
+};
+var seriesData = convertData(rawData);
 var option = {
-  backgroundColor: '#003',
-  title: { text: '40 全国线路', left: 'center', textStyle: { color: '#eee' } },
-  tooltip: { formatter: function(p) { return 'Line ' + p.dataIndex; } },
-  geo: {
-    map: 'china' || 'china', roam: true, silent: true,
-    itemStyle: { borderColor: '#003', color: '#005' }
-  },
-  series: [{
-    type: 'lines',
-    coordinateSystem: 'geo',
-    data: [[[116.46, 39.92], [121.48, 31.22]], [[116.46, 39.92], [113.23, 23.16]], [[121.48, 31.22], [114.07, 22.62]], [[113.23, 23.16], [104.06, 30.67]], [[114.07, 22.62], [121.48, 31.22]], [[104.06, 30.67], [116.46, 39.92]], [[121.48, 31.22], [104.06, 30.67]], [[116.46, 39.92], [114.07, 22.62]]],
-    large: true,
-    lineStyle: { color: '#ffd54f', opacity: 0.8, width: 2, curveness: 0.3 },
-  }]
+  backgroundColor: '#404a59',
+  title: { text: '40 模拟迁徙', left: 'center', textStyle: { color: '#fff' } },
+  tooltip: { trigger: 'item', formatter: function(p) { return p.data ? p.data.fromName + ' → ' + p.data.toName : ''; } },
+  geo: { map: 'china' || 'china', roam: true, label: { show: false },
+    itemStyle: { areaColor: '#323c48', borderColor: '#404a59' },
+    emphasis: { label: { show: true }, itemStyle: { areaColor: '#2a333d' } } },
+  series: [
+    { type: 'lines', zlevel: 1, effect: { show: true, period: 6, trailLength: 0.7, color: '#fff', symbolSize: 3 },
+      lineStyle: { color: '#a6c84c', width: 0, curveness: 0.2 }, data: seriesData },
+    { type: 'lines', zlevel: 2, symbol: ['none', 'arrow'], symbolSize: 10,
+      effect: { show: true, period: 6, trailLength: 0, symbol: planePath, symbolSize: 15 },
+      lineStyle: { color: '#a6c84c', width: 1, opacity: 0.6, curveness: 0.2 }, data: seriesData },
+    { type: 'effectScatter', coordinateSystem: 'geo', zlevel: 2, rippleEffect: { brushType: 'stroke' },
+      label: { show: true, position: 'right', formatter: '{b}' }, symbolSize: function(v) { return v[2] / 8 || 8; },
+      itemStyle: { color: '#a6c84c' },
+      data: rawData.map(function(d) { var c = geoCoordMap[d[1]]; return c ? { name: d[1], value: c.concat([d[2]||1]) } : null; }).filter(Boolean) }
+  ]
 };
 chart.setOption(option);
 window.addEventListener('resize', function() { chart.resize(); });
