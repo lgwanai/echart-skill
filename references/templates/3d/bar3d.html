@@ -21,13 +21,14 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: {},
   visualMap: { max: {{VMAX}}, inRange: { color: ['#313695', '#4575b4', '#74add1', '#fee090', '#f46d43', '#d73027'] } },
-  xAxis3D: { type: 'category' },
-  yAxis3D: { type: 'category' },
+  xAxis3D: { type: 'category', data: ['A','B','C'] },
+  yAxis3D: { type: 'category', data: ['Q1','Q2','Q3','Q4'] },
   zAxis3D: { type: 'value' },
+  grid3D: {},
   series: [{
     type: 'bar3D',
     coordinateSystem: 'cartesian3D',
-    shading: 'realistic',
+    shading: 'lambert',
     barSize: {{BAR_SIZE}},
     data: {{DATA}}
   }]
