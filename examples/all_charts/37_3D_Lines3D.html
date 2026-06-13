@@ -71,7 +71,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var geoCoordMap = {};
-var flights = [{"fromName": "A", "toName": "B", "coords": [[0, 0, 0], [10, 10, 10]]}, {"fromName": "B", "toName": "C", "coords": [[10, 10, 10], [20, 20, 30]]}];
+var flights = [["A", "B", 10], ["B", "C", 20]];
 var seriesData = flights.map(function(item) {
   return { coords: [geoCoordMap[item[0]], geoCoordMap[item[1]]] };
 });

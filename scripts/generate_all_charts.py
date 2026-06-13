@@ -223,14 +223,14 @@ CHARTS.append(("35_3D_Surface", "3d/surface.html", {
     "DATA_OR_EQUATION":"function(x,y){ return Math.sin(x*Math.PI)*Math.sin(y*Math.PI); }","PARAMETRIC":"false"}))
 
 CHARTS.append(("36_3D_Globe", "3d/globe.html", {
-    "TITLE":"36 3D地球","AUTO_ROTATE":"true","SHADING":"lambert","ENVIRONMENT":"","BASE_TEXTURE":"","HEIGHT_TEXTURE":"",
-    "SCATTER_SERIES":"[]","LAYERS":"[]"}))
+    "TITLE":"36 3D地球","SHADING":"lambert","ENVIRONMENT":"",
+    "DATA":D([[39.9,116.4,100],[31.2,121.5,95],[40.7,-74.0,200],[51.5,-0.1,150],[35.7,139.7,180]]),
+    "SCATTER_SERIES":"[]"}))
 
 CHARTS.append(("37_3D_Lines3D", "3d/lines3d.html", {
     "GEO_COORD_MAP":"{}",
     "TITLE":"37 3D折线","AUTO_ROTATE":"false","ENVIRONMENT":"","BASE_TEXTURE":"","LINE_COLOR":"#ff6600",
-    "FLIGHTS":D([{"fromName":"A","toName":"B","coords":[[0,0,0],[10,10,10]]},
-                 {"fromName":"B","toName":"C","coords":[[10,10,10],[20,20,30]]}])}))
+    "FLIGHTS":D([["A","B",10],["B","C",20]])}))
 
 # ═══ Misc ═══
 CHARTS.append(("39_Custom_Error_Bar", "custom/error-bar.html", {
