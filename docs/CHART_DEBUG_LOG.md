@@ -255,4 +255,12 @@
 - **现象**：35_3D_Surface 空白，JS 函数 `function(x,y){...}` 被当成字符串输出 `'function(x,y){...}'`
 - **根因**：`build_template.py` 的 `_json_safe` 不支持函数字符串，所有字符串值都被包在引号中
 - **修复**：(1) `_json_safe` 新增检测：以 `function` 或 `(` 开头的字符串直接原样返回；(2) surface 模板改为与官方示例一致的 `equation: {x,y,z}` 结构
+
+---
+
+## #30 — Globe 无纹理显示为纯色/空白球
+- **日期**：2026-06-13
+- **现象**：36_3D_Globe 显示为纯蓝/黄色球，无地球纹理
+- **根因**：未提供 `baseTexture`，ECharts globe 渲染为无纹理球体
+- **修复**：下载 ECharts 官方示例的 1.3MB JPG 地球纹理（`echarts.apache.org/examples/data-gl/asset/world.topo.bathy.200401.jpg`），base64 嵌入为 `baseTexture`
 | effectScatter | `series.data` | — |
