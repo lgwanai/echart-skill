@@ -477,6 +477,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | Skill 更新 | 更新、拉取、update、pull、升级 | 执行 /echart-update |
 | 自动分析 | 分析、洞察、发现、规律、趋势、异常、相关性、report、analyze | Scenario 16 |
 | 报告生成 | 报告、总结、出报告、结论、写报告、生成报告 | Scenario 17 |
+| 追问/继续 | 呢？、比呢？、刚才、上次、继续、深挖、为什么、换 | Scenario 18 |
 
 ---
 
@@ -1701,3 +1702,59 @@ Agent: [Generates professional HTML report with all insights, charts recommendat
 - Use `/analyze` to discover what's interesting → Use `/chart` to visualize key findings
 - Use `/report` for comprehensive analysis → Use `/dashboard` for interactive monitoring
 - Use `/insight` to drill into specific dimensions found by `/analyze`
+
+### Scenario 18: Contextual Follow-up (NEW in v1.7)
+**Trigger**: User asks a follow-up question referencing previous analysis — "上个月呢?", "和去年同期比呢?", "深挖一下广东", "为什么下降了".
+
+**Action**:
+
+1. **Detect follow-up intent**: The Context Manager automatically determines if the user is starting a new topic or continuing:
+   ```bash
+   python scripts/context_manager.py resolve "上个月呢？"
+   # Output: intent=FOLLOW_UP, follow_up=REFINE, time=2026-05-01~2026-05-31
+   ```
+
+2. **Start a session** (new analysis):
+   ```bash
+   python scripts/context_manager.py start orders --db workspace.duckdb
+   ```
+
+3. **View session context** for prompt injection:
+   ```bash
+   python scripts/context_manager.py context
+   ```
+
+**Supported Follow-up Types**:
+| Type | Example | System Action |
+|------|---------|--------------|
+| REFINE | "上个月呢？" | Resolve time reference, re-run with adjusted time range |
+| COMPARE | "和去年同期比" | Detect YoY/MoM, generate comparison query |
+| DRILL_DOWN | "深挖一下白酒" | Apply dimension filter, zoom in |
+| EXPLAIN | "为什么下降了" | Trigger attribution/root cause analysis |
+| PIVOT | "按渠道分析" | Switch dimension, re-aggregate |
+
+**From Python API**:
+```python
+from scripts.context_manager import ContextManager
+
+ctx = ContextManager()
+session = ctx.start_session("sales", dimensions=["region", "category"])
+
+# Record a turn
+ctx.record_turn(session, "查看各地区销售额",
+                sql="SELECT region, SUM(amount) FROM sales GROUP BY region")
+
+# Resolve follow-up
+result = ctx.resolve("上个月呢？", session)
+# result["time_range"] = {"start_date": "2026-05-01", "end_date": "2026-05-31", ...}
+# result["is_follow_up"] = True
+# result["context_prompt"] = "..."  # For LLM injection
+```
+
+**Key Features**:
+- Session persistence across restarts (SQLite-backed)
+- Automatic time context from table profiling
+- 10+ time reference patterns (上个月/去年/Q1/最近N天...)
+- Intent detection: refine, compare, pivot, drill-down, explain
+- Generates prompt context for LLM agents
+- Session history with query/SQL/chart tracking
