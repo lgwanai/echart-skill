@@ -1,44 +1,38 @@
 {
   "version": "1.0",
-  "timestamp": "2026-06-13T06:22:01Z",
-  "phase": null,
-  "phase_name": "v2.0 Agent BI — Multi-phase Development",
+  "timestamp": "2026-06-13T06:30:00Z",
+  "phase": "v2.0-complete",
+  "phase_name": "v2.0 Agent BI — All 6 Phases Complete",
   "phase_dir": ".planning/",
-  "plan": "ROADMAP_V2.md phases 18-20",
-  "task": 3,
-  "total_tasks": 3,
-  "status": "paused",
+  "plan": "ROADMAP_V2.md — all phases implemented",
+  "status": "completed",
   "completed_tasks": [
-    {"id": 1, "name": "Phase 18: Insight Engine", "status": "done", "commit": null},
-    {"id": 2, "name": "Phase 19: Report Engine", "status": "done", "commit": null},
-    {"id": 3, "name": "Phase 20: Semantic Layer", "status": "done", "commit": null}
+    {"id": 1, "name": "Phase 18: Insight Engine", "status": "done"},
+    {"id": 2, "name": "Phase 19: Report Engine", "status": "done"},
+    {"id": 3, "name": "Phase 20: Semantic Layer", "status": "done"},
+    {"id": 4, "name": "Phase 21: Context Manager", "status": "done"},
+    {"id": 5, "name": "Phase 22: Forecast Engine", "status": "done"},
+    {"id": 6, "name": "Phase 23: Attribution Engine", "status": "done"}
   ],
-  "remaining_tasks": [
-    {"id": 4, "name": "Phase 21: Context Manager (对话记忆)", "status": "not_started"},
-    {"id": 5, "name": "Phase 22: Forecast Engine (预测分析)", "status": "not_started"},
-    {"id": 6, "name": "Phase 23: Attribution Engine (归因分析)", "status": "not_started"}
-  ],
+  "remaining_tasks": [],
   "blockers": [],
-  "human_actions_pending": [
-    {"action": "Run insight engine tests to verify all 34 pass", "context": "CLI tests xfail due to DuckDB locking", "blocking": false},
-    {"action": "Review and possibly hand-tune semantic model for orders table", "context": "Auto-generated model may need manual refinement", "blocking": false}
+  "new_files": [
+    "scripts/insight_engine.py (~1400 lines)",
+    "scripts/report_engine.py (~700 lines)",
+    "scripts/semantic_model.py (~550 lines)",
+    "scripts/context_manager.py (~850 lines)",
+    "scripts/forecast_engine.py (~450 lines)",
+    "scripts/attribution_engine.py (~300 lines)",
+    "tests/test_insight_engine.py (34 tests)",
+    "tests/test_context_manager.py (30 tests)",
+    "tests/test_forecast_attribution.py (9 tests)",
+    "references/semantic/orders.json",
+    ".planning/ROADMAP_V2.md"
   ],
-  "decisions": [
-    {"decision": "Use Insight Engine profiling to auto-infer semantic models", "rationale": "Avoids manual configuration burden", "phase": "20"},
-    {"decision": "Store semantic models as JSON files in references/semantic/", "rationale": "Git-friendly, human-editable, zero-dependency", "phase": "20"},
-    {"decision": "Report engine uses template-driven sections with insight routing", "rationale": "Clean separation between analysis logic and presentation", "phase": "19"},
-    {"decision": "Z-score threshold 2.5 for anomaly detection", "rationale": "Balances sensitivity vs noise", "phase": "18"}
+  "commits": [
+    "c5b84f6 — Phases 18-20: insight/report/semantic engines",
+    "802ade7 — Phase 21: Context Manager",
+    "23bcc15 — Phases 22-23: Forecast & Attribution engines"
   ],
-  "uncommitted_files": [
-    "SKILL.md (modified)",
-    ".planning/STATE.md (modified)",
-    ".planning/ROADMAP_V2.md (new)",
-    "scripts/insight_engine.py (new, ~1400 lines)",
-    "scripts/report_engine.py (new, ~700 lines)",
-    "scripts/semantic_model.py (new, ~550 lines)",
-    "tests/test_insight_engine.py (new, ~430 lines)",
-    "references/semantic/orders.json (new)"
-  ],
-  "next_action": "Start Phase 21: Implement scripts/context_manager.py for conversation memory and follow-up question support",
-  "context_notes": "Completed 3 phases of v2.0 Agent BI transformation: insight engine (auto-pattern discovery with 7 detection types), report engine (3 templates, 3 formats), semantic layer (auto-infer from DB schema). Core architecture is in place. Next phases build on these foundations — context manager needs semantic model for reference resolution, forecast engine needs insight engine's trend detection, attribution engine needs both."
+  "next_action": "Polish & integrate: add /forecast and /why commands to SKILL.md, write report engine tests, end-to-end integration testing"
 }
