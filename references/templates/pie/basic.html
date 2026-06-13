@@ -26,7 +26,7 @@ var option = {
   series: [{
     type: 'pie',
     radius: {{RADIUS}},       // '60%' for pie, ['40%','70%'] for doughnut
-    roseType: {{ROSE_TYPE}},     // false | 'radius' | 'area'
+    roseType: {{ROSE_TYPE}} || false,     // false | 'radius' | 'area'
     center: ['50%', '50%'],
     itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
     label: { show: {{LABEL_SHOW}} },      // true | false

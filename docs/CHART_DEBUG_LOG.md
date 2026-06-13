@@ -151,4 +151,12 @@
 - **现象**：03_Bar_Stacked、07_Line_Stacked 无数据
 - **根因**：`bar/stack.html` 和 `line/stack.html` 使用 `{{SERIES}}` 替换整个 series 数组，每个 series 对象必须带 `type: "bar"/"line"`。ECharts 没有默认 series type
 - **修复**：数据 dict 中 series 对象添加 `"type": "bar"` 或 `"type": "line"`
+
+---
+
+## #17 — Pie 模板 roseType/RADIUS 类型错误导致空白
+- **日期**：2026-06-13
+- **现象**：09_Pie_Basic 空白，无任何图表
+- **根因**：(1) `ROSE_TYPE: ""` → JS 中变成 `roseType: ''`（空字符串），ECharts 不接受空串，只接受 `false`/`'radius'`/`'area'`；(2) `RADIUS: "['40%','70%']"` 被 `_json_safe` 当作字符串处理，单引号 JSON 解析失败，输出为带转义的字符串而非数组
+- **修复**：(1) `ROSE_TYPE: "false"` → `_json_safe` 识别为 JS keyword，输出 `false`；(2) `RADIUS` 改为 Python list `["40%","70%"]` → `_json_safe` 用 `json.dumps` 正确序列化为 JS 数组 `["40%","70%"]`；(3) **模板 `pie/basic.html` 增加防御**：`roseType` 默认为 `false` 当值为空串时
 | effectScatter | `series.data` | — |
