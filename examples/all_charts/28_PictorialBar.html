@@ -76,13 +76,13 @@ var option = {
     type: 'pictorialBar',
     symbol: 'rect',          // 'path://...' | 'image://...' | 'circle' | 'rect'
     symbolSize: 30,    // [width, height] | number
-    symbolRepeat: false,  // 'fixed' | true
-    symbolBoundingData: false,  // number (unit value per symbol)
+    symbolRepeat: true !== false,  // 'fixed' | true
+    symbolBoundingData: 1000 || 1000,  // number (unit value per symbol)
     symbolClip: false,    // true | false
-    symbolPosition: 'end',  // 'start' | 'end'
-    symbolMargin: 5,  // '5%' | number
+    symbolPosition: 'start',  // 'start' | 'end'
+    symbolMargin: '5%',  // '5%' | number
     itemStyle: { color: '#5470c6' },
-    label: { show: false, position: 'top' },
+    label: { show: true, position: 'top' },
     data: [6500, 3500, 3000, 2000, 1800]
   }]
 };

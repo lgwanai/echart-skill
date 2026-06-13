@@ -29,8 +29,8 @@ var option = {
     type: 'pictorialBar',
     symbol: {{SYMBOL}},          // 'path://...' | 'image://...' | 'circle' | 'rect'
     symbolSize: {{SYMBOL_SIZE}},    // [width, height] | number
-    symbolRepeat: {{SYMBOL_REPEAT}},  // 'fixed' | true
-    symbolBoundingData: {{SYMBOL_BOUNDING}},  // number (unit value per symbol)
+    symbolRepeat: {{SYMBOL_REPEAT}} !== false,  // 'fixed' | true
+    symbolBoundingData: {{SYMBOL_BOUNDING}} || 1000,  // number (unit value per symbol)
     symbolClip: {{SYMBOL_CLIP}},    // true | false
     symbolPosition: {{SYMBOL_POS}},  // 'start' | 'end'
     symbolMargin: {{SYMBOL_MARGIN}},  // '5%' | number
