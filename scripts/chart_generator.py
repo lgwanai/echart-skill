@@ -777,11 +777,17 @@ def generate_echarts_html(df, config, output_path):
                 config["custom_js"] = config.get("custom_js", "") + """
             // Vary symbol size by data value for geo scatter
             var geoData = option.series[0].data;
-            var vals = geoData.map(function(d){ return Array.isArray(d.value) ? d.value[2] : (d.value || 1); });
+            var vals = geoData.map(function(d){
+                var v = d.value;
+                return Array.isArray(v) ? v[v.length-1] : (v || 1);
+            });
             var minVal = Math.min.apply(null, vals);
             var maxVal = Math.max.apply(null, vals);
-            option.series[0].symbolSize = function(val) {
-                return 5 + (val[2] - minVal) / (maxVal - minVal || 1) * 40;
+            var range = maxVal - minVal || 1;
+            option.series[0].symbolSize = function(dataItem) {
+                var v = dataItem.value;
+                var num = Array.isArray(v) ? v[v.length-1] : (v || 1);
+                return 8 + (num - minVal) / range * 40;
             };
 """
             # Convert string symbolSize → encode.z (dimension reference)
