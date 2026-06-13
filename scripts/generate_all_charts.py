@@ -83,7 +83,7 @@ CHARTS.append(("12_Scatter_Geo", "scatter/geo.html", {
 CHARTS.append(("30_EffectScatter", "effectScatter/basic.html", {
     "TITLE":"30 涟漪散点","SIZE_SCALE":"1","MAP_NAME":"china",
     "GEO_COORD_MAP":D({"北京":[116.46,39.92],"上海":[121.48,31.22],"广州":[113.23,23.16],"深圳":[114.07,22.62],"成都":[104.06,30.67]}),
-    "DATA":D([{"name":"北京","value":100},{"name":"上海","value":95},{"name":"广州","value":80},{"name":"深圳","value":90},{"name":"成都","value":70}])}))
+    "DATA":D([{"name":"北京","value":100,"itemStyle":{"color":"#dd6b66"}},{"name":"上海","value":95,"itemStyle":{"color":"#759aa0"}},{"name":"广州","value":80,"itemStyle":{"color":"#e69d87"}},{"name":"深圳","value":90,"itemStyle":{"color":"#8dc1a9"}},{"name":"成都","value":70,"itemStyle":{"color":"#ea7e53"}}])}))
 
 # ═══ Map ═══
 CHARTS.append(("13_Map_China", "map/basic.html", {
