@@ -121,14 +121,17 @@ def build(template_path, data=None, output_path=None):
             html = html.replace("<!-- {{GL_INLINE}} -->",
                                 "<!-- echarts-gl.min.js not found — 3D charts will not render -->")
 
-    # Step 2: Replace all {{PLACEHOLDER}} variables FIRST (so map name is resolved)
+    # Step 2: Save MAP_INLINE flag BEFORE data replacement
+    has_map_inline = "{{MAP_INLINE}}" in html or "{{MAP_INLINE}}" in data.get("MAP_INLINE","")
+
+    # Replace all {{PLACEHOLDER}} variables
     if data:
         for key, value in data.items():
             placeholder = f"{{{{{key}}}}}"  # {{KEY}}
             html = html.replace(placeholder, _json_safe(value))
 
-    # Step 3: Map injection — AFTER data replacement, detect actual map name
-    if "<!-- {{MAP_INLINE}} -->" in html:
+    # Step 3: Map injection
+    if has_map_inline:
         # Find all map names in the processed HTML (supports 'map', 'geo', 'series-map')
         # Patterns: map: 'china'  map: "guangdong"  geo: { map: 'beijing' }
         map_names = set(re.findall(r"""map['\"]\s*:\s*['\"]([\w-]+)['\"]""", html))
