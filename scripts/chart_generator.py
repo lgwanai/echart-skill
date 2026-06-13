@@ -769,11 +769,38 @@ def generate_echarts_html(df, config, output_path):
     if "toolbox" not in option:
         option["toolbox"] = {"feature": {"saveAsImage": {}, "dataView": {"readOnly": False}}}
 
-    # Fix scatter bubble: symbolSize as dimension name → encode.z
+    # Fix scatter bubble: encode.z needs visualMap for symbol size variation
     for s in option.get("series", []):
-        if s.get("type") == "scatter" and isinstance(s.get("symbolSize"), str) and "z" not in s.get("encode", {}):
-            dim = s.pop("symbolSize")
-            s.setdefault("encode", {})["z"] = dim
+        if s.get("type") == "scatter":
+            # Convert string symbolSize → encode.z (dimension reference)
+            if isinstance(s.get("symbolSize"), str) and "z" not in s.get("encode", {}):
+                s.setdefault("encode", {})["z"] = s.pop("symbolSize")
+            # Auto-add visualMap for varying symbol size
+            enc = s.get("encode", {})
+            need_vm = ("z" in enc) or (s.get("coordinateSystem") == "geo" and "value" in enc)
+            if need_vm and "visualMap" not in option:
+                z_dim = enc.get("z") or enc.get("value", "")
+                # Find the column index from dataset source
+                src = option.get("dataset", {}).get("source", [])
+                vals = []
+                if len(src) > 1 and z_dim in src[0]:
+                    ci = src[0].index(z_dim)
+                    for row in src[1:]:
+                        try: vals.append(float(row[ci]))
+                        except: pass
+                # Also check series.data for direct data format (geo scatter)
+                if not vals and s.get("data"):
+                    for d in s["data"]:
+                        v = d.get("value", 0)
+                        if isinstance(v, (int, float)): vals.append(v)
+                        elif isinstance(v, list) and len(v) >= 3: vals.append(v[2])
+                if vals:
+                    option["visualMap"] = {
+                        "dimension": 2,
+                        "min": min(vals), "max": max(vals),
+                        "inRange": {"symbolSize": [5, 60]},
+                        "orient": "vertical", "right": 10
+                    }
 
     # Hard guarantee: option MUST have a renderable series type
     option = _validate_and_fix_option(option, chart_type, df.columns)
