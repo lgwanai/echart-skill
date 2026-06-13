@@ -67,16 +67,16 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-  legend: { data: [{{BAR_NAME}}, {{LINE_NAME}}] },
+  legend: { data: ['柱状', '折线'] },
   grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
   xAxis: { type: 'category', data: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"] },
   yAxis: [
-    { type: 'value', name: {{BAR_NAME}}, position: 'left' },
-    { type: 'value', name: {{LINE_NAME}}, position: 'right' }
+    { type: 'value', name: '柱状', position: 'left' },
+    { type: 'value', name: '折线', position: 'right' }
   ],
   series: [
-    { name: {{BAR_NAME}}, type: 'bar', data: [320, 332, 301, 334, 390, 330], itemStyle: { borderRadius: [4,4,0,0] } },
-    { name: {{LINE_NAME}}, type: 'line', yAxisIndex: 1, data: [220, 182, 191, 234, 290, 310], smooth: true,
+    { name: '柱状', type: 'bar', data: [320, 332, 301, 334, 390, 330], itemStyle: { borderRadius: [4,4,0,0] } },
+    { name: '折线', type: 'line', yAxisIndex: 1, data: [220, 182, 191, 234, 290, 310], smooth: true,
       symbol: 'circle', symbolSize: 8 }
   ]
 };

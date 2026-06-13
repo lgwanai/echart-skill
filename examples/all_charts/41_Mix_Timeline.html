@@ -67,15 +67,15 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   baseOption: {
-    timeline: { axisType: 'category', autoPlay: true, playInterval: 1000, data: {{TIMELINE}} },
+    timeline: { axisType: 'category', autoPlay: true, playInterval: 1000, data: [2020, 2021, 2022] },
     title: { text: '41 时间轴' },
     tooltip: {},
     grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-    xAxis: { type: 'category', data: {{CATEGORIES}} },
+    xAxis: { type: 'category', data: ["A", "B", "C"] },
     yAxis: { type: 'value' },
-    series: {{SERIES}}
+    series: [{"name": "A", "type": "bar", "data": [120, 145, 170]}, {"name": "B", "type": "bar", "data": [90, 110, 130]}, {"name": "C", "type": "bar", "data": [70, 85, 100]}]
   },
-  options: {{OPTIONS}}
+  options: []
 };
 chart.setOption(option);
 window.addEventListener('resize', function() { chart.resize(); });

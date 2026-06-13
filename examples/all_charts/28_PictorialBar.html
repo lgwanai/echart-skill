@@ -70,20 +70,20 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis' },
   grid: { left: '5%', right: '5%', bottom: '10%', top: '10%' },
-  xAxis: { type: 'category', data: {{CATEGORIES}}, axisTick: { show: false }, axisLine: { show: false } },
+  xAxis: { type: 'category', data: ["\u5927\u8c61", "\u7280\u725b", "\u6cb3\u9a6c", "\u6c34\u725b", "\u957f\u9888\u9e7f"], axisTick: { show: false }, axisLine: { show: false } },
   yAxis: { type: 'value', splitLine: { show: false }, axisLabel: { show: false }, axisTick: { show: false } },
   series: [{
     type: 'pictorialBar',
-    symbol: {{SYMBOL}},          // 'path://...' | 'image://...' | 'circle' | 'rect'
-    symbolSize: {{SYMBOL_SIZE}},    // [width, height] | number
-    symbolRepeat: {{SYMBOL_REPEAT}},  // 'fixed' | true
-    symbolBoundingData: {{SYMBOL_BOUNDING}},  // number (unit value per symbol)
-    symbolClip: {{SYMBOL_CLIP}},    // true | false
-    symbolPosition: {{SYMBOL_POS}},  // 'start' | 'end'
-    symbolMargin: {{SYMBOL_MARGIN}},  // '5%' | number
-    itemStyle: { color: {{COLOR}} },
-    label: { show: {{LABEL_SHOW}}, position: 'top' },
-    data: {{VALUES}}
+    symbol: 'rect',          // 'path://...' | 'image://...' | 'circle' | 'rect'
+    symbolSize: 30,    // [width, height] | number
+    symbolRepeat: false,  // 'fixed' | true
+    symbolBoundingData: false,  // number (unit value per symbol)
+    symbolClip: false,    // true | false
+    symbolPosition: 'end',  // 'start' | 'end'
+    symbolMargin: 5,  // '5%' | number
+    itemStyle: { color: '#5470c6' },
+    label: { show: false, position: 'top' },
+    data: [6500, 3500, 3000, 2000, 1800]
   }]
 };
 chart.setOption(option);

@@ -10,7 +10,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>10 基础散点图</title>
+<title>10 基础散点</title>
 <script>
 
 /*
@@ -62,7 +62,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">10 基础散点图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">10 基础散点</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -73,7 +73,7 @@ var option = {
   yAxis: { type: 'value' },
   series: [{
     type: 'scatter',
-    symbolSize: {{SYMBOL_SIZE}},     // number | function
+    symbolSize: 10,     // number | function
     data: [[10, 8.04], [8, 6.95], [13, 7.58], [9, 8.81], [11, 8.33], [14, 9.96], [6, 7.24], [4, 4.26], [12, 10.84], [7, 4.82], [5, 5.68]]
   }]
 };

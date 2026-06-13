@@ -9,7 +9,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>27 主题河流图</title>
+<title>27 主题河流</title>
 <script>
 
 /*
@@ -61,18 +61,18 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">27 主题河流图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">27 主题河流</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis' },
-  legend: { data: {{LEGEND}} },
+  legend: { data: true },
   singleAxis: { top: 50, bottom: 50, axisTick: {}, axisLabel: {}, type: 'time' },
   series: [{
     type: 'themeRiver',
     emphasis: { itemStyle: { shadowBlur: 20, shadowColor: 'rgba(0,0,0,0.8)' } },
-    data: [["2015/11/08", 10, "Evolution"], ["2015/11/09", 15, "Evolution"], ["2015/11/10", 35, "Evolution"], ["2015/11/08", 10, "Natural"], ["2015/11/09", 15, "Natural"], ["2015/11/10", 25, "Natural"], ["2015/11/08", 10, "Deep"], ["2015/11/09", 20, "Deep"], ["2015/11/10", 30, "Deep"]]
+    data: [["2015/11/08", 10, "Evolution"], ["2015/11/09", 15, "Evolution"], ["2015/11/08", 10, "Natural"], ["2015/11/09", 15, "Natural"], ["2015/11/08", 10, "Deep"], ["2015/11/09", 20, "Deep"]]
   }]
 };
 chart.setOption(option);

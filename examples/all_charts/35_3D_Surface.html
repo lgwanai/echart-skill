@@ -13,7 +13,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>35 3D曲面图</title>
+<title>35 3D曲面</title>
 <script>
 
 /*
@@ -68,7 +68,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">35 3D曲面图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">35 3D曲面</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -76,14 +76,14 @@ var option = {
   tooltip: {},
   visualMap: { show: false, dimension: 2, min: -1, max: 1, inRange: { color: ['#313695', '#4575b4', '#74add1', '#fee090', '#fdae61', '#f46d43', '#d73027'] } },
   xAxis3D: { type: 'value' }, yAxis3D: { type: 'value' }, zAxis3D: { type: 'value' },
-  grid3D: { viewControl: { projection: {{PROJECTION}} } },
+  grid3D: { viewControl: { projection: 'perspective' } },
   series: [{
     type: 'surface',
-    {{DATA_OR_EQUATION}}              // equation: {...}  or  data: [[x,y,z],...]
-    parametric: {{PARAMETRIC}},       // true | false
-    wireframe: { show: {{WIREFRAME}} },
+    'function(x,y){return Math.sin(x)*Math.cos(y)}'              // equation: {...}  or  data: [[x,y,z],...]
+    parametric: false,       // true | false
+    wireframe: { show: false },
     shading: 'realistic',
-    itemStyle: { color: {{COLOR}} }
+    itemStyle: { color: '#5470c6' }
   }]
 };
 chart.setOption(option);

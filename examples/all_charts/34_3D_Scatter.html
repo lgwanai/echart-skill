@@ -11,7 +11,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>34 3D散点图</title>
+<title>34 3D散点</title>
 <script>
 
 /*
@@ -66,16 +66,16 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">34 3D散点图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">34 3D散点</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: {},
-  {{AXIS_3D}}
+  [{"name": "X"}, {"name": "Y"}, {"name": "Z"}]
   series: [{
     type: 'scatter3D',
-    symbolSize: {{SYMBOL_SIZE}},
+    symbolSize: 10,
     data: [[10, 20, 30], [20, 10, 40], [30, 30, 20], [15, 25, 35], [25, 15, 25]],
     itemStyle: { opacity: 0.8 }
   }]

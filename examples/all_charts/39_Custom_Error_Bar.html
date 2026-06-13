@@ -71,13 +71,13 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'item' },
   grid: { left: '5%', right: '5%', bottom: '10%', top: '10%' },
-  xAxis: { type: 'category', data: {{CATEGORIES}} },
+  xAxis: { type: 'category', data: ["A", "B", "C", "D", "E"] },
   yAxis: { type: 'value' },
   series: [{
     type: 'custom',
-    renderItem: {{RENDER_ITEM}},     // function(params, api) { ... } or registered name string
-    encode: {{ENCODE}},              // { x: 0, y: [1, 2] }
-    data: [["A", 50, 45, 55], ["B", 65, 60, 72], ["C", 55, 50, 62], ["D", 70, 65, 80], ["E", 60, 55, 68]],
+    renderItem: false,     // function(params, api) { ... } or registered name string
+    encode: {},              // { x: 0, y: [1, 2] }
+    data: [[50, 45, 55], [65, 60, 72], [55, 50, 62], [70, 65, 80], [60, 55, 68]],
     itemStyle: { borderWidth: 2 }
   }]
 };

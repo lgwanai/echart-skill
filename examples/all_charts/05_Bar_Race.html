@@ -10,7 +10,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>05 动态排序柱状图</title>
+<title>05 动态排序</title>
 <script>
 
 /*
@@ -62,20 +62,20 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">05 动态排序柱状图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">05 动态排序</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   xAxis: { max: 'dataMax' },
   yAxis: {
-    type: 'category', data: {{CATEGORIES}}, inverse: true,
+    type: 'category', data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], inverse: true,
     animationDuration: 300, animationDurationUpdate: 300,
-    max: {{MAX_DISPLAY}}
+    max: 7
   },
   series: [{
     realtimeSort: true, type: 'bar',
-    data: {{VALUES}},
+    data: [120, 200, 150, 80, 70, 110, 130],
     label: { show: true, position: 'right', valueAnimation: true }
   }],
   animationDuration: 0, animationDurationUpdate: 3000,

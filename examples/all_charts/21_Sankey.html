@@ -70,14 +70,14 @@ var option = {
   series: [{
     type: 'sankey',
     layout: 'none',
-    orient: {{ORIENT}},          // 'horizontal' | 'vertical'
-    nodeAlign: {{NODE_ALIGN}},   // 'left' | 'right' | 'justify'
+    orient: 'horizontal',          // 'horizontal' | 'vertical'
+    nodeAlign: 'left',   // 'left' | 'right' | 'justify'
     emphasis: { focus: 'adjacency' },
     nodeWidth: 20, nodeGap: 8,
-    label: { show: true, position: {{LABEL_POS}} },
+    label: { show: true, position: 'right' },
     lineStyle: { color: 'gradient', curveness: 0.5 },
-    data: {{NODES}},
-    links: {{LINKS}}
+    data: [{"name": "\u9996\u9875"}, {"name": "\u641c\u7d22"}, {"name": "\u8be6\u60c5"}, {"name": "\u4e0b\u5355"}],
+    links: [{"source": "\u9996\u9875", "target": "\u641c\u7d22", "value": 40}, {"source": "\u9996\u9875", "target": "\u8be6\u60c5", "value": 20}, {"source": "\u641c\u7d22", "target": "\u8be6\u60c5", "value": 25}, {"source": "\u8be6\u60c5", "target": "\u4e0b\u5355", "value": 35}]
   }]
 };
 chart.setOption(option);

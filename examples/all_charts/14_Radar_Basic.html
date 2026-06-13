@@ -66,16 +66,16 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  legend: { data: {{LEGEND_NAMES}} },
+  legend: { data: ["\u9884\u7b97", "\u5b9e\u9645"] },
   radar: {
     indicator: [{"name": "\u9884\u7b97", "max": 5000}, {"name": "\u652f\u51fa", "max": 15000}, {"name": "\u9500\u552e", "max": 30000}, {"name": "\u5229\u6da6", "max": 40000}],
-    shape: {{SHAPE}},        // 'polygon' | 'circle'
+    shape: 'polygon',        // 'polygon' | 'circle'
     center: ['50%', '50%'],
     radius: '65%'
   },
   series: [{
     type: 'radar',
-    data: {{DATA}}
+    data: [{"name": "\u9884\u7b97", "value": [4200, 3000, 20000, 35000]}, {"name": "\u5b9e\u9645", "value": [5000, 14000, 28000, 26000]}]
   }]
 };
 chart.setOption(option);

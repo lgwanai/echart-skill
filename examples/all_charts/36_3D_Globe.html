@@ -74,15 +74,15 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   backgroundColor: '#000',
   globe: {
-    baseTexture: {{BASE_TEXTURE}},
-    heightTexture: {{HEIGHT_TEXTURE}},
-    shading: {{SHADING}},
-    environment: {{ENVIRONMENT}},
-    {{LAYERS}}
+    baseTexture: '',
+    heightTexture: '',
+    shading: 'lambert',
+    environment: '',
+    []
     light: { main: { intensity: 1.2 } },
-    viewControl: { autoRotate: {{AUTO_ROTATE}}, autoRotateSpeed: 0.5 }
+    viewControl: { autoRotate: true, autoRotateSpeed: 0.5 }
   }
-  {{SCATTER_SERIES}}
+  []
 };
 chart.setOption(option);
 window.addEventListener('resize', function() { chart.resize(); });

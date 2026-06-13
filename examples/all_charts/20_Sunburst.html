@@ -70,18 +70,18 @@ var option = {
   tooltip: { trigger: 'item' },
   series: [{
     type: 'sunburst',
-    radius: {{RADIUS}},           // [0, '90%']
+    radius: '[\'0%\',\'90%\']',           // [0, '90%']
     center: ['50%', '50%'],
-    nodeClick: {{NODE_CLICK}},  // 'rootToNode' | 'link' | undefined
-    emphasis: { focus: {{FOCUS}} },  // 'ancestor' | 'descendant'
+    nodeClick: false,  // 'rootToNode' | 'link' | undefined
+    emphasis: { focus: 'none' },  // 'ancestor' | 'descendant'
     label: {
-      show: {{LABEL_SHOW}},
-      rotate: {{ROTATE}},       // 'radial' | 'tangential' | 0
+      show: true,
+      rotate: 0,       // 'radial' | 'tangential' | 0
       position: 'outside',
       minAngle: 3
     },
     itemStyle: { borderRadius: 4, borderWidth: 2, borderColor: '#fff' },
-    data: [{"name": "A", "itemStyle": {"color": "#5470c6"}, "children": [{"name": "A1", "value": 25}, {"name": "A2", "value": 15}]}, {"name": "B", "itemStyle": {"color": "#91cc75"}, "children": [{"name": "B1", "value": 20}, {"name": "B2", "value": 10}]}, {"name": "C", "itemStyle": {"color": "#fac858"}, "children": [{"name": "C1", "value": 20}, {"name": "C2", "value": 10}]}]
+    data: [{"name": "A", "itemStyle": {"color": "#5470c6"}, "children": [{"name": "A1", "value": 25}, {"name": "A2", "value": 15}]}, {"name": "B", "itemStyle": {"color": "#91cc75"}, "children": [{"name": "B1", "value": 20}, {"name": "B2", "value": 10}]}]
   }]
 };
 chart.setOption(option);

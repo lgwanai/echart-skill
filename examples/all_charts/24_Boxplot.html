@@ -69,10 +69,10 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'item', axisPointer: { type: 'shadow' } },
   grid: { left: '10%', right: '10%', bottom: '10%' },
-  xAxis: { type: 'category', data: {{CATEGORIES}} },
-  yAxis: { type: 'value', name: {{Y_AXIS_NAME}} },
+  xAxis: { type: 'category', data: ["A", "B"] },
+  yAxis: { type: 'value', name: '' },
   dataset: [
-    { source: {{RAW_DATA}} },
+    { source: [[850, 740, 900, 1070, 930, 850, 950, 980, 980, 880, 1000, 980], [960, 940, 960, 940, 880, 800, 850, 880, 900, 840, 830, 880]] },
     { transform: { type: 'boxplot' } },
     { fromDatasetIndex: 1, fromTransformResult: 1 }
   ],

@@ -72,11 +72,11 @@ var option = {
   legend: { orient: 'vertical', right: 10, top: 'center' },
   series: [{
     type: 'pie',
-    radius: {{RADIUS}},       // '60%' for pie, ['40%','70%'] for doughnut
+    radius: '[\'20%\',\'80%\']',       // '60%' for pie, ['40%','70%'] for doughnut
     roseType: 'area',     // false | 'radius' | 'area'
     center: ['50%', '50%'],
     itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
-    label: { show: {{LABEL_SHOW}} },      // true | false
+    label: { show: true },      // true | false
     emphasis: { label: { show: true, fontSize: 20, fontWeight: 'bold' } },
     data: [{"name": "A", "value": 40}, {"name": "B", "value": 38}, {"name": "C", "value": 32}, {"name": "D", "value": 30}, {"name": "E", "value": 28}, {"name": "F", "value": 26}, {"name": "G", "value": 22}, {"name": "H", "value": 18}]
   }]

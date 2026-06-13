@@ -10,7 +10,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>11 气泡散点图</title>
+<title>11 气泡散点</title>
 <script>
 
 /*
@@ -62,7 +62,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">11 气泡散点图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">11 气泡散点</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -72,16 +72,16 @@ var option = {
     formatter: function(p) { return p.seriesName + '<br/>(' + p.value[0] + ', ' + p.value[1] + '): ' + (p.value[2] || p.value[3]); }
   },
   grid: { left: '5%', right: '10%', bottom: '10%', top: '10%' },
-  xAxis: { type: 'value', name: {{X_NAME}} },
-  yAxis: { type: 'value', name: {{Y_NAME}} },
+  xAxis: { type: 'value', name: 'GDP' },
+  yAxis: { type: 'value', name: 'Life' },
   visualMap: {
     dimension: 2,
-    min: {{VMIN}}, max: {{VMAX}},
+    min: 0, max: 100,
     inRange: { symbolSize: [5, 60], color: ['#50a3ba', '#eac736', '#d94e5d'] }
   },
   series: [{
     type: 'scatter',
-    data: [[28604, 77, 17096869], [31163, 77.4, 27662440], [1516, 68, 1154605773], [13670, 74.7, 10582082], [28599, 75, 4986705], [29476, 77.1, 56943299], [31476, 75.4, 78958237], [28666, 78.1, 254830], [12124, 72.6, 15770000], [11173, 72.8, 31570000]],
+    data: [[28604, 77, 17096869], [31163, 77.4, 27662440], [1516, 68, 1154605773], [13670, 74.7, 10582082]],
     emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
   }]
 };

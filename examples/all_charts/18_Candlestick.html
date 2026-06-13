@@ -69,7 +69,7 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
   grid: { left: '10%', right: '10%', bottom: '10%' },
-  xAxis: { type: 'category', data: {{DATES}}, boundaryGap: true },
+  xAxis: { type: 'category', data: ["1\u65e5", "2\u65e5", "3\u65e5", "4\u65e5", "5\u65e5", "6\u65e5", "7\u65e5"], boundaryGap: true },
   yAxis: { type: 'value', scale: true },
   series: [{
     type: 'candlestick',

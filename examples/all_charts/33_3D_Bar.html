@@ -12,7 +12,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>33 3D柱状图</title>
+<title>33 3D柱状</title>
 <script>
 
 /*
@@ -67,20 +67,20 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">33 3D柱状图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">33 3D柱状</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: {},
-  visualMap: { max: {{VMAX}}, inRange: { color: ['#313695', '#4575b4', '#74add1', '#fee090', '#f46d43', '#d73027'] } },
-  {{AXIS_3D}}
+  visualMap: { max: 250, inRange: { color: ['#313695', '#4575b4', '#74add1', '#fee090', '#f46d43', '#d73027'] } },
+  [{"name": "X", "data": ["A", "B", "C"]}, {"name": "Y", "data": ["Q1", "Q2", "Q3", "Q4"]}, {"name": "Z"}]
   series: [{
     type: 'bar3D',
-    {{COORD_SYSTEM}}
+    'cartesian3D'
     shading: 'realistic',
-    barSize: {{BAR_SIZE}},
-    data: [["A", "Q1", 120], ["A", "Q2", 200], ["A", "Q3", 150], ["A", "Q4", 180], ["B", "Q1", 90], ["B", "Q2", 130], ["B", "Q3", 110], ["B", "Q4", 100], ["C", "Q1", 160], ["C", "Q2", 220], ["C", "Q3", 190], ["C", "Q4", 210]]
+    barSize: 0.3,
+    data: [["A", "Q1", 120], ["A", "Q2", 200], ["B", "Q1", 90], ["B", "Q2", 130], ["C", "Q1", 160], ["C", "Q2", 220]]
   }]
 };
 chart.setOption(option);

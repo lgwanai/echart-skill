@@ -70,15 +70,15 @@ var option = {
   series: [{
     type: 'tree',
     data: {"name": "CEO", "children": [{"name": "CTO", "children": [{"name": "\u5de5\u7a0b\u5e08A"}, {"name": "\u5de5\u7a0b\u5e08B"}]}, {"name": "CFO", "children": [{"name": "\u4f1a\u8ba1A"}]}]},
-    orient: {{ORIENT}},         // 'LR' | 'RL' | 'TB' | 'BT'
-    layout: {{LAYOUT}},         // 'orthogonal' | 'radial'
+    orient: 'LR',         // 'LR' | 'RL' | 'TB' | 'BT'
+    layout: 'orthogonal',         // 'orthogonal' | 'radial'
     roam: true,
     symbolSize: 7,
     top: '1%', left: '7%', bottom: '1%', right: '20%',
-    label: { position: {{LABEL_POS}}, verticalAlign: 'middle', align: 'right', fontSize: 10 },
-    leaves: { label: { position: {{LEAF_POS}}, verticalAlign: 'middle', align: 'left' } },
+    label: { position: 'right', verticalAlign: 'middle', align: 'right', fontSize: 10 },
+    leaves: { label: { position: 'none', verticalAlign: 'middle', align: 'left' } },
     emphasis: { focus: 'descendant' },
-    expandAndCollapse: {{EXPAND_COLLAPSE}},   // true | false
+    expandAndCollapse: true,   // true | false
     animationDuration: 550,
     animationDurationUpdate: 750
   }]

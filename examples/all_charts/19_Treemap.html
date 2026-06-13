@@ -73,15 +73,15 @@ var option = {
     roam: false,
     width: '100%', height: '100%',
     top: 0, left: 0, bottom: 0, right: 0,
-    nodeClick: {{NODE_CLICK}},    // 'link' | 'zoomToNode' | false
-    breadcrumb: { show: {{BREADCRUMB_SHOW}} },
+    nodeClick: false,    // 'link' | 'zoomToNode' | false
+    breadcrumb: { show: true },
     label: { show: true, position: 'insideTopLeft' },
-    upperLabel: { show: {{UPPER_LABEL_SHOW}}, height: 30 },
+    upperLabel: { show: false, height: 30 },
     levels: [{
       itemStyle: { borderWidth: 3, borderColor: '#fff', gapBorderWidth: 1 },
       upperLabel: { show: true }
     }],
-    data: [{"name": "\u7535\u5b50", "children": [{"name": "\u624b\u673a", "value": 6000}, {"name": "\u7535\u8111", "value": 4000}, {"name": "\u5e73\u677f", "value": 2000}]}, {"name": "\u5bb6\u5c45", "children": [{"name": "\u5bb6\u5177", "value": 3000}, {"name": "\u706f\u5177", "value": 2000}, {"name": "\u56ed\u827a", "value": 1000}]}]
+    data: [{"name": "\u7535\u5b50", "children": [{"name": "\u624b\u673a", "value": 6000}, {"name": "\u7535\u8111", "value": 4000}]}, {"name": "\u5bb6\u5c45", "children": [{"name": "\u5bb6\u5177", "value": 3000}, {"name": "\u706f\u5177", "value": 2000}]}]
   }]
 };
 chart.setOption(option);

@@ -70,22 +70,22 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
-var geoCoordMap = {{GEO_COORD_MAP}};
-var flights = {{FLIGHTS}};
+var geoCoordMap = {};
+var flights = [{"fromName": "A", "toName": "B", "coords": [[0, 0, 0], [10, 10, 10]]}, {"fromName": "B", "toName": "C", "coords": [[10, 10, 10], [20, 20, 30]]}];
 var seriesData = flights.map(function(item) {
   return { coords: [geoCoordMap[item[0]], geoCoordMap[item[1]]] };
 });
 var option = {
   globe: {
-    baseTexture: {{BASE_TEXTURE}},
-    shading: 'color', environment: {{ENVIRONMENT}},
-    viewControl: { autoRotate: {{AUTO_ROTATE}} }
+    baseTexture: '',
+    shading: 'color', environment: '',
+    viewControl: { autoRotate: false }
   },
   series: [{
     type: 'lines3D',
     coordinateSystem: 'globe',
     effect: { show: true, period: 4, trailLength: 0.2, constantSpeed: 30 },
-    lineStyle: { width: 1, color: {{LINE_COLOR}}, opacity: 0.6 },
+    lineStyle: { width: 1, color: '#ff6600', opacity: 0.6 },
     blendMode: 'lighter',
     data: seriesData
   }]
