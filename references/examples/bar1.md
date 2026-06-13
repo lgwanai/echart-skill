@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar1
-**Template:** bar/basic.html
+**Template:** examples/bar1.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** markLine for reference lines
 
@@ -86,6 +86,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py bar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/bar1.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

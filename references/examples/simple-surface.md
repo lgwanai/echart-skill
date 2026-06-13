@@ -2,7 +2,7 @@
 
 **Category:** `surface`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=simple-surface
-**Template:** NONE — use knowledge base
+**Template:** examples/simple-surface.html
 **Data Format:** `N/A`
 **Features:** visualMap component required
 

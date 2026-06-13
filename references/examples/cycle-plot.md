@@ -2,7 +2,7 @@
 
 **Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=cycle-plot
-**Template:** NONE — use knowledge base
+**Template:** examples/cycle-plot.html
 **Data Format:** `N/A`
 **Features:** uses encode (dataset dimension mapping)
 

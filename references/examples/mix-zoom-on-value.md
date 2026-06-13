@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=mix-zoom-on-value
-**Template:** mix/line-bar.html
+**Template:** examples/mix-zoom-on-value.html
 **Data Format:** `{ categories: string[], barData: number[], lineData: number[] }`
 **Features:** labels displayed
 
@@ -109,6 +109,6 @@ $.get(
 ```
 
 ## Usage
-- Build: `scripts/build_template.py mix/line-bar.html -d data.json`
+- Build: `scripts/build_template.py examples/mix-zoom-on-value.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

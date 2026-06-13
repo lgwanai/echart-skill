@@ -2,7 +2,7 @@
 
 **Category:** `map, pie`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=map-iceland-pie
-**Template:** map/basic.html
+**Template:** examples/map-iceland-pie.html
 **Data Format:** `[{name: string, value: number}, ...]`
 **Features:** emphasis/hover effects
 
@@ -79,6 +79,6 @@ $.get(ROOT_PATH + '/data/asset/geo/iceland.geo.json', function (geoJSON) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py map/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/map-iceland-pie.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

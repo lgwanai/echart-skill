@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-simple
-**Template:** bar/basic.html
+**Template:** examples/bar-simple.html
 **Data Format:** `{ categories: string[], values: number[] }`
 
 ## Official Option Code
@@ -32,6 +32,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py bar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/bar-simple.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

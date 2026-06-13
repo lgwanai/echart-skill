@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-step
-**Template:** line/step.html
+**Template:** examples/line-step.html
 **Data Format:** `{values_start: [], values_middle: [], values_end: []}` — 3 series with different step values
 
 ## Official Option Code
@@ -23,5 +23,5 @@ option = {
 
 ## Key Points
 - Requires **3 separate series** with step: 'start'/'middle'/'end'
-- Template: `line/step.html` (NOT line/basic.html)
+- Template: `examples/line-step.html` (NOT line/basic.html)
 - Build: `scripts/build_template.py line/step.html -d data.json`

@@ -2,7 +2,7 @@
 
 **Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=custom-wind
-**Template:** NONE — use knowledge base
+**Template:** examples/custom-wind.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, visualMap component required, uses encode (dataset dimension mapping)
 

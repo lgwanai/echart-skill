@@ -2,7 +2,7 @@
 
 **Category:** `radar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=radar-multiple
-**Template:** radar/basic.html
+**Template:** examples/radar-multiple.html
 **Data Format:** `{ indicators: [{name: string, max: number}, ...], series: [{name: string, value: number[]}, ...] }`
 **Features:** area fill enabled
 
@@ -118,6 +118,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py radar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/radar-multiple.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

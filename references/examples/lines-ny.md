@@ -2,7 +2,7 @@
 
 **Category:** `'map, lines'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=lines-ny
-**Template:** lines/flights.html
+**Template:** examples/lines-ny.html
 **Data Format:** `{ geoCoordMap: {"name": [lng,lat]}, flights: [[fromName, toName], ...] }`
 **Features:** per-item colors via itemStyle
 
@@ -89,6 +89,6 @@ fetchData(0);
 ```
 
 ## Usage
-- Build: `scripts/build_template.py lines/flights.html -d data.json`
+- Build: `scripts/build_template.py examples/lines-ny.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

@@ -2,7 +2,7 @@
 
 **Category:** `matrix`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-covariance
-**Template:** NONE — use knowledge base
+**Template:** examples/matrix-covariance.html
 **Data Format:** `N/A`
 **Features:** visualMap component required
 

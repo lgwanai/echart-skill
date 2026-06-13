@@ -2,7 +2,7 @@
 
 **Category:** `line3D`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line3d-orthographic
-**Template:** NONE — use knowledge base
+**Template:** examples/line3d-orthographic.html
 **Data Format:** `N/A`
 **Features:** visualMap component required
 

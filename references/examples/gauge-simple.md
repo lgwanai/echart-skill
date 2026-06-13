@@ -2,7 +2,7 @@
 
 **Category:** `gauge`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=gauge-simple
-**Template:** NONE — use knowledge base
+**Template:** examples/gauge-simple.html
 **Data Format:** `N/A`
 
 ## Official Option Code

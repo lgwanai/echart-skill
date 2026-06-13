@@ -2,7 +2,7 @@
 
 **Category:** `map3D`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=map3d-wood-map
-**Template:** map/basic.html
+**Template:** examples/map3d-wood-map.html
 **Data Format:** `[{name: string, value: number}, ...]`
 
 ## Official Option Code
@@ -83,6 +83,6 @@ $.getJSON(ROOT_PATH + '/data-gl/asset/data/alcohol.json', function (data) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py map/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/map3d-wood-map.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

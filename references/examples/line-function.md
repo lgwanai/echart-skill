@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-function
-**Template:** line/xy.html
+**Template:** examples/line-function.html
 **Data Format:** `[[x, y], [x, y], ...]`
 
 ## Official Option Code
@@ -83,6 +83,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py line/xy.html -d data.json`
+- Build: `scripts/build_template.py examples/line-function.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

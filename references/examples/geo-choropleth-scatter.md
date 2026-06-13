@@ -2,7 +2,7 @@
 
 **Category:** `map, scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-choropleth-scatter
-**Template:** NONE — use knowledge base
+**Template:** examples/geo-choropleth-scatter.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, visualMap component required, uses encode (dataset dimension mapping), labels displayed
 

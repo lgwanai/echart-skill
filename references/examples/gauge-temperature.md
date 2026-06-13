@@ -2,7 +2,7 @@
 
 **Category:** `gauge`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=gauge-temperature
-**Template:** NONE — use knowledge base
+**Template:** examples/gauge-temperature.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle
 

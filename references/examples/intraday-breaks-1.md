@@ -2,7 +2,7 @@
 
 **Category:** `candlestick, line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=intraday-breaks-1
-**Template:** NONE — use knowledge base
+**Template:** examples/intraday-breaks-1.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, area fill enabled
 

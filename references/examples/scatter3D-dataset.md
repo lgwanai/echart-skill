@@ -2,7 +2,7 @@
 
 **Category:** `scatter3D`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter3D-dataset
-**Template:** NONE — use knowledge base
+**Template:** examples/scatter3D-dataset.html
 **Data Format:** `N/A`
 **Features:** uses encode (dataset dimension mapping), uses dataset (not series.data)
 

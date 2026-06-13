@@ -2,7 +2,7 @@
 
 **Category:** `candlestick`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=candlestick-large
-**Template:** candlestick/basic.html
+**Template:** examples/candlestick-large.html
 **Data Format:** `{ dates: string[], values: [[open, close, low, high], ...] }`
 **Features:** per-item colors via itemStyle, visualMap component required, uses encode (dataset dimension mapping), uses dataset (not series.data)
 
@@ -208,6 +208,6 @@ function generateOHLC(count) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py candlestick/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/candlestick-large.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

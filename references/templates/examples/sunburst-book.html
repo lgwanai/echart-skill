@@ -1,0 +1,93 @@
+<!--
+  Template: examples/sunburst-book.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=sunburst-book
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+  backgroundColor: bgColor,
+  color: colors,
+  series: [
+    {
+      type: 'sunburst',
+      center: ['50%', '48%'],
+      data: data,
+      sort: function (a, b) {
+        if (a.depth === 1) {
+          return b.getValue() - a.getValue();
+        } else {
+          return a.dataIndex - b.dataIndex;
+        }
+      },
+      label: {
+        rotate: 'radial',
+        color: bgColor
+      },
+      itemStyle: {
+        borderColor: bgColor,
+        borderWidth: 2
+      },
+      levels: [
+        {},
+        {
+          r0: 0,
+          r: 40,
+          label: {
+            rotate: 0
+          }
+        },
+        {
+          r0: 40,
+          r: 105
+        },
+        {
+          r0: 115,
+          r: 140,
+          itemStyle: {
+            shadowBlur: 2,
+            shadowColor: colors[2],
+            color: 'transparent'
+          },
+          label: {
+            rotate: 'tangential',
+            fontSize: 10,
+            color: colors[0]
+          }
+        },
+        {
+          r0: 140,
+          r: 145,
+          itemStyle: {
+            shadowBlur: 80,
+            shadowColor: colors[0]
+          },
+          label: {
+            position: 'outside',
+            textShadowBlur: 5,
+            textShadowColor: '#333'
+          },
+          downplay: {
+            label: {
+              opacity: 0.5
+            }
+          }
+        }
+      ]
+    }
+  ]
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

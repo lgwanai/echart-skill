@@ -1,0 +1,128 @@
+<!--
+  Template: examples/candlestick-sh-2015.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=candlestick-sh-2015
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+  legend: {
+    data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30'],
+    inactiveColor: '#777',
+    top: 20
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      animation: false,
+      type: 'cross',
+      lineStyle: {
+        color: '#376df4',
+        width: 2,
+        opacity: 1
+      }
+    }
+  },
+  xAxis: {
+    type: 'category',
+    data: dates,
+    axisLine: { lineStyle: { color: '#8392A5' } }
+  },
+  yAxis: {
+    scale: true,
+    axisLine: { lineStyle: { color: '#8392A5' } },
+    splitLine: { show: false }
+  },
+  grid: {
+    bottom: 80
+  },
+  dataZoom: [
+    {
+      textStyle: {
+        color: '#8392A5'
+      },
+      handleIcon:
+        'path://M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+      dataBackground: {
+        areaStyle: {
+          color: '#8392A5'
+        },
+        lineStyle: {
+          opacity: 0.8,
+          color: '#8392A5'
+        }
+      },
+      brushSelect: true
+    },
+    {
+      type: 'inside'
+    }
+  ],
+  series: [
+    {
+      type: 'candlestick',
+      name: 'Day',
+      data: data,
+      itemStyle: {
+        color: '#FD1050',
+        color0: '#0CF49B',
+        borderColor: '#FD1050',
+        borderColor0: '#0CF49B'
+      }
+    },
+    {
+      name: 'MA5',
+      type: 'line',
+      data: calculateMA(5, data),
+      smooth: true,
+      showSymbol: false,
+      lineStyle: {
+        width: 1
+      }
+    },
+    {
+      name: 'MA10',
+      type: 'line',
+      data: calculateMA(10, data),
+      smooth: true,
+      showSymbol: false,
+      lineStyle: {
+        width: 1
+      }
+    },
+    {
+      name: 'MA20',
+      type: 'line',
+      data: calculateMA(20, data),
+      smooth: true,
+      showSymbol: false,
+      lineStyle: {
+        width: 1
+      }
+    },
+    {
+      name: 'MA30',
+      type: 'line',
+      data: calculateMA(30, data),
+      smooth: true,
+      showSymbol: false,
+      lineStyle: {
+        width: 1
+      }
+    }
+  ]
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

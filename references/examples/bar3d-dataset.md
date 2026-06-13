@@ -2,7 +2,7 @@
 
 **Category:** `bar3D`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar3d-dataset
-**Template:** NONE — use knowledge base
+**Template:** examples/bar3d-dataset.html
 **Data Format:** `N/A`
 **Features:** visualMap component required, uses encode (dataset dimension mapping), uses dataset (not series.data)
 

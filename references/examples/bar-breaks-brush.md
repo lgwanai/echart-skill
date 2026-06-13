@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-breaks-brush
-**Template:** bar/basic.html
+**Template:** examples/bar-breaks-brush.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** per-item colors via itemStyle, emphasis/hover effects
 
@@ -225,6 +225,6 @@ setTimeout(initAxisBreakInteraction, 0);
 ```
 
 ## Usage
-- Build: `scripts/build_template.py bar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/bar-breaks-brush.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

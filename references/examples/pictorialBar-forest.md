@@ -2,7 +2,7 @@
 
 **Category:** `pictorialBar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=pictorialBar-forest
-**Template:** pictorialBar/basic.html
+**Template:** examples/pictorialBar-forest.html
 **Data Format:** `{ categories: string[], values: number[] }`
 
 ## Official Option Code
@@ -119,6 +119,6 @@ setInterval(function () {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py pictorialBar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/pictorialBar-forest.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

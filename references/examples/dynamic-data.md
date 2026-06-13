@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=dynamic-data
-**Template:** NONE — use knowledge base
+**Template:** examples/dynamic-data.html
 **Data Format:** `N/A`
 **Features:** labels displayed
 

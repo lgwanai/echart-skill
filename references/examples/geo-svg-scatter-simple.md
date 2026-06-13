@@ -2,7 +2,7 @@
 
 **Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-svg-scatter-simple
-**Template:** NONE — use knowledge base
+**Template:** examples/geo-svg-scatter-simple.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping)
 

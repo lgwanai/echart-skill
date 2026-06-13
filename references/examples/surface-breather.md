@@ -2,7 +2,7 @@
 
 **Category:** `surface`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=surface-breather
-**Template:** NONE — use knowledge base
+**Template:** examples/surface-breather.html
 **Data Format:** `N/A`
 **Features:** visualMap component required
 

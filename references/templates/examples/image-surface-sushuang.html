@@ -1,0 +1,80 @@
+<!--
+  Template: examples/image-surface-sushuang.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=image-surface-sushuang
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+      tooltip: {},
+      backgroundColor: '#fff',
+      xAxis3D: {
+        type: 'value'
+      },
+      yAxis3D: {
+        type: 'value'
+      },
+      zAxis3D: {
+        type: 'value',
+        min: 0,
+        max: 100
+      },
+      grid3D: {
+        axisPointer: {
+          show: false
+        },
+        viewControl: {
+          distance: 100
+        },
+        postEffect: {
+          enable: true
+        },
+        light: {
+          main: {
+            shadow: true,
+            intensity: 2
+          },
+          ambientCubemap: {
+            texture: ROOT_PATH + '/data-gl/asset/canyon.hdr',
+            exposure: 2,
+            diffuseIntensity: 0.2,
+            specularIntensity: 1
+          }
+        }
+      },
+      series: [
+        {
+          type: 'surface',
+          silent: true,
+          wireframe: {
+            show: false
+          },
+          itemStyle: {
+            color: function (params) {
+              var i = params.dataIndex;
+              var r = imgData.data[i * 4];
+              var g = imgData.data[i * 4 + 1];
+              var b = imgData.data[i * 4 + 2];
+              return 'rgb(' + [r, g, b].join(',') + ')';
+            }
+          },
+          data: data
+        }
+      ]
+    })
+  );
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

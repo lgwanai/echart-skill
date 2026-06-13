@@ -2,7 +2,7 @@
 
 **Category:** `radar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=radar
-**Template:** radar/basic.html
+**Template:** examples/radar.html
 **Data Format:** `{ indicators: [{name: string, max: number}, ...], series: [{name: string, value: number[]}, ...] }`
 
 ## Official Option Code
@@ -52,6 +52,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py radar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/radar.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

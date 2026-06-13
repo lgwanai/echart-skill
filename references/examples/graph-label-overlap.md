@@ -2,7 +2,7 @@
 
 **Category:** `graph`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=graph-label-overlap
-**Template:** graph/force.html
+**Template:** examples/graph-label-overlap.html
 **Data Format:** `{ nodes: [{id?, name, symbolSize?, category?, x?, y?}, ...], links: [{source, target, value?}, ...], categories?: [{name}, ...] }`
 **Features:** labels displayed
 
@@ -60,6 +60,6 @@ $.getJSON(ROOT_PATH + '/data/asset/data/les-miserables.json', function (graph) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py graph/force.html -d data.json`
+- Build: `scripts/build_template.py examples/graph-label-overlap.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

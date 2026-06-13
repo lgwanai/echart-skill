@@ -1,0 +1,124 @@
+<!--
+  Template: examples/custom-error-bar.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=custom-error-bar
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    }
+  },
+  title: {
+    text: 'Error bar chart'
+  },
+  legend: {
+    data: ['bar', 'error'],
+    top: 20,
+    right: 30
+  },
+  dataZoom: [
+    {
+      type: 'slider',
+      start: 50,
+      end: 70
+    },
+    {
+      type: 'inside',
+      start: 50,
+      end: 70
+    }
+  ],
+  xAxis: {
+    data: categoryData
+  },
+  yAxis: {},
+  series: [
+    {
+      type: 'bar',
+      name: 'bar',
+      data: barData,
+      itemStyle: {
+        color: '#77bef7'
+      }
+    },
+    {
+      type: 'custom',
+      name: 'error',
+      itemStyle: {
+        borderWidth: 1.5
+      },
+      renderItem: function (params, api) {
+        var xValue = api.value(0);
+        var highPoint = api.coord([xValue, api.value(1)]);
+        var lowPoint = api.coord([xValue, api.value(2)]);
+        var halfWidth = api.size([1, 0])[0] * 0.1;
+        var style = api.style({
+          stroke: api.visual('color'),
+          fill: undefined
+        });
+        return {
+          type: 'group',
+          children: [
+            {
+              type: 'line',
+              transition: ['shape'],
+              shape: {
+                x1: highPoint[0] - halfWidth,
+                y1: highPoint[1],
+                x2: highPoint[0] + halfWidth,
+                y2: highPoint[1]
+              },
+              style: style
+            },
+            {
+              type: 'line',
+              transition: ['shape'],
+              shape: {
+                x1: highPoint[0],
+                y1: highPoint[1],
+                x2: lowPoint[0],
+                y2: lowPoint[1]
+              },
+              style: style
+            },
+            {
+              type: 'line',
+              transition: ['shape'],
+              shape: {
+                x1: lowPoint[0] - halfWidth,
+                y1: lowPoint[1],
+                x2: lowPoint[0] + halfWidth,
+                y2: lowPoint[1]
+              },
+              style: style
+            }
+          ]
+        };
+      },
+      encode: {
+        x: 0,
+        y: [1, 2]
+      },
+      data: errorData,
+      z: 100
+    }
+  ]
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

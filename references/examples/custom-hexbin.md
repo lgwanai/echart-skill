@@ -2,7 +2,7 @@
 
 **Category:** `custom, map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=custom-hexbin
-**Template:** NONE — use knowledge base
+**Template:** examples/custom-hexbin.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, visualMap component required, uses encode (dataset dimension mapping)
 

@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=multiple-y-axis
-**Template:** NONE — use knowledge base
+**Template:** examples/multiple-y-axis.html
 **Data Format:** `N/A`
 
 ## Official Option Code

@@ -2,7 +2,7 @@
 
 **Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=map-bin
-**Template:** map/basic.html
+**Template:** examples/map-bin.html
 **Data Format:** `[{name: string, value: number}, ...]`
 **Features:** per-item colors via itemStyle, visualMap component required, uses encode (dataset dimension mapping), emphasis/hover effects
 
@@ -249,6 +249,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py map/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/map-bin.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

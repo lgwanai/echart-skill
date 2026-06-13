@@ -2,7 +2,7 @@
 
 **Category:** `dataset, pie, transform`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=data-transform-multiple-pie
-**Template:** NONE — use knowledge base
+**Template:** examples/data-transform-multiple-pie.html
 **Data Format:** `N/A`
 **Features:** uses dataset (not series.data)
 

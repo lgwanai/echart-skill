@@ -2,7 +2,7 @@
 
 **Category:** `bar3D`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=global-population-bar3d-on-globe
-**Template:** NONE — use knowledge base
+**Template:** examples/global-population-bar3d-on-globe.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, visualMap component required
 

@@ -2,7 +2,7 @@
 
 **Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-svg-lines
-**Template:** NONE — use knowledge base
+**Template:** examples/geo-svg-lines.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, emphasis/hover effects, labels displayed
 

@@ -2,7 +2,7 @@
 
 **Category:** `scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-map
-**Template:** scatter/geo.html
+**Template:** examples/scatter-map.html
 **Data Format:** `[{name: string, value: [lng, lat, val?]}, ...]`
 **Features:** per-item colors via itemStyle, visualMap component required, emphasis/hover effects
 
@@ -482,6 +482,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py scatter/geo.html -d data.json`
+- Build: `scripts/build_template.py examples/scatter-map.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

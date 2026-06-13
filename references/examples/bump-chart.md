@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bump-chart
-**Template:** NONE — use knowledge base
+**Template:** examples/bump-chart.html
 **Data Format:** `N/A`
 **Features:** emphasis/hover effects
 

@@ -2,7 +2,7 @@
 
 **Category:** `surface`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=surface-golden-rose
-**Template:** NONE — use knowledge base
+**Template:** examples/surface-golden-rose.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle
 

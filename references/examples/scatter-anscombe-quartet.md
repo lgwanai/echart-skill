@@ -2,7 +2,7 @@
 
 **Category:** `scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-anscombe-quartet
-**Template:** scatter/basic.html
+**Template:** examples/scatter-anscombe-quartet.html
 **Data Format:** `[[x, y], [x, y], ...]`
 **Features:** markLine for reference lines
 
@@ -159,6 +159,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py scatter/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/scatter-anscombe-quartet.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

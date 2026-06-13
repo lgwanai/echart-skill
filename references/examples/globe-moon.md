@@ -2,7 +2,7 @@
 
 **Category:** `globe`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=globe-moon
-**Template:** NONE — use knowledge base
+**Template:** examples/globe-moon.html
 **Data Format:** `N/A`
 
 ## Official Option Code

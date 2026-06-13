@@ -2,7 +2,7 @@
 
 **Category:** `gauge`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=gauge-clock
-**Template:** NONE — use knowledge base
+**Template:** examples/gauge-clock.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle
 

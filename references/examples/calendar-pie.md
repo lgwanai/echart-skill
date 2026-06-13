@@ -2,7 +2,7 @@
 
 **Category:** `'calendar, pie'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=calendar-pie
-**Template:** calendar/heatmap.html
+**Template:** examples/calendar-pie.html
 **Data Format:** `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
 **Features:** labels displayed
 
@@ -97,6 +97,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py calendar/heatmap.html -d data.json`
+- Build: `scripts/build_template.py examples/calendar-pie.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

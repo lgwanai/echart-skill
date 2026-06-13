@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-multi-drilldown
-**Template:** bar/basic.html
+**Template:** examples/bar-multi-drilldown.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** uses encode (dataset dimension mapping)
 
@@ -178,6 +178,6 @@ myChart.on('click', 'series', (params) => {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py bar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/bar-multi-drilldown.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

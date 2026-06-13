@@ -2,7 +2,7 @@
 
 **Category:** `scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-map-brush
-**Template:** scatter/geo.html
+**Template:** examples/scatter-map-brush.html
 **Data Format:** `[{name: string, value: [lng, lat, val?]}, ...]`
 **Features:** per-item colors via itemStyle, emphasis/hover effects, labels displayed
 
@@ -832,6 +832,6 @@ function renderBrushed(params) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py scatter/geo.html -d data.json`
+- Build: `scripts/build_template.py examples/scatter-map-brush.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

@@ -2,7 +2,7 @@
 
 **Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-svg-map
-**Template:** NONE — use knowledge base
+**Template:** examples/geo-svg-map.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), emphasis/hover effects, labels displayed
 

@@ -2,7 +2,7 @@
 
 **Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=circle-packing-with-d3
-**Template:** NONE — use knowledge base
+**Template:** examples/circle-packing-with-d3.html
 **Data Format:** `N/A`
 **Features:** visualMap component required, uses encode (dataset dimension mapping), uses dataset (not series.data), emphasis/hover effects
 

@@ -2,7 +2,7 @@
 
 **Category:** `'scatter, map'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=effectScatter-bmap
-**Template:** effectScatter/basic.html
+**Template:** examples/effectScatter-bmap.html
 **Data Format:** `{ geoCoordMap: {"name": [lng,lat]}, data: [{name: string, value: number}, ...] }`
 **Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), emphasis/hover effects, labels displayed
 
@@ -608,6 +608,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py effectScatter/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/effectScatter-bmap.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

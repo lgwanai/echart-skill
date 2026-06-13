@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=multiple-x-axis
-**Template:** NONE — use knowledge base
+**Template:** examples/multiple-x-axis.html
 **Data Format:** `N/A`
 **Features:** emphasis/hover effects
 

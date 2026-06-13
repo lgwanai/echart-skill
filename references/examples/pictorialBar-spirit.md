@@ -2,7 +2,7 @@
 
 **Category:** `pictorialBar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=pictorialBar-spirit
-**Template:** pictorialBar/basic.html
+**Template:** examples/pictorialBar-spirit.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** per-item colors via itemStyle, markLine for reference lines, labels displayed
 
@@ -127,6 +127,6 @@ setInterval(function () {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py pictorialBar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/pictorialBar-spirit.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

@@ -2,7 +2,7 @@
 
 **Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=custom-profit
-**Template:** NONE — use knowledge base
+**Template:** examples/custom-profit.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), labels displayed
 

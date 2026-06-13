@@ -2,7 +2,7 @@
 
 **Category:** `globe`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=globe-with-echarts-surface
-**Template:** NONE — use knowledge base
+**Template:** examples/globe-with-echarts-surface.html
 **Data Format:** `N/A`
 **Features:** visualMap component required
 

@@ -2,7 +2,7 @@
 
 **Category:** `matrix`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-mini-bar-data-collection
-**Template:** NONE — use knowledge base
+**Template:** examples/matrix-mini-bar-data-collection.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), uses dataset (not series.data)
 

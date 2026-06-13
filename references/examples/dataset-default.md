@@ -2,7 +2,7 @@
 
 **Category:** `'dataset, pie'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=dataset-default
-**Template:** NONE — use knowledge base
+**Template:** examples/dataset-default.html
 **Data Format:** `N/A`
 **Features:** uses encode (dataset dimension mapping), uses dataset (not series.data)
 

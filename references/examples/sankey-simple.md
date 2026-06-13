@@ -2,7 +2,7 @@
 
 **Category:** `sankey`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=sankey-simple
-**Template:** sankey/basic.html
+**Template:** examples/sankey-simple.html
 **Data Format:** `{ nodes: [{name: string, itemStyle?: {}}, ...], links: [{source: string, target: string, value: number}, ...] }`
 **Features:** emphasis/hover effects
 
@@ -79,6 +79,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py sankey/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/sankey-simple.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

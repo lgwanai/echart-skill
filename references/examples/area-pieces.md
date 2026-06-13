@@ -2,7 +2,7 @@
 
 **Category:** `'line, visualMap'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=area-pieces
-**Template:** line/basic.html
+**Template:** examples/area-pieces.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** visualMap component required, markLine for reference lines, area fill enabled
 
@@ -74,6 +74,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py line/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/area-pieces.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

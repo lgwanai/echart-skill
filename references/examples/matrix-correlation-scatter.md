@@ -2,7 +2,7 @@
 
 **Category:** `matrix`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-correlation-scatter
-**Template:** NONE — use knowledge base
+**Template:** examples/matrix-correlation-scatter.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, visualMap component required, labels displayed
 

@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=polar-endAngle
-**Template:** NONE — use knowledge base
+**Template:** examples/polar-endAngle.html
 **Data Format:** `N/A`
 
 ## Official Option Code

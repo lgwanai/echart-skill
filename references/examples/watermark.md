@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=watermark
-**Template:** NONE — use knowledge base
+**Template:** examples/watermark.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, visualMap component required, markLine for reference lines, labels displayed
 

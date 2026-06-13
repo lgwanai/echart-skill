@@ -2,7 +2,7 @@
 
 **Category:** `'matrix, candlestick'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-stock
-**Template:** NONE — use knowledge base
+**Template:** examples/matrix-stock.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, uses dataset (not series.data), area fill enabled, labels displayed
 

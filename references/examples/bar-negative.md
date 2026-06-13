@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-negative
-**Template:** bar/basic.html
+**Template:** examples/bar-negative.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** emphasis/hover effects, labels displayed
 
@@ -82,6 +82,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py bar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/bar-negative.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

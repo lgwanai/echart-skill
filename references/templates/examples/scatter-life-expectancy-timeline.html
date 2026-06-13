@@ -1,0 +1,143 @@
+<!--
+  Template: examples/scatter-life-expectancy-timeline.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=scatter-life-expectancy-timeline
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+    baseOption: {
+      timeline: {
+        axisType: 'category',
+        orient: 'vertical',
+        autoPlay: true,
+        inverse: true,
+        playInterval: 1000,
+        left: null,
+        right: 0,
+        top: 20,
+        bottom: 20,
+        width: 55,
+        height: null,
+        symbol: 'none',
+        checkpointStyle: {
+          borderWidth: 2
+        },
+        controlStyle: {
+          showNextBtn: false,
+          showPrevBtn: false
+        },
+        data: []
+      },
+      title: [
+        {
+          text: data.timeline[0],
+          textAlign: 'center',
+          left: '63%',
+          top: '55%',
+          textStyle: {
+            fontSize: 100
+          }
+        },
+        {
+          text: '各国人均寿命与GDP关系演变',
+          left: 'center',
+          top: 10,
+          textStyle: {
+            fontWeight: 'normal',
+            fontSize: 20
+          }
+        }
+      ],
+      tooltip: {
+        padding: 5,
+        borderWidth: 1,
+        formatter: function (obj) {
+          var value = obj.value;
+          // prettier-ignore
+          return schema[3].text + '：' + value[3] + '<br>'
+                        + schema[1].text + '：' + value[1] + schema[1].unit + '<br>'
+                        + schema[0].text + '：' + value[0] + schema[0].unit + '<br>'
+                        + schema[2].text + '：' + value[2] + '<br>';
+        }
+      },
+      grid: {
+        top: 100,
+        containLabel: true,
+        left: 30,
+        right: '110'
+      },
+      xAxis: {
+        type: 'log',
+        name: '人均收入',
+        max: 100000,
+        min: 300,
+        nameGap: 25,
+        nameLocation: 'middle',
+        nameTextStyle: {
+          fontSize: 18
+        },
+        splitLine: {
+          show: false
+        },
+        axisLabel: {
+          formatter: '{value} $'
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: '平均寿命',
+        max: 100,
+        nameTextStyle: {
+          fontSize: 18
+        },
+        splitLine: {
+          show: false
+        },
+        axisLabel: {
+          formatter: '{value} 岁'
+        }
+      },
+      visualMap: [
+        {
+          show: false,
+          dimension: 3,
+          categories: data.counties,
+          inRange: {
+            color: (function () {
+              // prettier-ignore
+              var colors = ['#51689b', '#ce5c5c', '#fbc357', '#8fbf8f', '#659d84', '#fb8e6a', '#c77288', '#786090', '#91c4c5', '#6890ba'];
+              return colors.concat(colors);
+            })()
+          }
+        }
+      ],
+      series: [
+        {
+          type: 'scatter',
+          itemStyle: itemStyle,
+          data: data.series[0],
+          symbolSize: function (val) {
+            return sizeFunction(val[2]);
+          }
+        }
+      ],
+      animationDurationUpdate: 1000,
+      animationEasingUpdate: 'quinticInOut'
+    },
+    options: []
+  });
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

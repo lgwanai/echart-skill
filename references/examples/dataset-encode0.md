@@ -2,7 +2,7 @@
 
 **Category:** `'dataset, bar'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=dataset-encode0
-**Template:** NONE — use knowledge base
+**Template:** examples/dataset-encode0.html
 **Data Format:** `N/A`
 **Features:** visualMap component required, uses encode (dataset dimension mapping), uses dataset (not series.data)
 

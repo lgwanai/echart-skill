@@ -2,7 +2,7 @@
 
 **Category:** `surface`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=surface-mollusc-shell
-**Template:** NONE — use knowledge base
+**Template:** examples/surface-mollusc-shell.html
 **Data Format:** `N/A`
 **Features:** visualMap component required
 

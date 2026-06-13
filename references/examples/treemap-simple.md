@@ -2,7 +2,7 @@
 
 **Category:** `treemap`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=treemap-simple
-**Template:** treemap/basic.html
+**Template:** examples/treemap-simple.html
 **Data Format:** `[{name: string, value?: number, children?: [...]}, ...]`
 
 ## Official Option Code
@@ -55,6 +55,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py treemap/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/treemap-simple.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

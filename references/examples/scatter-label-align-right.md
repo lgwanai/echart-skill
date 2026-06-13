@@ -2,7 +2,7 @@
 
 **Category:** `scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-label-align-right
-**Template:** scatter/basic.html
+**Template:** examples/scatter-label-align-right.html
 **Data Format:** `[[x, y], [x, y], ...]`
 **Features:** emphasis/hover effects, labels displayed
 
@@ -70,6 +70,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py scatter/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/scatter-label-align-right.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

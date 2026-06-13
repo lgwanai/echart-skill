@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=data-transform-filter
-**Template:** NONE — use knowledge base
+**Template:** examples/data-transform-filter.html
 **Data Format:** `N/A`
 **Features:** uses encode (dataset dimension mapping), uses dataset (not series.data)
 

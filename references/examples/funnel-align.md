@@ -2,7 +2,7 @@
 
 **Category:** `funnel`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=funnel-align
-**Template:** funnel/basic.html
+**Template:** examples/funnel-align.html
 **Data Format:** `[{name: string, value: number}, ...]`
 
 ## Official Option Code
@@ -111,6 +111,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py funnel/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/funnel-align.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

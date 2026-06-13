@@ -2,7 +2,7 @@
 
 **Category:** `graphic`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=graphic-loading
-**Template:** NONE — use knowledge base
+**Template:** examples/graphic-loading.html
 **Data Format:** `N/A`
 
 ## Official Option Code

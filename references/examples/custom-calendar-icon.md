@@ -2,7 +2,7 @@
 
 **Category:** `'custom, calendar'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=custom-calendar-icon
-**Template:** NONE — use knowledge base
+**Template:** examples/custom-calendar-icon.html
 **Data Format:** `N/A`
 
 ## Official Option Code

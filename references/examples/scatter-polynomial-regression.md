@@ -2,7 +2,7 @@
 
 **Category:** `scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-polynomial-regression
-**Template:** scatter/basic.html
+**Template:** examples/scatter-polynomial-regression.html
 **Data Format:** `[[x, y], [x, y], ...]`
 **Features:** uses encode (dataset dimension mapping), uses dataset (not series.data), labels displayed
 
@@ -99,6 +99,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py scatter/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/scatter-polynomial-regression.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

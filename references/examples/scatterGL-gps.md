@@ -2,7 +2,7 @@
 
 **Category:** `scatterGL`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatterGL-gps
-**Template:** NONE — use knowledge base
+**Template:** examples/scatterGL-gps.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, emphasis/hover effects
 

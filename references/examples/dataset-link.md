@@ -2,7 +2,7 @@
 
 **Category:** `'dataset, line, pie'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=dataset-link
-**Template:** NONE — use knowledge base
+**Template:** examples/dataset-link.html
 **Data Format:** `N/A`
 **Features:** uses encode (dataset dimension mapping), uses dataset (not series.data), emphasis/hover effects
 

@@ -1,0 +1,42 @@
+<!--
+  Template: examples/graphgl-gpu-layout.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=graphgl-gpu-layout
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+  series: [
+    {
+      type: 'graphGL',
+      nodes: nodes,
+      edges: edges,
+      itemStyle: {
+        color: 'rgba(255,255,255,0.8)'
+      },
+      lineStyle: {
+        color: 'rgba(255,255,255,0.8)',
+        width: 3
+      },
+      forceAtlas2: {
+        steps: 5,
+        jitterTolerence: 10,
+        edgeWeightInfluence: 4
+      }
+    }
+  ]
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

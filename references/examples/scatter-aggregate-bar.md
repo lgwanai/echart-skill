@@ -2,7 +2,7 @@
 
 **Category:** `scatter, animation`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-aggregate-bar
-**Template:** scatter/basic.html
+**Template:** examples/scatter-aggregate-bar.html
 **Data Format:** `[[x, y], [x, y], ...]`
 
 ## Official Option Code
@@ -201,6 +201,6 @@ setInterval(function () {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py scatter/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/scatter-aggregate-bar.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

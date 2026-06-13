@@ -1,0 +1,68 @@
+<!--
+  Template: examples/heatmap-large.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=heatmap-large
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+  tooltip: {},
+  xAxis: {
+    type: 'category',
+    data: xData
+  },
+  yAxis: {
+    type: 'category',
+    data: yData
+  },
+  visualMap: {
+    min: 0,
+    max: 1,
+    calculable: true,
+    realtime: false,
+    inRange: {
+      color: [
+        '#313695',
+        '#4575b4',
+        '#74add1',
+        '#abd9e9',
+        '#e0f3f8',
+        '#ffffbf',
+        '#fee090',
+        '#fdae61',
+        '#f46d43',
+        '#d73027',
+        '#a50026'
+      ]
+    }
+  },
+  series: [
+    {
+      name: 'Gaussian',
+      type: 'heatmap',
+      data: data,
+      emphasis: {
+        itemStyle: {
+          borderColor: '#333',
+          borderWidth: 1
+        }
+      },
+      progressive: 1000,
+      animation: false
+    }
+  ]
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

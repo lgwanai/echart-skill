@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=area-stack
-**Template:** line/stack.html
+**Template:** examples/area-stack.html
 **Data Format:** `{ categories: string[], series: [{name: string, stack: string, data: number[]}, ...] }`
 **Features:** area fill enabled, emphasis/hover effects, labels displayed
 
@@ -108,6 +108,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py line/stack.html -d data.json`
+- Build: `scripts/build_template.py examples/area-stack.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

@@ -2,7 +2,7 @@
 
 **Category:** `surface`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=metal-surface
-**Template:** NONE — use knowledge base
+**Template:** examples/metal-surface.html
 **Data Format:** `N/A`
 **Features:** visualMap component required
 

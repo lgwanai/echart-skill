@@ -1,0 +1,77 @@
+<!--
+  Template: examples/pie-labelLine-adjust.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=pie-labelLine-adjust
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+  title: {
+    text: '阅读书籍分布',
+    left: 'center',
+    textStyle: {
+      color: '#999',
+      fontWeight: 'normal',
+      fontSize: 14
+    }
+  },
+  series: datas.map(function (data, idx) {
+    var top = idx * 33.3;
+    return {
+      type: 'pie',
+      radius: [20, 60],
+      top: top + '%',
+      height: '33.33%',
+      left: 'center',
+      width: 400,
+      itemStyle: {
+        borderColor: '#fff',
+        borderWidth: 1
+      },
+      label: {
+        alignTo: 'edge',
+        formatter: '{name|{b}}\n{time|{c} 小时}',
+        minMargin: 5,
+        edgeDistance: 10,
+        lineHeight: 15,
+        rich: {
+          time: {
+            fontSize: 10,
+            color: '#999'
+          }
+        }
+      },
+      labelLine: {
+        length: 15,
+        length2: 0,
+        maxSurfaceAngle: 80
+      },
+      labelLayout: function (params) {
+        const isLeft = params.labelRect.x < myChart.getWidth() / 2;
+        const points = params.labelLinePoints;
+        // Update the end point.
+        points[2][0] = isLeft
+          ? params.labelRect.x
+          : params.labelRect.x + params.labelRect.width;
+        return {
+          labelLinePoints: points
+        };
+      },
+      data: data
+    };
+  })
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

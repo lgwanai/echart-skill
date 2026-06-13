@@ -2,7 +2,7 @@
 
 **Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=map-usa
-**Template:** map/basic.html
+**Template:** examples/map-usa.html
 **Data Format:** `[{name: string, value: number}, ...]`
 **Features:** visualMap component required, uses dataset (not series.data), emphasis/hover effects, labels displayed
 
@@ -152,6 +152,6 @@ $.get(ROOT_PATH + '/data/asset/geo/USA.json', function (usaJson) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py map/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/map-usa.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

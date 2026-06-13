@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=area-basic
-**Template:** line/basic.html
+**Template:** examples/area-basic.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** area fill enabled
 
@@ -35,6 +35,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py line/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/area-basic.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

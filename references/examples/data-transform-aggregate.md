@@ -2,7 +2,7 @@
 
 **Category:** `boxplot`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=data-transform-aggregate
-**Template:** NONE — use knowledge base
+**Template:** examples/data-transform-aggregate.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), uses dataset (not series.data), labels displayed
 

@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=mix-line-bar
-**Template:** mix/line-bar.html
+**Template:** examples/mix-line-bar.html
 **Data Format:** `{ categories: string[], barData: number[], lineData: number[] }`
 
 ## Official Option Code
@@ -107,6 +107,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py mix/line-bar.html -d data.json`
+- Build: `scripts/build_template.py examples/mix-line-bar.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

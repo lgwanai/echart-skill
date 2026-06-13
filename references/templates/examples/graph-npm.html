@@ -1,0 +1,43 @@
+<!--
+  Template: examples/graph-npm.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=graph-npm
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+        title: {
+          text: 'NPM Dependencies'
+        },
+        animationDurationUpdate: 1500,
+        animationEasingUpdate: 'quinticInOut',
+        series: [
+          {
+            type: 'graph',
+            layout: 'none',
+            // progressiveThreshold: 700,
+            data: json.nodes.map(function (node) {
+              return {
+                x: node.x,
+                y: node.y,
+                id: node.id,
+                name: node.label,
+                symbolSize: node.size,
+                itemStyle: {
+                  color: node.color
+                }
+              });
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!--
+  Template: examples/surface-golden-rose.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=surface-golden-rose
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+  toolbox: {
+    feature: {
+      saveAsImage: {
+        backgroundColor: '#111'
+      }
+    },
+    iconStyle: {
+      normal: {
+        borderColor: '#fff'
+      }
+    },
+    left: 0
+  },
+  xAxis3D: {
+    type: 'value'
+  },
+  yAxis3D: {
+    type: 'value'
+  },
+  zAxis3D: {
+    type: 'value'
+  },
+  grid3D: {
+    show: false,
+    boxWidth: 200,
+    boxDepth: 200,
+    axisPointer: {
+      show: false
+    },
+    axisLine: {
+      lineStyle: {
+        color: '#fff'
+      }
+    },
+    postEffect: {
+      enable: true,
+      SSAO: {
+        enable: true,
+        radius: 10,
+        intensity: 1
+      },
+      depthOfField: {
+        enable: true
+      }
+    },
+    temporalSuperSampling: {
+      enable: true
+    },
+    light: {
+      main: {
+        intensity: 1,
+        shadow: true
+      },
+      ambient: {
+        intensity: 0
+      },
+      ambientCubemap: {
+        texture: ROOT_PATH + '/data-gl/asset/pisa.hdr',
+        exposure: 1,
+        diffuseIntensity: 1,
+        specularIntensity: 1
+      }
+    },
+    viewControl: {
+      // projection: 'orthographic'
+    }
+  },
+  series: [
+    createSeries(1.5, 1.5),
+    createSeries(-1.5, -1.5),
+    createSeries(-1.5, 1.5),
+    createSeries(1.5, -1.5),
+    createSeries(0, 0)
+  ]
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

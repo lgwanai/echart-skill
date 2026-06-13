@@ -2,7 +2,7 @@
 
 **Category:** `parallel`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=parallel-simple
-**Template:** parallel/basic.html
+**Template:** examples/parallel-simple.html
 **Data Format:** `[[dim1, dim2, dim3, ...], ...]  (parallelAxis defines each dimension)`
 
 ## Official Option Code
@@ -41,6 +41,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py parallel/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/parallel-simple.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-race
-**Template:** bar/race.html
+**Template:** examples/bar-race.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** labels displayed
 
@@ -80,6 +80,6 @@ setInterval(function () {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py bar/race.html -d data.json`
+- Build: `scripts/build_template.py examples/bar-race.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

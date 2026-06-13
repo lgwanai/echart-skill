@@ -2,7 +2,7 @@
 
 **Category:** `'calendar, heatmap'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=calendar-heatmap
-**Template:** calendar/heatmap.html
+**Template:** examples/calendar-heatmap.html
 **Data Format:** `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
 **Features:** visualMap component required
 
@@ -63,6 +63,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py calendar/heatmap.html -d data.json`
+- Build: `scripts/build_template.py examples/calendar-heatmap.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

@@ -2,7 +2,7 @@
 
 **Category:** `candlestick`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=candlestick-simple
-**Template:** candlestick/basic.html
+**Template:** examples/candlestick-simple.html
 **Data Format:** `{ dates: string[], values: [[open, close, low, high], ...] }`
 
 ## Official Option Code
@@ -34,6 +34,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py candlestick/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/candlestick-simple.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

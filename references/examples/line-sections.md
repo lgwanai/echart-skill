@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-sections
-**Template:** line/basic.html
+**Template:** examples/line-sections.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** per-item colors via itemStyle, visualMap component required
 
@@ -114,6 +114,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py line/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/line-sections.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

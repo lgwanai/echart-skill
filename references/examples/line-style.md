@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-style
-**Template:** line/basic.html
+**Template:** examples/line-style.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** per-item colors via itemStyle
 
@@ -45,6 +45,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py line/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/line-style.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

@@ -2,7 +2,7 @@
 
 **Category:** `dataset, bar, transform`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=data-transform-sort-bar
-**Template:** NONE — use knowledge base
+**Template:** examples/data-transform-sort-bar.html
 **Data Format:** `N/A`
 **Features:** uses encode (dataset dimension mapping), uses dataset (not series.data)
 

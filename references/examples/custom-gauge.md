@@ -2,7 +2,7 @@
 
 **Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=custom-gauge
-**Template:** NONE — use knowledge base
+**Template:** examples/custom-gauge.html
 **Data Format:** `N/A`
 **Features:** uses dataset (not series.data)
 

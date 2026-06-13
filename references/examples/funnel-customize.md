@@ -2,7 +2,7 @@
 
 **Category:** `funnel`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=funnel-customize
-**Template:** funnel/basic.html
+**Template:** examples/funnel-customize.html
 **Data Format:** `[{name: string, value: number}, ...]`
 **Features:** per-item colors via itemStyle, emphasis/hover effects
 
@@ -98,6 +98,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py funnel/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/funnel-customize.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

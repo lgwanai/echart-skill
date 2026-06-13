@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=dynamic-data2
-**Template:** NONE — use knowledge base
+**Template:** examples/dynamic-data2.html
 **Data Format:** `N/A`
 
 ## Official Option Code

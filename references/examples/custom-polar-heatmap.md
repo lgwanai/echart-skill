@@ -2,7 +2,7 @@
 
 **Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=custom-polar-heatmap
-**Template:** NONE — use knowledge base
+**Template:** examples/custom-polar-heatmap.html
 **Data Format:** `N/A`
 **Features:** visualMap component required
 

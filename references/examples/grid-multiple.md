@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=grid-multiple
-**Template:** NONE — use knowledge base
+**Template:** examples/grid-multiple.html
 **Data Format:** `N/A`
 
 ## Official Option Code

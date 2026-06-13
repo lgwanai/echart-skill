@@ -2,7 +2,7 @@
 
 **Category:** `bar3D`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=transparent-bar3d
-**Template:** NONE — use knowledge base
+**Template:** examples/transparent-bar3d.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, visualMap component required, emphasis/hover effects
 

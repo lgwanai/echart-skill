@@ -2,7 +2,7 @@
 
 **Category:** `scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-weight
-**Template:** scatter/basic.html
+**Template:** examples/scatter-weight.html
 **Data Format:** `[[x, y], [x, y], ...]`
 **Features:** per-item colors via itemStyle, markLine for reference lines, emphasis/hover effects
 
@@ -289,6 +289,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py scatter/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/scatter-weight.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

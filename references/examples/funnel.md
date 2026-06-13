@@ -2,7 +2,7 @@
 
 **Category:** `funnel`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=funnel
-**Template:** funnel/basic.html
+**Template:** examples/funnel.html
 **Data Format:** `[{name: string, value: number}, ...]`
 **Features:** emphasis/hover effects, labels displayed
 
@@ -79,6 +79,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py funnel/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/funnel.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

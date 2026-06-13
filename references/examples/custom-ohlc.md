@@ -2,7 +2,7 @@
 
 **Category:** `candlestick`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=custom-ohlc
-**Template:** NONE — use knowledge base
+**Template:** examples/custom-ohlc.html
 **Data Format:** `N/A`
 **Features:** uses encode (dataset dimension mapping)
 

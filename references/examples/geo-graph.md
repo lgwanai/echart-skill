@@ -2,7 +2,7 @@
 
 **Category:** `map, graph`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-graph
-**Template:** NONE — use knowledge base
+**Template:** examples/geo-graph.html
 **Data Format:** `N/A`
 **Features:** labels displayed
 

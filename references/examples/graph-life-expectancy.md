@@ -2,7 +2,7 @@
 
 **Category:** `graph`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=graph-life-expectancy
-**Template:** graph/force.html
+**Template:** examples/graph-life-expectancy.html
 **Data Format:** `{ nodes: [{id?, name, symbolSize?, category?, x?, y?}, ...], links: [{source, target, value?}, ...], categories?: [{name}, ...] }`
 **Features:** per-item colors via itemStyle, visualMap component required, emphasis/hover effects, labels displayed
 
@@ -109,6 +109,6 @@ $.get(ROOT_PATH + '/data/asset/data/life-expectancy.json', function (rawData) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py graph/force.html -d data.json`
+- Build: `scripts/build_template.py examples/graph-life-expectancy.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

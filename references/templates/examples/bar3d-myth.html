@@ -1,0 +1,93 @@
+<!--
+  Template: examples/bar3d-myth.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=bar3d-myth
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+      tooltip: {},
+      backgroundColor: '#fff',
+      xAxis3D: {
+        type: 'value'
+      },
+      yAxis3D: {
+        type: 'value'
+      },
+      zAxis3D: {
+        type: 'value',
+        min: 0,
+        max: 100
+      },
+      grid3D: {
+        show: false,
+        viewControl: {
+          alpha: 70,
+          beta: 0
+        },
+        postEffect: {
+          enable: true,
+          depthOfField: {
+            enable: true,
+            blurRadius: 4,
+            fstop: 10
+          }
+          // SSAO: {
+          //     enable: true
+          // }
+        },
+        boxDepth: 100,
+        boxHeight: 20,
+        environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
+        light: {
+          main: {
+            shadow: true,
+            intensity: 2
+          },
+          ambientCubemap: {
+            texture: ROOT_PATH + '/data-gl/asset/canyon.hdr',
+            exposure: 2,
+            diffuseIntensity: 0.2
+          }
+        }
+      },
+      series: [
+        {
+          type: 'bar3D',
+          shading: 'lambert',
+          barSize: 0.8,
+          silent: true,
+          dimensions: ['x', 'y', 'z'],
+          itemStyle: {
+            color: function (params) {
+              var i = params.dataIndex;
+              var r = imgData.data[i * 4] / 255;
+              var g = imgData.data[i * 4 + 1] / 255;
+              var b = imgData.data[i * 4 + 2] / 255;
+              var lum = 0.2125 * r + 0.7154 * g + 0.0721 * b;
+              r *= lum * 2;
+              g *= lum * 2;
+              b *= lum * 2;
+              return [r, g, b, 1];
+            }
+          },
+          data: data
+        }
+      ]
+    })
+  );
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 
 **Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=custom-cartesian-polygon
-**Template:** NONE — use knowledge base
+**Template:** examples/custom-cartesian-polygon.html
 **Data Format:** `N/A`
 
 ## Official Option Code

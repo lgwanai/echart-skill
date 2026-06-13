@@ -2,7 +2,7 @@
 
 **Category:** `bar3D`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar3d-voxelize-image
-**Template:** NONE — use knowledge base
+**Template:** examples/bar3d-voxelize-image.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle
 

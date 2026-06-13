@@ -2,7 +2,7 @@
 
 **Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-race
-**Template:** line/basic.html
+**Template:** examples/line-race.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** uses encode (dataset dimension mapping), uses dataset (not series.data), emphasis/hover effects, labels displayed
 
@@ -111,6 +111,6 @@ function run(_rawData) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py line/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/line-race.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

@@ -2,7 +2,7 @@
 
 **Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-beef-cuts
-**Template:** NONE — use knowledge base
+**Template:** examples/geo-beef-cuts.html
 **Data Format:** `N/A`
 **Features:** visualMap component required, emphasis/hover effects
 

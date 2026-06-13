@@ -2,7 +2,7 @@
 
 **Category:** `scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-single-axis
-**Template:** scatter/basic.html
+**Template:** examples/scatter-single-axis.html
 **Data Format:** `[[x, y], [x, y], ...]`
 
 ## Official Option Code
@@ -72,6 +72,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py scatter/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/scatter-single-axis.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

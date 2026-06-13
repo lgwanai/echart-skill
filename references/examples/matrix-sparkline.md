@@ -2,7 +2,7 @@
 
 **Category:** `matrix, line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-sparkline
-**Template:** NONE — use knowledge base
+**Template:** examples/matrix-sparkline.html
 **Data Format:** `N/A`
 
 ## Official Option Code

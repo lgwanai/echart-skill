@@ -2,7 +2,7 @@
 
 **Category:** `scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-life-expectancy-timeline
-**Template:** scatter/bubble.html
+**Template:** examples/scatter-life-expectancy-timeline.html
 **Data Format:** `[[x, y, sizeValue], ...]`
 **Features:** per-item colors via itemStyle, visualMap component required
 
@@ -177,6 +177,6 @@ $.get(ROOT_PATH + '/data/asset/data/life-expectancy.json', function (data) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py scatter/bubble.html -d data.json`
+- Build: `scripts/build_template.py examples/scatter-life-expectancy-timeline.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

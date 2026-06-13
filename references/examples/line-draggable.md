@@ -2,7 +2,7 @@
 
 **Category:** `'line, graphic'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-draggable
-**Template:** line/xy.html
+**Template:** examples/line-draggable.html
 **Data Format:** `[[x, y], [x, y], ...]`
 
 ## Official Option Code
@@ -152,6 +152,6 @@ function onPointDragging(dataIndex, pos) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py line/xy.html -d data.json`
+- Build: `scripts/build_template.py examples/line-draggable.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

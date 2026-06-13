@@ -2,7 +2,7 @@
 
 **Category:** `matrix, bar, geo`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-mini-bar-geo
-**Template:** NONE — use knowledge base
+**Template:** examples/matrix-mini-bar-geo.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), labels displayed
 

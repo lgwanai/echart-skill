@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=mix-timeline-finance
-**Template:** mix/line-bar.html
+**Template:** examples/mix-timeline-finance.html
 **Data Format:** `{ categories: string[], barData: number[], lineData: number[] }`
 **Features:** labels displayed
 
@@ -445,6 +445,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py mix/line-bar.html -d data.json`
+- Build: `scripts/build_template.py examples/mix-timeline-finance.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

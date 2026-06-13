@@ -2,7 +2,7 @@
 
 **Category:** `graphic`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=graphic-stroke-animation
-**Template:** NONE — use knowledge base
+**Template:** examples/graphic-stroke-animation.html
 **Data Format:** `N/A`
 
 ## Official Option Code

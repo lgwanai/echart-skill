@@ -2,7 +2,7 @@
 
 **Category:** `boxplot`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=boxplot-light-velocity
-**Template:** boxplot/basic.html
+**Template:** examples/boxplot-light-velocity.html
 **Data Format:** `[[min, Q1, median, Q3, max], ...]  (one array per group)`
 **Features:** uses dataset (not series.data)
 
@@ -100,6 +100,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py boxplot/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/boxplot-light-velocity.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

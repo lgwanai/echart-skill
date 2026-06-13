@@ -1,0 +1,117 @@
+<!--
+  Template: examples/radar-aqi.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=radar-aqi
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+  backgroundColor: '#161627',
+  title: {
+    text: 'AQI - Radar',
+    left: 'center',
+    textStyle: {
+      color: '#eee'
+    }
+  },
+  legend: {
+    bottom: 5,
+    data: ['Beijing', 'Shanghai', 'Guangzhou'],
+    itemGap: 20,
+    textStyle: {
+      color: '#fff',
+      fontSize: 14
+    },
+    selectedMode: 'single'
+  },
+  radar: {
+    indicator: [
+      { name: 'AQI', max: 300 },
+      { name: 'PM2.5', max: 250 },
+      { name: 'PM10', max: 300 },
+      { name: 'CO', max: 5 },
+      { name: 'NO2', max: 200 },
+      { name: 'SO2', max: 100 }
+    ],
+    shape: 'circle',
+    splitNumber: 5,
+    axisName: {
+      color: 'rgb(238, 197, 102)'
+    },
+    splitLine: {
+      lineStyle: {
+        color: [
+          'rgba(238, 197, 102, 0.1)',
+          'rgba(238, 197, 102, 0.2)',
+          'rgba(238, 197, 102, 0.4)',
+          'rgba(238, 197, 102, 0.6)',
+          'rgba(238, 197, 102, 0.8)',
+          'rgba(238, 197, 102, 1)'
+        ].reverse()
+      }
+    },
+    splitArea: {
+      show: false
+    },
+    axisLine: {
+      lineStyle: {
+        color: 'rgba(238, 197, 102, 0.5)'
+      }
+    }
+  },
+  series: [
+    {
+      name: 'Beijing',
+      type: 'radar',
+      lineStyle: lineStyle,
+      data: dataBJ,
+      symbol: 'none',
+      itemStyle: {
+        color: '#F9713C'
+      },
+      areaStyle: {
+        opacity: 0.1
+      }
+    },
+    {
+      name: 'Shanghai',
+      type: 'radar',
+      lineStyle: lineStyle,
+      data: dataSH,
+      symbol: 'none',
+      itemStyle: {
+        color: '#B3E4A1'
+      },
+      areaStyle: {
+        opacity: 0.05
+      }
+    },
+    {
+      name: 'Guangzhou',
+      type: 'radar',
+      lineStyle: lineStyle,
+      data: dataGZ,
+      symbol: 'none',
+      itemStyle: {
+        color: 'rgb(238, 197, 102)'
+      },
+      areaStyle: {
+        opacity: 0.05
+      }
+    }
+  ]
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

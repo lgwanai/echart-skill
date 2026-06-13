@@ -2,7 +2,7 @@
 
 **Category:** `radar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=radar2
-**Template:** radar/basic.html
+**Template:** examples/radar2.html
 **Data Format:** `{ indicators: [{name: string, max: number}, ...], series: [{name: string, value: number[]}, ...] }`
 **Features:** visualMap component required, area fill enabled, emphasis/hover effects
 
@@ -87,6 +87,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py radar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/radar2.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

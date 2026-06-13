@@ -2,7 +2,7 @@
 
 **Category:** `globe`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=globe-country-carousel
-**Template:** NONE — use knowledge base
+**Template:** examples/globe-country-carousel.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle
 

@@ -2,7 +2,7 @@
 
 **Category:** `scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bubble-gradient
-**Template:** NONE — use knowledge base
+**Template:** examples/bubble-gradient.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, emphasis/hover effects, labels displayed
 

@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-stack
-**Template:** bar/stack.html
+**Template:** examples/bar-stack.html
 **Data Format:** `{ categories: string[], series: [{name: string, stack: string, data: number[]}, ...] }`
 **Features:** markLine for reference lines, emphasis/hover effects
 
@@ -126,6 +126,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py bar/stack.html -d data.json`
+- Build: `scripts/build_template.py examples/bar-stack.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

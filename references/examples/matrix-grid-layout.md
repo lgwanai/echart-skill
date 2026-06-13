@@ -2,7 +2,7 @@
 
 **Category:** `matrix`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-grid-layout
-**Template:** NONE — use knowledge base
+**Template:** examples/matrix-grid-layout.html
 **Data Format:** `N/A`
 
 ## Official Option Code

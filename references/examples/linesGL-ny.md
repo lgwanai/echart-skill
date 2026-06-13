@@ -2,7 +2,7 @@
 
 **Category:** `linesGL`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=linesGL-ny
-**Template:** NONE — use knowledge base
+**Template:** examples/linesGL-ny.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle
 

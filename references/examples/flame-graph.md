@@ -2,7 +2,7 @@
 
 **Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=flame-graph
-**Template:** NONE — use knowledge base
+**Template:** examples/flame-graph.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), emphasis/hover effects
 

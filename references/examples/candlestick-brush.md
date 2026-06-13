@@ -2,7 +2,7 @@
 
 **Category:** `candlestick`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=candlestick-brush
-**Template:** candlestick/basic.html
+**Template:** examples/candlestick-brush.html
 **Data Format:** `{ dates: string[], values: [[open, close, low, high], ...] }`
 **Features:** per-item colors via itemStyle, visualMap component required, labels displayed
 
@@ -263,6 +263,6 @@ $.get(ROOT_PATH + '/data/asset/data/stock-DJI.json', function (rawData) {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py candlestick/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/candlestick-brush.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

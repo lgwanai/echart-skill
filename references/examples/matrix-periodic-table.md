@@ -2,7 +2,7 @@
 
 **Category:** `matrix`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-periodic-table
-**Template:** NONE — use knowledge base
+**Template:** examples/matrix-periodic-table.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, labels displayed
 

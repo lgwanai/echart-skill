@@ -2,7 +2,7 @@
 
 **Category:** `tree`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=tree-polyline
-**Template:** tree/basic.html
+**Template:** examples/tree-polyline.html
 **Data Format:** `[{name: string, value?: number, collapsed?: boolean, children?: [...]}]`
 **Features:** emphasis/hover effects
 
@@ -179,6 +179,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py tree/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/tree-polyline.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

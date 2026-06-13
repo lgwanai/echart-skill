@@ -2,7 +2,7 @@
 
 **Category:** `graph`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=graph-grid
-**Template:** graph/static.html
+**Template:** examples/graph-grid.html
 **Data Format:** `{ nodes: [{name, x, y, symbolSize?}, ...], links: [{source, target}, ...] }`
 **Features:** labels displayed
 

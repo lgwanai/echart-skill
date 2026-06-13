@@ -2,7 +2,7 @@
 
 **Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-map-scatter
-**Template:** NONE — use knowledge base
+**Template:** examples/geo-map-scatter.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, visualMap component required, emphasis/hover effects, labels displayed
 

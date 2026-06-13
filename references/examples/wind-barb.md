@@ -2,7 +2,7 @@
 
 **Category:** `'custom, dataZoom'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=wind-barb
-**Template:** NONE — use knowledge base
+**Template:** examples/wind-barb.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle, visualMap component required, uses encode (dataset dimension mapping), area fill enabled, emphasis/hover effects
 

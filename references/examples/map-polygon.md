@@ -2,7 +2,7 @@
 
 **Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=map-polygon
-**Template:** map/basic.html
+**Template:** examples/map-polygon.html
 **Data Format:** `[{name: string, value: number}, ...]`
 **Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), emphasis/hover effects, labels displayed
 
@@ -669,6 +669,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py map/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/map-polygon.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

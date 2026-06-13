@@ -2,7 +2,7 @@
 
 **Category:** `globe`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=iron-globe
-**Template:** NONE — use knowledge base
+**Template:** examples/iron-globe.html
 **Data Format:** `N/A`
 
 ## Official Option Code

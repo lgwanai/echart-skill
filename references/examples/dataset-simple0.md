@@ -2,7 +2,7 @@
 
 **Category:** `'dataset, bar'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=dataset-simple0
-**Template:** NONE — use knowledge base
+**Template:** examples/dataset-simple0.html
 **Data Format:** `N/A`
 **Features:** uses dataset (not series.data)
 

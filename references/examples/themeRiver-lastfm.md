@@ -2,7 +2,7 @@
 
 **Category:** `themeRiver`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=themeRiver-lastfm
-**Template:** themeRiver/basic.html
+**Template:** examples/themeRiver-lastfm.html
 **Data Format:** `[[dateString, value, seriesName], ...]`
 
 ## Official Option Code
@@ -86,6 +86,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py themeRiver/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/themeRiver-lastfm.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

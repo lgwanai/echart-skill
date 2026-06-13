@@ -2,7 +2,7 @@
 
 **Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-svg-custom-effect
-**Template:** NONE — use knowledge base
+**Template:** examples/geo-svg-custom-effect.html
 **Data Format:** `N/A`
 
 ## Official Option Code

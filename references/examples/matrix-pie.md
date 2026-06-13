@@ -2,7 +2,7 @@
 
 **Category:** `matrix`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-pie
-**Template:** NONE — use knowledge base
+**Template:** examples/matrix-pie.html
 **Data Format:** `N/A`
 **Features:** emphasis/hover effects, labels displayed
 

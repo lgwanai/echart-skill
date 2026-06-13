@@ -2,7 +2,7 @@
 
 **Category:** `pie`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=pie-simple
-**Template:** pie/basic.html
+**Template:** examples/pie-simple.html
 **Data Format:** `[{name: string, value: number}, ...]`
 **Features:** emphasis/hover effects
 
@@ -53,6 +53,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py pie/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/pie-simple.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

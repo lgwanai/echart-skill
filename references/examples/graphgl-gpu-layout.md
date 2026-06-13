@@ -2,7 +2,7 @@
 
 **Category:** `graphGL`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=graphgl-gpu-layout
-**Template:** NONE — use knowledge base
+**Template:** examples/graphgl-gpu-layout.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle
 

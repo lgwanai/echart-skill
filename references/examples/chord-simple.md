@@ -2,7 +2,7 @@
 
 **Category:** `chord`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=chord-simple
-**Template:** chord/basic.html
+**Template:** examples/chord-simple.html
 **Data Format:** `{ nodes: [{name: string}, ...], links: [{source: string, target: string, value: number}, ...] }`
 **Features:** labels displayed
 
@@ -37,6 +37,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py chord/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/chord-simple.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

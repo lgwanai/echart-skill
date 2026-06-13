@@ -1,0 +1,77 @@
+<!--
+  Template: examples/bar-large.html
+  Official: https://echarts.apache.org/examples/zh/editor.html?c=bar-large
+  Data: Uses {DATA} placeholder — replace with real data matching the option format
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{TITLE}</title>
+<!-- {ECHARTS_INLINE} -->
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="text/javascript">
+var chart = echarts.init(document.getElementById('main'));
+chart.setOption({
+  title: {
+    text: echarts.format.addCommas(dataCount) + ' Data',
+    left: 10
+  },
+  toolbox: {
+    feature: {
+      dataZoom: {
+        yAxisIndex: false
+      },
+      saveAsImage: {
+        pixelRatio: 2
+      }
+    }
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    }
+  },
+  grid: {
+    bottom: 90
+  },
+  dataZoom: [
+    {
+      type: 'inside'
+    },
+    {
+      type: 'slider'
+    }
+  ],
+  xAxis: {
+    data: data.categoryData,
+    silent: false,
+    splitLine: {
+      show: false
+    },
+    splitArea: {
+      show: false
+    }
+  },
+  yAxis: {
+    splitArea: {
+      show: false
+    }
+  },
+  series: [
+    {
+      type: 'bar',
+      data: data.valueData,
+      // Set `large` for large data amount
+      large: true
+    }
+  ]
+});
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>

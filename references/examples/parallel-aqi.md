@@ -2,7 +2,7 @@
 
 **Category:** `parallel`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=parallel-aqi
-**Template:** parallel/basic.html
+**Template:** examples/parallel-aqi.html
 **Data Format:** `[[dim1, dim2, dim3, ...], ...]  (parallelAxis defines each dimension)`
 **Features:** visualMap component required
 
@@ -233,6 +233,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py parallel/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/parallel-aqi.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-polar-stack
-**Template:** bar/basic.html
+**Template:** examples/bar-polar-stack.html
 **Data Format:** `{ categories: string[], values: number[] }`
 **Features:** emphasis/hover effects
 
@@ -63,6 +63,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py bar/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/bar-polar-stack.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

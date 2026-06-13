@@ -2,7 +2,7 @@
 
 **Category:** `bar3D`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar3d-myth
-**Template:** NONE — use knowledge base
+**Template:** examples/bar3d-myth.html
 **Data Format:** `N/A`
 **Features:** per-item colors via itemStyle
 

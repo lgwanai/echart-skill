@@ -2,7 +2,7 @@
 
 **Category:** `surface`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=surface-theme-roses
-**Template:** NONE — use knowledge base
+**Template:** examples/surface-theme-roses.html
 **Data Format:** `N/A`
 
 ## Official Option Code

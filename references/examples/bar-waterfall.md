@@ -2,7 +2,7 @@
 
 **Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-waterfall
-**Template:** bar/waterfall.html
+**Template:** examples/bar-waterfall.html
 **Data Format:** `{ categories: string[], increase: (number|null)[], decrease: (number|null)[] }`
 **Features:** per-item colors via itemStyle, emphasis/hover effects, labels displayed
 
@@ -76,6 +76,6 @@ option = {
 ```
 
 ## Usage
-- Build: `scripts/build_template.py bar/waterfall.html -d data.json`
+- Build: `scripts/build_template.py examples/bar-waterfall.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues

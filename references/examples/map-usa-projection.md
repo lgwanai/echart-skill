@@ -2,7 +2,7 @@
 
 **Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=map-usa-projection
-**Template:** map/basic.html
+**Template:** examples/map-usa-projection.html
 **Data Format:** `[{name: string, value: number}, ...]`
 **Features:** visualMap component required, uses dataset (not series.data), emphasis/hover effects, labels displayed
 
@@ -149,6 +149,6 @@ $.when(
 ```
 
 ## Usage
-- Build: `scripts/build_template.py map/basic.html -d data.json`
+- Build: `scripts/build_template.py examples/map-usa-projection.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
 - Check `docs/CHART_DEBUG_LOG.md` for known issues
