@@ -484,6 +484,40 @@ def _auto_build_option(chart_type: str, df: "pd.DataFrame") -> dict:
     }
 
 
+def _validate_and_fix_option(option: dict, chart_type: str, df_columns: list) -> dict:
+    """Hard guarantee: option MUST have a renderable series with a type.
+
+    This is called right before HTML generation. If the option is missing
+    a series type it is auto-repaired — a broken chart is a critical bug,
+    not a missing-config warning.
+    """
+    series_list = option.get("series", [])
+
+    # Already valid
+    if series_list and all(s.get("type") for s in series_list):
+        return option
+
+    # Missing or incomplete series — auto-repair
+    repaired = dict(option)
+    cols = list(df_columns)
+
+    if not series_list:
+        if not cols:
+            repaired["series"] = [{"type": "bar", "data": []}]
+        elif len(cols) == 1:
+            repaired["series"] = [{"type": "bar", "encode": {"x": cols[0], "y": cols[0]}}]
+        else:
+            repaired["series"] = [{"type": "bar", "encode": {"x": cols[0], "y": cols[1]}}]
+        logger.warning("自动修复: option 缺少 series，已注入默认 bar 类型")
+    else:
+        for i, s in enumerate(series_list):
+            if not s.get("type"):
+                repaired["series"][i]["type"] = "bar"
+                logger.warning(f"自动修复: series[{i}] 缺少 type，已设为 bar")
+
+    return repaired
+
+
 def generate_echarts_html(df, config, output_path):
     """Generate an interactive HTML file using ECharts configuration.
 
@@ -566,6 +600,9 @@ def generate_echarts_html(df, config, output_path):
     except FileNotFoundError:
         logger.error("ECharts 库文件缺失", path=exporter.assets_dir / exporter.ECHARTS_FILE)
         echarts_js = "/* ECharts library not found — chart rendering disabled */"
+
+    # Hard guarantee: option MUST have a renderable series type
+    option = _validate_and_fix_option(option, chart_type, df.columns)
 
     option_json = json.dumps(option, ensure_ascii=False)
     required_maps = exporter._detect_required_maps(option_json, custom_js)
