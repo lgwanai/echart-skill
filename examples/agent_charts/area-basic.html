@@ -1,15 +1,16 @@
 <!--
-  Template: line/stack.html
-  Chart Type: Stacked Line / Area (堆叠折线/面积图)
-  Data Pattern: FLAT_ARRAY (multi-series with stack + areaStyle)
-  Data Format: { categories: string[], series: [{name: string, stack: string, data: number[]}, ...] }
-  Covers: line-stack, area-stack, area-stack-gradient, area-basic (4 examples)
+  Template: line/basic.html
+  Chart Type: Line (折线图)
+  Data Pattern: FLAT_ARRAY
+  Data Format: { categories: string[], values: number[] }
+  Covers: line-simple, line-smooth, line-style, line-marker, line-markline,
+          line-sections, line-log, line-y-category, line-graphic (14 examples)
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>area-basic</title>
+<title>基础面积图</title>
 <script>
 
 /*
@@ -61,17 +62,24 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">area-basic</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">基础面积图</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis' },
-  legend: {},
   grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'category', data: ["A", "B", "C", "D", "E"], boundaryGap: false },
+  xAxis: { type: 'category', data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], boundaryGap: false },
   yAxis: { type: 'value' },
-  series: []
+  series: [{
+    type: 'line',
+    smooth: false,     // true | false
+    step: false,          // false | 'start' | 'middle' | 'end'
+    areaStyle: true, // null | {}
+    symbol: 'circle',
+    symbolSize: 6,
+    data: [820, 932, 901, 1290, 1330, 1420, 1560]
+  }]
 };
 chart.setOption(option);
 window.addEventListener('resize', function() { chart.resize(); });
