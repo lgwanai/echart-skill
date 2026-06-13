@@ -199,4 +199,12 @@
 - **现象**：23_Tree 一片空白
 - **根因**：ECharts tree 的 `data` 必须是数组 `[{root}]`，但传入的是单个对象 `{name:"CEO",...}`
 - **修复**：(1) DATA 改为 `D([{...}])` — 包裹在数组中；(2) **模板增加防御**：`data: [].concat({{DATA}})` — `[].concat(obj)` 自动包数组，`[].concat(arr)` 保持不变
+
+---
+
+## #23 — Boxplot 空白：依赖缺失的 ecStat 库
+- **日期**：2026-06-13
+- **现象**：24_Boxplot 一片空白
+- **根因**：原模板使用 ECharts `transform: { type: 'boxplot' }`，需要 `ecStat` 扩展库，但项目中不存在该库
+- **修复**：(1) 模板重写为预计算五数概括格式 `series.data: [[min, Q1, median, Q3, max], ...]`，无需 ecStat；(2) 数据从原始值改为 `[[740,880,935,980,1070],[800,860,900,940,960]]`
 | effectScatter | `series.data` | — |
