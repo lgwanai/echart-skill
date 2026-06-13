@@ -746,6 +746,17 @@ def generate_echarts_html(df, config, output_path):
         logger.error("ECharts 库文件缺失", path=exporter.assets_dir / exporter.ECHARTS_FILE)
         echarts_js = "/* ECharts library not found — chart rendering disabled */"
 
+    # Detect 3D chart types — need echarts-gl
+    gl_js = ""
+    gl_types = {"bar3D", "scatter3D", "surface", "line3D", "lines3D", "scatterGL", "graphGL", "flowGL"}
+    series_types = {s.get("type", "") for s in option.get("series", [])}
+    if series_types & gl_types or option.get("globe"):
+        gl_path = exporter.assets_dir / "echarts-gl.min.js"
+        if gl_path.exists():
+            with open(gl_path, "r", encoding="utf-8") as gf:
+                gl_js = "<script>\n" + gf.read() + "\n</script>"
+            logger.info("echarts-gl 已内联", gl_types=series_types & gl_types)
+
     # Hard guarantee: option MUST have a renderable series type
     option = _validate_and_fix_option(option, chart_type, df.columns)
 
@@ -798,6 +809,7 @@ def generate_echarts_html(df, config, output_path):
     <script>
 {echarts_js}
     </script>
+{gl_js}
     <script>
 {map_scripts_inline}
     </script>
