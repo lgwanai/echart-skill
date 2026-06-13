@@ -70,12 +70,12 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis' },
   grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'category', data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], axisLabel: { rotate: 0 } },
+  xAxis: { type: 'category', data: ["Mon", "Tue", "Wed", "Thu", "Fri"], axisLabel: { rotate: 0 } },
   yAxis: { type: 'value' },
   series: [{
     type: 'bar',
     itemStyle: { borderRadius: [4, 4, 0, 0] },
-    data: [120, 200, 150, 80, 70, 110, 130]
+    data: [120, -200, 150, -80, 70]
   }]
 };
 chart.setOption(option);

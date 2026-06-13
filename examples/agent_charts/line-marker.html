@@ -1,15 +1,16 @@
 <!--
-  Template: funnel/basic.html
-  Chart Type: Funnel (漏斗图)
-  Data Pattern: NAMED_VALUE
-  Data Format: [{name: string, value: number}, ...]
-  Covers: funnel, funnel-align, funnel-customize, funnel-mutiple (4 examples)
+  Template: line/basic.html
+  Chart Type: Line (折线图)
+  Data Pattern: FLAT_ARRAY
+  Data Format: { categories: string[], values: number[] }
+  Covers: area-basic, area-simple, area-pieces, area-rainfall, area-time-axis, line-simple, line-smooth, line-style, line-marker, line-markline,
+          line-sections, line-log, line-y-category, line-graphic (14 examples)
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>funnel-customize</title>
+<title>line-marker</title>
 <script>
 
 /*
@@ -61,23 +62,23 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">funnel-customize</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">line-marker</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  tooltip: { trigger: 'item', formatter: '{a}<br/>{b}: {c}' },
-  legend: { top: '5%', left: 'center' },
+  tooltip: { trigger: 'axis' },
+  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+  xAxis: { type: 'category', data: ["2024-01-01", "2024-02-01", "2024-03-01", "2024-04-01", "2024-05-01", "2024-06-01", "2024-07-01", "2024-08-01", "2024-09-01", "2024-10-01", "2024-11-01", "2024-12-01"], boundaryGap: false && true },
+  yAxis: { type: 'value' },
   series: [{
-    type: 'funnel',
-    left: '10%', top: 60, bottom: 60, width: '80%',
-    min: 1800,            // 0
-    max: 10000,            // 100
-    sort: 'descending',             // 'descending' | 'ascending' | 'none'
-    gap: 2,
-    label: { show: true, position: 'inside' },    // 'inside' | 'outside'
-    emphasis: { label: { fontSize: 20 } },
-    data: [{"name": "\u8bbf\u95ee", "value": 10000}, {"name": "\u6ce8\u518c", "value": 6500}, {"name": "\u6fc0\u6d3b", "value": 4200}, {"name": "\u4e0b\u5355", "value": 2800}, {"name": "\u652f\u4ed8", "value": 1800}]
+    type: 'line',
+    smooth: false,     // true | false
+    step: false,          // false | 'start' | 'middle' | 'end'
+    areaStyle: false, // null | {}
+    symbol: 'circle',
+    symbolSize: 6,
+    data: [820, 932, 901, 1290, 1330, 1420, 1560, 1480, 1620, 1720, 1680, 1890]
   }]
 };
 chart.setOption(option);

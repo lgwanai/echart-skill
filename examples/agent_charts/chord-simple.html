@@ -9,7 +9,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>和弦图</title>
+<title>chord</title>
 <script>
 
 /*
@@ -61,7 +61,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">和弦图</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">chord</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -73,7 +73,7 @@ var option = {
     label: { show: true, rotate: false },
     emphasis: { lineStyle: { width: 8 }, itemStyle: { borderWidth: 0 } },
     data: [{"name": "\u5317\u4eac"}, {"name": "\u4e0a\u6d77"}, {"name": "\u5e7f\u5dde"}, {"name": "\u6df1\u5733"}],
-    links: [{"source": "\u5317\u4eac", "target": "\u4e0a\u6d77", "value": 95}, {"source": "\u5317\u4eac", "target": "\u5e7f\u5dde", "value": 60}, {"source": "\u4e0a\u6d77", "target": "\u6df1\u5733", "value": 55}, {"source": "\u5e7f\u5dde", "target": "\u6df1\u5733", "value": 70}]
+    links: [{"source": "\u5317\u4eac", "target": "\u4e0a\u6d77", "value": 95}, {"source": "\u5317\u4eac", "target": "\u5e7f\u5dde", "value": 60}, {"source": "\u4e0a\u6d77", "target": "\u6df1\u5733", "value": 55}]
   }]
 };
 chart.setOption(option);

@@ -6,7 +6,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>地理迁徙</title>
+<title>geo-lines</title>
 <script>
 
 /*
@@ -111,8 +111,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
-var geoCoordMap = {"\u5317\u4eac": [116.46, 39.92], "\u4e0a\u6d77": [121.48, 31.22], "\u5e7f\u5dde": [113.51, 23.22], "\u6df1\u5733": [114.07, 22.62], "\u6210\u90fd": [104.06, 30.67], "\u6b66\u6c49": [114.39, 30.66], "\u676d\u5dde": [119.53, 29.88]} || {};
-var rawData = [["\u5317\u4eac", "\u4e0a\u6d77", 95], ["\u5317\u4eac", "\u5e7f\u5dde", 90], ["\u5317\u4eac", "\u6df1\u5733", 80], ["\u5317\u4eac", "\u6210\u90fd", 70], ["\u5317\u4eac", "\u6b66\u6c49", 60], ["\u4e0a\u6d77", "\u5e7f\u5dde", 85], ["\u4e0a\u6d77", "\u6df1\u5733", 75], ["\u5e7f\u5dde", "\u6210\u90fd", 80], ["\u5e7f\u5dde", "\u6b66\u6c49", 60], ["\u6df1\u5733", "\u676d\u5dde", 65], ["\u6210\u90fd", "\u6b66\u6c49", 70], ["\u6b66\u6c49", "\u676d\u5dde", 80]];
+var geoCoordMap = {"\u5317\u4eac": [116.46, 39.92], "\u4e0a\u6d77": [121.48, 31.22], "\u5e7f\u5dde": [113.51, 23.22], "\u6df1\u5733": [114.07, 22.62], "\u6210\u90fd": [104.06, 30.67]} || {};
+var rawData = [["\u5317\u4eac", "\u4e0a\u6d77", 95], ["\u5317\u4eac", "\u5e7f\u5dde", 90], ["\u5317\u4eac", "\u6df1\u5733", 80], ["\u4e0a\u6d77", "\u6df1\u5733", 75]];
 var planePath = 'path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z';
 
 var convertData = function(data) {
@@ -124,7 +124,7 @@ var convertData = function(data) {
 var seriesData = convertData(rawData);
 var option = {
   backgroundColor: '#404a59',
-  title: { text: '地理迁徙', left: 'center', textStyle: { color: '#fff' } },
+  title: { text: 'geo-lines', left: 'center', textStyle: { color: '#fff' } },
   tooltip: { trigger: 'item', formatter: function(p) { return p.data ? p.data.fromName + ' → ' + p.data.toName : ''; } },
   geo: { map: 'china' || 'china', roam: true, label: { show: false },
     itemStyle: { areaColor: '#323c48', borderColor: '#404a59' },

@@ -9,7 +9,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>平行坐标</title>
+<title>parallel</title>
 <script>
 
 /*
@@ -61,7 +61,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">平行坐标</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">parallel</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -72,7 +72,7 @@ var option = {
     type: 'parallel',
     lineStyle: { width: 1.5, opacity: 0.6 },
     emphasis: { lineStyle: { width: 3, opacity: 0.8 } },
-    data: [[55, 85, 78, 90, 65, "A"], [70, 80, 82, 95, 72, "B"], [60, 75, 68, 85, 58, "C"], [80, 90, 88, 92, 78, "D"], [45, 65, 55, 70, 48, "E"]]
+    data: [[55, 85, 78, 90, 65, "A"], [70, 80, 82, 95, 72, "B"], [60, 75, 68, 85, 58, "C"]]
   }]
 };
 chart.setOption(option);

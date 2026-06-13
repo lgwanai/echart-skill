@@ -1,15 +1,16 @@
 <!--
-  Template: radar/basic.html
-  Chart Type: Radar (雷达图)
-  Data Pattern: RADAR_VALUE
-  Data Format: { indicators: [{name: string, max: number}, ...], series: [{name: string, value: number[]}, ...] }
-  Covers: radar, radar2, radar-aqi, radar-custom, radar-multiple (5 examples)
+  Template: line/basic.html
+  Chart Type: Line (折线图)
+  Data Pattern: FLAT_ARRAY
+  Data Format: { categories: string[], values: number[] }
+  Covers: area-basic, area-simple, area-pieces, area-rainfall, area-time-axis, line-simple, line-smooth, line-style, line-marker, line-markline,
+          line-sections, line-log, line-y-category, line-graphic (14 examples)
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>radar2</title>
+<title>line-style</title>
 <script>
 
 /*
@@ -61,21 +62,23 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">radar2</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">line-style</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  legend: { data: ["\u9884\u7b97", "\u5b9e\u9645"] },
-  radar: {
-    indicator: [{"name": "budget", "max": 6000.0}, {"name": "spending", "max": 16800.0}, {"name": "sales", "max": 33600.0}, {"name": "profit", "max": 42000.0}],
-    shape: 'polygon',        // 'polygon' | 'circle'
-    center: ['50%', '50%'],
-    radius: '65%'
-  },
+  tooltip: { trigger: 'axis' },
+  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+  xAxis: { type: 'category', data: ["2024-01-01", "2024-02-01", "2024-03-01", "2024-04-01", "2024-05-01", "2024-06-01", "2024-07-01", "2024-08-01", "2024-09-01", "2024-10-01", "2024-11-01", "2024-12-01"], boundaryGap: false && true },
+  yAxis: { type: 'value' },
   series: [{
-    type: 'radar',
-    data: [{"name": "\u9884\u7b97", "value": [4200, 3000, 20000, 35000]}, {"name": "\u5b9e\u9645", "value": [5000, 14000, 28000, 26000]}]
+    type: 'line',
+    smooth: false,     // true | false
+    step: false,          // false | 'start' | 'middle' | 'end'
+    areaStyle: false, // null | {}
+    symbol: 'circle',
+    symbolSize: 6,
+    data: [820, 932, 901, 1290, 1330, 1420, 1560, 1480, 1620, 1720, 1680, 1890]
   }]
 };
 chart.setOption(option);

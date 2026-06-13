@@ -1,16 +1,16 @@
 <!--
-  Template: scatter/basic.html
-  Chart Type: Scatter (散点图)
-  Data Pattern: XY_PAIRS
-  Data Format: [[x, y], [x, y], ...]
-  Covers: scatter-simple, scatter-effect, scatter-clustering, scatter-weight,
-          scatter-anscombe-quartet, scatter-linear-regression, scatter-aggregate-bar (10 examples)
+  Template: scatter/bubble.html
+  Chart Type: Bubble Scatter (气泡图 — size-encoded third dimension)
+  Data Pattern: XY_PAIRS + visualMap on symbolSize
+  Data Format: [[x, y, sizeValue], ...]
+  Covers: scatter-life-expectancy-timeline, scatter-world-population,
+          scatter-aqi-color, scatter-nebula, scatter-painter-choice (5 examples)
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>scatter-jitter</title>
+<title>scatter-bubble</title>
 <script>
 
 /*
@@ -62,19 +62,34 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">scatter-jitter</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">scatter-bubble</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
+	var rawData = [[28604, 77, 80], [31163, 77.4, 90], [1516, 68, 15], [13670, 74.7, 40]];
+	var vmMin = 0, vmMax = 100;
+	if (vmMin === 0 && vmMax === 100) {
+	  var vals = rawData.map(function(d){ return d[2] || 1; });
+	  vmMin = Math.min.apply(null, vals);
+	  vmMax = Math.max.apply(null, vals);
+	}
 var option = {
-  tooltip: { trigger: 'item', formatter: function(p) { return '(' + p.value[0] + ', ' + p.value[1] + ')'; } },
-  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'value' },
-  yAxis: { type: 'value' },
+  tooltip: {
+    trigger: 'item',
+    formatter: function(p) { return p.seriesName + '<br/>(' + p.value[0] + ', ' + p.value[1] + '): ' + (p.value[2] || p.value[3]); }
+  },
+  grid: { left: '5%', right: '10%', bottom: '10%', top: '10%' },
+  xAxis: { type: 'value', name: 'X' },
+  yAxis: { type: 'value', name: 'Y' },
+  visualMap: {
+    dimension: 2,
+    min: vmMin, max: vmMax,
+    inRange: { symbolSize: [5, 60], color: ['#50a3ba', '#eac736', '#d94e5d'] }
+  },
   series: [{
     type: 'scatter',
-    symbolSize: 10,     // number | function
-    data: [[10, 8.04], [8, 6.95], [13, 7.58], [9, 8.81], [11, 8.33], [14, 9.96], [6, 7.24], [4, 4.26], [12, 10.84]]
+    data: [[28604, 77, 80], [31163, 77.4, 90], [1516, 68, 15], [13670, 74.7, 40]],
+    emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
   }]
 };
 chart.setOption(option);
