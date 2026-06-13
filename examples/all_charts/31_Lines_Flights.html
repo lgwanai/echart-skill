@@ -123,7 +123,7 @@ var planePath = 'path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0
 var seriesData = flights.map(function(item) {
   return {
     coords: [geoCoordMap[item[0]], geoCoordMap[item[1]]],
-    lineStyle: { width: Math.max(1, (item[2] || 1) / 1) }
+    lineStyle: { width: Math.max(1, (item[2] || 1) / 10) }
   };
 });
 
