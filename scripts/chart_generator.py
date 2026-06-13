@@ -772,9 +772,18 @@ def generate_echarts_html(df, config, output_path):
     # Fix scatter bubble: encode.z needs visualMap for symbol size variation
     for s in option.get("series", []):
         if s.get("type") == "scatter":
-            # Geo scatter: fixed symbolSize (don't use visualMap for size)
+            # Geo scatter: compute symbolSize from value in custom JS
             if s.get("coordinateSystem") == "geo" and "symbolSize" not in s:
-                s["symbolSize"] = 12
+                config["custom_js"] = config.get("custom_js", "") + """
+            // Vary symbol size by data value for geo scatter
+            var geoData = option.series[0].data;
+            var vals = geoData.map(function(d){ return Array.isArray(d.value) ? d.value[2] : (d.value || 1); });
+            var minVal = Math.min.apply(null, vals);
+            var maxVal = Math.max.apply(null, vals);
+            option.series[0].symbolSize = function(val) {
+                return 5 + (val[2] - minVal) / (maxVal - minVal || 1) * 40;
+            };
+"""
             # Convert string symbolSize → encode.z (dimension reference)
             if isinstance(s.get("symbolSize"), str) and "z" not in s.get("encode", {}):
                 s.setdefault("encode", {})["z"] = s.pop("symbolSize")
