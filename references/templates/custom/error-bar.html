@@ -1,12 +1,7 @@
 <!--
   Template: custom/error-bar.html
-  Chart Type: Custom Error Bar (自定义误差棒图)
-  Data Pattern: CUSTOM_VALUE
-  Data Format: [[xIdx, lowValue, highValue], ...] with encode: {x:0, y:[1,2]}
-  Covers: custom-error-bar, custom-error-scatter, custom-profile, custom-gantt-flight,
-          custom-profit, custom-cartesian-polygon, custom-ohlc, custom-wind,
-          custom-spiral-race, custom-hexbin, custom-calendar-icon, custom-gauge,
-          custom-bar-trend, custom-polar-heatmap (14 examples)
+  Chart Type: Error Bar (柱状图 + 误差线)
+  Data Format: [[category, value, min, max], ...]
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -21,18 +16,25 @@
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
+var rawData = {{DATA}};
+var cats = rawData.map(function(d){return d[0]});
+var vals = rawData.map(function(d){return d[1]});
+var errs = rawData.map(function(d){return [d[1]-d[2], d[3]-d[1]]});
 var option = {
-  tooltip: { trigger: 'item' },
+  tooltip: { trigger: 'axis' },
   grid: { left: '5%', right: '5%', bottom: '10%', top: '10%' },
-  xAxis: { type: 'category', data: {{CATEGORIES}} },
+  xAxis: { type: 'category', data: cats },
   yAxis: { type: 'value' },
-  series: [{
-    type: 'custom',
-    renderItem: {{RENDER_ITEM}},     // function(params, api) { ... } or registered name string
-    encode: {{ENCODE}},              // { x: 0, y: [1, 2] }
-    data: {{DATA}},
-    itemStyle: { borderWidth: 2 }
-  }]
+  series: [
+    { type: 'bar', data: vals, itemStyle: { color: '#5470c6' }, barWidth: '40%' },
+    { type: 'bar', data: vals, barGap: '-100%', barWidth: '40%',
+      itemStyle: { color: 'transparent' },
+      markLine: { silent: true, symbol: ['none','none'],
+        lineStyle: { color: '#333', type: 'solid', width: 1 },
+        data: rawData.map(function(d,i){ return [{ yAxis: d[2], xAxis: i }, { yAxis: d[3], xAxis: i }] })
+      }
+    }
+  ]
 };
 chart.setOption(option);
 window.addEventListener('resize', function() { chart.resize(); });

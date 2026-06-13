@@ -234,9 +234,8 @@ CHARTS.append(("37_3D_Lines3D", "3d/lines3d.html", {
 
 # ═══ Misc ═══
 CHARTS.append(("39_Custom_Error_Bar", "custom/error-bar.html", {
-    "TITLE":"39 误差柱图","RENDER_ITEM":"false","ENCODE":"{}",
-    "CATEGORIES":["大象", "犀牛", "河马", "水牛", "长颈鹿"],
-    "DATA":D([[50,45,55],[65,60,72],[55,50,62],[70,65,80],[60,55,68]])}))
+    "TITLE":"39 误差柱图",
+    "DATA":D([["A",50,45,55],["B",65,60,72],["C",55,50,62],["D",70,65,80],["E",60,55,68]])}))
 
 CHARTS.append(("40_Geo_Lines", "geo/lines.html", {
     "TITLE":"40 全国线路","MAP_NAME":"china","SIZE_SCALE":"1","EFFECT_DATA":"[]",
