@@ -1007,7 +1007,8 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 | 知识库索引 | `references/knowledge/INDEX.md` |
 | 案例索引 | `references/knowledge/examples/INDEX.md` |
 | 模板映射索引 | `references/templates/INDEX.md` |
-| HTML 模板 | `references/templates/<类型>/<模板>.html` |
+| 一一对应模板 (NEW) | `references/templates/examples/<chart-name>.html` — 295 个精确匹配官方示例 |
+| 通用模板 | `references/templates/<类型>/<模板>.html` — 41 个常用类型 |
 | 模板构建脚本 | `scripts/build_template.py` |
 | 概念文件 | `references/knowledge/concepts/` |
 | 图表类型文件 | `references/knowledge/chart-types/` |
