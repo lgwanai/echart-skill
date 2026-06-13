@@ -1,0 +1,153 @@
+# 多 Y 轴示例 / Multiple Y Axes
+
+**Category:** `bar`
+**Example dir:** `multiple-y-axis`
+**Difficulty:** 4
+
+## Template Match
+- **3d/bar3d.html** — Bar3D
+
+## Option Code
+```javascript
+const colors = ['#5070dd', '#b6d634', '#505372'];
+option = {
+  color: colors,
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross'
+    }
+  },
+  grid: {
+    right: '20%'
+  },
+  toolbox: {
+    feature: {
+      dataView: { show: true, readOnly: false },
+      restore: { show: true },
+      saveAsImage: { show: true }
+    }
+  },
+  legend: {
+    data: ['Evaporation', 'Precipitation', 'Temperature']
+  },
+  xAxis: [
+    {
+      type: 'category',
+      axisTick: {
+        alignWithLabel: true
+      },
+      // prettier-ignore
+      data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    }
+  ],
+  yAxis: [
+    {
+      type: 'value',
+      name: 'Evaporation',
+      position: 'right',
+      alignTicks: true,
+      axisLine: {
+        show: true,
+        lineStyle: {
+          color: colors[0]
+        }
+      },
+      axisLabel: {
+        formatter: '{value} ml'
+      }
+    },
+    {
+      type: 'value',
+      name: 'Precipitation',
+      position: 'right',
+      alignTicks: true,
+      offset: 80,
+      axisLine: {
+        show: true,
+        lineStyle: {
+          color: colors[1]
+        }
+      },
+      axisLabel: {
+        formatter: '{value} ml'
+      }
+    },
+    {
+      type: 'value',
+      name: '温度',
+      position: 'left',
+      alignTicks: true,
+      axisLine: {
+        show: true,
+        lineStyle: {
+          color: colors[2]
+        }
+      },
+      axisLabel: {
+        formatter: '{value} °C'
+      }
+    }
+  ],
+  series: [
+    {
+      name: 'Evaporation',
+      type: 'bar',
+      data: [
+        2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
+      ]
+    },
+    {
+      name: 'Precipitation',
+      type: 'bar',
+      yAxisIndex: 1,
+      data: [
+        2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
+      ]
+    },
+    {
+      name: 'Temperature',
+      type: 'line',
+      yAxisIndex: 2,
+      data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
+    }
+  ]
+};
+```
+
+## Relevant Debug Patterns
+## #16
+ — Stacked bar/line 模板 series 缺少 type 字段
+- **日期**：2026-06-13
+- **现象**：03_Bar_Stacked、07_Line_Stacked 无数据
+- **根因**：`bar/stack.html` 和 `line/stack.html` 使用 `{{SERIES}}` 替换整个 series 数组，每个 series 对象必须带 `type: "bar"/"line"`。ECharts 没有默认 series type
+- **修复**：数据 dict 中 series 对象添加 `"type": "bar"` 或 `"type": "line"`
+
+---
+...
+
+## #24
+ — PictorialBar：symbol 必须用真实位图，SVG/矢量路径效果差
+- **日期**：2026-06-13
+- **现象**：28_PictorialBar 显示纯色方块，无象形效果
+- **根因**：(1) `SYMBOL: "rect"` → 普通矩形，不"象形"；(2) SVG 手绘路径质量差；(3) `SYMBOL_BOUNDING: "false"` → 无 bounding，所有值显为单个图标
+- **修复**：(1) 下载 Twitter emoji CDN 的 72x72 PNG 光栅图（大象/犀牛/河马/水牛/长颈鹿）；(2) 通过 `data[i].symbol` 为每个数据项设置独立图标 URI；`symbolBoundingData: 1000`，`symbolRepeat: true`；(3) **模板增加防御**：`symbol` 为空时允许 data[i].symbol 覆盖
+
+---
+...
+
+## #27
+ — 3D Bar 空白：GL_INLINE + coordinateSystem + zAxis3D 配置错误
+- **日期**：2026-06-13
+- **现象**：33_3D_Bar 一片空白
+- **根因**：(1) `GL_INLINE: ""` 破坏 echarts-gl 注入（同 #18）；(2) `coordinateSystem: 'cartesian3D'` + `zAxis3D: {type:'value'}` + `shading:'realistic'` 不是官方推荐的配置组合；(3) 官方示例用 `zAxis3D: {}`（空对象）、无 `coordinateSystem`、`shading: 'lambert'`
+- **修复**：模板改为与 ECharts 官方 bar3D 示例完全一致的配置：`grid3D: {}`、`zAxis3D: {}`、`shading: 'lambert'`、无 `coordinateSystem`、无 `barSize`
+
+---
+...
+
+## Key Points
+- This is an official ECharts example from `multiple-y-axis/main.js`
+- Template data format: `[[x, y, z], ...]`
+- Use `scripts/build_template.py` with the matching template + data
+- Always validate with `scripts/validate_chart.py` after generation
