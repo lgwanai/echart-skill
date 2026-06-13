@@ -2,10 +2,10 @@
 
 **Category:** `lines3D`
 **Example dir:** `lines3d-flights`
-**Difficulty:** 
 
-## Template Match
+## Template
 - **3d/lines3d.html** — Lines3D
+Data format: `{ geoCoordMap: {"name": [lng, lat]}, flights: [[fromName, toName], ...] }`
 
 ## Option Code
 ```javascript
@@ -80,75 +80,9 @@ $.getJSON(ROOT_PATH + '/data-gl/asset/data/flights.json', function (data) {
     legend: {
       selectedMode: 'single',
       left: 'left',
-      data: Object.keys(routesGroupByAirline),
-      orient: 'vertical',
-      textStyle: {
-        color: '#fff'
-      }
-    },
-    globe: {
-      environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
-      heightTexture:
-        ROOT_PATH + '/data-gl/asset/bathymetry_bw_composite_4k.jpg',
-      displacementScale: 0.1,
-      displacementQuality: 'high',
-      baseColor: '#000',
-      shading: 'realistic',
-      realisticMaterial: {
-        roughness: 0.2,
-        metalness: 0
-      },
-      postEffect: {
-        enable: true,
-        depthOfField: {
-          enable: false,
-          focalDistance: 150
-        }
-      },
-      temporalSuperSampling: {
-        enable: true
-      },
-      light: {
-        ambient: {
-          intensity: 0
-        },
-        main: {
-          intensity: 0.1,
-          shadow: false
-        },
-        ambientCubemap: {
-          texture: ROOT_PATH + '/data-gl/asset/lake.hdr',
-          exposure: 1,
-          diffuseIntensity: 0.5,
-          specularIntensity: 2
-        }
-      },
-      vie
+      data: Object.keys(routesGroupByA
 ```
 
-## Relevant Debug Patterns
-## #28
- — 3D Scatter/Surface/Globe/Lines3D 同样空白
-- **日期**：2026-06-13
-- **现象**：34/35/36/37 全部空白
-- **根因**：与 #27 相同——GL_INLINE 破坏注入 + 模板配置偏离官方示例。所有 3D 模板统一修复
-- **修复**：3d/scatter3d.html、3d/surface.html、3d/globe.html、3d/lines3d.html 全部改为与官方示例一致的配置。关键：`zAxis3D: {}`（非 `{type:'value'}`）、`grid3D: {}`、无 `coordinateSystem`
-
----
-...
-
-## #31
- — Lines3D 空白：GEO_COORD_MAP 为空 + BASE_TEXTURE 缺失
-- **日期**：2026-06-13
-- **现象**：37_3D_Lines3D 一片空白
-- **根因**：(1) `GEO_COORD_MAP: "{}"` 空对象，FLIGHTS 使用不存在的地名 "A/B/C"；(2) `BASE_TEXTURE: ""` 无地球纹理；(3) GL_INLINE 破坏注入（同 #18）
-- **修复**：(1) GEO_COORD_MAP 提供真实城市经纬度；(2) FLIGHTS 改用真实城市名 `[["北京","上海"],...]`；(3) BASE_TEXTURE 使用真实地球纹理；(4) **模板守卫**：`geoCoordMap || {}`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `lines3d-flights/main.js`
-- Template data format: `{ geoCoordMap: {"name": [lng, lat]}, flights: [[fromName, toName], ...] }`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py 3d/lines3d.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

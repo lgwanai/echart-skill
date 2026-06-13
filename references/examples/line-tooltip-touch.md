@@ -2,10 +2,10 @@
 
 **Category:** `'line, dataZoom'`
 **Example dir:** `line-tooltip-touch`
-**Difficulty:** 10
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **line/basic.html** — Line
+Data format: `{ categories: string[], values: number[] }`
 
 ## Option Code
 ```javascript
@@ -107,60 +107,9 @@ option = {
       name: 'Fake Data',
       type: 'line',
       smooth: true,
-      symbol: 'circle',
-      symbolSize: 5,
-      sampling: 'average',
-      itemStyle: {
-        color: '#0770FF'
-      },
-      stack: 'a',
-      areaStyle: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          {
-            offset: 0,
-            color: 'rgba(58,77,233,0.8)'
-          },
-          {
-            offset: 1,
-            color: 'rgba(58,77,233,0.3)'
-          }
-        ])
-      },
-      data: data
-    },
-    {
-      name: 'Fake Data',
-      type: 'line',
-      smooth: true,
-      stack: 'a',
-      symbol: 'circle',
-      symbolSize: 5,
-      sampling: 'average',
-      itemStyle: {
-        color: '#F2597F'
-      },
-      areaStyle: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          {
-            offset: 0,
-            color: 'rgba(213,72,120,0.8)'
-          },
-          {
-            offset: 1,
-            color: 'rgba(213,72,120,0.3)'
-          }
-        ])
-      },
-      data: data2
-    }
-  ]
-};
+      symbol: 'circle'
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `line-tooltip-touch/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py line/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

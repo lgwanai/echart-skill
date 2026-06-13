@@ -2,10 +2,10 @@
 
 **Category:** `matrix`
 **Example dir:** `matrix-periodic-table`
-**Difficulty:** 10
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -83,36 +83,9 @@ option = {
       ['8', '4', '25', 'Mn', colors.blue],
       ['9', '4', '26', 'Fe', colors.blue],
       ['10', '4', '27', 'Co', colors.blue],
-      ['11', '4', '28', 'Ni', colors.blue],
-      ['12', '4', '29', 'Cu', colors.blue],
-      ['13', '4', '30', 'Zn', colors.blue],
-      ['14', '4', '31', 'Ga', colors.yellow],
-      ['15', '4', '32', 'Ge', colors.yellow],
-      ['16', '4', '33', 'As', colors.yellow],
-      ['17', '4', '34', 'Se', colors.yellow],
-      ['18', '4', '35', 'Br', colors.yellow],
-      ['19', '4', '36', 'Kr', colors.yellow],
-      ['1', '5', '37', 'Rb', colors.red],
-      ['2', '5', '38', 'Sr', colors.red],
-      ['4', '5', '39', 'Y', colors.blue],
-      ['5', '5', '40', 'Zr', colors.blue],
-      ['6', '5', '41', 'Nb', colors.blue],
-      ['7', '5', '42', 'Mo', colors.blue],
-      ['8', '5', '43', 'Tc', colors.blue],
-      ['9', '5', '44', 'Ru', colors.blue],
-      ['10', '5', '45', 'Rh', colors.blue],
-      ['11', '5', '46', 'Pd', colors.blue],
-      ['12', '5', '47', 'Ag', colors.blue],
-      ['13', '5', '48', 'Cd', colors.blue],
-      ['14', '5', '49', 'In', colors.yellow],
-      ['15', '5', '50', 'Sn', colors.yellow],
-      ['16', '5', '
+      ['11', '4', '28', 'Ni', colors
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `matrix-periodic-table/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

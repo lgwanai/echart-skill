@@ -2,10 +2,10 @@
 
 **Category:** `'matrix, candlestick'`
 **Example dir:** `matrix-stock`
-**Difficulty:** 3
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -65,43 +65,9 @@ while (time < eTime) {
   if (time === sTime) {
     // Today open price
     direction = Math.random() < 0.5 ? 1 : -1;
-    price = lastClose * (1 + (Math.random() - 0.5) * 0.02);
-  } else {
-    // 70% chance to maintain the last direction
-    direction = Math.random() < 0.8 ? direction : -direction;
-    price = Math.round((price + direction * (Math.random() * 0.1)) * 100) / 100;
-  }
-  priceData.push([time, price]);
-  sumPrice += price * volume;
-  averageData.push([time, sumPrice / sumVolume]);
-  maxAbs = Math.max(maxAbs, Math.abs(price - lastClose));
-  if (time === breakStartTime) {
-    time = breakEndTime;
-  } else {
-    time += 60 * 1000; // increment by 1 minute
-  }
-}
-// Calculate MACD
-// 1. Calculate Exponential Moving Average (EMA)
-function calculateEMA(prices, period) {
-  let ema = [];
-  const k = 2 / (period + 1);
-  // No special handling for small datasets
-  // Just calculate EMA from the period point onwards
-  // If we have enough data points
-  if (prices.length >= period) {
-    // Calculate first EMA using Simple Moving Average (SMA)
-    let sum = 0;
-    for (let i = 0; i < period; i++) {
-      sum += prices[i][1];
-    }
-    const firstEMA = su
+    price = lastClose * (1 + (Math.random() - 0.5) * 
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `matrix-stock/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

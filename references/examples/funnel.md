@@ -2,10 +2,10 @@
 
 **Category:** `funnel`
 **Example dir:** `funnel`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **funnel/basic.html** — Funnel
+Data format: `[{name: string, value: number}, ...]`
 
 ## Option Code
 ```javascript
@@ -73,10 +73,6 @@ option = {
 };
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `funnel/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py funnel/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

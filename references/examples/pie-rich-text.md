@@ -2,10 +2,10 @@
 
 **Category:** `'pie, rich'`
 **Example dir:** `pie-rich-text`
-**Difficulty:** 4
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **pie/basic.html** — Pie
+Data format: `[{name: string, value: number}, ...]`
 
 ## Option Code
 ```javascript
@@ -81,48 +81,9 @@ option = {
               Showers: {
                 height: 30,
                 align: 'left',
-                backgroundColor: {
-                  image: weatherIcons.Showers
-                }
-              },
-              weatherHead: {
-                color: '#333',
-                height: 24,
-                align: 'left'
-              },
-              hr: {
-                borderColor: '#777',
-                width: '100%',
-                borderWidth: 0.5,
-                height: 0
-              },
-              value: {
-                width: 20,
-                padding: [0, 20, 0, 30],
-                align: 'left'
-              },
-              valueHead: {
-                color: '#333',
-                width: 20,
-                padding: [0, 20, 0, 30],
-                align: 'center'
-              },
-              rate: {
-                width: 40,
-                align: 'right',
-                padding: [0, 10, 0, 0]
-              },
-              rateHead: {
-                color: '#333',
-                width: 40,
-                align: 'center',
-                pa
+ 
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `pie-rich-text/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py pie/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

@@ -2,10 +2,10 @@
 
 **Category:** `radar`
 **Example dir:** `radar-aqi`
-**Difficulty:** 1
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **radar/basic.html** — Radar
+Data format: `{ indicators: [{name: string, max: number}, ...], series: [{name: string, value: number[]}, ...] }`
 
 ## Option Code
 ```javascript
@@ -69,43 +69,9 @@ const dataGZ = [
   [84, 94, 140, 2.238, 68, 18, 22],
   [93, 77, 104, 1.165, 53, 7, 23],
   [99, 130, 227, 3.97, 55, 15, 24],
-  [146, 84, 139, 1.094, 40, 17, 25],
-  [113, 108, 137, 1.481, 48, 15, 26],
-  [81, 48, 62, 1.619, 26, 3, 27],
-  [56, 48, 68, 1.336, 37, 9, 28],
-  [82, 92, 174, 3.29, 0, 13, 29],
-  [106, 116, 188, 3.628, 101, 16, 30],
-  [118, 50, 0, 1.383, 76, 11, 31]
-];
-const dataSH = [
-  [91, 45, 125, 0.82, 34, 23, 1],
-  [65, 27, 78, 0.86, 45, 29, 2],
-  [83, 60, 84, 1.09, 73, 27, 3],
-  [109, 81, 121, 1.28, 68, 51, 4],
-  [106, 77, 114, 1.07, 55, 51, 5],
-  [109, 81, 121, 1.28, 68, 51, 6],
-  [106, 77, 114, 1.07, 55, 51, 7],
-  [89, 65, 78, 0.86, 51, 26, 8],
-  [53, 33, 47, 0.64, 50, 17, 9],
-  [80, 55, 80, 1.01, 75, 24, 10],
-  [117, 81, 124, 1.03, 45, 24, 11],
-  [99, 71, 142, 1.1, 62, 42, 12],
-  [95, 69, 130, 1.28, 74, 50, 13],
-  [116, 87, 131, 1.47, 84, 40, 14],
-  [108, 80, 121, 1.3, 85, 37, 15],
-  [134, 83, 167, 1.16, 57, 43, 16],
-  [79, 43, 107, 1.05, 59, 37, 17],
-  [71, 46, 89, 0.86, 64, 25, 18],
-  [97, 71, 113, 1.17, 88, 31, 19],
-  [84, 57, 91, 0.85, 55, 31, 20],
-  [87, 63, 101, 0.9, 56, 41, 21],
-  [104, 77, 119, 1.09, 73,
+  [146, 84, 139, 1.0
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `radar-aqi/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py radar/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

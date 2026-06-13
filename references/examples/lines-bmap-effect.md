@@ -2,10 +2,10 @@
 
 **Category:** `'map, lines'`
 **Example dir:** `lines-bmap-effect`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **lines/flights.html** — Lines
+Data format: `{ geoCoordMap: {"name": [lng,lat]}, flights: [[fromName, toName], ...] }`
 
 ## Option Code
 ```javascript
@@ -86,50 +86,9 @@ $.get(ROOT_PATH + '/data/asset/data/lines-bus.json', function (data) {
               }
             },
             {
-              featureType: 'railway',
-              elementType: 'geometry.fill',
-              stylers: {
-                color: '#000000'
-              }
-            },
-            {
-              featureType: 'railway',
-              elementType: 'geometry.stroke',
-              stylers: {
-                color: '#08304b'
-              }
-            },
-            {
-              featureType: 'subway',
-              elementType: 'geometry',
-              stylers: {
-                lightness: -70
-              }
-            },
-            {
-              featureType: 'building',
-              elementType: 'geometry.fill',
-              stylers: {
-                color: '#000000'
-              }
-            },
-            {
-              featureType: 'all',
-              elementType: 'labels.text.fill',
-              stylers: {
-                color: '#857f7f'
-              }
-            },
-            {
-              featureType: 'all',
-              elementType: 'labels.text.stroke',
- 
+   
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `lines-bmap-effect/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py lines/flights.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

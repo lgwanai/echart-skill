@@ -2,10 +2,10 @@
 
 **Category:** `scatter`
 **Example dir:** `scatter-linear-regression`
-**Difficulty:** 2
 
-## Template Match
-- **3d/scatter3d.html** — Scatter3D
+## Template
+- **scatter/basic.html** — Scatter
+Data format: `[[x, y], [x, y], ...]`
 
 ## Option Code
 ```javascript
@@ -91,81 +91,9 @@ const data = [
   [0.307047, 3.557078],
   [0.277261, 3.552874],
   [0.279101, 3.494159],
-  [0.175724, 3.206828],
-  [0.156383, 3.195266],
-  [0.733165, 4.221292],
-  [0.848142, 4.413372],
-  [0.771184, 4.184347],
-  [0.429492, 3.742878],
-  [0.162176, 3.201878],
-  [0.917064, 4.648964],
-  [0.315044, 3.510117],
-  [0.201473, 3.274434],
-  [0.297038, 3.579622],
-  [0.336647, 3.489244],
-  [0.666109, 4.237386],
-  [0.583888, 3.913749],
-  [0.085031, 3.22899],
-  [0.687006, 4.286286],
-  [0.949655, 4.628614],
-  [0.189912, 3.239536],
-  [0.844027, 4.457997],
-  [0.333288, 3.513384],
-  [0.427035, 3.729674],
-  [0.466369, 3.834274],
-  [0.550659, 3.811155],
-  [0.278213, 3.598316],
-  [0.918769, 4.692514],
-  [0.886555, 4.604859],
-  [0.569488, 3.864912],
-  [0.066379, 3.184236],
-  [0.335751, 3.500796],
-  [0.426863, 3.743365],
-  [0.395746, 3.622905],
-  [0.694221, 4.310796],
-  [0.27276, 3.583357],
-  [0.503495, 3.901852],
-  [0.067119, 3.233521],
-  [0.038326, 3.105266],
-  [0.599122, 3.865544],
-  [0.947054, 4.628625],
-  [0.671279, 4.231213],
-  [0.434811, 3.791149],
-  [0.509381, 3.968271],
-  [0.749442, 4.25391],
-  
+  [0.17
 ```
 
-## Relevant Debug Patterns
-## #18
- — Scatter Geo/Map 空白：MAP_INLINE 被替换导致地图未加载
-- **日期**：2026-06-13
-- **现象**：12_Scatter_Geo、13_Map_China 等地图类图表空白
-- **根因**：数据 dict 中 `"MAP_INLINE": ""` → `_json_safe` 替换 `{{MAP_INLINE}}` 为 `''` → `<!-- {{MAP_INLINE}} -->` 变成 `<!-- '' -->` → `build_template.py` 的地图注入检测 `if "<!-- {{MAP_INLINE}} -->" in html` 失败 → China GeoJSON 未嵌入 → 地图空白
-- **修复**：**不要在数据 dict 中提供 `MAP_INLINE`/`GL_INLINE`/`ECHARTS_INLINE` 这三个特殊占位符**。它们由 `build_template.py` 自动处理（代码中已排除此三类占位符的校验）。**模板不需要修改**——模板中的 `<!-- {{MAP_INLINE}} --...
-
-## #19
- — Scatter Geo 气泡大小无差异
-- **日期**：2026-06-13
-- **现象**：12_Scatter_Geo 所有气泡一样大
-- **根因**：模板 `symbolSize: function(val) { return Math.sqrt(val[2]) / SIZE_SCALE || 8; }` 中 `Math.sqrt` 压缩了数值差异。值 70-100 经 sqrt 后为 8.4-10，差值仅 1.6px，肉眼不可分辨
-- **修复**：模板改为 `val[2] / {{SIZE_SCALE}}`（线性），SIZE_SCALE=5 → 14-20px 可分辨范围
-
----
-...
-
-## #25
- — EffectScatter 空白 + 颜色不生效
-- **日期**：2026-06-13
-- **现象**：30_EffectScatter 一片空白，修复后各城市同色
-- **根因**：(1) `GEO_COORD_MAP: "{}"` 空对象，`MAP_NAME: ""` 空地图名 → 无地图；(2) `convertData()` 只复制 `name`/`value`，丢弃 `itemStyle`
-- **修复**：(1) 提供真实 GEO_COORD_MAP + MAP_NAME="china"；(2) `convertData` 保留 `itemStyle`；(3) 每城市设不同颜色 `itemStyle.color`；(4) **模板守卫**：`geoCoordMap || {}`，`map || "china"`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `scatter-linear-regression/main.js`
-- Template data format: `[[x, y, z], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py scatter/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

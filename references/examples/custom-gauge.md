@@ -2,10 +2,10 @@
 
 **Category:** `custom`
 **Example dir:** `custom-gauge`
-**Difficulty:** 9
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **custom/error-bar.html** — Error Bar
+Data format: `[[xIdx, val, lowVal, highVal], ...]`
 
 ## Option Code
 ```javascript
@@ -81,61 +81,9 @@ function renderItem(params, api) {
         style: {
           fill: '#fff',
           shadowBlur: 25,
-          shadowOffsetX: 0,
-          shadowOffsetY: 0,
-          shadowColor: 'rgba(76,107,167,0.4)'
-        }
-      },
-      {
-        type: 'text',
-        extra: {
-          valOnRadian: valOnRadian,
-          transition: 'valOnRadian',
-          enterFrom: { valOnRadian: 0 }
-        },
-        style: {
-          text: makeText(valOnRadian),
-          fontSize: 50,
-          fontWeight: 700,
-          x: params.coordSys.cx,
-          y: params.coordSys.cy,
-          fill: 'rgb(0,50,190)',
-          align: 'center',
-          verticalAlign: 'middle',
-          enterFrom: { opacity: 0 }
-        },
-        during: function (apiDuring) {
-          apiDuring.setStyle(
-            'text',
-            makeText(apiDuring.getExtra('valOnRadian'))
-          );
-        }
-      }
-    ]
-  };
-}
-function convertToPolarPoint(renderItemParams, radius, radian) {
-  return [
-    Math.cos(radian) * radius + renderItemParams.coordSys.cx,
-    -Math.sin(radian) * radius + renderItemParams.coordSys.cy
-  ];
-}
-function mak
+          shado
 ```
 
-## Relevant Debug Patterns
-## #32
- — Error Bar 空白：custom renderItem 函数无法通过占位符传递
-- **日期**：2026-06-13
-- **现象**：39_Custom_Error_Bar 空白
-- **根因**：(1) `RENDER_ITEM: "false"` → 无渲染函数，custom 类型不知道该画什么；(2) 多行 JS 函数无法通过 Python 字符串占位符传递（换行导致语法错误）
-- **修复**：(1) `renderItem` 直接硬编码在模板中；(2) 模板简化为只需 `DATA` 占位符；(3) 误差线红色 `#e54035`，柱体蓝色 `#5470c6`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `custom-gauge/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py custom/error-bar.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

@@ -2,10 +2,10 @@
 
 **Category:** `pictorialBar`
 **Example dir:** `pictorialBar-dotted`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **pictorialBar/basic.html** — PictorialBar
+Data format: `{ categories: string[], values: number[] }`
 
 ## Option Code
 ```javascript
@@ -110,19 +110,6 @@ option = {
 };
 ```
 
-## Relevant Debug Patterns
-## #24
- — PictorialBar：symbol 必须用真实位图，SVG/矢量路径效果差
-- **日期**：2026-06-13
-- **现象**：28_PictorialBar 显示纯色方块，无象形效果
-- **根因**：(1) `SYMBOL: "rect"` → 普通矩形，不"象形"；(2) SVG 手绘路径质量差；(3) `SYMBOL_BOUNDING: "false"` → 无 bounding，所有值显为单个图标
-- **修复**：(1) 下载 Twitter emoji CDN 的 72x72 PNG 光栅图（大象/犀牛/河马/水牛/长颈鹿）；(2) 通过 `data[i].symbol` 为每个数据项设置独立图标 URI；`symbolBoundingData: 1000`，`symbolRepeat: true`；(3) **模板增加防御**：`symbol` 为空时允许 data[i].symbol 覆盖
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `pictorialBar-dotted/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py pictorialBar/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

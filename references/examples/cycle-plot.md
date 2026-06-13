@@ -2,10 +2,10 @@
 
 **Category:** `custom`
 **Example dir:** `cycle-plot`
-**Difficulty:** 3
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -67,79 +67,9 @@ function renderTrendItem(params, api) {
   };
 }
 function renderAverageItem(param, api) {
-  var bandWidth = api.size([0, 0])[0] * 0.85;
-  var point = api.coord([api.value(0), api.value(1)]);
-  return {
-    type: 'line',
-    transition: ['shape'],
-    shape: {
-      x1: point[0] - bandWidth / 2,
-      x2: point[0] + bandWidth / 2,
-      y1: point[1],
-      y2: point[1]
-    },
-    style: api.style({
-      fill: null,
-      stroke: api.visual('color'),
-      lineWidth: 2
-    })
-  };
-}
-option = {
-  tooltip: {},
-  title: {
-    text: 'Sales Trends by Year within Each Month',
-    subtext: 'Sample of Cycle Plot',
-    left: 'center'
-  },
-  legend: {
-    top: 70,
-    data: ['Trend by year (2002 - 2012)', 'Average']
-  },
-  dataZoom: [
-    {
-      type: 'slider',
-      labelFormatter: ''
-    },
-    {
-      type: 'inside'
-    }
-  ],
-  grid: {
-    bottom: 70,
-    top: 120
-  },
-  xAxis: {
-    data: months
-  },
-  yAxis: {
-    boundaryGap: [0, '20%']
-  },
-  series: [
-    {
-      type: 'custom',
-      name: 'Average',
-      renderItem: renderAverageItem,
-      encode: {
-        x: 0,
-        y: 1
-      },
-
+  var bandWidth
 ```
 
-## Relevant Debug Patterns
-## #32
- — Error Bar 空白：custom renderItem 函数无法通过占位符传递
-- **日期**：2026-06-13
-- **现象**：39_Custom_Error_Bar 空白
-- **根因**：(1) `RENDER_ITEM: "false"` → 无渲染函数，custom 类型不知道该画什么；(2) 多行 JS 函数无法通过 Python 字符串占位符传递（换行导致语法错误）
-- **修复**：(1) `renderItem` 直接硬编码在模板中；(2) 模板简化为只需 `DATA` 占位符；(3) 误差线红色 `#e54035`，柱体蓝色 `#5470c6`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `cycle-plot/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

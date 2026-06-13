@@ -2,10 +2,10 @@
 
 **Category:** `'line, dataZoom'`
 **Example dir:** `area-simple`
-**Difficulty:** 4
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **line/stack.html** — Stacked Line / Area
+Data format: `{ categories: string[], series: [{name: string, stack: string, data: number[]}, ...] }`
 
 ## Option Code
 ```javascript
@@ -85,10 +85,6 @@ option = {
 };
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `area-simple/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py line/stack.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

@@ -2,10 +2,10 @@
 
 **Category:** `graphic`
 **Example dir:** `graphic-wave-animation`
-**Difficulty:** 10
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -92,48 +92,9 @@ app.configParameters = {
   maxSize: { min: 0, max: 100 },
   duration: { min: 100, max: 100000 }
 };
-///////////////////////////////////////////////////////////////////////////
-// Simplex and perlin noise helper from https://github.com/josephg/noisejs
-///////////////////////////////////////////////////////////////////////////
-function getNoiseHelper() {
-  class Grad {
-    constructor(x, y, z) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-    }
-    dot2(x, y) {
-      return this.x * x + this.y * y;
-    }
-    dot3(x, y, z) {
-      return this.x * x + this.y * y + this.z * z;
-    }
-  }
-  const grad3 = [
-    new Grad(1, 1, 0),
-    new Grad(-1, 1, 0),
-    new Grad(1, -1, 0),
-    new Grad(-1, -1, 0),
-    new Grad(1, 0, 1),
-    new Grad(-1, 0, 1),
-    new Grad(1, 0, -1),
-    new Grad(-1, 0, -1),
-    new Grad(0, 1, 1),
-    new Grad(0, -1, 1),
-    new Grad(0, 1, -1),
-    new Grad(0, -1, -1)
-  ];
-  const p = [
-    151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140,
-    36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148, 247, 120,
-    234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
- 
+///////////////////////////////////////////////////////////
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `graphic-wave-animation/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

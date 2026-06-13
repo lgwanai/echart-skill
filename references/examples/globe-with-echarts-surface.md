@@ -2,10 +2,10 @@
 
 **Category:** `globe`
 **Example dir:** `globe-with-echarts-surface`
-**Difficulty:** 
 
-## Template Match
+## Template
 - **3d/globe.html** — Globe
+Data format: `[[lat, lng, value], ...]`
 
 ## Option Code
 ```javascript
@@ -75,52 +75,9 @@ mapChart.setOption({
         { name: 'Brunei', value: 27.223 },
         { name: 'Bhutan', value: 716.939 },
         { name: 'Botswana', value: 1969.341 },
-        { name: 'Central African Republic', value: 4349.921 },
-        { name: 'Canada', value: 34126.24 },
-        { name: 'Switzerland', value: 7830.534 },
-        { name: 'Chile', value: 17150.76 },
-        { name: 'China', value: 1359821.465 },
-        { name: 'Ivory Coast', value: 60508.978 },
-        { name: 'Cameroon', value: 20624.343 },
-        { name: 'Democratic Republic of the Congo', value: 62191.161 },
-        { name: 'Republic of the Congo', value: 3573.024 },
-        { name: 'Colombia', value: 46444.798 },
-        { name: 'Costa Rica', value: 4669.685 },
-        { name: 'Cuba', value: 11281.768 },
-        { name: 'Northern Cyprus', value: 1.468 },
-        { name: 'Cyprus', value: 1103.685 },
-        { name: 'Czech Republic', value: 10553.701 },
-        { name: 'Germany', value: 83017.404 },
-        { name: 'Djibouti', value: 834.036 },
-        { name: 'Denmark', value: 5550.959 },
-        { name: 'Dominican Republic', value: 10016.797 },
-        { name: 'Algeria', value: 37062.82 },
-        { name: 'E
+        { name: 'Central African
 ```
 
-## Relevant Debug Patterns
-## #28
- — 3D Scatter/Surface/Globe/Lines3D 同样空白
-- **日期**：2026-06-13
-- **现象**：34/35/36/37 全部空白
-- **根因**：与 #27 相同——GL_INLINE 破坏注入 + 模板配置偏离官方示例。所有 3D 模板统一修复
-- **修复**：3d/scatter3d.html、3d/surface.html、3d/globe.html、3d/lines3d.html 全部改为与官方示例一致的配置。关键：`zAxis3D: {}`（非 `{type:'value'}`）、`grid3D: {}`、无 `coordinateSystem`
-
----
-...
-
-## #30
- — Globe 无纹理显示为纯色/空白球
-- **日期**：2026-06-13
-- **现象**：36_3D_Globe 显示为纯蓝/黄色球，无地球纹理
-- **根因**：未提供 `baseTexture`，ECharts globe 渲染为无纹理球体
-- **修复**：下载 ECharts 官方示例的 1.3MB JPG 地球纹理（`echarts.apache.org/examples/data-gl/asset/world.topo.bathy.200401.jpg`），base64 嵌入为 `baseTexture`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `globe-with-echarts-surface/main.js`
-- Template data format: `[[lat, lng, value], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py 3d/globe.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

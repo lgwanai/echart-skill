@@ -2,10 +2,10 @@
 
 **Category:** `bar3D`
 **Example dir:** `bar3d-voxelize-image`
-**Difficulty:** 
 
-## Template Match
+## Template
 - **3d/bar3d.html** — Bar3D
+Data format: `[[x, y, z], ...]`
 
 ## Option Code
 ```javascript
@@ -106,54 +106,9 @@ function updateData(pixelData, width, height) {
     var r = pixelData[i * 4];
     var g = pixelData[i * 4 + 1];
     var b = pixelData[i * 4 + 2];
-    var lum = 0.2125 * r + 0.7154 * g + 0.0721 * b;
-    lum = (lum - 125) * config.scale + 50;
-    data[off++] = i % width;
-    data[off++] = height - Math.floor(i / width);
-    data[off++] = lum;
-  }
-  myChart.setOption({
-    grid3D: {
-      boxWidth: (100 / height) * width
-    },
-    series: [
-      {
-        animation: false,
-        type: 'bar3D',
-        shading: 'realistic',
-        realisticMaterial: {
-          roughness: config.roughness,
-          metalness: config.metalness
-        },
-        barSize: config.barSize,
-        bevelSize: config.barBevel,
-        silent: true,
-        dimensions: ['x', 'y', 'z'],
-        itemStyle: {
-          color: config.sameColor
-            ? config.color
-            : function (params) {
-                var i = params.dataIndex;
-                var r = pixelData[i * 4] / 255;
-                var g = pixelData[i * 4 + 1] / 255;
-                var b = pixelData[i * 4 + 2] / 255;
-                var lum = 0.2125 * r + 0.7154 * g + 0.0721 * b;
-       
+    var lu
 ```
 
-## Relevant Debug Patterns
-## #27
- — 3D Bar 空白：GL_INLINE + coordinateSystem + zAxis3D 配置错误
-- **日期**：2026-06-13
-- **现象**：33_3D_Bar 一片空白
-- **根因**：(1) `GL_INLINE: ""` 破坏 echarts-gl 注入（同 #18）；(2) `coordinateSystem: 'cartesian3D'` + `zAxis3D: {type:'value'}` + `shading:'realistic'` 不是官方推荐的配置组合；(3) 官方示例用 `zAxis3D: {}`（空对象）、无 `coordinateSystem`、`shading: 'lambert'`
-- **修复**：模板改为与 ECharts 官方 bar3D 示例完全一致的配置：`grid3D: {}`、`zAxis3D: {}`、`shading: 'lambert'`、无 `coordinateSystem`、无 `barSize`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `bar3d-voxelize-image/main.js`
-- Template data format: `[[x, y, z], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py 3d/bar3d.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

@@ -2,10 +2,10 @@
 
 **Category:** `map, graph`
 **Example dir:** `geo-graph`
-**Difficulty:** 3
 
-## Template Match
+## Template
 - **geo/lines.html** — 
+Data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
 
 ## Option Code
 ```javascript
@@ -82,36 +82,9 @@ function createChart() {
             target: 'j'
           },
           {
-            source: 'j',
-            target: 'k'
-          }
-        ],
-        edgeSymbol: ['none', 'arrow'],
-        edgeSymbolSize: 5,
-        lineStyle: {
-          color: '#718adbff',
-          opacity: 1
-        }
-      }
-    ]
-  };
-  myChart.setOption(option);
-}
-function fetchGeoJSON() {
-  myChart.showLoading();
-  $.get(ROOT_PATH + '/data/asset/geo/ch.geo.json', function (geoJSON) {
-    echarts.registerMap('ch', geoJSON);
-    createChart();
-    myChart.hideLoading();
-  });
-}
-fetchGeoJSON();
+            s
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `geo-graph/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py geo/lines.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

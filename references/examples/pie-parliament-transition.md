@@ -2,10 +2,10 @@
 
 **Category:** `custom, animtion`
 **Example dir:** `pie-parliament-transition`
-**Difficulty:** 10
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **pie/basic.html** — Pie
+Data format: `[{name: string, value: number}, ...]`
 
 ## Option Code
 ```javascript
@@ -88,50 +88,9 @@ const parliamentOption = (function () {
       animationDurationUpdate: 1000,
       renderItem: function (params, api) {
         var idx = params.dataIndex;
-        var viewSize = Math.min(api.getWidth(), api.getHeight());
-        var r0 = ((parseFloat(radius[0]) / 100) * viewSize) / 2;
-        var r1 = ((parseFloat(radius[1]) / 100) * viewSize) / 2;
-        var cx = api.getWidth() * 0.5;
-        var cy = api.getHeight() * 0.5;
-        var size = viewSize / 50;
-        var points = parliamentLayout(
-          angles[idx],
-          angles[idx + 1],
-          Math.PI * 2,
-          r0,
-          r1,
-          size + 3
-        );
-        return {
-          type: 'group',
-          children: points.map(function (pt) {
-            return {
-              type: 'circle',
-              autoBatch: true,
-              shape: {
-                cx: cx + pt[0],
-                cy: cy + pt[1],
-                r: size / 2
-              },
-              style: {
-                fill: defaultPalette[idx % defaultPalette.length]
-              }
-            };
-          })
-        };
-      }
-    }
-  };
-})();
-let currentOption = (option = pieOption);
-setInterval(function () {
-  curre
+        var viewSize = Mat
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `pie-parliament-transition/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py pie/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

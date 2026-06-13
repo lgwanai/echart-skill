@@ -2,10 +2,10 @@
 
 **Category:** `'custom, dataZoom'`
 **Example dir:** `custom-error-scatter`
-**Difficulty:** 2
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **custom/error-bar.html** — Error Bar
+Data format: `[[xIdx, val, lowVal, highVal], ...]`
 
 ## Option Code
 ```javascript
@@ -45,50 +45,9 @@ function renderItem(params, api) {
     let otherDimIdx = 1 - baseDimIdx;
     let encode = params.encode;
     let baseValue = api.value(encode[coordDims[baseDimIdx]][0]);
-    let param = [];
-    param[baseDimIdx] = baseValue;
-    param[otherDimIdx] = api.value(encode[coordDims[otherDimIdx]][1]);
-    let highPoint = api.coord(param);
-    param[otherDimIdx] = api.value(encode[coordDims[otherDimIdx]][2]);
-    let lowPoint = api.coord(param);
-    let halfWidth = 5;
-    var style = api.style({
-      stroke: api.visual('color'),
-      fill: undefined
-    });
-    group.children.push(
-      {
-        type: 'line',
-        transition: ['shape'],
-        shape: makeShape(
-          baseDimIdx,
-          highPoint[baseDimIdx] - halfWidth,
-          highPoint[otherDimIdx],
-          highPoint[baseDimIdx] + halfWidth,
-          highPoint[otherDimIdx]
-        ),
-        style: style
-      },
-      {
-        type: 'line',
-        transition: ['shape'],
-        shape: makeShape(
-          baseDimIdx,
-          highPoint[baseDimIdx],
-          highPoint[otherDimIdx],
-          lowPoint[baseDimIdx],
-          lowPoint[otherDimIdx]
-        ),
-        style: style
-      },
-      {
-        t
+    let param = []
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `custom-error-scatter/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py custom/error-bar.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

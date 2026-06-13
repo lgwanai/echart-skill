@@ -2,10 +2,10 @@
 
 **Category:** `calendar`
 **Example dir:** `calendar-simple`
-**Difficulty:** 0
 
-## Template Match
+## Template
 - **calendar/heatmap.html** — Calendar Heatmap
+Data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
 
 ## Option Code
 ```javascript
@@ -39,10 +39,6 @@ option = {
 };
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `calendar-simple/main.js`
-- Template data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py calendar/heatmap.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

@@ -2,10 +2,10 @@
 
 **Category:** `'scatter, map'`
 **Example dir:** `effectScatter-bmap`
-**Difficulty:** 10
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **effectScatter/basic.html** — EffectScatter
+Data format: `{ geoCoordMap: {"name": [lng,lat]}, data: [{name: string, value: number}, ...] }`
 
 ## Option Code
 ```javascript
@@ -78,47 +78,9 @@ const data = [
   { name: '寿光', value: 40 },
   { name: '盘锦', value: 40 },
   { name: '长治', value: 41 },
-  { name: '深圳', value: 41 },
-  { name: '珠海', value: 42 },
-  { name: '宿迁', value: 43 },
-  { name: '咸阳', value: 43 },
-  { name: '铜川', value: 44 },
-  { name: '平度', value: 44 },
-  { name: '佛山', value: 44 },
-  { name: '海口', value: 44 },
-  { name: '江门', value: 45 },
-  { name: '章丘', value: 45 },
-  { name: '肇庆', value: 46 },
-  { name: '大连', value: 47 },
-  { name: '临汾', value: 47 },
-  { name: '吴江', value: 47 },
-  { name: '石嘴山', value: 49 },
-  { name: '沈阳', value: 50 },
-  { name: '苏州', value: 50 },
-  { name: '茂名', value: 50 },
-  { name: '嘉兴', value: 51 },
-  { name: '长春', value: 51 },
-  { name: '胶州', value: 52 },
-  { name: '银川', value: 52 },
-  { name: '张家港', value: 52 },
-  { name: '三门峡', value: 53 },
-  { name: '锦州', value: 54 },
-  { name: '南昌', value: 54 },
-  { name: '柳州', value: 54 },
-  { name: '三亚', value: 54 },
-  { name: '自贡', value: 56 },
-  { name: '吉林', value: 56 },
-  { name: '阳江', value: 57 },
-  { name: '泸州', value: 57 },
-  { name: '西宁', value: 57 },
-  { name: '宜宾', value: 58 },
-  { name: '呼和浩特
+  { 
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `effectScatter-bmap/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py effectScatter/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

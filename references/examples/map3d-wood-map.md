@@ -2,10 +2,10 @@
 
 **Category:** `map3D`
 **Example dir:** `map3d-wood-map`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **map/basic.html** — Map
+Data format: `[{name: string, value: number}, ...]`
 
 ## Option Code
 ```javascript
@@ -78,10 +78,6 @@ $.getJSON(ROOT_PATH + '/data-gl/asset/data/alcohol.json', function (data) {
 });
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `map3d-wood-map/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py map/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

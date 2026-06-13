@@ -2,10 +2,10 @@
 
 **Category:** `gauge`
 **Example dir:** `gauge-grade`
-**Difficulty:** 4
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **gauge/basic.html** — Gauge
+Data format: `{ value: number, name?: string, max?: number }`
 
 ## Option Code
 ```javascript
@@ -96,10 +96,6 @@ option = {
 };
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `gauge-grade/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py gauge/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

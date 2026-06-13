@@ -2,10 +2,10 @@
 
 **Category:** `gauge`
 **Example dir:** `gauge-barometer`
-**Difficulty:** 6
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **gauge/basic.html** — Gauge
+Data format: `{ value: number, name?: string, max?: number }`
 
 ## Option Code
 ```javascript
@@ -93,52 +93,8 @@ option = {
       axisTick: {
         distance: 0,
         length: 10,
-        lineStyle: {
-          color: '#000'
-        }
-      },
-      axisLabel: {
-        distance: 10,
-        fontSize: 25,
-        color: '#000'
-      },
-      pointer: {
-        show: false
-      },
-      title: {
-        show: false
-      },
-      anchor: {
-        show: true,
-        size: 14,
-        itemStyle: {
-          color: '#000'
-        }
-      }
-    }
-  ]
-};
-setInterval(function () {
-  myChart.setOption({
-    series: [
-      {
-        type: 'gauge',
-        data: [
-          {
-            value: +(Math.random() * 100).toFixed(2),
-            name: 'PLP'
-          }
-        ]
-      }
-    ]
-  });
-}, 2000);
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `gauge-barometer/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py gauge/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

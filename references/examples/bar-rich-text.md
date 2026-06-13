@@ -2,10 +2,10 @@
 
 **Category:** `'bar, rich'`
 **Example dir:** `bar-rich-text`
-**Difficulty:** 6
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **bar/basic.html** — Bar
+Data format: `{ categories: string[], values: number[] }`
 
 ## Option Code
 ```javascript
@@ -103,54 +103,8 @@ option = {
           lineHeight: 26,
           // shadowBlur: 5,
           // shadowColor: '#000',
-          // shadowOffsetX: 0,
-          // shadowOffsetY: 1,
-          position: 'right',
-          distance: 20,
-          rich: {
-            a: {
-              align: 'center',
-              color: '#fff',
-              fontSize: 18,
-              textShadowBlur: 2,
-              textShadowColor: '#000',
-              textShadowOffsetX: 0,
-              textShadowOffsetY: 1,
-              textBorderColor: '#333',
-              textBorderWidth: 2
-            },
-            b: {
-              color: '#333'
-            },
-            c: {
-              color: '#ff8811',
-              textBorderColor: '#000',
-              textBorderWidth: 1,
-              fontSize: 22
-            }
-          }
-        },
-        data: [
-          { type: 'max', name: 'max days: ' },
-          { type: 'min', name: 'min days: ' }
-        ]
-      }
-    },
-    {
-      name: 'City Beta',
-      type: 'bar',
-      label: seriesLabel,
-      data: [150, 105, 110]
-    },
-    {
-      name: 'City Gamma',
-      t
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `bar-rich-text/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py bar/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

@@ -2,10 +2,10 @@
 
 **Category:** `parallel`
 **Example dir:** `parallel-aqi`
-**Difficulty:** 2
 
-## Template Match
+## Template
 - **parallel/basic.html** — Parallel Coordinates
+Data format: `[[dim1, dim2, dim3, ...], ...]  (parallelAxis defines each dimension)`
 
 ## Option Code
 ```javascript
@@ -62,39 +62,9 @@ var dataGZ = [
   [15, 109, 68, 87, 0.996, 74, 29, '轻度污染'],
   [16, 73, 68, 97, 0.905, 51, 34, '良'],
   [17, 54, 27, 47, 0.592, 53, 12, '良'],
-  [18, 51, 61, 97, 0.811, 65, 19, '良'],
-  [19, 91, 71, 121, 1.374, 43, 18, '良'],
-  [20, 73, 102, 182, 2.787, 44, 19, '良'],
-  [21, 73, 50, 76, 0.717, 31, 20, '良'],
-  [22, 84, 94, 140, 2.238, 68, 18, '良'],
-  [23, 93, 77, 104, 1.165, 53, 7, '良'],
-  [24, 99, 130, 227, 3.97, 55, 15, '良'],
-  [25, 146, 84, 139, 1.094, 40, 17, '轻度污染'],
-  [26, 113, 108, 137, 1.481, 48, 15, '轻度污染'],
-  [27, 81, 48, 62, 1.619, 26, 3, '良'],
-  [28, 56, 48, 68, 1.336, 37, 9, '良'],
-  [29, 82, 92, 174, 3.29, 0, 13, '良'],
-  [30, 106, 116, 188, 3.628, 101, 16, '轻度污染'],
-  [31, 118, 50, 0, 1.383, 76, 11, '轻度污染']
-];
-var dataSH = [
-  [1, 91, 45, 125, 0.82, 34, 23, '良'],
-  [2, 65, 27, 78, 0.86, 45, 29, '良'],
-  [3, 83, 60, 84, 1.09, 73, 27, '良'],
-  [4, 109, 81, 121, 1.28, 68, 51, '轻度污染'],
-  [5, 106, 77, 114, 1.07, 55, 51, '轻度污染'],
-  [6, 109, 81, 121, 1.28, 68, 51, '轻度污染'],
-  [7, 106, 77, 114, 1.07, 55, 51, '轻度污染'],
-  [8, 89, 65, 78, 0.86, 51, 26, '良'],
-  [9, 53, 33, 47, 0.64, 50, 17, '良'],
-  [10, 80, 55, 80, 1.01, 75, 24, '良'],
-
+  
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `parallel-aqi/main.js`
-- Template data format: `[[dim1, dim2, dim3, ...], ...]  (parallelAxis defines each dimension)`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py parallel/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

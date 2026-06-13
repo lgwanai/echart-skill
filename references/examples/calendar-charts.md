@@ -2,10 +2,10 @@
 
 **Category:** `'calendar, scatter'`
 **Example dir:** `calendar-charts`
-**Difficulty:** 11
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **calendar/heatmap.html** — Calendar Heatmap
+Data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
 
 ## Option Code
 ```javascript
@@ -116,61 +116,9 @@ option = {
     },
     {
       orient: 'vertical',
-      yearLabel: {
-        margin: 40
-      },
-      dayLabel: {
-        firstDay: 1,
-        nameMap: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-      },
-      monthLabel: {
-        nameMap: 'cn',
-        margin: 20
-      },
-      cellSize: 40,
-      top: 350,
-      left: 460,
-      range: '2017-04'
-    }
-  ],
-  series: [
-    {
-      type: 'graph',
-      edgeSymbol: ['none', 'arrow'],
-      coordinateSystem: 'calendar',
-      links: links,
-      symbolSize: 10,
-      calendarIndex: 0,
-      data: graphData
-    },
-    {
-      type: 'heatmap',
-      coordinateSystem: 'calendar',
-      data: getVirtualData('2017')
-    },
-    {
-      type: 'effectScatter',
-      coordinateSystem: 'calendar',
-      calendarIndex: 1,
-      symbolSize: function (val) {
-        return val[1] / 40;
-      },
-      data: getVirtualData('2017')
-    },
-    {
-      type: 'scatter',
-      coordinateSystem: 'calendar',
-      calendarIndex: 2,
-      symbolSize: function (val) {
-        return val[1] / 60;
-      },
-      dat
+      yearLab
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `calendar-charts/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py calendar/heatmap.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

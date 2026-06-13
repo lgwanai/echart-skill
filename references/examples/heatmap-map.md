@@ -2,10 +2,10 @@
 
 **Category:** `heatmap`
 **Example dir:** `heatmap-map`
-**Difficulty:** 3
 
-## Template Match
-- **calendar/heatmap.html** — Calendar Heatmap
+## Template
+- **heatmap/basic.html** — Heatmap
+Data format: `{ xLabels: string[], yLabels: string[], data: [[xIdx, yIdx, value], ...] }`
 
 ## Option Code
 ```javascript
@@ -92,55 +92,9 @@ var geoCoordMap = {
   大连: [121.62, 38.92],
   临汾: [111.5, 36.08],
   吴江: [120.63, 31.16],
-  石嘴山: [106.39, 39.04],
-  沈阳: [123.38, 41.8],
-  苏州: [120.62, 31.32],
-  茂名: [110.88, 21.68],
-  嘉兴: [120.76, 30.77],
-  长春: [125.35, 43.88],
-  胶州: [120.03336, 36.264622],
-  银川: [106.27, 38.47],
-  张家港: [120.555821, 31.875428],
-  三门峡: [111.19, 34.76],
-  锦州: [121.15, 41.13],
-  南昌: [115.89, 28.68],
-  柳州: [109.4, 24.33],
-  三亚: [109.511909, 18.252847],
-  自贡: [104.778442, 29.33903],
-  吉林: [126.57, 43.87],
-  阳江: [111.95, 21.85],
-  泸州: [105.39, 28.91],
-  西宁: [101.74, 36.56],
-  宜宾: [104.56, 29.77],
-  呼和浩特: [111.65, 40.82],
-  成都: [104.06, 30.67],
-  大同: [113.3, 40.12],
-  镇江: [119.44, 32.2],
-  桂林: [110.28, 25.29],
-  张家界: [110.479191, 29.117096],
-  宜兴: [119.82, 31.36],
-  北海: [109.12, 21.49],
-  西安: [108.95, 34.27],
-  金坛: [119.56, 31.74],
-  东营: [118.49, 37.46],
-  牡丹江: [129.58, 44.6],
-  遵义: [106.9, 27.7],
-  绍兴: [120.58, 30.01],
-  扬州: [119.42, 32.39],
-  常州: [119.95, 31.79],
-  潍坊: [119.1, 36.62],
-  重庆: [106.54, 29.59],
-  台州: [121.420757, 28.656386],
-  南京: [118.78, 32.04],
-  滨州: [118.03, 37.36],
-  贵阳: [106.71, 26.57],
-  无锡:
+  石嘴山: [106.39, 
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `heatmap-map/main.js`
-- Template data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py heatmap/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

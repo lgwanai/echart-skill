@@ -2,10 +2,10 @@
 
 **Category:** `calendar`
 **Example dir:** `calendar-lunar`
-**Difficulty:** 4
 
-## Template Match
+## Template
 - **calendar/heatmap.html** — Calendar Heatmap
+Data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
 
 ## Option Code
 ```javascript
@@ -95,57 +95,9 @@ const dateList = [
   ['2017-3-24', '廿七'],
   ['2017-3-25', '廿八'],
   ['2017-3-26', '廿九'],
-  ['2017-3-27', '三十'],
-  ['2017-3-28', '三月'],
-  ['2017-3-29', '初二'],
-  ['2017-3-30', '初三'],
-  ['2017-3-31', '初四'],
-  ['2017-4-1', '初五'],
-  ['2017-4-2', '初六'],
-  ['2017-4-3', '初七'],
-  ['2017-4-4', '初八', '清明'],
-  ['2017-4-5', '初九'],
-  ['2017-4-6', '初十'],
-  ['2017-4-7', '十一'],
-  ['2017-4-8', '十二'],
-  ['2017-4-9', '十三'],
-  ['2017-4-10', '十四'],
-  ['2017-4-11', '十五'],
-  ['2017-4-12', '十六'],
-  ['2017-4-13', '十七'],
-  ['2017-4-14', '十八'],
-  ['2017-4-15', '十九'],
-  ['2017-4-16', '二十'],
-  ['2017-4-17', '廿一'],
-  ['2017-4-18', '廿二'],
-  ['2017-4-19', '廿三'],
-  ['2017-4-20', '廿四', '穀雨'],
-  ['2017-4-21', '廿五'],
-  ['2017-4-22', '廿六'],
-  ['2017-4-23', '廿七'],
-  ['2017-4-24', '廿八'],
-  ['2017-4-25', '廿九'],
-  ['2017-4-26', '四月'],
-  ['2017-4-27', '初二'],
-  ['2017-4-28', '初三'],
-  ['2017-4-29', '初四'],
-  ['2017-4-30', '初五'],
-  ['2017-5-1', '初六'],
-  ['2017-5-2', '初七'],
-  ['2017-5-3', '初八'],
-  ['2017-5-4', '初九'],
-  ['2017-5-5', '初十', '立夏'],
-  ['2017-5-6', '十一'],
-  ['2017-5-7', '十二'],
-  ['2017-5-8', '十三'],
-  ['2017-5-9', '十四'],
-  ['2
+  ['2017-3-27', '
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `calendar-lunar/main.js`
-- Template data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py calendar/heatmap.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

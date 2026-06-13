@@ -2,10 +2,10 @@
 
 **Category:** `sankey`
 **Example dir:** `sankey-vertical`
-**Difficulty:** 1
 
-## Template Match
+## Template
 - **sankey/basic.html** — Sankey
+Data format: `{ nodes: [{name: string, itemStyle?: {}}, ...], links: [{source: string, target: string, value: number}, ...] }`
 
 ## Option Code
 ```javascript
@@ -51,10 +51,6 @@ option = {
 };
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `sankey-vertical/main.js`
-- Template data format: `{ nodes: [{name: string, itemStyle?: {}}, ...], links: [{source: string, target: string, value: number}, ...] }`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py sankey/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

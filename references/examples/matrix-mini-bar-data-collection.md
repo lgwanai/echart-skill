@@ -2,10 +2,10 @@
 
 **Category:** `matrix`
 **Example dir:** `matrix-mini-bar-data-collection`
-**Difficulty:** 3
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -77,48 +77,9 @@ option = {
       ['2021-02-06', 'amount', 7221, 'file', 5121, 'Q', 1303],
       ['2021-02-07', 'amount', 5121, 'file', 4121, 'Q', 1819],
       ['2021-02-08', 'amount', 6121, 'file', 3121, 'Q', 2303],
-      ['2021-02-09', 'amount', 7121, 'file', 2121, 'Q', 3303],
-      ['2021-02-10', 'amount', 8121, 'file', 1121, 'Q', 4303]
-    ]
-  },
-  matrix: {
-    // matrix.x/y.data is not specified, which means they will be collected from
-    // `dataset.source` (or `series.data`, if any).
-    // All of values under the dimensions specified by `series.encode.x/y` will be
-    // auto-collected as `matrix.x/y.data`.
-    x: {
-      levelSize: 50,
-      itemStyle: { color: '#f0f8ff' },
-      label: { fontWeight: 'bold' }
-    }
-  },
-  series: [
-    {
-      type: 'custom',
-      coordinateSystem: 'matrix',
-      encode: { x: 1, y: 0 },
-      renderItem: makeRenderItem(1, 0, 2, _dataExtent)
-    },
-    {
-      type: 'custom',
-      coordinateSystem: 'matrix',
-      encode: { x: 3, y: 0 },
-      renderItem: makeRenderItem(3, 0, 4, _dataExtent)
-    },
-    {
-      type: 'custom',
-      coordinateSystem: 'matrix',
-      encode: { x: 5, y: 0 },
-      renderItem: makeRenderItem(5, 0, 6, _dataExtent)
-    }
-  ]
-};
+      ['2021-0
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `matrix-mini-bar-data-collection/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

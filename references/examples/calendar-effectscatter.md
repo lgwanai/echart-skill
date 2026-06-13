@@ -2,10 +2,10 @@
 
 **Category:** `calendar`
 **Example dir:** `calendar-effectscatter`
-**Difficulty:** 3
 
-## Template Match
+## Template
 - **calendar/heatmap.html** — Calendar Heatmap
+Data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
 
 ## Option Code
 ```javascript
@@ -109,61 +109,9 @@ option = {
       type: 'scatter',
       coordinateSystem: 'calendar',
       data: data,
-      symbolSize: function (val) {
-        return val[1] / 500;
-      },
-      itemStyle: {
-        color: '#ddb926'
-      }
-    },
-    {
-      name: 'Steps',
-      type: 'scatter',
-      coordinateSystem: 'calendar',
-      calendarIndex: 1,
-      data: data,
-      symbolSize: function (val) {
-        return val[1] / 500;
-      },
-      itemStyle: {
-        color: '#ddb926'
-      }
-    },
-    {
-      name: 'Top 12',
-      type: 'effectScatter',
-      coordinateSystem: 'calendar',
-      calendarIndex: 1,
-      data: data
-        .sort(function (a, b) {
-          return b[1] - a[1];
-        })
-        .slice(0, 12),
-      symbolSize: function (val) {
-        return val[1] / 500;
-      },
-      showEffectOn: 'render',
-      rippleEffect: {
-        brushType: 'stroke'
-      },
-      itemStyle: {
-        color: '#f4e925',
-        shadowBlur: 10,
-        shadowColor: '#333'
-      },
-      zlevel: 1
-    },
-    {
-      name: 'Top 12',
-      type: 'effectScatter',
-      coordinateSystem: 'calendar',
-    
+      symb
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `calendar-effectscatter/main.js`
-- Template data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py calendar/heatmap.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

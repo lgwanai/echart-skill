@@ -2,10 +2,10 @@
 
 **Category:** `candlestick`
 **Example dir:** `candlestick-large`
-**Difficulty:** 3
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **candlestick/basic.html** — Candlestick
+Data format: `{ dates: string[], values: [[open, close, low, high], ...] }`
 
 ## Option Code
 ```javascript
@@ -124,55 +124,9 @@ option = {
       itemStyle: {
         color: upColor,
         color0: downColor,
-        borderColor: upBorderColor,
-        borderColor0: downBorderColor
-      },
-      encode: {
-        x: 0,
-        y: [1, 4, 3, 2]
-      }
-    },
-    {
-      name: 'Volumn',
-      type: 'bar',
-      xAxisIndex: 1,
-      yAxisIndex: 1,
-      itemStyle: {
-        color: '#7fbe9e'
-      },
-      large: true,
-      encode: {
-        x: 0,
-        y: 5
-      }
-    }
-  ]
-};
-function generateOHLC(count) {
-  let data = [];
-  let xValue = +new Date(2011, 0, 1);
-  let minute = 60 * 1000;
-  let baseValue = Math.random() * 12000;
-  let boxVals = new Array(4);
-  let dayRange = 12;
-  for (let i = 0; i < count; i++) {
-    baseValue = baseValue + Math.random() * 20 - 10;
-    for (let j = 0; j < 4; j++) {
-      boxVals[j] = (Math.random() - 0.5) * dayRange + baseValue;
-    }
-    boxVals.sort();
-    let openIdx = Math.round(Math.random() * 3);
-    let closeIdx = Math.round(Math.random() * 2);
-    if (closeIdx === openIdx) {
-      closeIdx++;
-    }
-    let volumn = boxVals[3] * (1000 + Math.random(
+
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `candlestick-large/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py candlestick/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

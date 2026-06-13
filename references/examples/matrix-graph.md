@@ -2,10 +2,10 @@
 
 **Category:** `matrix`
 **Example dir:** `matrix-graph`
-**Difficulty:** 2
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -96,40 +96,9 @@ option = {
     elements: [
       {
         type: 'text',
-        x: (width / 4) * 2.5 + margin[1],
-        y: margin[0] - 15,
-        style: {
-          text: 'Course Categories',
-          textAlign: 'center',
-          textVerticalAlign: 'bottom',
-          fontSize: 18,
-          fontWeight: 'bold',
-          fill: '#333'
-        }
-      },
-      {
-        type: 'text',
-        x: margin[1] - 15,
-        y: (height / 5) * 3 + margin[0],
-        style: {
-          text: 'Course Categories',
-          textAlign: 'center',
-          textVerticalAlign: 'bottom',
-          fontSize: 18,
-          fontWeight: 'bold',
-          fill: '#333'
-        },
-        rotation: Math.PI / 2
-      }
-    ]
-  }
-};
+        x: (width / 4) * 2.5 + margin[1
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `matrix-graph/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

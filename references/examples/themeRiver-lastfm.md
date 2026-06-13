@@ -2,10 +2,10 @@
 
 **Category:** `themeRiver`
 **Example dir:** `themeRiver-lastfm`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **themeRiver/basic.html** — ThemeRiver
+Data format: `[[dateString, value, seriesName], ...]`
 
 ## Option Code
 ```javascript
@@ -49,42 +49,9 @@ let labels = [
   'Kings of Convenience',
   'Brett Dennen',
   'Psapp',
-  'The Bad Plus',
-  'Feist',
-  'Battles',
-  'Avishai Cohen',
-  'Rachael Yamagata',
-  'Norah Jones',
-  'B\xc3\xa9la Fleck and the Flecktones',
-  'Joshua Redman'
-];
-let data = [];
-for (let i = 0; i < rawData.length; i++) {
-  for (let j = 0; j < rawData[i].length; j++) {
-    let label = labels[i];
-    data.push([j, rawData[i][j], label]);
-  }
-}
-option = {
-  singleAxis: {
-    max: 'dataMax'
-  },
-  series: [
-    {
-      type: 'themeRiver',
-      data: data,
-      label: {
-        show: false
-      }
-    }
-  ]
-};
+  'The 
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `themeRiver-lastfm/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py themeRiver/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

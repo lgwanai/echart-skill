@@ -2,10 +2,10 @@
 
 **Category:** `themeRiver`
 **Example dir:** `themeRiver-basic`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **themeRiver/basic.html** — ThemeRiver
+Data format: `[[dateString, value, seriesName], ...]`
 
 ## Option Code
 ```javascript
@@ -91,42 +91,9 @@ option = {
         ['2015/11/20', 30, 'TY'],
         ['2015/11/21', 28, 'TY'],
         ['2015/11/22', 27, 'TY'],
-        ['2015/11/23', 26, 'TY'],
-        ['2015/11/24', 15, 'TY'],
-        ['2015/11/25', 30, 'TY'],
-        ['2015/11/26', 35, 'TY'],
-        ['2015/11/27', 42, 'TY'],
-        ['2015/11/28', 42, 'TY'],
-        ['2015/11/08', 21, 'SS'],
-        ['2015/11/09', 25, 'SS'],
-        ['2015/11/10', 27, 'SS'],
-        ['2015/11/11', 23, 'SS'],
-        ['2015/11/12', 24, 'SS'],
-        ['2015/11/13', 21, 'SS'],
-        ['2015/11/14', 35, 'SS'],
-        ['2015/11/15', 39, 'SS'],
-        ['2015/11/16', 40, 'SS'],
-        ['2015/11/17', 36, 'SS'],
-        ['2015/11/18', 33, 'SS'],
-        ['2015/11/19', 43, 'SS'],
-        ['2015/11/20', 40, 'SS'],
-        ['2015/11/21', 34, 'SS'],
-        ['2015/11/22', 28, 'SS'],
-        ['2015/11/23', 26, 'SS'],
-        ['2015/11/24', 37, 'SS'],
-        ['2015/11/25', 41, 'SS'],
-        ['2015/11/26', 46, 'SS'],
-        ['2015/11/27', 47, 'SS'],
-        ['2015/11/28', 41, 'SS'],
-        ['2015/11/08', 10, 'QG'],
-        ['2015/11/09', 15, 'QG'],
-        ['2015/11/10', 3
+        ['
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `themeRiver-basic/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py themeRiver/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

@@ -2,10 +2,10 @@
 
 **Category:** `parallel`
 **Example dir:** `parallel-simple`
-**Difficulty:** 1
 
-## Template Match
+## Template
 - **parallel/basic.html** — Parallel Coordinates
+Data format: `[[dim1, dim2, dim3, ...], ...]  (parallelAxis defines each dimension)`
 
 ## Option Code
 ```javascript
@@ -35,10 +35,6 @@ option = {
 };
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `parallel-simple/main.js`
-- Template data format: `[[dim1, dim2, dim3, ...], ...]  (parallelAxis defines each dimension)`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py parallel/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

@@ -2,10 +2,10 @@
 
 **Category:** `boxplot`
 **Example dir:** `boxplot-light-velocity`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **boxplot/basic.html** — Boxplot
+Data format: `[[min, Q1, median, Q3, max], ...]  (one array per group)`
 
 ## Option Code
 ```javascript
@@ -94,19 +94,6 @@ option = {
 };
 ```
 
-## Relevant Debug Patterns
-## #23
- — Boxplot 空白：依赖缺失的 ecStat 库
-- **日期**：2026-06-13
-- **现象**：24_Boxplot 一片空白
-- **根因**：原模板使用 ECharts `transform: { type: 'boxplot' }`，需要 `ecStat` 扩展库，但项目中不存在该库
-- **修复**：(1) 模板重写为预计算五数概括格式 `series.data: [[min, Q1, median, Q3, max], ...]`，无需 ecStat；(2) 数据从原始值改为 `[[740,880,935,980,1070],[800,860,900,940,960]]`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `boxplot-light-velocity/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py boxplot/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

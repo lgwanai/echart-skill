@@ -2,10 +2,10 @@
 
 **Category:** `custom`
 **Example dir:** `flame-graph`
-**Difficulty:** 4
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -87,73 +87,9 @@ const renderItem = (params, api) => {
   const start = api.coord([api.value(1), level]);
   const end = api.coord([api.value(2), level]);
   const height = ((api.size && api.size([0, 1])) || [0, 20])[1];
-  const width = end[0] - start[0];
-  return {
-    type: 'rect',
-    transition: ['shape'],
-    shape: {
-      x: start[0],
-      y: start[1] - height / 2,
-      width,
-      height: height - 2 ,
-      r: 2
-    },
-    style: {
-      fill: api.visual('color')
-    },
-    emphasis: {
-      style: {
-        stroke: '#000'
-      }
-    },
-    textConfig: {
-      position: 'insideLeft'
-    },
-    textContent: {
-      style: {
-        text: api.value(3),
-        fontFamily: 'Verdana',
-        fill: '#000',
-        width: width - 4,
-        overflow: 'truncate',
-        ellipsis: '..',
-        truncateMinChar: 1
-      },
-      emphasis: {
-        style: {
-          stroke: '#000',
-          lineWidth: 0.5
-        }
-      }
-    }
-  };
-};
-myChart.showLoading();
-$.get(ROOT_PATH + '/data/asset/data/stack-trace.json', (stackTrace) => {
-  myChart.hideLoading();
-  const levelOfOriginalJson = heightOfJson(stackTrace);
-  option = {
-    backgroundColor: {
-      type: 'linear',
-      x: 0,
-      y: 0,
-      x2: 0,
- 
+  const wi
 ```
 
-## Relevant Debug Patterns
-## #32
- — Error Bar 空白：custom renderItem 函数无法通过占位符传递
-- **日期**：2026-06-13
-- **现象**：39_Custom_Error_Bar 空白
-- **根因**：(1) `RENDER_ITEM: "false"` → 无渲染函数，custom 类型不知道该画什么；(2) 多行 JS 函数无法通过 Python 字符串占位符传递（换行导致语法错误）
-- **修复**：(1) `renderItem` 直接硬编码在模板中；(2) 模板简化为只需 `DATA` 占位符；(3) 误差线红色 `#e54035`，柱体蓝色 `#5470c6`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `flame-graph/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

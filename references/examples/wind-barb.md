@@ -2,10 +2,10 @@
 
 **Category:** `'custom, dataZoom'`
 **Example dir:** `wind-barb`
-**Difficulty:** 5
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -78,49 +78,9 @@ $.getJSON(
           {
             type: 'image',
             style: {
-              image: api.value(dims.weatherIcon),
-              x: -weatherIconSize / 2,
-              y: -weatherIconSize / 2,
-              width: weatherIconSize,
-              height: weatherIconSize
-            },
-            position: [point[0], 110]
-          },
-          {
-            type: 'text',
-            style: {
-              text:
-                api.value(dims.minTemp) + ' - ' + api.value(dims.maxTemp) + '°',
-              textFont: api.font({ fontSize: 14 }),
-              textAlign: 'center',
-              textVerticalAlign: 'bottom'
-            },
-            position: [point[0], 80]
-          }
-        ]
-      };
-    };
-    option = {
-      title: {
-        text: '天气 风向 风速 海浪 预报',
-        subtext: '示例数据源于 www.seabreeze.com.au',
-        left: 'center'
-      },
-      tooltip: {
-        trigger: 'axis',
-        formatter: function (params) {
-          return [
-            echarts.format.formatTime(
-              'yyyy-MM-dd',
-              params[0].value[dims.time]
-            ) +
-              ' 
+              image: api.value(
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `wind-barb/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

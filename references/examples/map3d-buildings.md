@@ -2,10 +2,10 @@
 
 **Category:** `map3D`
 **Example dir:** `map3d-buildings`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **map/basic.html** — Map
+Data format: `[{name: string, value: number}, ...]`
 
 ## Option Code
 ```javascript
@@ -89,40 +89,9 @@ $.getJSON(
             color: '#333'
           },
           viewControl: {
-            minBeta: -360,
-            maxBeta: 360,
-            alpha: 50,
-            center: [50, 0, -10],
-            distance: 30,
-            minDistance: 5,
-            panMouseButton: 'left',
-            rotateMouseButton: 'middle',
-            zoomSensitivity: 0.5
-          },
-          itemStyle: {
-            areaColor: '#666'
-            // borderColor: '#222',
-            // borderWidth: 1
-          },
-          label: {
-            color: 'white'
-          },
-          silent: true,
-          instancing: true,
-          boxWidth: 200,
-          boxHeight: 1,
-          data: regions
-        }
-      ]
-    });
-  }
-);
+          
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `map3d-buildings/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py map/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

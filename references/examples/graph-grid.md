@@ -2,10 +2,10 @@
 
 **Category:** `graph`
 **Example dir:** `graph-grid`
-**Difficulty:** 2
 
-## Template Match
-- **graph/force.html** — Force Graph
+## Template
+- **graph/static.html** — Static Graph
+Data format: `{ nodes: [{name, x, y, symbolSize?}, ...], links: [{source, target}, ...] }`
 
 ## Option Code
 ```javascript
@@ -54,10 +54,6 @@ option = {
 };
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `graph-grid/main.js`
-- Template data format: `{ nodes: [{id?, name, symbolSize?, category?, x?, y?}, ...], links: [{source, target, value?}, ...], categories?: [{name}, ...] }`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py graph/static.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

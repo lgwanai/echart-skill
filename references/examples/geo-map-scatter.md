@@ -2,10 +2,10 @@
 
 **Category:** `map`
 **Example dir:** `geo-map-scatter`
-**Difficulty:** 
 
-## Template Match
-- **calendar/heatmap.html** — Calendar Heatmap
+## Template
+- **geo/lines.html** — 
+Data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
 
 ## Option Code
 ```javascript
@@ -87,81 +87,8 @@ var geoCoordMap = {
   连云港: [119.16, 34.59],
   葫芦岛: [120.836932, 40.711052],
   常熟: [120.74, 31.64],
-  东莞: [113.75, 23.04],
-  河源: [114.68, 23.73],
-  淮安: [119.15, 33.5],
-  泰州: [119.9, 32.49],
-  南宁: [108.33, 22.84],
-  营口: [122.18, 40.65],
-  惠州: [114.4, 23.09],
-  江阴: [120.26, 31.91],
-  蓬莱: [120.75, 37.8],
-  韶关: [113.62, 24.84],
-  嘉峪关: [98.289152, 39.77313],
-  广州: [113.23, 23.16],
-  延安: [109.47, 36.6],
-  太原: [112.53, 37.87],
-  清远: [113.01, 23.7],
-  中山: [113.38, 22.52],
-  昆明: [102.73, 25.04],
-  寿光: [118.73, 36.86],
-  盘锦: [122.070714, 41.119997],
-  长治: [113.08, 36.18],
-  深圳: [114.07, 22.62],
-  珠海: [113.52, 22.3],
-  宿迁: [118.3, 33.96],
-  咸阳: [108.72, 34.36],
-  铜川: [109.11, 35.09],
-  平度: [119.97, 36.77],
-  佛山: [113.11, 23.05],
-  海口: [110.35, 20.02],
-  江门: [113.06, 22.61],
-  章丘: [117.53, 36.72],
-  肇庆: [112.44, 23.05],
-  大连: [121.62, 38.92],
-  临汾: [111.5, 36.08],
-  吴江: [120.63, 31.16],
-  石嘴山: [106.39, 39.04],
-  沈阳: [123.38, 41.8],
-  苏州: [120.62, 31.32],
-  茂名: [110.88, 21.68],
-  嘉兴: [120.76, 30.77],
-  长春: [125.35, 43.88],
-  胶州: [120.03336, 36.264622],
-  银川: [106.27, 38.47],
-  张家港: [120.555821, 
 ```
 
-## Relevant Debug Patterns
-## #18
- — Scatter Geo/Map 空白：MAP_INLINE 被替换导致地图未加载
-- **日期**：2026-06-13
-- **现象**：12_Scatter_Geo、13_Map_China 等地图类图表空白
-- **根因**：数据 dict 中 `"MAP_INLINE": ""` → `_json_safe` 替换 `{{MAP_INLINE}}` 为 `''` → `<!-- {{MAP_INLINE}} -->` 变成 `<!-- '' -->` → `build_template.py` 的地图注入检测 `if "<!-- {{MAP_INLINE}} -->" in html` 失败 → China GeoJSON 未嵌入 → 地图空白
-- **修复**：**不要在数据 dict 中提供 `MAP_INLINE`/`GL_INLINE`/`ECHARTS_INLINE` 这三个特殊占位符**。它们由 `build_template.py` 自动处理（代码中已排除此三类占位符的校验）。**模板不需要修改**——模板中的 `<!-- {{MAP_INLINE}} --...
-
-## #20
- — Treemap 父节点缺少 value 导致布局错误
-- **日期**：2026-06-13
-- **现象**：19_Treemap 布局比例失调，标签只显示根节点名称
-- **根因**：(1) 父节点没有 `value` 属性，ECharts treemap 无法按比例分配面积；(2) 数据只有 2 大类 4 项，过于稀疏；(3) `UPPER_LABEL_SHOW: false` 导致上层标签不显示
-- **修复**：(1) 父节点添加 `value`（子节点之和）；(2) 扩充为 3 大类 11 项；(3) `UPPER_LABEL_SHOW: true`；(4) **模板增加防御**：`upperLabel.show` 和 `breadcrumb.show` 在值为空时默认为 `true`
-
----
-...
-
-## #25
- — EffectScatter 空白 + 颜色不生效
-- **日期**：2026-06-13
-- **现象**：30_EffectScatter 一片空白，修复后各城市同色
-- **根因**：(1) `GEO_COORD_MAP: "{}"` 空对象，`MAP_NAME: ""` 空地图名 → 无地图；(2) `convertData()` 只复制 `name`/`value`，丢弃 `itemStyle`
-- **修复**：(1) 提供真实 GEO_COORD_MAP + MAP_NAME="china"；(2) `convertData` 保留 `itemStyle`；(3) 每城市设不同颜色 `itemStyle.color`；(4) **模板守卫**：`geoCoordMap || {}`，`map || "china"`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `geo-map-scatter/main.js`
-- Template data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py geo/lines.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

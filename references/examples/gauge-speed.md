@@ -2,10 +2,10 @@
 
 **Category:** `gauge`
 **Example dir:** `gauge-speed`
-**Difficulty:** 2
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **gauge/basic.html** — Gauge
+Data format: `{ value: number, name?: string, max?: number }`
 
 ## Option Code
 ```javascript
@@ -81,29 +81,9 @@ option = {
           value: {
             fontSize: 50,
             fontWeight: 'bolder',
-            color: '#777'
-          },
-          unit: {
-            fontSize: 20,
-            color: '#999',
-            padding: [0, 0, -20, 10]
-          }
-        }
-      },
-      data: [
-        {
-          value: 100
-        }
-      ]
-    }
-  ]
-};
+     
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `gauge-speed/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py gauge/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

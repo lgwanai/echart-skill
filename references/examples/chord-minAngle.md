@@ -2,10 +2,10 @@
 
 **Category:** `chord`
 **Example dir:** `chord-minAngle`
-**Difficulty:** 1
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **chord/basic.html** — Chord
+Data format: `{ nodes: [{name: string}, ...], links: [{source: string, target: string, value: number}, ...] }`
 
 ## Option Code
 ```javascript
@@ -35,10 +35,6 @@ option = {
 };
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `chord-minAngle/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py chord/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

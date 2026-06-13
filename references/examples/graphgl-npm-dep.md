@@ -2,10 +2,10 @@
 
 **Category:** `graphGL`
 **Example dir:** `graphgl-npm-dep`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -92,41 +92,9 @@ $.getJSON(ROOT_PATH + '/data-gl/asset/data/npmdep.json', function (data) {
           // borderWidth: 1
         },
         focusNodeAdjacency: false,
-        focusNodeAdjacencyOn: 'click',
-        symbolSize: function (value) {
-          return Math.sqrt(value / 10);
-        },
-        label: {
-          color: '#fff'
-        },
-        emphasis: {
-          label: {
-            show: false
-          },
-          lineStyle: {
-            opacity: 0.5,
-            width: 4
-          }
-        },
-        forceAtlas2: {
-          steps: 5,
-          stopThreshold: 20,
-          jitterTolerence: 10,
-          edgeWeight: [0.2, 1],
-          gravity: 5,
-          edgeWeightInfluence: 0
-          // preventOverlap: true
-        }
-      }
-    ]
-  });
-});
+        foc
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `graphgl-npm-dep/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

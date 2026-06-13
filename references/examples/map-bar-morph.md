@@ -2,10 +2,10 @@
 
 **Category:** `map, animation`
 **Example dir:** `map-bar-morph`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **map/basic.html** — Map
+Data format: `[{name: string, value: number}, ...]`
 
 ## Option Code
 ```javascript
@@ -69,40 +69,8 @@ $.get(ROOT_PATH + '/data/asset/geo/USA.json', function (usaJson) {
     { name: 'North Dakota', value: 699628 },
     { name: 'Ohio', value: 11544225 },
     { name: 'Oklahoma', value: 3814820 },
-    { name: 'Oregon', value: 3899353 },
-    { name: 'Pennsylvania', value: 12763536 },
-    { name: 'Rhode Island', value: 1050292 },
-    { name: 'South Carolina', value: 4723723 },
-    { name: 'South Dakota', value: 833354 },
-    { name: 'Tennessee', value: 6456243 },
-    { name: 'Texas', value: 26059203 },
-    { name: 'Utah', value: 2855287 },
-    { name: 'Vermont', value: 626011 },
-    { name: 'Virginia', value: 8185867 },
-    { name: 'Washington', value: 6897012 },
-    { name: 'West Virginia', value: 1855413 },
-    { name: 'Wisconsin', value: 5726398 },
-    { name: 'Wyoming', value: 576412 },
-    { name: 'Puerto Rico', value: 3667084 }
-  ];
-  data.sort(function (a, b) {
-    return a.value - b.value;
-  });
-  const mapOption = {
-    visualMap: {
-      left: 'right',
-      min: 500000,
-      max: 38000000,
-      inRange: {
-        // prettier-ignore
-        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
-
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `map-bar-morph/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py map/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

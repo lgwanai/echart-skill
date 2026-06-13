@@ -2,10 +2,10 @@
 
 **Category:** `radar`
 **Example dir:** `radar-custom`
-**Difficulty:** 2
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **radar/basic.html** — Radar
+Data format: `{ indicators: [{name: string, max: number}, ...], series: [{name: string, value: number[]}, ...] }`
 
 ## Option Code
 ```javascript
@@ -100,43 +100,9 @@ option = {
           value: [120, 118, 130, 100, 99, 70],
           name: 'Data C',
           symbol: 'rect',
-          symbolSize: 12,
-          lineStyle: {
-            type: 'dashed'
-          },
-          label: {
-            show: true,
-            formatter: function (params) {
-              return params.value;
-            }
-          }
-        },
-        {
-          value: [100, 93, 50, 90, 70, 60],
-          name: 'Data D',
-          areaStyle: {
-            color: new echarts.graphic.RadialGradient(0.1, 0.6, 1, [
-              {
-                color: 'rgba(255, 145, 124, 0.1)',
-                offset: 0
-              },
-              {
-                color: 'rgba(255, 145, 124, 0.9)',
-                offset: 1
-              }
-            ])
-          }
-        }
-      ]
-    }
-  ]
-};
+          sym
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `radar-custom/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py radar/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

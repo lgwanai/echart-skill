@@ -2,10 +2,10 @@
 
 **Category:** `heatmap`
 **Example dir:** `heatmap-bmap`
-**Difficulty:** 3
 
-## Template Match
-- **calendar/heatmap.html** — Calendar Heatmap
+## Template
+- **heatmap/basic.html** — Heatmap
+Data format: `{ xLabels: string[], yLabels: string[], data: [[xIdx, yIdx, value], ...] }`
 
 ## Option Code
 ```javascript
@@ -54,10 +54,6 @@ $.get(ROOT_PATH + '/data/asset/data/hangzhou-tracks.json', function (data) {
 });
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `heatmap-bmap/main.js`
-- Template data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py heatmap/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

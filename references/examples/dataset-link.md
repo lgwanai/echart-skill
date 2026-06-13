@@ -2,10 +2,10 @@
 
 **Category:** `'dataset, line, pie'`
 **Example dir:** `dataset-link`
-**Difficulty:** 5
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -94,10 +94,6 @@ setTimeout(function () {
 });
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `dataset-link/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

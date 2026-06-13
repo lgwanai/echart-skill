@@ -2,10 +2,10 @@
 
 **Category:** `matrix`
 **Example dir:** `matrix-confusion`
-**Difficulty:** 3
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -103,21 +103,9 @@ option = {
           text: 'Predicted Class',
           fill: '#333',
           font: 'bold 24px serif',
-          textAlign: 'center'
-        },
-        x: (window.innerWidth - 600) / 2 - 50,
-        y: 270,
-        rotation: Math.PI / 2
-      }
-    ]
-  }
-};
+          text
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `matrix-confusion/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

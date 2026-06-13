@@ -2,10 +2,10 @@
 
 **Category:** `parallel`
 **Example dir:** `parallel-nutrients`
-**Difficulty:** 4
 
-## Template Match
+## Template
 - **parallel/basic.html** — Parallel Coordinates
+Data format: `[[dim1, dim2, dim3, ...], ...]  (parallelAxis defines each dimension)`
 
 ## Option Code
 ```javascript
@@ -84,46 +84,9 @@ function getOption(data) {
     },
     title: [
       {
-        text: 'Groups',
-        top: 0,
-        left: 0,
-        textStyle: {
-          color: '#fff'
-        }
-      }
-    ],
-    visualMap: {
-      show: true,
-      type: 'piecewise',
-      categories: groupCategories,
-      dimension: indices.group,
-      inRange: {
-        color: groupColors //['#d94e5d','#eac736','#50a3ba']
-      },
-      outOfRange: {
-        color: ['#ccc'] //['#d94e5d','#eac736','#50a3ba']
-      },
-      top: 20,
-      textStyle: {
-        color: '#fff'
-      },
-      realtime: false
-    },
-    parallelAxis: [
-      { dim: 16, name: schema[16].name, scale: true, nameLocation: 'end' },
-      { dim: 2, name: schema[2].name, nameLocation: 'end' },
-      { dim: 4, name: schema[4].name, nameLocation: 'end' },
-      { dim: 3, name: schema[3].name, nameLocation: 'end' },
-      { dim: 5, name: schema[5].name, nameLocation: 'end' },
-      { dim: 6, name: schema[6].name, nameLocation: 'end' },
-      { dim: 7, name: schema[7].name, nameLocation: 'end' },
-      { dim: 8, name: schema[8
+        text: 
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `parallel-nutrients/main.js`
-- Template data format: `[[dim1, dim2, dim3, ...], ...]  (parallelAxis defines each dimension)`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py parallel/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

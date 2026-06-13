@@ -2,10 +2,10 @@
 
 **Category:** `'calendar, graph'`
 **Example dir:** `calendar-graph`
-**Difficulty:** 4
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **calendar/heatmap.html** — Calendar Heatmap
+Data format: `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
 
 ## Option Code
 ```javascript
@@ -105,10 +105,6 @@ option = {
 };
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `calendar-graph/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py calendar/heatmap.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

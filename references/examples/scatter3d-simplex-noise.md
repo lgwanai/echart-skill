@@ -2,10 +2,10 @@
 
 **Category:** `scatter3D`
 **Example dir:** `scatter3d-simplex-noise`
-**Difficulty:** 
 
-## Template Match
+## Template
 - **3d/scatter3d.html** — Scatter3D
+Data format: `[[x, y, z], ...]`
 
 ## Option Code
 ```javascript
@@ -86,19 +86,6 @@ $.getScript(CDN_PATH + 'simplex-noise@2.4.0/simplex-noise.js').done(
 );
 ```
 
-## Relevant Debug Patterns
-## #28
- — 3D Scatter/Surface/Globe/Lines3D 同样空白
-- **日期**：2026-06-13
-- **现象**：34/35/36/37 全部空白
-- **根因**：与 #27 相同——GL_INLINE 破坏注入 + 模板配置偏离官方示例。所有 3D 模板统一修复
-- **修复**：3d/scatter3d.html、3d/surface.html、3d/globe.html、3d/lines3d.html 全部改为与官方示例一致的配置。关键：`zAxis3D: {}`（非 `{type:'value'}`）、`grid3D: {}`、无 `coordinateSystem`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `scatter3d-simplex-noise/main.js`
-- Template data format: `[[x, y, z], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py 3d/scatter3d.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

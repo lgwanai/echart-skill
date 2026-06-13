@@ -2,10 +2,10 @@
 
 **Category:** `matrix`
 **Example dir:** `matrix-grid-layout`
-**Difficulty:** 3
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -98,61 +98,9 @@ const _sectionDefinitionMap = {
         },
         top: 30,
         bottom: 10,
-        left: 10,
-        right: 10,
-        outerBounds: {
-          top: 30,
-          left: 20,
-          bottom: 20,
-          right: 20
-        }
-      },
-      series: {
-        type: 'line',
-        id: 'header_1',
-        xAxisId: 'header_1',
-        yAxisId: 'header_1',
-        symbol: 'none',
-        data: generateSingleSeriesData(100, false)
-      }
-    }
-  },
-  section_sidebar_1: {
-    option: {
-      title: {
-        coordinateSystem: 'matrix',
-        text: 'Sidebar Section',
-        textStyle: { fontSize: 14 },
-        left: 'center',
-        top: 15
-      },
-      xAxis: {
-        id: 'sidebar_1',
-        gridId: 'sidebar_1',
-        splitLine: { show: false },
-        axisLabel: {
-          hideOverlap: true
-        }
-      },
-      yAxis: {
-        type: 'time',
-        id: 'sidebar_1',
-        gridId: 'sidebar_1',
-        axisLabel: {
-          hideOverlap: true
-        }
-      },
-      grid: {
-        id: 'sidebar_1',
-        coordinateSystem: 'matrix',
-        tooltip: {
-     
+        left
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `matrix-grid-layout/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

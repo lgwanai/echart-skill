@@ -2,10 +2,10 @@
 
 **Category:** `globe`
 **Example dir:** `globe-contour-paint`
-**Difficulty:** 
 
-## Template Match
+## Template
 - **3d/globe.html** — Globe
+Data format: `[[lat, lng, value], ...]`
 
 ## Option Code
 ```javascript
@@ -73,65 +73,9 @@ $.when(
       initCharts(opt);
     }
   );
-  function image(url) {
-    return new Promise(function (resolve) {
-      var image = new Image();
-      image.src = url;
-      image.crossOrigin = 'Anonymous';
-      image.onload = function () {
-        var canvas = document.createElement('canvas');
-        canvas.width = image.width / 4;
-        canvas.height = image.height / 4;
-        var context = canvas.getContext('2d');
-        context.drawImage(image, 0, 0, canvas.width, canvas.height);
-        resolve(context.getImageData(0, 0, canvas.width, canvas.height));
-      };
-    });
-  }
-  var contourChart = echarts.init(document.createElement('canvas'), null, {
-    width: 4096,
-    height: 2048
-  });
-  var img = new echarts.graphic.Image({
-    style: {
-      x: -1,
-      y: -1
-    }
-  });
-  onupdate = function () {
-    img.dirty();
-  };
-  function initCharts(opt) {
-    img.style.width = opt.image.width + 2;
-    img.style.height = opt.image.height + 2;
-    img.style.image = opt.image;
-    contourChart.getZr().add(img);
-    myChart.setOpt
+  
 ```
 
-## Relevant Debug Patterns
-## #28
- — 3D Scatter/Surface/Globe/Lines3D 同样空白
-- **日期**：2026-06-13
-- **现象**：34/35/36/37 全部空白
-- **根因**：与 #27 相同——GL_INLINE 破坏注入 + 模板配置偏离官方示例。所有 3D 模板统一修复
-- **修复**：3d/scatter3d.html、3d/surface.html、3d/globe.html、3d/lines3d.html 全部改为与官方示例一致的配置。关键：`zAxis3D: {}`（非 `{type:'value'}`）、`grid3D: {}`、无 `coordinateSystem`
-
----
-...
-
-## #30
- — Globe 无纹理显示为纯色/空白球
-- **日期**：2026-06-13
-- **现象**：36_3D_Globe 显示为纯蓝/黄色球，无地球纹理
-- **根因**：未提供 `baseTexture`，ECharts globe 渲染为无纹理球体
-- **修复**：下载 ECharts 官方示例的 1.3MB JPG 地球纹理（`echarts.apache.org/examples/data-gl/asset/world.topo.bathy.200401.jpg`），base64 嵌入为 `baseTexture`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `globe-contour-paint/main.js`
-- Template data format: `[[lat, lng, value], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py 3d/globe.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

@@ -2,10 +2,10 @@
 
 **Category:** `matrix`
 **Example dir:** `matrix-mbti`
-**Difficulty:** 11
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -100,58 +100,8 @@ const generateGroup = (groupName) => {
     },
     children: groupMembers[groupName].map((mbti) => ({
       value: mbti,
-      label: {
-        color: colorMap[groupName],
-        fontSize: fontSize.item,
-        fontWeight: 'bold'
-      }
-    }))
-  };
-};
-const xData = [
-  generateGroup('NF'),
-  generateGroup('NT'),
-  generateGroup('SJ'),
-  generateGroup('SP')
-];
-const yData = [
-  generateGroup('NF'),
-  generateGroup('NT'),
-  generateGroup('SJ'),
-  generateGroup('SP')
-];
-const originalData = [
-  ['ENFJ', 'ENFJ', 0.86],
-  ['ENFJ', 'ENFP', 0.91],
-  ['ENFJ', 'ENTJ', 0.42],
-  ['ENFJ', 'ENTP', 0.73],
-  ['ENFJ', 'ESFJ', 0.64],
-  ['ENFJ', 'ESFP', 0.8],
-  ['ENFJ', 'ESTJ', 0.22],
-  ['ENFJ', 'ESTP', 0.41],
-  ['ENFJ', 'INFJ', 0.74],
-  ['ENFJ', 'INFP', 0.73],
-  ['ENFJ', 'INTJ', 0.16],
-  ['ENFJ', 'INTP', 0.35],
-  ['ENFJ', 'ISFJ', 0.3],
-  ['ENFJ', 'ISFP', 0.4],
-  ['ENFJ', 'ISTJ', 0.18],
-  ['ENFJ', 'ISTP', 0.09],
-  ['ENFP', 'ENFJ', 0.91],
-  ['ENFP', 'ENFP', 0.97],
-  ['ENFP', 'ENTJ', 0.37],
-  ['ENFP', 'ENTP', 0.85],
-  ['ENFP', 'ESFJ', 0.42],
-  ['ENFP', 'ESFP', 0.93],
-  ['ENFP', 'ESTJ', 0.27],
-  ['ENFP', 'ESTP', 0.76],
-
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `matrix-mbti/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

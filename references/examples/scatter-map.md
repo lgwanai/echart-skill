@@ -2,10 +2,10 @@
 
 **Category:** `scatter`
 **Example dir:** `scatter-map`
-**Difficulty:** 
 
-## Template Match
-- **3d/scatter3d.html** — Scatter3D
+## Template
+- **scatter/geo.html** — Scatter on Geo Map
+Data format: `[{name: string, value: [lng, lat, val?]}, ...]`
 
 ## Option Code
 ```javascript
@@ -92,81 +92,9 @@ var geoCoordMap = {
   大连: [121.62, 38.92],
   临汾: [111.5, 36.08],
   吴江: [120.63, 31.16],
-  石嘴山: [106.39, 39.04],
-  沈阳: [123.38, 41.8],
-  苏州: [120.62, 31.32],
-  茂名: [110.88, 21.68],
-  嘉兴: [120.76, 30.77],
-  长春: [125.35, 43.88],
-  胶州: [120.03336, 36.264622],
-  银川: [106.27, 38.47],
-  张家港: [120.555821, 31.875428],
-  三门峡: [111.19, 34.76],
-  锦州: [121.15, 41.13],
-  南昌: [115.89, 28.68],
-  柳州: [109.4, 24.33],
-  三亚: [109.511909, 18.252847],
-  自贡: [104.778442, 29.33903],
-  吉林: [126.57, 43.87],
-  阳江: [111.95, 21.85],
-  泸州: [105.39, 28.91],
-  西宁: [101.74, 36.56],
-  宜宾: [104.56, 29.77],
-  呼和浩特: [111.65, 40.82],
-  成都: [104.06, 30.67],
-  大同: [113.3, 40.12],
-  镇江: [119.44, 32.2],
-  桂林: [110.28, 25.29],
-  张家界: [110.479191, 29.117096],
-  宜兴: [119.82, 31.36],
-  北海: [109.12, 21.49],
-  西安: [108.95, 34.27],
-  金坛: [119.56, 31.74],
-  东营: [118.49, 37.46],
-  牡丹江: [129.58, 44.6],
-  遵义: [106.9, 27.7],
-  绍兴: [120.58, 30.01],
-  扬州: [119.42, 32.39],
-  常州: [119.95, 31.79],
-  潍坊: [119.1, 36.62],
-  重庆: [106.54, 29.59],
-  台州: [121.420757, 28.656386],
-  南京: [118.78, 32.04],
-  滨州: [118.03, 37.36],
-  贵阳: [106.71, 26.57],
-  无锡:
+  石嘴山: [106.39, 
 ```
 
-## Relevant Debug Patterns
-## #18
- — Scatter Geo/Map 空白：MAP_INLINE 被替换导致地图未加载
-- **日期**：2026-06-13
-- **现象**：12_Scatter_Geo、13_Map_China 等地图类图表空白
-- **根因**：数据 dict 中 `"MAP_INLINE": ""` → `_json_safe` 替换 `{{MAP_INLINE}}` 为 `''` → `<!-- {{MAP_INLINE}} -->` 变成 `<!-- '' -->` → `build_template.py` 的地图注入检测 `if "<!-- {{MAP_INLINE}} -->" in html` 失败 → China GeoJSON 未嵌入 → 地图空白
-- **修复**：**不要在数据 dict 中提供 `MAP_INLINE`/`GL_INLINE`/`ECHARTS_INLINE` 这三个特殊占位符**。它们由 `build_template.py` 自动处理（代码中已排除此三类占位符的校验）。**模板不需要修改**——模板中的 `<!-- {{MAP_INLINE}} --...
-
-## #19
- — Scatter Geo 气泡大小无差异
-- **日期**：2026-06-13
-- **现象**：12_Scatter_Geo 所有气泡一样大
-- **根因**：模板 `symbolSize: function(val) { return Math.sqrt(val[2]) / SIZE_SCALE || 8; }` 中 `Math.sqrt` 压缩了数值差异。值 70-100 经 sqrt 后为 8.4-10，差值仅 1.6px，肉眼不可分辨
-- **修复**：模板改为 `val[2] / {{SIZE_SCALE}}`（线性），SIZE_SCALE=5 → 14-20px 可分辨范围
-
----
-...
-
-## #25
- — EffectScatter 空白 + 颜色不生效
-- **日期**：2026-06-13
-- **现象**：30_EffectScatter 一片空白，修复后各城市同色
-- **根因**：(1) `GEO_COORD_MAP: "{}"` 空对象，`MAP_NAME: ""` 空地图名 → 无地图；(2) `convertData()` 只复制 `name`/`value`，丢弃 `itemStyle`
-- **修复**：(1) 提供真实 GEO_COORD_MAP + MAP_NAME="china"；(2) `convertData` 保留 `itemStyle`；(3) 每城市设不同颜色 `itemStyle.color`；(4) **模板守卫**：`geoCoordMap || {}`，`map || "china"`
-
----
-...
-
 ## Key Points
-- This is an official ECharts example from `scatter-map/main.js`
-- Template data format: `[[x, y, z], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py scatter/geo.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

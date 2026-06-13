@@ -2,10 +2,10 @@
 
 **Category:** `candlestick`
 **Example dir:** `candlestick-brush`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **candlestick/basic.html** — Candlestick
+Data format: `{ dates: string[], values: [[open, close, low, high], ...] }`
 
 ## Option Code
 ```javascript
@@ -92,63 +92,9 @@ $.get(ROOT_PATH + '/data/asset/data/stock-DJI.json', function (rawData) {
         }
       },
       brush: {
-        xAxisIndex: 'all',
-        brushLink: 'all',
-        outOfBrush: {
-          colorAlpha: 0.1
-        }
-      },
-      visualMap: {
-        show: false,
-        seriesIndex: 5,
-        dimension: 2,
-        pieces: [
-          {
-            value: 1,
-            color: downColor
-          },
-          {
-            value: -1,
-            color: upColor
-          }
-        ]
-      },
-      grid: [
-        {
-          left: '10%',
-          right: '8%',
-          height: '50%'
-        },
-        {
-          left: '10%',
-          right: '8%',
-          top: '63%',
-          height: '16%'
-        }
-      ],
-      xAxis: [
-        {
-          type: 'category',
-          data: data.categoryData,
-          boundaryGap: false,
-          axisLine: { onZero: false },
-          splitLine: { show: false },
-          min: 'dataMin',
-          max: 'dataMax',
-          axisPointer: {
-            z: 100
-          }
-        },
-        {
-          type: 'category',
-          gridIndex: 1,
-          data: data
+        xAxisIn
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `candlestick-brush/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py candlestick/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

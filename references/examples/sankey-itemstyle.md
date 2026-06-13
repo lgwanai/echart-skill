@@ -2,10 +2,10 @@
 
 **Category:** `sankey`
 **Example dir:** `sankey-itemstyle`
-**Difficulty:** 2
 
-## Template Match
+## Template
 - **sankey/basic.html** — Sankey
+Data format: `{ nodes: [{name: string, itemStyle?: {}}, ...], links: [{source: string, target: string, value: number}, ...] }`
 
 ## Option Code
 ```javascript
@@ -104,60 +104,9 @@ option = {
           name: 'Leeds',
           itemStyle: {
             color: '#9B2D1F',
-            borderColor: '#9B2D1F'
-          }
-        },
-        {
-          name: 'Victoria',
-          itemStyle: {
-            color: '#604878',
-            borderColor: '#604878'
-          }
-        },
-        {
-          name: 'Erlangen',
-          itemStyle: {
-            color: '#A5644E',
-            borderColor: '#A5644E'
-          }
-        },
-        {
-          name: 'Saint Germain en Laye',
-          itemStyle: {
-            color: '#2D3F3A',
-            borderColor: '#2D3F3A'
-          }
-        },
-        {
-          name: 'Roissy en Brie',
-          itemStyle: {
-            color: '#761721',
-            borderColor: '#761721'
-          }
-        },
-        {
-          name: 'Wokingham',
-          itemStyle: {
-            color: '#B1BADD',
-            borderColor: '#B1BADD'
-          }
-        },
-        {
-          name: 'Runcorn',
-          itemStyle: {
-            color: '#B0CCB0',
-            borderColor: '#B0CCB0'
-          }
-        },
-        {
-          name: 'Newton',
-          
+            borde
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `sankey-itemstyle/main.js`
-- Template data format: `{ nodes: [{name: string, itemStyle?: {}}, ...], links: [{source: string, target: string, value: number}, ...] }`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py sankey/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

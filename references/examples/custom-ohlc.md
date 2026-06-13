@@ -2,10 +2,10 @@
 
 **Category:** `candlestick`
 **Example dir:** `custom-ohlc`
-**Difficulty:** 1
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **custom/error-bar.html** — Error Bar
+Data format: `[[xIdx, val, lowVal, highVal], ...]`
 
 ## Option Code
 ```javascript
@@ -92,65 +92,9 @@ $.get(ROOT_PATH + '/data/asset/data/stock-DJI.json', function (rawData) {
       axisPointer: {
         link: [{ xAxisIndex: 'all' }]
       },
-      toolbox: {
-        feature: {
-          dataZoom: {
-            yAxisIndex: false
-          },
-          brush: {
-            type: ['lineX', 'clear']
-          }
-        }
-      },
-      grid: [
-        {
-          left: '10%',
-          right: '8%',
-          bottom: 150
-        }
-      ],
-      xAxis: [
-        {
-          type: 'category',
-          data: data.categoryData,
-          boundaryGap: false,
-          axisLine: { onZero: false },
-          splitLine: { show: false },
-          min: 'dataMin',
-          max: 'dataMax',
-          axisPointer: {
-            z: 100
-          }
-        }
-      ],
-      yAxis: [
-        {
-          scale: true,
-          splitArea: {
-            show: true
-          }
-        }
-      ],
-      dataZoom: [
-        {
-          type: 'inside',
-          start: 98,
-          end: 100,
-          minValueSpan: 10
-        },
-        {
-          show: true,
-          type: 'slider',
-          bottom: 60,
-          start: 98,
-          end: 100,
 
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `custom-ohlc/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py custom/error-bar.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

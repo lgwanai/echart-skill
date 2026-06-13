@@ -2,10 +2,10 @@
 
 **Category:** `line, graphic`
 **Example dir:** `line-graphic`
-**Difficulty:** 9
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **line/basic.html** — Line
+Data format: `{ categories: string[], values: number[] }`
 
 ## Option Code
 ```javascript
@@ -106,28 +106,9 @@ option = {
             fill: '#333',
             width: 220,
             overflow: 'break',
-            text: 'xAxis represents temperature in °C, yAxis represents altitude in km, An image watermark in the upper right, This text block can be placed in any place',
-            font: '14px Microsoft YaHei'
-          }
-        }
-      ]
-    }
-  ],
-  series: [
-    {
-      name: '高度(km)与气温(°C)变化关系',
-      type: 'line',
-      smooth: true,
-      data: [15, -50, -56.5, -46.5, -22.1, -2.5, -27.7, -55.7, -76.5]
-    }
-  ]
-};
+            text: 'xAxis represents t
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `line-graphic/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py line/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

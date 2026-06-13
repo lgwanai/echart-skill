@@ -2,10 +2,10 @@
 
 **Category:** `flowGL`
 **Example dir:** `flowGL-noise`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -94,42 +94,9 @@ $.getScript(CDN_PATH + 'simplex-noise@2.4.0/simplex-noise.js').done(
           type: 'custom',
           data: data,
           encode: {
-            x: 0,
-            y: 0
-          },
-          renderItem: function (params, api) {
-            var x = api.value(0),
-              y = api.value(1),
-              dx = api.value(2),
-              dy = api.value(3);
-            var start = api.coord([x - dx / 2, y - dy / 2]);
-            var end = api.coord([x + dx / 2, y + dy / 2]);
-            return {
-              type: 'line',
-              shape: {
-                x1: start[0],
-                y1: start[1],
-                x2: end[0],
-                y2: end[1]
-              },
-              style: {
-                lineWidth: 2,
-                stroke: '#fff',
-                opacity: 0.2
-              }
-            };
-          }
-        }
-      ]
-    });
-  }
-);
+            x
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `flowGL-noise/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

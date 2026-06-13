@@ -2,10 +2,10 @@
 
 **Category:** `'map, lines'`
 **Example dir:** `lines-ny`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+- **lines/flights.html** — Lines
+Data format: `{ geoCoordMap: {"name": [lng,lat]}, flights: [[fromName, toName], ...] }`
 
 ## Option Code
 ```javascript
@@ -82,10 +82,6 @@ option = {
 fetchData(0);
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `lines-ny/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py lines/flights.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

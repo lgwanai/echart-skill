@@ -2,10 +2,10 @@
 
 **Category:** `graphGL`
 **Example dir:** `graphgl-large-internet`
-**Difficulty:** 
 
-## Template Match
-- **geo/lines.html** — 
+## Template
+⚠️ No template — use knowledge base
+Data format: `N/A`
 
 ## Option Code
 ```javascript
@@ -88,24 +88,9 @@ $.getJSON(
           },
           forceAtlas2: {
             steps: 1,
-            stopThreshold: 1,
-            jitterTolerence: 10,
-            edgeWeight: [0.2, 1],
-            gravity: 0,
-            edgeWeightInfluence: 1,
-            scaling: 0.2
-          }
-        }
-      ]
-    });
-  }
-);
+    
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `graphgl-large-internet/main.js`
-- Template data format: `GEO_COORD_MAP + FLIGHTS [[from, to, val], ...]`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py  -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`

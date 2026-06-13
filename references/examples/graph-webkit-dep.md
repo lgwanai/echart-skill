@@ -2,10 +2,10 @@
 
 **Category:** `graph`
 **Example dir:** `graph-webkit-dep`
-**Difficulty:** 8
 
-## Template Match
+## Template
 - **graph/force.html** — Force Graph
+Data format: `{ nodes: [{id?, name, symbolSize?, category?, x?, y?}, ...], links: [{source, target, value?}, ...], categories?: [{name}, ...] }`
 
 ## Option Code
 ```javascript
@@ -60,10 +60,6 @@ $.get(ROOT_PATH + '/data/asset/data/webkit-dep.json', function (webkitDep) {
 });
 ```
 
-
-
 ## Key Points
-- This is an official ECharts example from `graph-webkit-dep/main.js`
-- Template data format: `{ nodes: [{id?, name, symbolSize?, category?, x?, y?}, ...], links: [{source, target, value?}, ...], categories?: [{name}, ...] }`
-- Use `scripts/build_template.py` with the matching template + data
-- Always validate with `scripts/validate_chart.py` after generation
+- Generate via: `scripts/build_template.py graph/force.html -d data.json`
+- Validate: `scripts/validate_chart.py <output.html>`
