@@ -10,7 +10,7 @@ import duckdb
 from scripts.chart_generator import generate_chart, CHART_REQUIREMENTS
 
 
-OUT = "examples/all_charts"
+OUT = os.path.abspath("examples/all_charts")
 os.makedirs(OUT, exist_ok=True)
 
 # ── Temp DuckDB file (generate_chart needs a file path) ──
