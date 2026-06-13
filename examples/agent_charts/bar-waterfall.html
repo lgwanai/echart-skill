@@ -10,7 +10,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>bar-waterfall</title>
+<title>瀑布图</title>
 <script>
 
 /*
@@ -62,13 +62,13 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">bar-waterfall</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">瀑布图</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
-var rawIncrease = [];
-var rawDecrease = [];
-var categories = ["A", "B", "C", "D", "E"];
+var rawIncrease = [120, 200, 150, 80, 0, 0, 260];
+var rawDecrease = [0, 0, 0, 0, 110, 60, 0];
+var categories = ["\u542f\u52a8", "\u7814\u53d1", "\u8425\u9500", "\u8fd0\u7ef4", "\u9500\u552e", "\u5229\u6da6", "\u7ed3\u7b97"];
 
 // Auto-compute waterfall helper (transparent base) and split positive/negative
 var helper = [], positive = [], negative = [];
@@ -88,7 +88,7 @@ for (var i = 0; i < categories.length; i++) {
 }
 
 var option = {
-  title: { text: 'bar-waterfall', left: 'center' },
+  title: { text: '瀑布图', left: 'center' },
   tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
   grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
   xAxis: { type: 'category', data: categories },

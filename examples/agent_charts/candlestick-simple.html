@@ -10,7 +10,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>candlestick-simple</title>
+<title>K线图</title>
 <script>
 
 /*
@@ -62,18 +62,18 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">candlestick-simple</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">K线图</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
   grid: { left: '10%', right: '10%', bottom: '10%' },
-  xAxis: { type: 'category', data: [], boundaryGap: true },
+  xAxis: { type: 'category', data: ["1\u65e5", "2\u65e5", "3\u65e5", "4\u65e5", "5\u65e5"], boundaryGap: true },
   yAxis: { type: 'value', scale: true },
   series: [{
     type: 'candlestick',
-    data: [],
+    data: [[20, 34, 10, 38], [40, 35, 30, 50], [31, 38, 33, 44], [38, 15, 5, 42], [11, 35, 8, 35]],
     itemStyle: { color: '#ef5350', color0: '#26a69a', borderColor: '#ef5350', borderColor0: '#26a69a' }
   }]
 };

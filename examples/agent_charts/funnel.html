@@ -9,7 +9,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>funnel</title>
+<title>漏斗图</title>
 <script>
 
 /*
@@ -61,7 +61,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">funnel</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">漏斗图</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -71,13 +71,13 @@ var option = {
   series: [{
     type: 'funnel',
     left: '10%', top: 60, bottom: 60, width: '80%',
-    min: {{MIN_VALUE}},            // 0
-    max: {{MAX_VALUE}},            // 100
+    min: 1800,            // 0
+    max: 10000,            // 100
     sort: 'descending',             // 'descending' | 'ascending' | 'none'
     gap: 2,
-    label: { show: true, position: '""' },    // 'inside' | 'outside'
+    label: { show: true, position: 'inside' },    // 'inside' | 'outside'
     emphasis: { label: { fontSize: 20 } },
-    data: []
+    data: [{"name": "\u8bbf\u95ee", "value": 10000}, {"name": "\u6ce8\u518c", "value": 6500}, {"name": "\u6fc0\u6d3b", "value": 4200}, {"name": "\u4e0b\u5355", "value": 2800}, {"name": "\u652f\u4ed8", "value": 1800}]
   }]
 };
 chart.setOption(option);

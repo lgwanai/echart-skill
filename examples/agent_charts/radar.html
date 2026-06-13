@@ -9,7 +9,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>radar</title>
+<title>雷达图</title>
 <script>
 
 /*
@@ -61,21 +61,21 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">radar</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">雷达图</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
-  legend: { data: '""' },
+  legend: { data: ["\u9884\u7b97", "\u5b9e\u9645"] },
   radar: {
-    indicator: [],
-    shape: '""',        // 'polygon' | 'circle'
+    indicator: [{"name": "budget", "max": 6000.0}, {"name": "spending", "max": 16800.0}, {"name": "sales", "max": 33600.0}, {"name": "profit", "max": 42000.0}],
+    shape: 'polygon',        // 'polygon' | 'circle'
     center: ['50%', '50%'],
     radius: '65%'
   },
   series: [{
     type: 'radar',
-    data: []
+    data: [{"name": "\u9884\u7b97", "value": [4200, 3000, 20000, 35000]}, {"name": "\u5b9e\u9645", "value": [5000, 14000, 28000, 26000]}]
   }]
 };
 chart.setOption(option);

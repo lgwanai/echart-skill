@@ -69,7 +69,7 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis' },
   grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'category', data: ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00"], boundaryGap: false },
+  xAxis: { type: 'category', data: ["00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"], boundaryGap: false },
   yAxis: { type: 'value' },
   series: [{
     type: 'line',
@@ -78,7 +78,7 @@ var option = {
     areaStyle: true, // null | {}
     symbol: 'circle',
     symbolSize: 6,
-    data: [10, 8, 12, 15, 20, 30, 45, 60, 55, 40, 25, 18, 12]
+    data: [120, 200, 150, 80, 70, 110, 130]
   }]
 };
 chart.setOption(option);

@@ -9,7 +9,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>heatmap-cartesian</title>
+<title>热力图</title>
 <script>
 
 /*
@@ -61,24 +61,24 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">heatmap-cartesian</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">热力图</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { position: 'top' },
   grid: { height: '60%', top: '10%' },
-  xAxis: { type: 'category', data: [], splitArea: { show: true } },
-  yAxis: { type: 'category', data: [], splitArea: { show: true } },
+  xAxis: { type: 'category', data: [0, 1, 2], splitArea: { show: true } },
+  yAxis: { type: 'category', data: [0, 1, 2], splitArea: { show: true } },
   visualMap: {
-    min: 0, max: 100,
+    min: 0, max: 10,
     calculable: true, orient: 'horizontal',
     left: 'center', bottom: '5%',
     inRange: { color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#fee090', '#fdae61', '#f46d43', '#d73027'] }
   },
   series: [{
     type: 'heatmap',
-    data: [],
+    data: [[0, 0, 5], [0, 1, 10], [0, 2, 8], [1, 0, 3], [1, 1, 8], [1, 2, 6], [2, 0, 2], [2, 1, 5], [2, 2, 4]],
     label: { show: false },
     emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
   }]

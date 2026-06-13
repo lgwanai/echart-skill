@@ -11,7 +11,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>pie-doughnut</title>
+<title>环形图</title>
 <script>
 
 /*
@@ -63,7 +63,7 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">pie-doughnut</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">环形图</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
@@ -76,9 +76,9 @@ var option = {
     roseType: false || false,     // false | 'radius' | 'area'
     center: ['50%', '50%'],
     itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
-    label: { show: false },      // true | false
+    label: { show: true },      // true | false
     emphasis: { label: { show: true, fontSize: 20, fontWeight: 'bold' } },
-    data: []
+    data: [{"name": "\u641c\u7d22", "value": 1048}, {"name": "\u76f4\u63a5", "value": 735}, {"name": "\u90ae\u4ef6", "value": 580}, {"name": "\u8054\u76df", "value": 484}, {"name": "\u89c6\u9891", "value": 300}]
   }]
 };
 chart.setOption(option);
