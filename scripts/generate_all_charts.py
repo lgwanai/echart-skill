@@ -202,9 +202,9 @@ CHARTS.append(("32_Mix_Line_Bar", "mix/line-bar.html", {
 
 CHARTS.append(("41_Mix_Timeline", "mix/timeline.html", {
     "TITLE":"41 时间轴",
-    "TIMELINE":D([2020,2021,2022]),
+    "TIMELINE":D(["2020年","2021年","2022年"]),
     "CATEGORIES":D(["A","B","C"]),
-    "SERIES":D([{"name":"sales","type":"bar"}]),
+    "SERIES":D([{"name":"sales","type":"bar","data":[120,90,70]}]),
     "OPTIONS":D([{"series":[{"data":[120,90,70]}]},{"series":[{"data":[145,110,85]}]},{"series":[{"data":[170,130,100]}]}])}))
 
 # ═══ 3D ═══

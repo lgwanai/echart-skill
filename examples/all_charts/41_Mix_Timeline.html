@@ -67,13 +67,13 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   baseOption: {
-    timeline: { axisType: 'category', autoPlay: true, playInterval: 1000, data: [2020, 2021, 2022] },
+    timeline: { axisType: 'category', autoPlay: true, playInterval: 1000, data: ["2020\u5e74", "2021\u5e74", "2022\u5e74"] },
     title: { text: '41 时间轴' },
     tooltip: {},
     grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
     xAxis: { type: 'category', data: ["A", "B", "C"] },
     yAxis: { type: 'value' },
-    series: [{"name": "sales", "type": "bar"}]
+    series: [{"name": "sales", "type": "bar", "data": [120, 90, 70]}]
   },
   options: [{"series": [{"data": [120, 90, 70]}]}, {"series": [{"data": [145, 110, 85]}]}, {"series": [{"data": [170, 130, 100]}]}]
 };
