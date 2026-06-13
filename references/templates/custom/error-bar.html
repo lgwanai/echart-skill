@@ -1,7 +1,8 @@
 <!--
   Template: custom/error-bar.html
-  Chart Type: Error Bar (柱状图 + 误差线)
-  Data Format: [[category, value, min, max], ...]
+  Chart Type: Error Bar (柱状图 + 自定义误差线)
+  Data Format: [[xIdx, val, lowVal, highVal], ...]
+  Uses official ECharts custom series renderItem for error bars
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -17,22 +18,40 @@
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var rawData = {{DATA}};
+var barData = rawData.map(function(d){return d[1]});
+var errorData = rawData.map(function(d,i){return [i, d[2], d[3]]});
 var cats = rawData.map(function(d){return d[0]});
-var vals = rawData.map(function(d){return d[1]});
-var errs = rawData.map(function(d){return [d[1]-d[2], d[3]-d[1]]});
 var option = {
-  tooltip: { trigger: 'axis' },
-  grid: { left: '5%', right: '5%', bottom: '10%', top: '10%' },
-  xAxis: { type: 'category', data: cats },
-  yAxis: { type: 'value' },
+  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+  xAxis: { data: cats },
+  yAxis: {},
   series: [
-    { type: 'bar', data: vals, itemStyle: { color: '#5470c6' }, barWidth: '40%' },
-    { type: 'bar', data: vals, barGap: '-100%', barWidth: '40%',
-      itemStyle: { color: 'transparent' },
-      markLine: { silent: true, symbol: ['none','none'],
-        lineStyle: { color: '#333', type: 'solid', width: 1 },
-        data: rawData.map(function(d,i){ return [{ yAxis: d[2], xAxis: i }, { yAxis: d[3], xAxis: i }] })
-      }
+    {
+      type: 'bar', name: 'value',
+      data: barData,
+      itemStyle: { color: '#5470c6' }
+    },
+    {
+      type: 'custom', name: 'error',
+      itemStyle: { borderWidth: 1.5 },
+      renderItem: function(params, api) {
+        var xValue = api.value(0);
+        var highPoint = api.coord([xValue, api.value(1)]);
+        var lowPoint = api.coord([xValue, api.value(2)]);
+        var halfWidth = api.size([1, 0])[0] * 0.1;
+        var style = api.style({ stroke: api.visual('color'), fill: undefined });
+        return {
+          type: 'group',
+          children: [
+            { type: 'line', shape: { x1: highPoint[0] - halfWidth, y1: highPoint[1], x2: highPoint[0] + halfWidth, y2: highPoint[1] }, style: style },
+            { type: 'line', shape: { x1: highPoint[0], y1: highPoint[1], x2: lowPoint[0], y2: lowPoint[1] }, style: style },
+            { type: 'line', shape: { x1: lowPoint[0] - halfWidth, y1: lowPoint[1], x2: lowPoint[0] + halfWidth, y2: lowPoint[1] }, style: style }
+          ]
+        };
+      },
+      encode: { x: 0, y: [1, 2] },
+      data: errorData,
+      z: 100
     }
   ]
 };
