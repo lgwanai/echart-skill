@@ -40,6 +40,9 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | `/stop` | `/停止服务` | 停止本地服务 | `/stop` |
 | `/status` | `/状态` | 查看服务状态和链接 | `/status` |
 | `/echart-update` | `/update`, `/更新` | 从 GitHub 拉取最新代码并备份旧文件 | `/echart-update` |
+| `/analyze` | `/a`, `/分析` | 自动分析数据表，发现规律与异常 | `/analyze sales` |
+| `/insight` | `/洞察` | 对指定维度生成深度洞察 | `/insight sales --dim region` |
+| `/report` | `/r`, `/报告` | 一键生成专业分析报告 | `/report sales --template sales` |
 
 ### 指令处理流程
 
@@ -384,6 +387,79 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   ✅ 更新成功
 ```
 
+#### `/analyze` - 自动数据分析
+```
+/analyze <表名> [选项]
+/a <表名>  # 别名
+/分析 <表名>  # 中文别名
+
+自动分析数据表，发现趋势、异常、排名、占比、相关性等规律。
+
+选项:
+  --dimensions, -d <列名列表>  指定分析维度（逗号分隔）
+  --metric, -m <列名列表>      指定分析指标（逗号分隔）
+  --date-column <列名>         指定时间列
+  --top-n <数量>               Top-N 数量（默认 5）
+  --quick                      快速扫描模式
+  --format <text|json>         输出格式
+
+示例:
+  /analyze sales                           # 自动分析 sales 表
+  /analyze orders --dimensions region,category --metric amount
+  /analyze sales --date-column order_date  # 含时间序列分析
+  /analyze sales --quick                   # 快速扫描
+  /a sales                                 # 别名
+
+洞察类型:
+  - 📈 趋势分析: 上升/下降趋势，趋势加速/减速
+  - ⚠️ 异常检测: Z-score 检测异常波动
+  - 📊 排名分析: Top-N / Bottom-N 排名
+  - 🥧 占比分析: 构成分布与集中度
+  - 🔗 相关性: 指标间关联关系
+  - 📅 季节性: 周期性规律检测
+  - 📉 变化分析: 环比/同比变化
+```
+
+#### `/insight` - 深度洞察
+```
+/insight <表名> --dim <维度列> [选项]
+/洞察 <表名> --dim <维度列>  # 中文别名
+
+对指定维度生成深度洞察，适合追问"为什么"的场景。
+
+示例:
+  /insight sales --dim region          # 各地区深度分析
+  /insight sales --dim product --metric amount,quantity
+  /insight orders --dim channel --top-n 10
+```
+
+#### `/report` - 分析报告生成
+```
+/report <表名> [选项]
+/r <表名>  # 别名
+/报告 <表名>  # 中文别名
+
+一键生成专业数据分析报告，支持 Markdown/HTML/JSON 格式。
+
+选项:
+  --title, -t <标题>           报告标题
+  --template <模板名>           报告模板: general, sales, quick
+  --format <markdown|html|json> 输出格式（默认 markdown）
+  --output, -o <路径>          输出路径
+  --quick                       快速报告模式
+
+报告模板:
+  - general: 通用数据分析报告（含摘要/概览/指标/维度/趋势/异常/建议）
+  - sales:   销售分析报告（含销售概况/产品/渠道/区域/趋势）
+  - quick:   快速分析摘要（核心发现/数据画像/关键洞察/行动建议）
+
+示例:
+  /report sales                                    # 生成通用报告(Markdown)
+  /report sales --template sales --format html     # 销售报告(HTML)
+  /report orders --quick --format markdown         # 快速摘要
+  /r sales --title "Q1销售分析" --format html       # 指定标题
+```
+
 ### 模糊匹配关键词
 
 当用户输入不是显性指令时，通过关键词推断意图：
@@ -399,6 +475,8 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | 指标管理 | 指标、口径、定义、metric | Scenario 8 |
 | 服务管理 | 服务、服务器、启动、停止、server、start、stop | 直接执行 /start 或 /stop |
 | Skill 更新 | 更新、拉取、update、pull、升级 | 执行 /echart-update |
+| 自动分析 | 分析、洞察、发现、规律、趋势、异常、相关性、report、analyze | Scenario 16 |
+| 报告生成 | 报告、总结、出报告、结论、写报告、生成报告 | Scenario 17 |
 
 ---
 
@@ -1485,3 +1563,141 @@ python scripts/polling_cli.py remove <job_id>
 - Maximum interval: 86400 seconds (24 hours)
 - Polling runs in background thread
 - Tables are replaced on each poll (not appended)
+
+### Scenario 16: Automated Data Analysis (NEW in v1.6)
+**Trigger**: User wants to understand their data — discover patterns, anomalies, trends without manually writing SQL or picking charts.
+
+**Action**:
+
+1. **Run Analysis**: Use the Insight Engine to automatically analyze a table:
+   ```bash
+   # Full analysis
+   python scripts/insight_engine.py analyze <table_name> --db workspace.duckdb
+
+   # Quick scan
+   python scripts/insight_engine.py analyze <table_name> --quick --db workspace.duckdb
+
+   # With specific dimensions
+   python scripts/insight_engine.py analyze <table_name> \
+       --dimensions region,category --metric amount --date-column order_date
+   ```
+
+2. **Profile First**: If you need to understand the data structure:
+   ```bash
+   python scripts/insight_engine.py profile <table_name> --db workspace.duckdb
+   ```
+
+3. **Present Insights**: The engine returns structured insights with:
+   - 📈 **Trend**: Direction & strength of change over time
+   - ⚠️ **Anomaly**: Statistical outliers (Z-score method)
+   - 📊 **Ranking**: Top-N / Bottom-N by dimension
+   - 🥧 **Composition**: Distribution & concentration
+   - 🔗 **Correlation**: Relationships between metrics
+   - 📅 **Seasonality**: Periodic patterns
+   - 📉 **Change**: Period-over-period comparison
+
+4. **Insight Output Format**: Each insight includes:
+   - Severity level (critical/high/medium/low/info)
+   - Natural language description in Chinese
+   - Supporting evidence (numbers, periods, percentages)
+   - Recommended chart type
+   - Related columns for follow-up analysis
+
+**From Python API**:
+```python
+from scripts.insight_engine import InsightEngine
+
+engine = InsightEngine("workspace.duckdb")
+insights = engine.analyze("sales", date_column="order_date")
+for ins in insights:
+    print(f"{ins.severity.value}: {ins.title} — {ins.description}")
+```
+
+**Key Features**:
+- Completely automated — no need to write SQL or specify chart types
+- Data privacy preserved — all computation is local in DuckDB
+- Chinese natural language output
+- Insights ranked by importance (critical → info)
+- Each insight suggests the best chart type for visualization
+- Supports time-series, categorical, and cross-metric analysis
+
+### Scenario 17: Analysis Report Generation (NEW in v1.6)
+**Trigger**: User wants a professional analysis report, not just individual charts or insights.
+
+**Action**:
+
+1. **Generate Report**:
+   ```bash
+   # Quick report (Markdown)
+   python scripts/report_engine.py <table_name> --quick --format markdown
+
+   # Full report with template
+   python scripts/report_engine.py <table_name> --template sales --format html
+
+   # Custom title and output
+   python scripts/report_engine.py <table_name> \
+       --title "销售数据分析报告" --template general --format html -o reports/sales_analysis.html
+   ```
+
+2. **Available Templates**:
+   - `general` — 8-section comprehensive report (summary, overview, metrics, dimensions, trends, anomalies, correlation, recommendations)
+   - `sales` — Sales-specific report (overview, product, channel, region, trend, recommendations)
+   - `quick` — 4-section brief (key findings, profile, insights, actions)
+
+3. **Output Formats**:
+   - `markdown` — Clean markdown, ideal for embedding in AI responses
+   - `html` — Styled HTML with dark/light theme support, ready to share
+   - `json` — Structured JSON for programmatic consumption
+
+4. **Report Content**: Each report includes:
+   - Executive summary with key findings
+   - Data overview table with column profiles
+   - KPI statistics (mean, median, min, max, std)
+   - Dimension analysis (rankings + compositions)
+   - Trend analysis with direction and strength
+   - Anomaly detection results
+   - Correlation analysis
+   - Actionable recommendations based on findings
+
+**From Python API**:
+```python
+from scripts.report_engine import ReportEngine
+
+engine = ReportEngine("workspace.duckdb")
+path = engine.generate(
+    table="sales",
+    title="销售数据分析报告",
+    template="sales",
+    output_format="html",
+)
+print(f"Report: {path}")
+
+# Quick mode for fast summaries
+path = engine.quick_report("sales", output_format="markdown")
+```
+
+**Tips for Best Results**:
+- Ensure table has proper column types (dates as DATE/TIMESTAMP, numbers as INT/DOUBLE)
+- For time-series insights, specify a date column
+- Use the `sales` template when table contains revenue, product, channel data
+- Reports work offline — all analysis is local, no data leaves the machine
+- Combine with `/chart` or `/dashboard` to add visualizations to the report
+
+**Interaction Flow**:
+```
+User: /analyze sales
+Agent: [Runs automated analysis, returns 26 insights with severity rankings]
+       🔴 Critical: 单价环比增长113.9%
+       🟠 High: 数量季节性波动59%
+       🟡 Medium: 前2个渠道合计占69.1%
+       ...
+
+User: /report sales --template sales --format html
+Agent: [Generates professional HTML report with all insights, charts recommendations]
+       ✅ Report: outputs/reports/sales_sales_20260613_140000.html
+```
+
+**Integration with existing commands**:
+- Use `/analyze` to discover what's interesting → Use `/chart` to visualize key findings
+- Use `/report` for comprehensive analysis → Use `/dashboard` for interactive monitoring
+- Use `/insight` to drill into specific dimensions found by `/analyze`
