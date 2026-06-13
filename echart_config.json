@@ -1,0 +1,13 @@
+{
+  "server": {
+    "enabled": false,
+    "port_range": [
+      8100,
+      8200
+    ]
+  },
+  "output": {
+    "dir": "outputs/html"
+  },
+  "baidu_ak": ""
+}

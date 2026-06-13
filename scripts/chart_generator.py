@@ -415,6 +415,75 @@ def _is_map_chart(option: dict, custom_js: str) -> bool:
     return any(kw in combined for kw in map_keywords)
 
 
+def _auto_build_option(chart_type: str, df: "pd.DataFrame") -> dict:
+    """Auto-build an ECharts option from chart_type using DataFrame columns.
+
+    This is the safety net — when a caller passes only ``chart_type``
+    without an explicit ``echarts_option``, we infer sensible defaults
+    so the chart always renders.
+    """
+    cols = list(df.columns)
+    if not cols:
+        return {}
+
+    # Map single-result queries to a gauge-like display
+    if len(cols) == 1 and len(df) == 1:
+        val = df.iloc[0, 0]
+        return {"series": [{"type": "gauge", "data": [{"value": float(val) if val is not None else 0, "name": cols[0]}]}]}
+
+    first_col = cols[0]
+    second_col = cols[1] if len(cols) > 1 else first_col
+
+    ct = chart_type.lower()
+
+    if ct in ("bar", "column"):
+        return {
+            "xAxis": {"type": "category"},
+            "yAxis": {"type": "value"},
+            "series": [{"type": "bar", "encode": {"x": first_col, "y": second_col}}],
+        }
+    elif ct == "line":
+        return {
+            "xAxis": {"type": "category"},
+            "yAxis": {"type": "value"},
+            "series": [{"type": "line", "encode": {"x": first_col, "y": second_col}}],
+        }
+    elif ct == "pie":
+        return {
+            "series": [{"type": "pie", "encode": {"itemName": first_col, "value": second_col},
+                        "radius": ["40%", "70%"]}],
+        }
+    elif ct == "scatter":
+        return {
+            "xAxis": {"type": "value"},
+            "yAxis": {"type": "value"},
+            "series": [{"type": "scatter", "encode": {"x": first_col, "y": second_col}}],
+        }
+    elif ct == "map":
+        # Auto-detect map level from column name / data
+        map_name = "china"
+        if any("市" in str(v) or "city" in str(v).lower() for v in df[first_col].head(3)):
+            map_name = "china"
+        return {
+            "series": [{"type": "map", "map": map_name,
+                        "encode": {"itemName": first_col, "value": second_col}}],
+        }
+    elif ct == "radar":
+        # Build radar indicators from remaining columns
+        indicators = [{"name": c, "max": float(df[c].max()) * 1.2 if df[c].dtype in ('float64','int64') else 100}
+                      for c in cols[1:]]
+        return {
+            "radar": {"indicator": indicators},
+            "series": [{"type": "radar", "encode": {"itemName": first_col, "value": cols[1:]}}],
+        }
+    # Default: bar chart
+    return {
+        "xAxis": {"type": "category"},
+        "yAxis": {"type": "value"},
+        "series": [{"type": "bar", "encode": {"x": first_col, "y": second_col}}],
+    }
+
+
 def generate_echarts_html(df, config, output_path):
     """Generate an interactive HTML file using ECharts configuration.
 
@@ -429,6 +498,11 @@ def generate_echarts_html(df, config, output_path):
     title = config.get("title", "Chart")
     custom_js = config.get("custom_js", "")
     option = config.get("echarts_option", {})
+    chart_type = config.get("chart_type", "")
+
+    # 0. Auto-build option from chart_type when no explicit echarts_option
+    if not option and chart_type:
+        option = _auto_build_option(chart_type, df)
 
     # 1. Automatic Dataset Injection (if not already provided by custom option)
     if not option.get('dataset') and not df.empty:
