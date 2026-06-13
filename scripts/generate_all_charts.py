@@ -71,7 +71,7 @@ CHARTS.append(("10_Scatter_Basic", "scatter/basic.html", {
     "DATA":D([[10,8.04],[8,6.95],[13,7.58],[9,8.81],[11,8.33],[14,9.96],[6,7.24],[4,4.26],[12,10.84],[7,4.82],[5,5.68]])}))
 
 CHARTS.append(("11_Scatter_Bubble", "scatter/bubble.html", {
-    "TITLE":"11 气泡散点","X_NAME":"GDP","Y_NAME":"Life","VMIN":0,"VMAX":100,
+    "TITLE":"11 气泡散点","X_NAME":"GDP","Y_NAME":"Life","VMIN":10000000,"VMAX":1200000000,
     "DATA":D([[28604,77,17096869],[31163,77.4,27662440],[1516,68,1154605773],[13670,74.7,10582082]])}))
 
 CHARTS.append(("12_Scatter_Geo", "scatter/geo.html", {

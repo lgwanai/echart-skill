@@ -19,6 +19,13 @@
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
+	var rawData = {{DATA}};
+	var vmMin = {{VMIN}}, vmMax = {{VMAX}};
+	if (vmMin === 0 && vmMax === 100) {
+	  var vals = rawData.map(function(d){ return d[2] || 1; });
+	  vmMin = Math.min.apply(null, vals);
+	  vmMax = Math.max.apply(null, vals);
+	}
 var option = {
   tooltip: {
     trigger: 'item',
@@ -29,7 +36,7 @@ var option = {
   yAxis: { type: 'value', name: {{Y_NAME}} },
   visualMap: {
     dimension: 2,
-    min: {{VMIN}}, max: {{VMAX}},
+    min: vmMin, max: vmMax,
     inRange: { symbolSize: [5, 60], color: ['#50a3ba', '#eac736', '#d94e5d'] }
   },
   series: [{

@@ -66,6 +66,13 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
+	var rawData = [[28604, 77, 17096869], [31163, 77.4, 27662440], [1516, 68, 1154605773], [13670, 74.7, 10582082]];
+	var vmMin = 10000000, vmMax = 1200000000;
+	if (vmMin === 0 && vmMax === 100) {
+	  var vals = rawData.map(function(d){ return d[2] || 1; });
+	  vmMin = Math.min.apply(null, vals);
+	  vmMax = Math.max.apply(null, vals);
+	}
 var option = {
   tooltip: {
     trigger: 'item',
@@ -76,7 +83,7 @@ var option = {
   yAxis: { type: 'value', name: 'Life' },
   visualMap: {
     dimension: 2,
-    min: 0, max: 100,
+    min: vmMin, max: vmMax,
     inRange: { symbolSize: [5, 60], color: ['#50a3ba', '#eac736', '#d94e5d'] }
   },
   series: [{
