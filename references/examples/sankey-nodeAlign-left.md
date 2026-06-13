@@ -1,12 +1,53 @@
 # 桑基图左对齐布局
 
-**Category:** sankey
+**Category:** `sankey`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=sankey-nodeAlign-left
 **Template:** sankey/basic.html
+**Data Format:** `{ nodes: [{name: string, itemStyle?: {}}, ...], links: [{source: string, target: string, value: number}, ...] }`
+**Features:** emphasis/hover effects
 
-## Option Code
+## Official Option Code
 
+```javascript
+/*
+title: Node Align Left in Sankey
+category: sankey
+titleCN: 桑基图左对齐布局
+difficulty: 3
+*/
+myChart.showLoading();
+$.get(ROOT_PATH + '/data/asset/data/energy.json', function (data) {
+  myChart.hideLoading();
+  myChart.setOption(
+    (option = {
+      title: {
+        text: 'Node Align Left'
+      },
+      tooltip: {
+        trigger: 'item',
+        triggerOn: 'mousemove'
+      },
+      series: [
+        {
+          type: 'sankey',
+          emphasis: {
+            focus: 'adjacency'
+          },
+          nodeAlign: 'left',
+          data: data.nodes,
+          links: data.links,
+          lineStyle: {
+            color: 'source',
+            curveness: 0.5
+          }
+        }
+      ]
+    })
+  );
+});
+```
 
 ## Usage
-- Build: 
-- Validate: 
+- Build: `scripts/build_template.py sankey/basic.html -d data.json`
+- Validate: `scripts/validate_chart.py output.html`
+- Check `docs/CHART_DEBUG_LOG.md` for known issues
