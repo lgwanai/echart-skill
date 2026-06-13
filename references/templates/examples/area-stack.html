@@ -20,7 +20,7 @@ chart.setOption({
     }
   },
   legend: {
-    data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+    data: {{DATA}}
   },
   toolbox: {
     feature: {
@@ -31,7 +31,7 @@ chart.setOption({
     {
       type: 'category',
       boundaryGap: false,
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      data: {{DATA}}
     }
   ],
   yAxis: [
@@ -48,7 +48,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: [120, 132, 101, 134, 90, 230, 210]
+      data: {{DATA}}
     },
     {
       name: 'Union Ads',
@@ -58,7 +58,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: [220, 182, 191, 234, 290, 330, 310]
+      data: {{DATA}}
     },
     {
       name: 'Video Ads',
@@ -68,7 +68,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: [150, 232, 201, 154, 190, 330, 410]
+      data: {{DATA}}
     },
     {
       name: 'Direct',
@@ -78,7 +78,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: [320, 332, 301, 334, 390, 330, 320]
+      data: {{DATA}}
     },
     {
       name: 'Search Engine',
@@ -92,7 +92,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: [820, 932, 901, 934, 1290, 1330, 1320]
+      data: {{DATA}}
     }
   ]
 });

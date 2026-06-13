@@ -15,23 +15,14 @@ chart.setOption({
       top: '2%',
       left: '3%',
       orient: 'vertical',
-      data: [
-        {
-          name: 'tree1',
-          icon: 'rectangle'
-        },
-        {
-          name: 'tree2',
-          icon: 'rectangle'
-        }
-      ],
+      data: {{DATA}},
       borderColor: '#c23531'
     },
     series: [
       {
         type: 'tree',
         name: 'tree1',
-        data: [data],
+        data: {{DATA}},
         top: '5%',
         left: '7%',
         bottom: '2%',
@@ -59,7 +50,7 @@ chart.setOption({
       {
         type: 'tree',
         name: 'tree2',
-        data: [data2],
+        data: {{DATA}},
         top: '20%',
         left: '60%',
         bottom: '22%',

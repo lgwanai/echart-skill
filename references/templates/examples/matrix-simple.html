@@ -9,22 +9,14 @@ var chart=echarts.init(document.getElementById("main"));
 chart.setOption({
   matrix: {
     x: {
-      data: [
-        {
-          value: 'A',
-          children: [
-            'A1',
-            'A2',
-            {
-              value: 'A3',
-              children: ['A31', 'A32']
+      data: {{DATA}}
             }
           ]
         }
       ]
     },
     y: {
-      data: ['U', 'V']
+      data: {{DATA}}
     },
     top: 150,
     bottom: 150
@@ -40,8 +32,7 @@ chart.setOption({
   series: {
     type: 'heatmap',
     coordinateSystem: 'matrix',
-    data: [
-      ['A1', 'U', 10],
+    data: {{DATA}},
       ['A1', 'V', 20],
       ['A2', 'U', 30],
       ['A2', 'V', 40],

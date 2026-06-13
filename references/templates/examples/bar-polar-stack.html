@@ -10,14 +10,14 @@ chart.setOption({
   angleAxis: {},
   radiusAxis: {
     type: 'category',
-    data: ['Mon', 'Tue', 'Wed', 'Thu'],
+    data: {{DATA}},
     z: 10
   },
   polar: {},
   series: [
     {
       type: 'bar',
-      data: [1, 2, 3, 4],
+      data: {{DATA}},
       coordinateSystem: 'polar',
       name: 'A',
       stack: 'a',
@@ -27,7 +27,7 @@ chart.setOption({
     },
     {
       type: 'bar',
-      data: [2, 4, 6, 8],
+      data: {{DATA}},
       coordinateSystem: 'polar',
       name: 'B',
       stack: 'a',
@@ -37,7 +37,7 @@ chart.setOption({
     },
     {
       type: 'bar',
-      data: [1, 2, 3, 4],
+      data: {{DATA}},
       coordinateSystem: 'polar',
       name: 'C',
       stack: 'a',
@@ -48,7 +48,7 @@ chart.setOption({
   ],
   legend: {
     show: true,
-    data: ['A', 'B', 'C']
+    data: {{DATA}}
   }
 });
 window.addEventListener("resize",function(){chart.resize();});

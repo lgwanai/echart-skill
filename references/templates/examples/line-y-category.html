@@ -8,7 +8,7 @@
 var chart=echarts.init(document.getElementById("main"));
 chart.setOption({
   legend: {
-    data: ['Altitude (km) vs. temperature (°C)']
+    data: {{DATA}}
   },
   tooltip: {
     trigger: 'axis',
@@ -33,7 +33,7 @@ chart.setOption({
       formatter: '{value} km'
     },
     boundaryGap: false,
-    data: ['0', '10', '20', '30', '40', '50', '60', '70', '80']
+    data: {{DATA}}
   },
   series: [
     {
@@ -48,7 +48,7 @@ chart.setOption({
         shadowBlur: 10,
         shadowOffsetY: 8
       },
-      data: [15, -50, -56.5, -46.5, -22.1, -2.5, -27.7, -55.7, -76.5]
+      data: {{DATA}}
     }
   ]
 });

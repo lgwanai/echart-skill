@@ -19,7 +19,7 @@ chart.setOption({
   legend: {
     bottom: 10,
     left: 'center',
-    data: ['CityA', 'CityB', 'CityD', 'CityC', 'CityE']
+    data: {{DATA}}
   },
   series: [
     {
@@ -27,19 +27,7 @@ chart.setOption({
       radius: '65%',
       center: ['50%', '50%'],
       selectedMode: 'single',
-      data: [
-        {
-          value: 1548,
-          name: 'CityE',
-          label: {
-            formatter: [
-              '{title|{b}}{abg|}',
-              '  {weatherHead|Weather}{valueHead|Days}{rateHead|Percent}',
-              '{hr|}',
-              '  {Sunny|}{value|202}{rate|55.3%}',
-              '  {Cloudy|}{value|142}{rate|38.9%}',
-              '  {Showers|}{value|21}{rate|5.8%}'
-            ].join('\n'),
+      data: {{DATA}}.join('\n'),
             backgroundColor: '#eee',
             borderColor: '#777',
             borderWidth: 1,

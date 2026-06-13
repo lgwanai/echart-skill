@@ -30,7 +30,7 @@ chart.setOption({
   legend: {
     orient: 'vertical',
     left: 'left',
-    data: ['Prod A', 'Prod B', 'Prod C', 'Prod D', 'Prod E']
+    data: {{DATA}}
   },
   series: [
     {
@@ -41,13 +41,7 @@ chart.setOption({
       left: '5%',
       top: '50%',
       funnelAlign: 'right',
-      data: [
-        { value: 60, name: 'Prod C' },
-        { value: 30, name: 'Prod D' },
-        { value: 10, name: 'Prod E' },
-        { value: 80, name: 'Prod B' },
-        { value: 100, name: 'Prod A' }
-      ]
+      data: {{DATA}}
     },
     {
       name: 'Pyramid',
@@ -58,13 +52,7 @@ chart.setOption({
       top: '5%',
       sort: 'ascending',
       funnelAlign: 'right',
-      data: [
-        { value: 60, name: 'Prod C' },
-        { value: 30, name: 'Prod D' },
-        { value: 10, name: 'Prod E' },
-        { value: 80, name: 'Prod B' },
-        { value: 100, name: 'Prod A' }
-      ]
+      data: {{DATA}}
     },
     {
       name: 'Funnel',
@@ -74,13 +62,7 @@ chart.setOption({
       left: '55%',
       top: '5%',
       funnelAlign: 'left',
-      data: [
-        { value: 60, name: 'Prod C' },
-        { value: 30, name: 'Prod D' },
-        { value: 10, name: 'Prod E' },
-        { value: 80, name: 'Prod B' },
-        { value: 100, name: 'Prod A' }
-      ]
+      data: {{DATA}}
     },
     {
       name: 'Pyramid',
@@ -91,13 +73,7 @@ chart.setOption({
       top: '50%',
       sort: 'ascending',
       funnelAlign: 'left',
-      data: [
-        { value: 60, name: 'Prod C' },
-        { value: 30, name: 'Prod D' },
-        { value: 10, name: 'Prod E' },
-        { value: 80, name: 'Prod B' },
-        { value: 100, name: 'Prod A' }
-      ]
+      data: {{DATA}}
     }
   ]
 });

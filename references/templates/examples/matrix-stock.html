@@ -139,82 +139,7 @@ chart.setOption({
       markPoint: {
         symbolSize: 0,
         symbol: 'circle',
-        data: [
-          {
-            relativeTo: 'coordinate',
-            x: 0,
-            y: 0,
-            name: 'max',
-            type: 'max',
-            label: {
-              align: 'left',
-              verticalAlign: 'top',
-              formatter: priceFormatter(lastClose + maxAbs),
-              color: getPriceColor(lastClose + maxAbs)
-            }
-          },
-          {
-            relativeTo: 'coordinate',
-            x: 0,
-            y: '50%',
-            name: lastClose + '',
-            label: {
-              align: 'left',
-              verticalAlign: 'middle',
-              formatter: priceFormatter(lastClose),
-              color: getPriceColor(lastClose)
-            }
-          },
-          {
-            relativeTo: 'coordinate',
-            x: 0,
-            y: '100%',
-            name: 'min',
-            type: 'min',
-            label: {
-              align: 'left',
-              verticalAlign: 'bottom',
-              formatter: priceFormatter(lastClose - maxAbs),
-              color: getPriceColor(lastClose - maxAbs)
-            }
-          },
-          {
-            relativeTo: 'coordinate',
-            x: '100%',
-            y: 0,
-            name: priceFormatter((maxAbs / lastClose) * 100) + '%',
-            label: {
-              align: 'right',
-              verticalAlign: 'top',
-              color: colorRed,
-              formatter: '{b}'
-            }
-          },
-          {
-            relativeTo: 'coordinate',
-            x: '100%',
-            y: '50%',
-            name: '0%',
-            label: {
-              align: 'right',
-              verticalAlign: 'middle',
-              color: colorGray,
-              formatter: '{b}'
-            }
-          },
-          {
-            relativeTo: 'coordinate',
-            x: '100%',
-            y: '100%',
-            name: '-' + priceFormatter((maxAbs / lastClose) * 100) + '%',
-            label: {
-              align: 'right',
-              verticalAlign: 'bottom',
-              color: colorGreen,
-              formatter: '{b}'
-            }
-          }
-        ]
+        data: {{DATA}}
       }
     },
     {
@@ -349,10 +274,7 @@ chart.setOption({
       data: Array(6).fill(null)
     },
     body: {
-      data: [
-        {
-          coord: [
-            [0, 3],
+      data: {{DATA}},
             [0, 3]
           ],
           mergeCells: true

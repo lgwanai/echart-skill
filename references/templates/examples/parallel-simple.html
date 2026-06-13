@@ -15,7 +15,7 @@ chart.setOption({
       dim: 3,
       name: 'Score',
       type: 'category',
-      data: ['Excellent', 'Good', 'OK', 'Bad']
+      data: {{DATA}}
     }
   ],
   series: {
@@ -23,8 +23,7 @@ chart.setOption({
     lineStyle: {
       width: 4
     },
-    data: [
-      [12.99, 100, 82, 'Good'],
+    data: {{DATA}},
       [9.99, 80, 77, 'OK'],
       [20, 120, 60, 'Excellent']
     ]

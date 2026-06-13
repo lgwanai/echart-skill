@@ -26,7 +26,7 @@ chart.setOption({
     }
   },
   legend: {
-    data: ['Expenses', 'Income']
+    data: {{DATA}}
   },
   grid: {
     left: '3%',
@@ -63,7 +63,7 @@ chart.setOption({
           color: 'transparent'
         }
       },
-      data: [0, 900, 1245, 1530, 1376, 1376, 1511, 1689, 1856, 1495, 1292]
+      data: {{DATA}}
     },
     {
       name: 'Income',
@@ -73,7 +73,7 @@ chart.setOption({
         show: true,
         position: 'top'
       },
-      data: [900, 345, 393, '-', '-', 135, 178, 286, '-', '-', '-']
+      data: {{DATA}}
     },
     {
       name: 'Expenses',
@@ -83,7 +83,7 @@ chart.setOption({
         show: true,
         position: 'bottom'
       },
-      data: ['-', '-', '-', 108, 154, '-', '-', '-', 119, 361, 203]
+      data: {{DATA}}
     }
   ]
 });

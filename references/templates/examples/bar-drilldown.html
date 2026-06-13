@@ -8,7 +8,7 @@
 var chart=echarts.init(document.getElementById("main"));
 chart.setOption({
   xAxis: {
-    data: ['Animals', 'Fruits', 'Cars']
+    data: {{DATA}}
   },
   yAxis: {},
   dataGroupId: '',
@@ -16,20 +16,7 @@ chart.setOption({
   series: {
     type: 'bar',
     id: 'sales',
-    data: [
-      {
-        value: 5,
-        groupId: 'animals'
-      },
-      {
-        value: 2,
-        groupId: 'fruits'
-      },
-      {
-        value: 4,
-        groupId: 'cars'
-      }
-    ],
+    data: {{DATA}},
     universalTransition: {
       enabled: true,
       divideShape: 'clone'

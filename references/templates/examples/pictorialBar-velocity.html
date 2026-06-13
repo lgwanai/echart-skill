@@ -17,7 +17,7 @@ chart.setOption({
     }
   },
   xAxis: {
-    data: ['驯鹿', '火箭', '飞机', '高铁', '轮船', '汽车', '跑步', '步行'],
+    data: {{DATA}},
     axisTick: { show: false },
     axisLine: { show: false },
     axisLabel: {
@@ -46,7 +46,7 @@ chart.setOption({
           opacity: 1
         }
       },
-      data: [123, 60, 25, 18, 12, 9, 2, 1],
+      data: {{DATA}},
       z: 10
     },
     {
@@ -56,11 +56,7 @@ chart.setOption({
       symbolPosition: 'end',
       symbolSize: 50,
       symbolOffset: [0, '-120%'],
-      data: [
-        {
-          value: 123,
-          symbol: pathSymbols.reindeer,
-          symbolSize: [60, 60]
+      data: {{DATA}}
         },
         {
           value: 60,

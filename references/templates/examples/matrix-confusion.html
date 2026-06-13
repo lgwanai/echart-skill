@@ -9,11 +9,11 @@ var chart=echarts.init(document.getElementById("main"));
 chart.setOption({
   matrix: {
     x: {
-      data: ['Positive', 'Negative'],
+      data: {{DATA}},
       label
     },
     y: {
-      data: ['Positive', 'Negative'],
+      data: {{DATA}},
       label
     },
     top: 80,
@@ -23,8 +23,7 @@ chart.setOption({
   series: {
     type: 'custom',
     coordinateSystem: 'matrix',
-    data: [
-      ['Positive', 'Positive', 10],
+    data: {{DATA}},
       ['Positive', 'Negative', 2],
       ['Negative', 'Positive', 3],
       ['Negative', 'Negative', 5]

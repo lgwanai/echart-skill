@@ -44,15 +44,7 @@ chart.setOption({
       },
       xAxis: {},
       yAxis: {
-        data: [
-          'heart',
-          'large-intestine',
-          'small-intestine',
-          'spleen',
-          'kidney',
-          'lung',
-          'liver'
-        ]
+        data: {{DATA}}
       },
       series: [
         {
@@ -60,7 +52,7 @@ chart.setOption({
           emphasis: {
             focus: 'self'
           },
-          data: [121, 321, 141, 52, 198, 289, 139]
+          data: {{DATA}}
         }
       ]
     });

@@ -9,11 +9,11 @@ var chart=echarts.init(document.getElementById("main"));
 chart.setOption({
   tooltip: {},
   legend: {
-    data: ['typeA', 'typeB'],
+    data: {{DATA}},
     selectedMode: 'single'
   },
   xAxis: {
-    data: ['a', 'b', 'c', 'd', 'e'],
+    data: {{DATA}},
     axisTick: { show: false },
     axisLine: { show: false },
     axisLabel: { show: false }
@@ -37,10 +37,7 @@ chart.setOption({
       symbolClip: true,
       symbolBoundingData: bodyMax,
       label: labelSetting,
-      data: [
-        {
-          value: 123,
-          symbol: symbols[0]
+      data: {{DATA}}
         },
         {
           value: 34,
@@ -68,10 +65,7 @@ chart.setOption({
       symbolClip: true,
       symbolBoundingData: bodyMax,
       label: labelSetting,
-      data: [
-        {
-          value: 12,
-          symbol: symbols[0]
+      data: {{DATA}}
         },
         {
           value: 44,
@@ -101,10 +95,7 @@ chart.setOption({
       itemStyle: {
         color: '#ccc'
       },
-      data: [
-        {
-          value: 1,
-          symbol: symbols[0]
+      data: {{DATA}}
         },
         {
           value: 1,

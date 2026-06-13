@@ -2,7 +2,7 @@
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{TITLE}</title>
 <!-- {ECHARTS_INLINE} -->
-<!-- {{GL_INLINE}} -->
+
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -20,7 +20,7 @@ chart.setOption({
       tooltip: {},
       legend: {
         left: 'left',
-        data: ['å¼º', 'ä¸­', 'å¼±'],
+        data: {{DATA}},
         textStyle: {
           color: '#ccc'
         }

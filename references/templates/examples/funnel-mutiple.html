@@ -28,7 +28,7 @@ chart.setOption({
   legend: {
     orient: 'vertical',
     left: 'left',
-    data: ['Show', 'Click', 'Visit', 'Inquiry', 'Order']
+    data: {{DATA}}
   },
   series: [
     {
@@ -38,13 +38,7 @@ chart.setOption({
       height: '45%',
       left: '5%',
       top: '50%',
-      data: [
-        { value: 60, name: 'Visit' },
-        { value: 30, name: 'Inquiry' },
-        { value: 10, name: 'Order' },
-        { value: 80, name: 'Click' },
-        { value: 100, name: 'Show' }
-      ]
+      data: {{DATA}}
     },
     {
       name: 'Pyramid',
@@ -54,13 +48,7 @@ chart.setOption({
       left: '5%',
       top: '5%',
       sort: 'ascending',
-      data: [
-        { value: 60, name: 'Visit' },
-        { value: 30, name: 'Inquiry' },
-        { value: 10, name: 'Order' },
-        { value: 80, name: 'Click' },
-        { value: 100, name: 'Show' }
-      ]
+      data: {{DATA}}
     },
     {
       name: 'Funnel',
@@ -72,13 +60,7 @@ chart.setOption({
       label: {
         position: 'left'
       },
-      data: [
-        { value: 60, name: 'Visit' },
-        { value: 30, name: 'Inquiry' },
-        { value: 10, name: 'Order' },
-        { value: 80, name: 'Click' },
-        { value: 100, name: 'Show' }
-      ]
+      data: {{DATA}}
     },
     {
       name: 'Pyramid',
@@ -91,13 +73,7 @@ chart.setOption({
       label: {
         position: 'left'
       },
-      data: [
-        { value: 60, name: 'Visit' },
-        { value: 30, name: 'Inquiry' },
-        { value: 10, name: 'Order' },
-        { value: 80, name: 'Click' },
-        { value: 100, name: 'Show' }
-      ]
+      data: {{DATA}}
     }
   ]
 });

@@ -22,7 +22,7 @@ chart.setOption({
     }
   },
   legend: {
-    data: ['Show', 'Click', 'Visit', 'Inquiry', 'Order']
+    data: {{DATA}}
   },
   series: [
     {
@@ -45,13 +45,7 @@ chart.setOption({
           formatter: '{b}Expected: {c}%'
         }
       },
-      data: [
-        { value: 60, name: 'Visit' },
-        { value: 40, name: 'Inquiry' },
-        { value: 20, name: 'Order' },
-        { value: 80, name: 'Click' },
-        { value: 100, name: 'Show' }
-      ]
+      data: {{DATA}}
     },
     {
       name: 'Actual',
@@ -75,13 +69,7 @@ chart.setOption({
           formatter: '{b}Actual: {c}%'
         }
       },
-      data: [
-        { value: 30, name: 'Visit' },
-        { value: 10, name: 'Inquiry' },
-        { value: 5, name: 'Order' },
-        { value: 50, name: 'Click' },
-        { value: 80, name: 'Show' }
-      ],
+      data: {{DATA}},
       // Ensure outer shape will not be over inner shape when hover.
       z: 100
     }

@@ -14,7 +14,7 @@ chart.setOption({
   },
   xAxis: [
     {
-      data: ['Christmas Wish List', '', 'Qomolangma', 'Kilimanjaro'],
+      data: {{DATA}},
       axisTick: { show: false },
       axisLine: { show: false },
       axisLabel: {
@@ -48,12 +48,7 @@ chart.setOption({
         fontSize: 16,
         color: '#e54035'
       },
-      data: [
-        {
-          value: 13000,
-          symbol: 'image://' + paperDataURI,
-          symbolRepeat: true,
-          symbolSize: ['130%', '20%'],
+      data: {{DATA}},
           symbolOffset: [0, 10],
           symbolMargin: '-30%',
           animationDelay: function (dataIndex, params) {
@@ -89,11 +84,7 @@ chart.setOption({
           color: '#e54035',
           width: 2
         },
-        data: [
-          {
-            yAxis: 8844
-          }
-        ]
+        data: {{DATA}}
       }
     },
     {
@@ -107,10 +98,7 @@ chart.setOption({
       silent: true,
       symbolOffset: [0, '50%'],
       z: -10,
-      data: [
-        {
-          value: 1,
-          symbolSize: ['150%', 50]
+      data: {{DATA}}
         },
         {
           value: '-'

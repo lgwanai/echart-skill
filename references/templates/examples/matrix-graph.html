@@ -12,10 +12,10 @@ chart.setOption({
   },
   matrix: {
     x: {
-      data: ['Data Analysis', 'Programming', 'Algorithms']
+      data: {{DATA}}
     },
     y: {
-      data: ['1st Year', '2nd Year', '3rd Year', '4th Year']
+      data: {{DATA}}
     },
     left: margin[1],
     right: margin[1],
@@ -58,8 +58,7 @@ chart.setOption({
           target: 3
         }
       ],
-      data: [
-        ['Programming', '1st Year', 1, 'Intro to Computer Science'],
+      data: {{DATA}},
         ['Data Analysis', '2nd Year', 1, 'Intro to Data Analysis'],
         ['Algorithms', '2nd Year', 1, 'Intro to Algorithms'],
         ['Programming', '2nd Year', 1, 'Advanced Programming'],

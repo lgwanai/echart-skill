@@ -43,23 +43,14 @@ chart.setOption({
 const barOption = {
   xAxis: {
     type: 'category',
-    data: ['Female', 'Male']
+    data: {{DATA}}
   },
   yAxis: {},
   series: [
     {
       type: 'bar',
       id: 'total',
-      data: [
-        {
-          value: calculateAverage(maleDeta, 0),
-          groupId: 'male'
-        },
-        {
-          value: calculateAverage(femaleData, 0),
-          groupId: 'female'
-        }
-      ],
+      data: {{DATA}},
       universalTransition: {
         enabled: true,
         seriesKey: ['female', 'male'],

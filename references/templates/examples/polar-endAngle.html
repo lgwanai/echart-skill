@@ -14,14 +14,14 @@ chart.setOption({
       polarIndex: 0,
       startAngle: 90,
       endAngle: 0,
-      data: ['S1', 'S2', 'S3']
+      data: {{DATA}}
     },
     {
       type: 'category',
       polarIndex: 1,
       startAngle: -90,
       endAngle: -180,
-      data: ['T1', 'T2', 'T3']
+      data: {{DATA}}
     }
   ],
   radiusAxis: [{ polarIndex: 0 }, { polarIndex: 1 }],
@@ -30,13 +30,13 @@ chart.setOption({
     {
       type: 'bar',
       polarIndex: 0,
-      data: [1, 2, 3],
+      data: {{DATA}},
       coordinateSystem: 'polar'
     },
     {
       type: 'bar',
       polarIndex: 1,
-      data: [1, 2, 3],
+      data: {{DATA}},
       coordinateSystem: 'polar'
     }
   ]

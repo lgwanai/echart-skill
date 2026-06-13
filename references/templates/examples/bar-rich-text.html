@@ -17,7 +17,7 @@ chart.setOption({
     }
   },
   legend: {
-    data: ['City Alpha', 'City Beta', 'City Gamma']
+    data: {{DATA}}
   },
   grid: {
     left: 100
@@ -38,7 +38,7 @@ chart.setOption({
   yAxis: {
     type: 'category',
     inverse: true,
-    data: ['Sunny', 'Cloudy', 'Showers'],
+    data: {{DATA}},
     axisLabel: {
       formatter: function (value) {
         return '{' + value + '| }\n{value|' + value + '}';
@@ -77,7 +77,7 @@ chart.setOption({
     {
       name: 'City Alpha',
       type: 'bar',
-      data: [165, 170, 30],
+      data: {{DATA}},
       label: seriesLabel,
       markPoint: {
         symbolSize: 1,
@@ -119,23 +119,20 @@ chart.setOption({
             }
           }
         },
-        data: [
-          { type: 'max', name: 'max days: ' },
-          { type: 'min', name: 'min days: ' }
-        ]
+        data: {{DATA}}
       }
     },
     {
       name: 'City Beta',
       type: 'bar',
       label: seriesLabel,
-      data: [150, 105, 110]
+      data: {{DATA}}
     },
     {
       name: 'City Gamma',
       type: 'bar',
       label: seriesLabel,
-      data: [220, 82, 63]
+      data: {{DATA}}
     }
   ]
 });

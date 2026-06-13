@@ -22,7 +22,7 @@ chart.setOption({
     }
   },
   yAxis: {
-    data: ['2013', '2014', '2015', '2016'],
+    data: {{DATA}},
     inverse: true,
     axisTick: { show: false },
     axisLine: { show: false },
@@ -48,7 +48,7 @@ chart.setOption({
       symbolClip: true,
       symbolSize: 30,
       symbolBoundingData: maxData,
-      data: [891, 1220, 660, 1670],
+      data: {{DATA}},
       markLine: {
         symbol: 'none',
         label: {
@@ -61,11 +61,7 @@ chart.setOption({
           opacity: 0.2,
           width: 2
         },
-        data: [
-          {
-            type: 'max'
-          }
-        ]
+        data: {{DATA}}
       },
       z: 10
     },
@@ -91,7 +87,7 @@ chart.setOption({
       symbol: spirit,
       symbolSize: 30,
       symbolBoundingData: maxData,
-      data: [891, 1220, 660, 1670],
+      data: {{DATA}},
       z: 5
     }
   ]
