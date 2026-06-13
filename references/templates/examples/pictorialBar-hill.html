@@ -1,11 +1,12 @@
-<!-- pictorialBar-hill — https://echarts.apache.org/examples/zh/editor.html?c=pictorialBar-hill -->
+<!-- pictorialBar-hill -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   backgroundColor: '#0f375f',
   tooltip: {},
   legend: {
@@ -13,7 +14,7 @@ chart.setOption({
   },
   xAxis: [
     {
-      data: {{DATA}},
+      data: ['Christmas Wish List', '', 'Qomolangma', 'Kilimanjaro'],
       axisTick: { show: false },
       axisLine: { show: false },
       axisLabel: {
@@ -47,7 +48,12 @@ chart.setOption({
         fontSize: 16,
         color: '#e54035'
       },
-      data: {{DATA}},
+      data: [
+        {
+          value: 13000,
+          symbol: 'image://' + paperDataURI,
+          symbolRepeat: true,
+          symbolSize: ['130%', '20%'],
           symbolOffset: [0, 10],
           symbolMargin: '-30%',
           animationDelay: function (dataIndex, params) {
@@ -83,7 +89,11 @@ chart.setOption({
           color: '#e54035',
           width: 2
         },
-        data: {{DATA}}
+        data: [
+          {
+            yAxis: 8844
+          }
+        ]
       }
     },
     {
@@ -97,7 +107,10 @@ chart.setOption({
       silent: true,
       symbolOffset: [0, '50%'],
       z: -10,
-      data: {{DATA}}
+      data: [
+        {
+          value: 1,
+          symbolSize: ['150%', 50]
         },
         {
           value: '-'
@@ -113,6 +126,7 @@ chart.setOption({
       ]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

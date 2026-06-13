@@ -1,11 +1,12 @@
-<!-- line-stack — https://echarts.apache.org/examples/zh/editor.html?c=line-stack -->
+<!-- line-stack -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Stacked Line'
   },
@@ -13,7 +14,7 @@ chart.setOption({
     trigger: 'axis'
   },
   legend: {
-    data: {{DATA}}
+    data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
   },
   grid: {
     left: '3%',
@@ -29,7 +30,7 @@ chart.setOption({
   xAxis: {
     type: 'category',
     boundaryGap: false,
-    data: {{DATA}}
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   },
   yAxis: {
     type: 'value'
@@ -39,33 +40,34 @@ chart.setOption({
       name: 'Email',
       type: 'line',
       stack: 'Total',
-      data: {{DATA}}
+      data: [120, 132, 101, 134, 90, 230, 210]
     },
     {
       name: 'Union Ads',
       type: 'line',
       stack: 'Total',
-      data: {{DATA}}
+      data: [220, 182, 191, 234, 290, 330, 310]
     },
     {
       name: 'Video Ads',
       type: 'line',
       stack: 'Total',
-      data: {{DATA}}
+      data: [150, 232, 201, 154, 190, 330, 410]
     },
     {
       name: 'Direct',
       type: 'line',
       stack: 'Total',
-      data: {{DATA}}
+      data: [320, 332, 301, 334, 390, 330, 320]
     },
     {
       name: 'Search Engine',
       type: 'line',
       stack: 'Total',
-      data: {{DATA}}
+      data: [820, 932, 901, 934, 1290, 1330, 1320]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

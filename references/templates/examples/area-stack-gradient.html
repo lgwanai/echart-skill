@@ -1,11 +1,12 @@
-<!-- area-stack-gradient — https://echarts.apache.org/examples/zh/editor.html?c=area-stack-gradient -->
+<!-- area-stack-gradient -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
   title: {
     text: 'Gradient Stacked Area Chart'
@@ -20,7 +21,7 @@ chart.setOption({
     }
   },
   legend: {
-    data: {{DATA}}
+    data: ['Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 5']
   },
   toolbox: {
     feature: {
@@ -31,7 +32,7 @@ chart.setOption({
     {
       type: 'category',
       boundaryGap: false,
-      data: {{DATA}}
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     }
   ],
   yAxis: [
@@ -65,7 +66,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [140, 232, 101, 264, 90, 340, 250]
     },
     {
       name: 'Line 2',
@@ -92,7 +93,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [120, 282, 111, 234, 220, 340, 310]
     },
     {
       name: 'Line 3',
@@ -119,7 +120,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [320, 132, 201, 334, 190, 130, 220]
     },
     {
       name: 'Line 4',
@@ -146,7 +147,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [220, 402, 231, 134, 190, 230, 120]
     },
     {
       name: 'Line 5',
@@ -177,9 +178,10 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [220, 302, 181, 234, 210, 290, 150]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

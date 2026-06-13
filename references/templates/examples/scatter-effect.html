@@ -1,11 +1,12 @@
-<!-- scatter-effect — https://echarts.apache.org/examples/zh/editor.html?c=scatter-effect -->
+<!-- scatter-effect -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   xAxis: {
     scale: true
   },
@@ -16,14 +17,15 @@ chart.setOption({
     {
       type: 'effectScatter',
       symbolSize: 20,
-      data: {{DATA}},
+      data: [
+        [172.7, 105.2],
         [153.4, 42]
       ]
     },
     {
       type: 'scatter',
       // prettier-ignore
-      data: {{DATA}}, [167.5, 59.0], [159.5, 49.2], [157.0, 63.0], [155.8, 53.6],
+      data: [[161.2, 51.6], [167.5, 59.0], [159.5, 49.2], [157.0, 63.0], [155.8, 53.6],
                 [170.0, 59.0], [159.1, 47.6], [166.0, 69.8], [176.2, 66.8], [160.2, 75.2],
                 [172.5, 55.2], [170.9, 54.2], [172.9, 62.5], [153.4, 42.0], [160.0, 50.0],
                 [147.2, 49.8], [168.2, 49.2], [175.0, 73.2], [157.0, 47.8], [167.6, 68.8],
@@ -78,6 +80,7 @@ chart.setOption({
             ]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

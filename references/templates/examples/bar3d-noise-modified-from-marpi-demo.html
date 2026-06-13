@@ -1,12 +1,13 @@
-<!-- bar3d-noise-modified-from-marpi-demo — https://echarts.apache.org/examples/zh/editor.html?c=bar3d-noise-modified-from-marpi-demo -->
+<!-- bar3d-noise-modified-from-marpi-demo -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
 <!-- {{GL_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
         toolbox: {
           left: 20,
           iconStyle: {
@@ -93,7 +94,7 @@ chart.setOption({
             },
             instancing: true,
             barSize: 0.6,
-            data: {{DATA}},
+            data: [],
             lineStyle: {
               width: 4
             },
@@ -104,6 +105,7 @@ chart.setOption({
             animationDurationUpdate: UPDATE_DURATION
           }
         ]
-      });
+      };
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

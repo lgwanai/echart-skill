@@ -1,11 +1,12 @@
-<!-- matrix-stock — https://echarts.apache.org/examples/zh/editor.html?c=matrix-stock -->
+<!-- matrix-stock -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: titles,
   xAxis: [
     {
@@ -138,7 +139,82 @@ chart.setOption({
       markPoint: {
         symbolSize: 0,
         symbol: 'circle',
-        data: {{DATA}}
+        data: [
+          {
+            relativeTo: 'coordinate',
+            x: 0,
+            y: 0,
+            name: 'max',
+            type: 'max',
+            label: {
+              align: 'left',
+              verticalAlign: 'top',
+              formatter: priceFormatter(lastClose + maxAbs),
+              color: getPriceColor(lastClose + maxAbs)
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: 0,
+            y: '50%',
+            name: lastClose + '',
+            label: {
+              align: 'left',
+              verticalAlign: 'middle',
+              formatter: priceFormatter(lastClose),
+              color: getPriceColor(lastClose)
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: 0,
+            y: '100%',
+            name: 'min',
+            type: 'min',
+            label: {
+              align: 'left',
+              verticalAlign: 'bottom',
+              formatter: priceFormatter(lastClose - maxAbs),
+              color: getPriceColor(lastClose - maxAbs)
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: '100%',
+            y: 0,
+            name: priceFormatter((maxAbs / lastClose) * 100) + '%',
+            label: {
+              align: 'right',
+              verticalAlign: 'top',
+              color: colorRed,
+              formatter: '{b}'
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: '100%',
+            y: '50%',
+            name: '0%',
+            label: {
+              align: 'right',
+              verticalAlign: 'middle',
+              color: colorGray,
+              formatter: '{b}'
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: '100%',
+            y: '100%',
+            name: '-' + priceFormatter((maxAbs / lastClose) * 100) + '%',
+            label: {
+              align: 'right',
+              verticalAlign: 'bottom',
+              color: colorGreen,
+              formatter: '{b}'
+            }
+          }
+        ]
       }
     },
     {
@@ -273,7 +349,10 @@ chart.setOption({
       data: Array(6).fill(null)
     },
     body: {
-      data: {{DATA}},
+      data: [
+        {
+          coord: [
+            [0, 3],
             [0, 3]
           ],
           mergeCells: true
@@ -347,6 +426,7 @@ chart.setOption({
       })
     )
   }
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

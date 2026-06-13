@@ -1,16 +1,17 @@
-<!-- radar — https://echarts.apache.org/examples/zh/editor.html?c=radar -->
+<!-- radar -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Basic Radar Chart'
   },
   legend: {
-    data: {{DATA}}
+    data: ['Allocated Budget', 'Actual Spending']
   },
   radar: {
     // shape: 'circle',
@@ -27,7 +28,9 @@ chart.setOption({
     {
       name: 'Budget vs spending',
       type: 'radar',
-      data: {{DATA}},
+      data: [
+        {
+          value: [4200, 3000, 20000, 35000, 50000, 18000],
           name: 'Allocated Budget'
         },
         {
@@ -37,6 +40,7 @@ chart.setOption({
       ]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

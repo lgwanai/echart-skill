@@ -1,16 +1,17 @@
-<!-- pictorialBar-vehicle — https://echarts.apache.org/examples/zh/editor.html?c=pictorialBar-vehicle -->
+<!-- pictorialBar-vehicle -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Vehicles in X City'
   },
   legend: {
-    data: {{DATA}}
+    data: ['2015', '2016']
   },
   tooltip: {
     trigger: 'axis',
@@ -23,7 +24,7 @@ chart.setOption({
     left: 20
   },
   yAxis: {
-    data: {{DATA}},
+    data: ['reindeer', 'ship', 'plane', 'train', 'car'],
     inverse: true,
     axisLine: { show: false },
     axisTick: { show: false },
@@ -52,7 +53,28 @@ chart.setOption({
       symbolRepeat: true,
       symbolSize: ['80%', '60%'],
       barCategoryGap: '40%',
-      data: {{DATA}}
+      data: [
+        {
+          value: 157,
+          symbol: pathSymbols.reindeer
+        },
+        {
+          value: 21,
+          symbol: pathSymbols.ship
+        },
+        {
+          value: 66,
+          symbol: pathSymbols.plane
+        },
+        {
+          value: 78,
+          symbol: pathSymbols.train
+        },
+        {
+          value: 123,
+          symbol: pathSymbols.car
+        }
+      ]
     },
     {
       name: '2016',
@@ -61,9 +83,31 @@ chart.setOption({
       label: labelSetting,
       symbolRepeat: true,
       symbolSize: ['80%', '60%'],
-      data: {{DATA}}
+      data: [
+        {
+          value: 184,
+          symbol: pathSymbols.reindeer
+        },
+        {
+          value: 29,
+          symbol: pathSymbols.ship
+        },
+        {
+          value: 73,
+          symbol: pathSymbols.plane
+        },
+        {
+          value: 91,
+          symbol: pathSymbols.train
+        },
+        {
+          value: 95,
+          symbol: pathSymbols.car
+        }
+      ]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

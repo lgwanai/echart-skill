@@ -1,11 +1,12 @@
-<!-- geo-choropleth-scatter — https://echarts.apache.org/examples/zh/editor.html?c=geo-choropleth-scatter -->
+<!-- geo-choropleth-scatter -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
     geo: {
       map: 'iceland',
       roam: true,
@@ -62,7 +63,8 @@ chart.setOption({
           tooltip: 2,
           label: 2
         },
-        data: {{DATA}},
+        data: [
+          [-21.9348415, 64.1334671, 14523],
           [-19.028531, 63.710241, 45126],
           [-17.089925, 65.37887072, 12345],
           [-19.15936, 65.6218101, 56789],
@@ -84,9 +86,15 @@ chart.setOption({
         // instead of creating an internal geo coord sys.
         geoIndex: 0,
         map: '',
-        data: {{DATA}}
+        data: [
+          { name: 'Austurland', value: 423 },
+          { name: 'Suðurland', value: 256 },
+          { name: 'Norðurland vestra', value: 489 },
+          { name: 'Norðurland eystra', value: 51 }
+        ]
       }
     ]
-  });
+  };
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

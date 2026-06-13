@@ -1,11 +1,12 @@
-<!-- radar2 — https://echarts.apache.org/examples/zh/editor.html?c=radar2 -->
+<!-- radar2 -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Proportion of Browsers',
     subtext: 'Fake Data',
@@ -57,7 +58,15 @@ chart.setOption({
             color: 'rgba(0,250,0,0.3)'
           }
         },
-        data: {{DATA}},
+        data: [
+          {
+            value: [
+              (40 - i) * 10,
+              (38 - i) * 4 + 60,
+              i * 5 + 10,
+              i * 9,
+              (i * i) / 2
+            ],
             name: i + 2000 + ''
           }
         ]
@@ -65,6 +74,7 @@ chart.setOption({
     }
     return series;
   })()
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

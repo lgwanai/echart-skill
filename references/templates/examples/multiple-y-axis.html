@@ -1,11 +1,12 @@
-<!-- multiple-y-axis — https://echarts.apache.org/examples/zh/editor.html?c=multiple-y-axis -->
+<!-- multiple-y-axis -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   color: colors,
   tooltip: {
     trigger: 'axis',
@@ -24,7 +25,7 @@ chart.setOption({
     }
   },
   legend: {
-    data: {{DATA}}
+    data: ['Evaporation', 'Precipitation', 'Temperature']
   },
   xAxis: [
     {
@@ -33,7 +34,7 @@ chart.setOption({
         alignWithLabel: true
       },
       // prettier-ignore
-      data: {{DATA}}
+      data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     }
   ],
   yAxis: [
@@ -88,21 +89,26 @@ chart.setOption({
     {
       name: 'Evaporation',
       type: 'bar',
-      data: {{DATA}}
+      data: [
+        2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
+      ]
     },
     {
       name: 'Precipitation',
       type: 'bar',
       yAxisIndex: 1,
-      data: {{DATA}}
+      data: [
+        2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
+      ]
     },
     {
       name: 'Temperature',
       type: 'line',
       yAxisIndex: 2,
-      data: {{DATA}}
+      data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

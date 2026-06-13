@@ -1,11 +1,12 @@
-<!-- bar-y-category-stack — https://echarts.apache.org/examples/zh/editor.html?c=bar-y-category-stack -->
+<!-- bar-y-category-stack -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   tooltip: {
     trigger: 'axis',
     axisPointer: {
@@ -19,7 +20,7 @@ chart.setOption({
   },
   yAxis: {
     type: 'category',
-    data: {{DATA}}
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   },
   series: [
     {
@@ -32,7 +33,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [320, 302, 301, 334, 390, 330, 320]
     },
     {
       name: 'Mail Ad',
@@ -44,7 +45,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [120, 132, 101, 134, 90, 230, 210]
     },
     {
       name: 'Affiliate Ad',
@@ -56,7 +57,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [220, 182, 191, 234, 290, 330, 310]
     },
     {
       name: 'Video Ad',
@@ -68,7 +69,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [150, 212, 201, 154, 190, 330, 410]
     },
     {
       name: 'Search Engine',
@@ -80,9 +81,10 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [820, 832, 901, 934, 1290, 1330, 1320]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

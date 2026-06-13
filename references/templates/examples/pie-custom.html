@@ -1,11 +1,12 @@
-<!-- pie-custom — https://echarts.apache.org/examples/zh/editor.html?c=pie-custom -->
+<!-- pie-custom -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   backgroundColor: '#2c343c',
   title: {
     text: 'Customized Pie',
@@ -32,7 +33,13 @@ chart.setOption({
       type: 'pie',
       radius: '55%',
       center: ['50%', '50%'],
-      data: {{DATA}}.sort(function (a, b) {
+      data: [
+        { value: 335, name: 'Direct' },
+        { value: 310, name: 'Email' },
+        { value: 274, name: 'Union Ads' },
+        { value: 235, name: 'Video Ads' },
+        { value: 400, name: 'Search Engine' }
+      ].sort(function (a, b) {
         return a.value - b.value;
       }),
       roseType: 'radius',
@@ -59,6 +66,7 @@ chart.setOption({
       }
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

@@ -1,11 +1,12 @@
-<!-- radar-multiple — https://echarts.apache.org/examples/zh/editor.html?c=radar-multiple -->
+<!-- radar-multiple -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Multiple Radar'
   },
@@ -14,7 +15,13 @@ chart.setOption({
   },
   legend: {
     left: 'center',
-    data: {{DATA}}
+    data: [
+      'A Software',
+      'A Phone',
+      'Another Phone',
+      'Precipitation',
+      'Evaporation'
+    ]
   },
   radar: [
     {
@@ -57,7 +64,9 @@ chart.setOption({
         trigger: 'item'
       },
       areaStyle: {},
-      data: {{DATA}},
+      data: [
+        {
+          value: [60, 73, 85, 40],
           name: 'A Software'
         }
       ]
@@ -66,7 +75,9 @@ chart.setOption({
       type: 'radar',
       radarIndex: 1,
       areaStyle: {},
-      data: {{DATA}},
+      data: [
+        {
+          value: [85, 90, 90, 95, 95],
           name: 'A Phone'
         },
         {
@@ -79,7 +90,12 @@ chart.setOption({
       type: 'radar',
       radarIndex: 2,
       areaStyle: {},
-      data: {{DATA}}
+      data: [
+        {
+          name: 'Precipitation',
+          value: [
+            2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 75.6, 82.2, 48.7, 18.8, 6.0, 2.3
+          ]
         },
         {
           name: 'Evaporation',
@@ -90,6 +106,7 @@ chart.setOption({
       ]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

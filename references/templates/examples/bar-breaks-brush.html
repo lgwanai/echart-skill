@@ -1,11 +1,12 @@
-<!-- bar-breaks-brush — https://echarts.apache.org/examples/zh/editor.html?c=bar-breaks-brush -->
+<!-- bar-breaks-brush -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Bar Chart with Axis Break (Brush-enabled)',
     subtext:
@@ -34,7 +35,7 @@ chart.setOption({
   xAxis: [
     {
       type: 'category',
-      data: {{DATA}}
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     }
   ],
   yAxis: [
@@ -58,7 +59,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [1500, 2032, 2001, 3154, 2190, 4330, 2410]
     },
     {
       name: 'Data B',
@@ -66,7 +67,7 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [1200, 1320, 1010, 1340, 900, 2300, 2100]
     },
     {
       name: 'Data C',
@@ -74,17 +75,18 @@ chart.setOption({
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA}}
+      data: [103200, 100320, 103010, 102340, 103900, 103300, 103200]
     },
     {
       name: 'Data D',
       type: 'bar',
-      data: {{DATA}},
+      data: [106212, 102118, 102643, 104631, 106679, 100130, 107022],
       emphasis: {
         focus: 'series'
       }
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

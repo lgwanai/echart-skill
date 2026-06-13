@@ -1,20 +1,21 @@
-<!-- matrix-graph — https://echarts.apache.org/examples/zh/editor.html?c=matrix-graph -->
+<!-- matrix-graph -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Course Prerequisites'
   },
   matrix: {
     x: {
-      data: {{DATA}}
+      data: ['Data Analysis', 'Programming', 'Algorithms']
     },
     y: {
-      data: {{DATA}}
+      data: ['1st Year', '2nd Year', '3rd Year', '4th Year']
     },
     left: margin[1],
     right: margin[1],
@@ -57,7 +58,8 @@ chart.setOption({
           target: 3
         }
       ],
-      data: {{DATA}},
+      data: [
+        ['Programming', '1st Year', 1, 'Intro to Computer Science'],
         ['Data Analysis', '2nd Year', 1, 'Intro to Data Analysis'],
         ['Algorithms', '2nd Year', 1, 'Intro to Algorithms'],
         ['Programming', '2nd Year', 1, 'Advanced Programming'],
@@ -115,6 +117,7 @@ chart.setOption({
       }
     ]
   }
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

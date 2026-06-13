@@ -1,11 +1,12 @@
-<!-- bar-rich-text — https://echarts.apache.org/examples/zh/editor.html?c=bar-rich-text -->
+<!-- bar-rich-text -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Weather Statistics'
   },
@@ -16,7 +17,7 @@ chart.setOption({
     }
   },
   legend: {
-    data: {{DATA}}
+    data: ['City Alpha', 'City Beta', 'City Gamma']
   },
   grid: {
     left: 100
@@ -37,7 +38,7 @@ chart.setOption({
   yAxis: {
     type: 'category',
     inverse: true,
-    data: {{DATA}},
+    data: ['Sunny', 'Cloudy', 'Showers'],
     axisLabel: {
       formatter: function (value) {
         return '{' + value + '| }\n{value|' + value + '}';
@@ -76,7 +77,7 @@ chart.setOption({
     {
       name: 'City Alpha',
       type: 'bar',
-      data: {{DATA}},
+      data: [165, 170, 30],
       label: seriesLabel,
       markPoint: {
         symbolSize: 1,
@@ -118,22 +119,26 @@ chart.setOption({
             }
           }
         },
-        data: {{DATA}}
+        data: [
+          { type: 'max', name: 'max days: ' },
+          { type: 'min', name: 'min days: ' }
+        ]
       }
     },
     {
       name: 'City Beta',
       type: 'bar',
       label: seriesLabel,
-      data: {{DATA}}
+      data: [150, 105, 110]
     },
     {
       name: 'City Gamma',
       type: 'bar',
       label: seriesLabel,
-      data: {{DATA}}
+      data: [220, 82, 63]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

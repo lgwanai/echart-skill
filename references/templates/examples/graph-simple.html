@@ -1,11 +1,12 @@
-<!-- graph-simple — https://echarts.apache.org/examples/zh/editor.html?c=graph-simple -->
+<!-- graph-simple -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Basic Graph'
   },
@@ -26,7 +27,28 @@ chart.setOption({
       edgeLabel: {
         fontSize: 20
       },
-      data: {{DATA}},
+      data: [
+        {
+          name: 'Node 1',
+          x: 300,
+          y: 300
+        },
+        {
+          name: 'Node 2',
+          x: 800,
+          y: 300
+        },
+        {
+          name: 'Node 3',
+          x: 550,
+          y: 100
+        },
+        {
+          name: 'Node 4',
+          x: 550,
+          y: 500
+        }
+      ],
       // links: [],
       links: [
         {
@@ -75,6 +97,7 @@ chart.setOption({
       }
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

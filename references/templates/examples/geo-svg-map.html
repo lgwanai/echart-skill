@@ -1,11 +1,12 @@
-<!-- geo-svg-map — https://echarts.apache.org/examples/zh/editor.html?c=geo-svg-map -->
+<!-- geo-svg-map -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
       tooltip: {
         formatter: function (params) {
           console.log(params);
@@ -165,12 +166,14 @@ chart.setOption({
             backgroundColor: '#555'
           }
         },
-        data: {{DATA}},
+        data: [
+          [0, 0, 'route1'],
           [1, 0, 'route2']
         ]
       }
       // Make buttons end
       // -----------------
-    });
+    };
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

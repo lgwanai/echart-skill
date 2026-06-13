@@ -1,11 +1,12 @@
-<!-- bar-polar-label-tangential — https://echarts.apache.org/examples/zh/editor.html?c=bar-polar-label-tangential -->
+<!-- bar-polar-label-tangential -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: [
     {
       text: 'Tangential Polar Bar Label Position (middle)'
@@ -20,12 +21,12 @@ chart.setOption({
   },
   radiusAxis: {
     type: 'category',
-    data: {{DATA}}
+    data: ['a', 'b', 'c', 'd']
   },
   tooltip: {},
   series: {
     type: 'bar',
-    data: {{DATA}},
+    data: [2, 1.2, 2.4, 3.6],
     coordinateSystem: 'polar',
     label: {
       show: true,
@@ -33,6 +34,7 @@ chart.setOption({
       formatter: '{b}: {c}'
     }
   }
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

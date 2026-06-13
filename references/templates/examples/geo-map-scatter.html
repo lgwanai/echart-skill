@@ -1,11 +1,12 @@
-<!-- geo-map-scatter — https://echarts.apache.org/examples/zh/editor.html?c=geo-map-scatter -->
+<!-- geo-map-scatter -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   tooltip: {},
   visualMap: {
     min: 0,
@@ -67,9 +68,45 @@ chart.setOption({
       name: 'categoryA',
       type: 'map',
       geoIndex: 0,
-      data: {{DATA}}
+      data: [
+        { name: '北京', value: randomValue() },
+        { name: '天津', value: randomValue() },
+        { name: '上海', value: randomValue() },
+        { name: '重庆', value: randomValue() },
+        { name: '河北', value: randomValue() },
+        { name: '河南', value: randomValue() },
+        { name: '云南', value: randomValue() },
+        { name: '辽宁', value: randomValue() },
+        { name: '黑龙江', value: randomValue() },
+        { name: '湖南', value: randomValue() },
+        { name: '安徽', value: randomValue() },
+        { name: '山东', value: randomValue() },
+        { name: '新疆', value: randomValue() },
+        { name: '江苏', value: randomValue() },
+        { name: '浙江', value: randomValue() },
+        { name: '江西', value: randomValue() },
+        { name: '湖北', value: randomValue() },
+        { name: '广西', value: randomValue() },
+        { name: '甘肃', value: randomValue() },
+        { name: '山西', value: randomValue() },
+        { name: '内蒙古', value: randomValue() },
+        { name: '陕西', value: randomValue() },
+        { name: '吉林', value: randomValue() },
+        { name: '福建', value: randomValue() },
+        { name: '贵州', value: randomValue() },
+        { name: '广东', value: randomValue() },
+        { name: '青海', value: randomValue() },
+        { name: '西藏', value: randomValue() },
+        { name: '四川', value: randomValue() },
+        { name: '宁夏', value: randomValue() },
+        { name: '海南', value: randomValue() },
+        { name: '台湾', value: randomValue() },
+        { name: '香港', value: randomValue() },
+        { name: '澳门', value: randomValue() }
+      ]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

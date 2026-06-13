@@ -1,6 +1,6 @@
-<!-- bar-data-color -->
+<!-- area-pieces -->
 <!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>bar-data-color</title>
+<head><meta charset="utf-8"><title>area-pieces</title>
 <script>
 
 /*
@@ -105,28 +105,56 @@ var chart=echarts.init(document.getElementById("main"));
 var option = {
   xAxis: {
     type: 'category',
-    data: [120, {"value": 200, "itemStyle": {"color": "#505372"}}, 150, {"value": 80, "itemStyle": {"color": "#ee6666"}}, 70, {"value": 110, "itemStyle": {"color": "#fac858"}}, 130]
+    boundaryGap: false
   },
   yAxis: {
-    type: 'value'
+    type: 'value',
+    boundaryGap: [0, '30%']
+  },
+  visualMap: {
+    type: 'piecewise',
+    show: false,
+    dimension: 0,
+    seriesIndex: 0,
+    pieces: [
+      {
+        gt: 1,
+        lt: 3,
+        color: 'rgba(0, 0, 180, 0.4)'
+      },
+      {
+        gt: 5,
+        lt: 7,
+        color: 'rgba(0, 0, 180, 0.4)'
+      }
+    ]
   },
   series: [
     {
+      type: 'line',
+      smooth: 0.6,
+      symbol: 'none',
+      lineStyle: {
+        color: '#5470C6',
+        width: 5
+      },
+      markLine: {
+        symbol: ['none', 'none'],
+        label: { show: false },
+        data: [["2019-10-10", 200], ["2019-10-11", 560], ["2019-10-12", 750], ["2019-10-13", 580], ["2019-10-14", 250], ["2019-10-15", 300]]
+      },
+      areaStyle: {},
       data: [
-        120,
-        {
-          value: 200,
-          itemStyle: {
-            color: '#505372'
-          }
-        },
-        150,
-        80,
-        70,
-        110,
-        130
-      ],
-      type: 'bar'
+        ['2019-10-10', 200],
+        ['2019-10-11', 560],
+        ['2019-10-12', 750],
+        ['2019-10-13', 580],
+        ['2019-10-14', 250],
+        ['2019-10-15', 300],
+        ['2019-10-16', 450],
+        ['2019-10-17', 300],
+        ['2019-10-18', 100]
+      ]
     }
   ]
 };

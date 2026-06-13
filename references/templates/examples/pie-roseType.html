@@ -1,11 +1,12 @@
-<!-- pie-roseType — https://echarts.apache.org/examples/zh/editor.html?c=pie-roseType -->
+<!-- pie-roseType -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Nightingale Chart',
     subtext: 'Fake Data',
@@ -18,7 +19,16 @@ chart.setOption({
   legend: {
     left: 'center',
     top: 'bottom',
-    data: {{DATA}}
+    data: [
+      'rose1',
+      'rose2',
+      'rose3',
+      'rose4',
+      'rose5',
+      'rose6',
+      'rose7',
+      'rose8'
+    ]
   },
   toolbox: {
     show: true,
@@ -47,7 +57,16 @@ chart.setOption({
           show: true
         }
       },
-      data: {{DATA}}
+      data: [
+        { value: 40, name: 'rose 1' },
+        { value: 33, name: 'rose 2' },
+        { value: 28, name: 'rose 3' },
+        { value: 22, name: 'rose 4' },
+        { value: 20, name: 'rose 5' },
+        { value: 15, name: 'rose 6' },
+        { value: 12, name: 'rose 7' },
+        { value: 10, name: 'rose 8' }
+      ]
     },
     {
       name: 'Area Mode',
@@ -58,9 +77,19 @@ chart.setOption({
       itemStyle: {
         borderRadius: 5
       },
-      data: {{DATA}}
+      data: [
+        { value: 30, name: 'rose 1' },
+        { value: 28, name: 'rose 2' },
+        { value: 26, name: 'rose 3' },
+        { value: 24, name: 'rose 4' },
+        { value: 22, name: 'rose 5' },
+        { value: 20, name: 'rose 6' },
+        { value: 18, name: 'rose 7' },
+        { value: 16, name: 'rose 8' }
+      ]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

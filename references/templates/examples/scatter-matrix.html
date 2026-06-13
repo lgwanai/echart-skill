@@ -1,11 +1,12 @@
-<!-- scatter-matrix — https://echarts.apache.org/examples/zh/editor.html?c=scatter-matrix -->
+<!-- scatter-matrix -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   animation: false,
   brush: {
     brushLink: 'all',
@@ -50,7 +51,7 @@ chart.setOption({
       dim: 6,
       name: schema[6].text,
       type: 'category',
-      data: {{DATA}}
+      data: ['优', '良', '轻度', '中度', '重度', '严重']
     }
   ],
   parallel: {
@@ -101,6 +102,7 @@ chart.setOption({
     },
     ...gridOption.series
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

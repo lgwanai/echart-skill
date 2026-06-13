@@ -1,11 +1,12 @@
-<!-- bar-waterfall2 — https://echarts.apache.org/examples/zh/editor.html?c=bar-waterfall2 -->
+<!-- bar-waterfall2 -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Accumulated Waterfall Chart'
   },
@@ -25,7 +26,7 @@ chart.setOption({
     }
   },
   legend: {
-    data: {{DATA}}
+    data: ['Expenses', 'Income']
   },
   grid: {
     left: '3%',
@@ -62,7 +63,7 @@ chart.setOption({
           color: 'transparent'
         }
       },
-      data: {{DATA}}
+      data: [0, 900, 1245, 1530, 1376, 1376, 1511, 1689, 1856, 1495, 1292]
     },
     {
       name: 'Income',
@@ -72,7 +73,7 @@ chart.setOption({
         show: true,
         position: 'top'
       },
-      data: {{DATA}}
+      data: [900, 345, 393, '-', '-', 135, 178, 286, '-', '-', '-']
     },
     {
       name: 'Expenses',
@@ -82,9 +83,10 @@ chart.setOption({
         show: true,
         position: 'bottom'
       },
-      data: {{DATA}}
+      data: ['-', '-', '-', 108, 154, '-', '-', '-', 119, 361, 203]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

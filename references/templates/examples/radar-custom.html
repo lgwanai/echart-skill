@@ -1,11 +1,12 @@
-<!-- radar-custom — https://echarts.apache.org/examples/zh/editor.html?c=radar-custom -->
+<!-- radar-custom -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   color: ['#67F9D8', '#FFE434', '#56A3F1', '#FF917C'],
   title: {
     text: 'Customized Radar Chart'
@@ -74,7 +75,9 @@ chart.setOption({
           width: 4
         }
       },
-      data: {{DATA}},
+      data: [
+        {
+          value: [100, 8, 0.4, -80, 2000],
           name: 'Data A'
         },
         {
@@ -89,7 +92,9 @@ chart.setOption({
     {
       type: 'radar',
       radarIndex: 1,
-      data: {{DATA}},
+      data: [
+        {
+          value: [120, 118, 130, 100, 99, 70],
           name: 'Data C',
           symbol: 'rect',
           symbolSize: 12,
@@ -122,6 +127,7 @@ chart.setOption({
       ]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

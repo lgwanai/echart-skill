@@ -1,11 +1,12 @@
-<!-- sunburst-label-rotate — https://echarts.apache.org/examples/zh/editor.html?c=sunburst-label-rotate -->
+<!-- sunburst-label-rotate -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   silent: true,
   series: [
     {
@@ -15,7 +16,26 @@ chart.setOption({
       emphasis: {
         focus: 'ancestor'
       },
-      data: {{DATA}}
+      data: [
+        {
+          value: 8,
+          children: [
+            {
+              value: 4,
+              children: [
+                {
+                  value: 2
+                },
+                {
+                  value: 1
+                },
+                {
+                  value: 1
+                },
+                {
+                  value: 0.5
+                }
+              ]
             },
             {
               value: 2
@@ -104,6 +124,7 @@ chart.setOption({
       ]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

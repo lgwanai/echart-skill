@@ -1,13 +1,14 @@
-<!-- bar-brush — https://echarts.apache.org/examples/zh/editor.html?c=bar-brush -->
+<!-- bar-brush -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   legend: {
-    data: {{DATA}},
+    data: ['bar', 'bar2', 'bar3', 'bar4'],
     left: '10%'
   },
   brush: {
@@ -64,6 +65,7 @@ chart.setOption({
       data: data4
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

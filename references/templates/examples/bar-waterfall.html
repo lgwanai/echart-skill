@@ -1,11 +1,12 @@
-<!-- bar-waterfall — https://echarts.apache.org/examples/zh/editor.html?c=bar-waterfall -->
+<!-- bar-waterfall -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-chart.setOption({
+var option = {
   title: {
     text: 'Waterfall Chart',
     subtext: 'Living Expenses in Shenzhen'
@@ -29,7 +30,7 @@ chart.setOption({
   xAxis: {
     type: 'category',
     splitLine: { show: false },
-    data: {{DATA}}
+    data: ['Total', 'Rent', 'Utilities', 'Transportation', 'Meals', 'Other']
   },
   yAxis: {
     type: 'value'
@@ -49,7 +50,7 @@ chart.setOption({
           color: 'transparent'
         }
       },
-      data: {{DATA}}
+      data: [0, 1700, 1400, 1200, 300, 0]
     },
     {
       name: 'Life Cost',
@@ -59,9 +60,10 @@ chart.setOption({
         show: true,
         position: 'inside'
       },
-      data: {{DATA}}
+      data: [2900, 1200, 300, 200, 900, 300]
     }
   ]
-});
+};
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>
