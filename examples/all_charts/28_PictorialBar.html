@@ -74,7 +74,7 @@ var option = {
   yAxis: { type: 'value', splitLine: { show: false }, axisLabel: { show: false }, axisTick: { show: false } },
   series: [{
     type: 'pictorialBar',
-    symbol: '',          // 'path://...' | 'image://...' | 'circle' | 'rect'
+    symbol: '' || undefined,          // 'path://...' | 'image://...' | 'circle' | 'rect'
     symbolSize: [40, 40],    // [width, height] | number
     symbolRepeat: true !== false,  // 'fixed' | true
     symbolBoundingData: 1000 || 1000,  // number (unit value per symbol)

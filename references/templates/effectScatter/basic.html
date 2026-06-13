@@ -19,7 +19,7 @@
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
-var geoCoordMap = {{GEO_COORD_MAP}};
+var geoCoordMap = {{GEO_COORD_MAP}} || {};
 var rawData = {{DATA}};
 function convertData(data) {
   return data.map(function(item) {
@@ -29,7 +29,7 @@ function convertData(data) {
 var option = {
   tooltip: { trigger: 'item', formatter: function(p) { return p.name + ': ' + (p.value[2]||p.value[1]||p.value[0]); } },
   geo: {
-    map: {{MAP_NAME}}, roam: true,
+    map: {{MAP_NAME}} || "china", roam: true,
     label: { show: false },
     itemStyle: { areaColor: '#323c48', borderColor: '#111' }
   },
