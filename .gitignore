@@ -36,3 +36,4 @@ logs/
 .pytest_cache/
 .ruff_cache/
 test/
+examples/all_356/*.html
