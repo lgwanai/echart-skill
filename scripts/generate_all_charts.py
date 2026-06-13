@@ -130,7 +130,7 @@ CHARTS.append(("19_Treemap", "treemap/basic.html", {
 
 # ═══ Sunburst ═══
 CHARTS.append(("20_Sunburst", "sunburst/basic.html", {
-    "TITLE":"20 旭日图","LABEL_SHOW":"true","NODE_CLICK":"false","FOCUS":"none","RADIUS":"['0%','90%']","ROTATE":0,
+    "TITLE":"20 旭日图","LABEL_SHOW":"true","NODE_CLICK":"false","FOCUS":"ancestor","RADIUS":D(["0%","90%"]),"ROTATE":0,
     "DATA":D([{"name":"A","itemStyle":{"color":"#5470c6"},"children":[{"name":"A1","value":25},{"name":"A2","value":15}]},
               {"name":"B","itemStyle":{"color":"#91cc75"},"children":[{"name":"B1","value":20},{"name":"B2","value":10}]}])}))
 

@@ -74,9 +74,9 @@ var option = {
     width: '100%', height: '100%',
     top: 0, left: 0, bottom: 0, right: 0,
     nodeClick: false,    // 'link' | 'zoomToNode' | false
-    breadcrumb: { show: true },
+    breadcrumb: { show: true !== false },
     label: { show: true, position: 'insideTopLeft' },
-    upperLabel: { show: true, height: 30 },
+    upperLabel: { show: true !== false, height: 30 },
     levels: [{
       itemStyle: { borderWidth: 3, borderColor: '#fff', gapBorderWidth: 1 },
       upperLabel: { show: true }

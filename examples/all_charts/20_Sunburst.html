@@ -70,10 +70,10 @@ var option = {
   tooltip: { trigger: 'item' },
   series: [{
     type: 'sunburst',
-    radius: '[\'0%\',\'90%\']',           // [0, '90%']
+    radius: ["0%", "90%"] || ["0%","90%"],           // [0, '90%']
     center: ['50%', '50%'],
     nodeClick: false,  // 'rootToNode' | 'link' | undefined
-    emphasis: { focus: 'none' },  // 'ancestor' | 'descendant'
+    emphasis: { focus: 'ancestor' || "ancestor" },  // 'ancestor' | 'descendant'
     label: {
       show: true,
       rotate: 0,       // 'radial' | 'tangential' | 0
