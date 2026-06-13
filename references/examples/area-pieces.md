@@ -4,7 +4,7 @@
 **Example dir:** `area-pieces`
 
 ## Template
-- **line/stack.html** — Stacked Line / Area
+- **line/basic.html** — Stacked Line / Area
 Data format: `{ categories: string[], series: [{name: string, stack: string, data: number[]}, ...] }`
 
 ## Option Code
@@ -66,6 +66,10 @@ option = {
   ]
 };
 ```
+
+## Important
+- Area chart = line chart with `AREA_STYLE: true`
+- Use `line/basic.html` template
 
 ## Key Points
 - Generate via: `scripts/build_template.py line/stack.html -d data.json`
