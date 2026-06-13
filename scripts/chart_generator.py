@@ -772,12 +772,16 @@ def generate_echarts_html(df, config, output_path):
     # Fix scatter bubble: encode.z needs visualMap for symbol size variation
     for s in option.get("series", []):
         if s.get("type") == "scatter":
+            # Geo scatter: fixed symbolSize (don't use visualMap for size)
+            if s.get("coordinateSystem") == "geo" and "symbolSize" not in s:
+                s["symbolSize"] = 12
             # Convert string symbolSize → encode.z (dimension reference)
             if isinstance(s.get("symbolSize"), str) and "z" not in s.get("encode", {}):
                 s.setdefault("encode", {})["z"] = s.pop("symbolSize")
-            # Auto-add visualMap for varying symbol size
+            # Auto-add visualMap for varying symbol size (bubble charts only, not geo)
             enc = s.get("encode", {})
-            need_vm = ("z" in enc) or (s.get("coordinateSystem") == "geo" and "value" in enc)
+            is_geo = s.get("coordinateSystem") == "geo"
+            need_vm = ("z" in enc) and not is_geo  # only for cartesian bubble scatter
             if need_vm and "visualMap" not in option:
                 z_dim = enc.get("z") or enc.get("value", "")
                 # Find the column index from dataset source
