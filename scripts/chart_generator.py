@@ -656,10 +656,37 @@ def generate_echarts_html(df, config, output_path):
     if not option and chart_type:
         option = _auto_build_option(chart_type, df)
 
-    # 1. Automatic Dataset Injection (if not already provided by custom option)
-    if not option.get('dataset') and not df.empty:
-        dataset_source = [df.columns.tolist()] + df.values.tolist()
-        option['dataset'] = {'source': dataset_source}
+    # 1. Automatic Dataset — only for types that support it.
+    #    Types needing direct data arrays get data injected into series.
+    series_has_data = any(s.get("data") for s in option.get("series", []))
+    if not df.empty:
+        cols = list(df.columns)
+        rows = df.values.tolist()
+        dataset_source = [cols] + rows
+        stype = option.get("series", [{}])[0].get("type", "")
+
+        # Determine if this scatter uses geo coordinateSystem (needs data array)
+        is_geo_scatter = (stype == "scatter" and
+                          option.get("series", [{}])[0].get("coordinateSystem") == "geo")
+
+        # Types that need series.data (NOT dataset):
+        if stype in ("pie", "map", "radar", "funnel", "gauge", "treemap", "sunburst",
+                      "sankey", "graph", "tree", "parallel", "themeRiver", "pictorialBar",
+                      "chord", "lines", "effectScatter", "bar3D", "scatter3D", "surface", "line3D") \
+           or is_geo_scatter:
+            if not series_has_data and len(cols) >= 2:
+                data = []
+                for row in rows:
+                    item = {"name": str(row[0]), "value": row[1] if row[1] is not None else 0}
+                    # For geo scatter with lat/lng
+                    if is_geo_scatter and len(row) >= 4:
+                        item["value"] = [row[1], row[2], row[0]] if len(row) == 3 else row[3]
+                    data.append(item)
+                option.setdefault("series", [{}])[0]["data"] = data
+        else:
+            # Types that support dataset+encode: bar, line, scatter(cartesian), candlestick, boxplot, heatmap
+            if not option.get('dataset'):
+                option['dataset'] = {'source': dataset_source}
 
     raw_data_json = json.dumps(df.to_dict(orient='records'), ensure_ascii=False, default=str)
     dataset_source_json = json.dumps(

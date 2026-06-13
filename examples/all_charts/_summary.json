@@ -42,12 +42,12 @@
   {
     "status": "✅",
     "title": "09_Pie_Basic",
-    "detail": "1118228 bytes"
+    "detail": "1118286 bytes"
   },
   {
     "status": "✅",
     "title": "38_Pie_Rose",
-    "detail": "1118333 bytes"
+    "detail": "1118442 bytes"
   },
   {
     "status": "✅",
@@ -62,32 +62,32 @@
   {
     "status": "✅",
     "title": "12_Scatter_Geo",
-    "detail": "1198669 bytes"
+    "detail": "1198839 bytes"
   },
   {
     "status": "✅",
     "title": "30_EffectScatter",
-    "detail": "1154245 bytes"
+    "detail": "1154291 bytes"
   },
   {
     "status": "✅",
     "title": "13_Map_China",
-    "detail": "2486344 bytes"
+    "detail": "2487300 bytes"
   },
   {
     "status": "✅",
     "title": "14_Radar_Basic",
-    "detail": "1118487 bytes"
+    "detail": "1118405 bytes"
   },
   {
     "status": "✅",
     "title": "15_Gauge",
-    "detail": "1118109 bytes"
+    "detail": "1118069 bytes"
   },
   {
     "status": "✅",
     "title": "16_Funnel",
-    "detail": "1118335 bytes"
+    "detail": "1118387 bytes"
   },
   {
     "status": "✅",
@@ -107,22 +107,22 @@
   {
     "status": "✅",
     "title": "20_Sunburst",
-    "detail": "1118882 bytes"
+    "detail": "1118656 bytes"
   },
   {
     "status": "✅",
     "title": "21_Sankey",
-    "detail": "1119078 bytes"
+    "detail": "1118864 bytes"
   },
   {
     "status": "✅",
     "title": "22_Graph_Force",
-    "detail": "1118650 bytes"
+    "detail": "1118553 bytes"
   },
   {
     "status": "✅",
     "title": "23_Tree",
-    "detail": "1118516 bytes"
+    "detail": "1118355 bytes"
   },
   {
     "status": "✅",
@@ -132,7 +132,7 @@
   {
     "status": "✅",
     "title": "25_Parallel",
-    "detail": "1118843 bytes"
+    "detail": "1118761 bytes"
   },
   {
     "status": "✅",
@@ -142,17 +142,17 @@
   {
     "status": "✅",
     "title": "27_ThemeRiver",
-    "detail": "1118893 bytes"
+    "detail": "1119026 bytes"
   },
   {
     "status": "✅",
     "title": "28_PictorialBar",
-    "detail": "1118272 bytes"
+    "detail": "1118330 bytes"
   },
   {
     "status": "✅",
     "title": "29_Chord",
-    "detail": "1154781 bytes"
+    "detail": "1154587 bytes"
   },
   {
     "status": "✅",
@@ -167,27 +167,27 @@
   {
     "status": "✅",
     "title": "33_3D_Bar",
-    "detail": "1118816 bytes"
+    "detail": "1118905 bytes"
   },
   {
     "status": "✅",
     "title": "34_3D_Scatter",
-    "detail": "1118515 bytes"
+    "detail": "1118518 bytes"
   },
   {
     "status": "✅",
     "title": "35_3D_Surface",
-    "detail": "1118948 bytes"
+    "detail": "1119092 bytes"
   },
   {
     "status": "✅",
     "title": "36_3D_Globe",
-    "detail": "1118098 bytes"
+    "detail": "1118057 bytes"
   },
   {
     "status": "✅",
     "title": "37_3D_Lines3D",
-    "detail": "1118429 bytes"
+    "detail": "1118466 bytes"
   },
   {
     "status": "✅",
