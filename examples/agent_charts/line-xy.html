@@ -1,16 +1,16 @@
 <!--
-  Template: line/basic.html
-  Chart Type: Line (折线图)
-  Data Pattern: FLAT_ARRAY
-  Data Format: { categories: string[], values: number[] }
-  Covers: area-basic, area-simple, area-pieces, area-rainfall, area-time-axis, line-simple, line-smooth, line-style, line-marker, line-markline,
-          line-sections, line-log, line-y-category, line-graphic (14 examples)
+  Template: line/xy.html
+  Chart Type: Cartesian Line (XY折线图, numeric axes)
+  Data Pattern: XY_PAIRS
+  Data Format: [[x, y], [x, y], ...]
+  Covers: line-function, line-pen, line-draggable, line-in-cartesian-coordinate-system,
+          line-fisheye-lens, line-easing (6 examples)
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>Line Smooth</title>
+<title>XY折线图</title>
 <script>
 
 /*
@@ -62,23 +62,20 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head>
 <body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">Line Smooth</div>
+<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">XY折线图</div>
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: { trigger: 'axis' },
   grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'category', data: ["2024-01-01", "2024-02-01", "2024-03-01", "2024-04-01", "2024-05-01", "2024-06-01", "2024-07-01", "2024-08-01", "2024-09-01", "2024-10-01", "2024-11-01", "2024-12-01"], boundaryGap: false && true },
+  xAxis: { type: 'value' },
   yAxis: { type: 'value' },
   series: [{
     type: 'line',
-    smooth: true,     // true | false
-    step: false,          // false | 'start' | 'middle' | 'end'
-    areaStyle: false, // null | {}
-    symbol: 'circle',
-    symbolSize: 6,
-    data: [820, 932, 901, 1290, 1330, 1420, 1560, 1480, 1620, 1720, 1680, 1890]
+    smooth: false,
+    showSymbol: false,
+    data: [[4, 4.26], [5, 5.68], [6, 7.24], [7, 4.82], [8, 6.95], [9, 8.81], [10, 8.04]].sort(function(a,b){ return a[0]-b[0]; })
   }]
 };
 chart.setOption(option);
