@@ -328,11 +328,37 @@ class DashboardController {
         pixelRatio: 2,
         backgroundColor: this.theme === 'dark' ? '#1e293b' : '#fff'
       });
-      
+
       const link = document.createElement('a');
       link.href = url;
       link.download = filename || `chart_${id}.png`;
       link.click();
+    }
+  }
+
+  /**
+   * Focus on a clicked insight card — highlight it and show details.
+   * Reads insight data from the element's data-insight attribute.
+   */
+  focusInsight(cardElement) {
+    // Deselect all other cards
+    document.querySelectorAll('.insight-card.selected').forEach(el => {
+      el.classList.remove('selected');
+    });
+
+    // Highlight clicked card
+    cardElement.classList.add('selected');
+
+    // Parse and log the insight data (future: show in a modal/sidebar)
+    try {
+      const raw = cardElement.getAttribute('data-insight');
+      if (raw) {
+        const insight = JSON.parse(raw);
+        console.log('Insight focused:', insight.title, insight);
+        this.showToast(`🔍 ${insight.title || '洞察详情'}`);
+      }
+    } catch (e) {
+      console.warn('Failed to parse insight data:', e);
     }
   }
 }

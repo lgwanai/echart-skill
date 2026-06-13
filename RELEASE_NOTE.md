@@ -1,5 +1,43 @@
 # Release Note - Echart Skill
 
+## v2.0.0 (2026-06-13) — Agent BI: From Chart Generator to AI Analysis Assistant
+
+### 🧠 7 New Intelligent Engines (~4,600 LOC, 206 tests)
+
+| Engine | Module | Description |
+|--------|--------|-------------|
+| **Insight Engine** | `scripts/insight_engine.py` | Auto-discovers 7 pattern types (trends, anomalies, rankings, composition, correlation, seasonality, changes) |
+| **Report Engine** | `scripts/report_engine.py` | One-click professional analysis reports (Markdown/HTML/JSON) with 3 templates |
+| **Semantic Layer** | `scripts/semantic_model.py` | Business-aware data modeling — natural language to SQL, column auto-classification |
+| **Context Manager** | `scripts/context_manager.py` | Conversational session state, 10+ time-reference resolution ("上个月"), intent detection |
+| **Forecast Engine** | `scripts/forecast_engine.py` | 4 time-series methods (MA/Exponential/Linear/Ensemble), zero external ML dependencies |
+| **Attribution Engine** | `scripts/attribution_engine.py` | Root cause analysis — contribution decomposition, automatic drill-down recommendations |
+| **Dashboard Insights** | `scripts/dashboard_insights.py` | Insight cards embedded in dashboards with severity grading and click-to-drill |
+
+### 🔒 Enterprise Privacy Guard
+
+- **Auto PII Detection**: 12 sensitive column patterns (phone, email, ID card, bank card, salary, etc.) in Chinese & English
+- **Column-Level Masking**: `138****1234` / `u***@domain.com` / `3201**********1234` / `[REDACTED]`
+- **Read-Only Enforcement**: Blocks DROP/DELETE/UPDATE/INSERT/ALTER/TRUNCATE
+- **Audit Trail**: `logs/audit.log` — JSON-lines format with timestamps, table names, query hashes
+- **4-Tier Classification**: `public < internal < sensitive < restricted`
+
+### 💻 4 New Commands
+
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `/forecast` | `/f` `/预测` | Time-series forecasting with 4 methods + confidence intervals |
+| `/why` | `/w` `/归因` | Root cause attribution — "why did this metric change?" |
+| `/context` | `/ctx` `/会话` | Session management (start/resolve/history/list) |
+| `--insights` | — | Dashboard flag to embed insight cards |
+
+### 📊 Test Coverage
+
+- **206 tests** (73 → 206), all passing
+- New test files: `test_report_engine.py` (28), `test_semantic_model.py` (60), `test_e2e_integration.py` (26), `test_dashboard_insights.py` (19), `test_privacy_guard.py` (54)
+
+---
+
 ## v1.4.0 (2026-06-05) - Self-Contained HTML & Configurable Architecture
 
 ### 🧩 自包含单文件 HTML（重大变更）

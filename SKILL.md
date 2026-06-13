@@ -43,6 +43,9 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | `/analyze` | `/a`, `/分析` | 自动分析数据表，发现规律与异常 | `/analyze sales` |
 | `/insight` | `/洞察` | 对指定维度生成深度洞察 | `/insight sales --dim region` |
 | `/report` | `/r`, `/报告` | 一键生成专业分析报告 | `/report sales --template sales` |
+| `/forecast` | `/f`, `/预测` | 时间序列预测 | `/forecast orders 订单日期 金额 --periods 6` |
+| `/why` | `/w`, `/归因`, `/为什么` | 数据变化归因分析 | `/why orders 金额 订单日期 2024-01 2024-06` |
+| `/context` | `/ctx`, `/会话` | 会话管理（开始/追问/历史/列表） | `/context start sales` |
 
 ### 指令处理流程
 
@@ -66,6 +69,9 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 │                ├── 查询关键词 ──→ Scenario 2 (SQL 查询)           │
 │                ├── 图表关键词 ──→ Scenario 4 (图表生成)           │
 │                ├── 导出关键词 ──→ Scenario 6 (数据导出)           │
+│                ├── 预测关键词 ──→ Scenario 19 (趋势预测)          │
+│                ├── 归因关键词 ──→ Scenario 20 (归因分析)          │
+│                ├── 会话关键词 ──→ /context 子命令                  │
 │                └── 其他 ──→ 自然语言理解                          │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -161,6 +167,31 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   - ✅ 响应式设计
   - ✅ 自动刷新、导出 PDF
   - ✅ 图表搜索、单独下载
+  - ✅ 智能数据洞察卡片（NEW v2.0 — 使用 --insights 启用）
+
+选项:
+  --insights                    启用数据洞察卡片（自动分析表数据并展示关键发现）
+  --insights-dimensions, -d <列> 洞察分析的维度列（逗号分隔）
+  --insights-date-column <列>    洞察分析的日期列（用于趋势/周期性检测）
+  --insights-max <数量>          最大洞察卡片数（默认 6）
+
+示例:
+  # 基础仪表盘（不含洞察）
+  /dashboard 创建销售分析仪表盘
+
+  # 含洞察卡片的仪表盘
+  /dashboard 销售分析仪表盘 --insights
+
+  # 指定洞察分析的维度和日期列
+  /dashboard 销售仪表盘 --insights --insights-dimensions region,category --insights-date-column order_date
+
+洞察卡片功能:
+  - 📈 自动发现 7 种洞察模式（趋势、异常、排名、构成、相关性、周期、变化）
+  - 🔴🟠🟡⚪ 严重程度分级（严重/重要/中等/信息）
+  - 🎯 每个卡片显示关键指标值和变化百分比
+  - 🔍 悬停显示"点击深入分析"提示
+  - 📊 自动推荐最合适的图表类型
+  - 零额外配置 — 只需加 --insights 即可启用
 
 支持图表类型:
   - bar (柱状图): group_by 参数
@@ -460,6 +491,123 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   /r sales --title "Q1销售分析" --format html       # 指定标题
 ```
 
+#### `/forecast` - 时间序列预测
+```
+/forecast <表名> <日期列> <指标列> [选项]
+/f <表名> <日期列> <指标列>  # 别名
+/预测 <表名> <日期列> <指标列>  # 中文别名
+
+基于纯 Python 实现的时间序列预测，支持多种方法，零外部依赖（无需 sklearn/tensorflow）。
+
+选项:
+  --periods, -p <数量>        预测期数（默认 6）
+  --method, -m <方法>         预测方法: moving_average(移动平均), exponential(指数平滑), linear_trend(线性趋势), ensemble(集成,默认)
+  --granularity, -g <粒度>    时间粒度: day(日), week(周), month(月,默认), quarter(季), year(年)
+  --filter <条件>             数据过滤条件（SQL WHERE 子句）
+  --db <数据库路径>           数据库路径（默认 workspace.duckdb）
+  --format <text|json>        输出格式
+
+预测方法说明:
+  - moving_average: 移动平均法 — 自适应窗口，适合稳定序列
+  - exponential:    指数平滑法 — 含趋势检测，适合有趋势的序列
+  - linear_trend:   线性回归法 — 给出 R² 置信度，适合线性趋势
+  - ensemble:       集成方法 — 加权融合以上三种方法（推荐）
+
+输出内容:
+  - 历史数据摘要（最近 6 期）
+  - 未来 N 期预测值
+  - 预测区间（上下限 80% 置信区间）
+  - 置信度评分 (0-1)
+  - 趋势方向（上升/下降/平稳）及变化率
+
+示例:
+  /forecast orders 订单日期 金额 --periods 6                   # 默认集成预测
+  /forecast orders 订单日期 金额 --method linear_trend -p 12  # 线性趋势预测12期
+  /forecast sales order_date amount --granularity quarter    # 按季度预测
+  /f orders 下单时间 数量 --periods 3 -m exponential         # 指数平滑预测3期
+```
+
+#### `/why` - 归因分析
+```
+/why <表名> <指标列> <日期列> <起始期> <终止期> [选项]
+/w <表名> <指标列> <日期列> <起始期> <终止期>  # 别名
+/归因 <表名> <指标列> <日期列> <起始期> <终止期>  # 中文别名
+/为什么 <表名> <指标列> <日期列> <起始期> <终止期>  # 中文别名
+
+分析指标变化的根本原因，将总变化分解到各维度的贡献值，自动推荐钻取路径。
+
+选项:
+  --dimensions, -d <维度列表>  分析维度，逗号分隔（默认自动检测前3个分类维度）
+  --top-n <数量>               每个维度返回的 top 贡献项数（默认 8）
+  --db <数据库路径>             数据库路径（默认 workspace.duckdb）
+  --format <text|json>         输出格式
+
+分析内容:
+  - 总量变化（起始值 → 终止值，变化率）
+  - 各维度 Top 驱动力排名（含贡献百分比）
+  - 抵消效应检测（增长/下降维度分布）
+  - 自动化钻取建议（下一步从哪里深入分析）
+
+贡献度阈值:
+  - 贡献度 ≥ 15% 标记为主要驱动力（📌）
+  - 贡献度 < 15% 归为次要因素
+
+示例:
+  /why orders 金额 订单日期 2024-01 2024-06 -d 商品分类,渠道,支付方式
+  /why sales amount order_date 2024-Q1 2024-Q2 --dimensions region,category
+  /w orders 数量 日期 2025-01 2025-03
+  /为什么 sales 销售额 下单日期 2024-01 2024-06 -d 省份
+```
+
+#### `/context` - 会话管理
+```
+/context <子命令> [参数]
+/ctx <子命令>  # 别名
+/会话 <子命令>  # 中文别名
+
+管理分析会话状态，支持会话创建、追问解析、历史查看、会话列表等功能。
+
+子命令:
+  start <表名> [选项]    开始新的分析会话
+  resolve <文本>         解析追问内容（"上个月呢？"等）
+  history                查看当前会话的对话历史
+  context                查看当前会话的上下文提示词
+  list                   列出所有已保存的会话
+
+start 选项:
+  --db <路径>                   数据库路径（默认 workspace.duckdb）
+  --dimensions, -d <维度列表>   分析维度，逗号分隔
+  --metrics, -m <指标列表>      关注指标，逗号分隔
+  --date-column <日期列>        日期列名
+  --semantic-model, -s <模型>   关联的语义模型名
+
+会话功能说明:
+  - 会话持久化存储（SQLite），重启后保留上下文
+  - 自动时间上下文检测（从表数据中推断日期范围）
+  - 支持 10+ 种时间表达式解析（上个月/去年/Q1/最近N天...）
+  - 意图检测：refine(细化)、compare(对比)、pivot(切换维度)、drill_down(深挖)、explain(归因)、predict(预测)
+
+追问类型对照:
+  | 类型 | 示例 | 系统行为 |
+  |------|------|----------|
+  | REFINE | "上个月呢？" | 解析时间引用，调整查询范围 |
+  | COMPARE | "和去年同期比" | 检测同比/环比，生成对比查询 |
+  | DRILL_DOWN | "深挖一下白酒" | 应用维度过滤器 |
+  | EXPLAIN | "为什么下降了" | 触发归因分析（→ /why） |
+  | PIVOT | "按渠道分析" | 切换分析维度 |
+  | PREDICT | "预测下个月" | 触发趋势预测（→ /forecast） |
+
+示例:
+  /context start sales                                          # 开始分析 sales 表
+  /context start orders --dimensions region,category --db workspace.duckdb
+  /context resolve "上个月呢？"                                   # 解析追问
+  /context resolve "和去年同期比" --session-id <id>              # 指定会话
+  /context history                                              # 查看历史
+  /context context                                              # 查看上下文
+  /context list                                                 # 列出所有会话
+  /ctx list                                                     # 别名
+```
+
 ### 模糊匹配关键词
 
 当用户输入不是显性指令时，通过关键词推断意图：
@@ -478,6 +626,9 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | 自动分析 | 分析、洞察、发现、规律、趋势、异常、相关性、report、analyze | Scenario 16 |
 | 报告生成 | 报告、总结、出报告、结论、写报告、生成报告 | Scenario 17 |
 | 追问/继续 | 呢？、比呢？、刚才、上次、继续、深挖、为什么、换 | Scenario 18 |
+| 趋势预测 | 预测、预估、趋势、forecast、预测未来、走向、接下来 | Scenario 19 |
+| 归因分析 | 为什么、原因、驱动因素、归因、贡献、变化分析、why、explain | Scenario 20 |
+| 会话管理 | 会话、上下文、context、session、对话历史、追问 | /context 子命令 |
 
 ---
 
@@ -1758,3 +1909,192 @@ result = ctx.resolve("上个月呢？", session)
 - Intent detection: refine, compare, pivot, drill-down, explain
 - Generates prompt context for LLM agents
 - Session history with query/SQL/chart tracking
+
+### Scenario 19: Time-Series Forecasting (NEW in v2.0)
+**Trigger**: User wants to predict future trends — "预测下季度销售", "接下来6个月的趋势", "预估明年的收入".
+
+**Action**:
+
+1. **Run Forecast**:
+   ```bash
+   # Basic ensemble forecast (recommended)
+   python scripts/forecast_engine.py <table> <date_column> <metric> --periods 6
+
+   # With specific method
+   python scripts/forecast_engine.py sales order_date amount --method linear_trend -p 12
+
+   # JSON output for programmatic use
+   python scripts/forecast_engine.py sales order_date amount --format json -p 6
+   ```
+
+2. **Forecast Methods**:
+   | Method | Best For | Confidence Indicator |
+   |--------|----------|---------------------|
+   | `ensemble` | Most cases (default) | Weighted average of all methods |
+   | `moving_average` | Stable, non-trending data | Low CV (coefficient of variation) |
+   | `exponential` | Data with trend/seasonality | Trend consistency |
+   | `linear_trend` | Strong linear patterns | R² score |
+
+3. **Output Includes**:
+   - Historical values (last 6 periods shown)
+   - Forecast values with upper/lower bounds (80% CI)
+   - Trend direction (上升/下降/平稳) and strength (% per period)
+   - Overall confidence score (0-1)
+
+4. **Auto-Visualization**: After generating a forecast, ALWAYS suggest creating a line chart:
+   ```
+   /chart line 历史趋势与预测 --table <table>
+   ```
+   Or generate a forecast-specific chart that overlays historical + predicted values with confidence bands.
+
+**From Python API**:
+```python
+from scripts.forecast_engine import ForecastEngine, ForecastMethod
+
+engine = ForecastEngine("workspace.duckdb")
+
+# Quick forecast
+result = engine.quick_forecast("sales", "order_date", "amount", periods=3)
+print(f"Trend: {result.trend_direction} ({result.trend_strength_pct:+.1f}%/period)")
+
+# Detailed forecast with specific method
+result = engine.forecast(
+    "sales", "order_date", "amount",
+    periods=12,
+    method=ForecastMethod.EXPONENTIAL,
+    granularity="month",
+)
+
+# Access results
+for fp in result.forecast_points:
+    print(f"{fp.period}: {fp.value:.1f} [{fp.lower_bound:.1f} - {fp.upper_bound:.1f}]")
+
+# Export as dict
+data = result.to_dict()  # Includes historical + forecast arrays
+```
+
+**Tips for Best Results**:
+- Ensure the date column is properly typed (DATE/TIMESTAMP) for accurate period generation
+- Use `--granularity quarter` for quarterly forecasting, `--granularity year` for annual
+- The `ensemble` method is recommended for most cases — it blends all 3 methods
+- Data with fewer than 4 periods will raise an error — ensure sufficient history
+- Combine with `/chart line` for visual trend display
+- Use `/why` to understand what drives the trend direction
+
+**Interaction Flow**:
+```
+User: 预测接下来6个月的销售趋势
+Agent: [Runs forecast_engine.py on sales table]
+       📈 预测结果: amount
+       方法: ensemble | 置信度: 85%
+       趋势: up (+3.2%/期)
+       
+       历史数据 (12 期):
+       2024-01           12,400
+       ...
+       
+       预测 (6 期):
+       期数         预测值        下限        上限
+       2025-01      18,500     15,200     21,800
+       ...
+       
+       💡 建议使用 /chart line 生成趋势图查看预测区间
+
+User: /chart line 过去12个月销售额趋势及未来6个月预测
+Agent: [Generates line chart with historical + forecast + confidence bands]
+       ✅ Chart: outputs/charts/sales_trend_forecast_*.html
+```
+
+### Scenario 20: Attribution Analysis (NEW in v2.0)
+**Trigger**: User wants to understand why a metric changed — "为什么销售额下降了", "广东的增长贡献了多少", "分析一下上个月的变化原因".
+
+Note: When user asks "为什么" as a follow-up to an existing analysis session, the Context Manager (Scenario 18) automatically detects this as EXPLAIN intent and may resolve time references. Use attribution for both fresh analysis and as the EXPLAIN action in follow-up flows.
+
+**Action**:
+
+1. **Run Attribution Analysis**:
+   ```bash
+   # With explicit dimensions
+   python scripts/attribution_engine.py <table> <metric> <date_column> <before> <after> \
+       --dimensions 商品分类,渠道,支付方式
+
+   # Auto-detect dimensions (uses first 3 category columns)
+   python scripts/attribution_engine.py sales amount order_date 2024-01 2024-06
+
+   # JSON output
+   python scripts/attribution_engine.py sales amount order_date 2024-01 2024-06 \
+       -d region,category --format json
+   ```
+
+2. **Period Format**: Use YYYY-MM for month-level analysis (e.g., `2024-01`, `2024-06`).
+
+3. **Output Structure**:
+   - **总量变化**: Total before → after, absolute change, percentage change
+   - **主要驱动力**: Top contributors sorted by contribution %, with 📌 markers for ≥15% contribution
+   - **抵消效应检测**: When some dimensions go up while others go down
+   - **钻取建议**: Human-readable recommendations for further analysis
+
+4. **Auto-Visualization**: After attribution, suggest:
+   - `/chart bar 各维度变化贡献度` — waterfall/bar chart showing contribution by dimension
+   - `/chart pie 各维度占比变化` — compare before vs after pie charts
+
+**From Python API**:
+```python
+from scripts.attribution_engine import AttributionEngine
+
+engine = AttributionEngine("workspace.duckdb")
+
+# Detailed analysis
+result = engine.explain_change(
+    "sales", "amount", "order_date",
+    "2024-01", "2024-06",
+    dimensions=["region", "category", "channel"],
+    top_n=8,
+)
+
+print(f"Change: {result.total_change_pct:+.1f}%")
+print(f"Direction: {result.change_direction}")
+
+for c in result.top_drivers:
+    print(f"  {c.dimension}「{c.value}」: {c.change:+.1f} ({c.contribution_pct:+.1f}%)")
+
+for rec in result.drill_recommendations:
+    print(f"  💡 {rec}")
+
+# Quick explain with auto-detected dimensions
+result = engine.quick_explain("sales", "amount", "order_date", "2024-01", "2024-06")
+
+# Export as dict
+data = result.to_dict()
+```
+
+**Tips for Best Results**:
+- Choose 2-4 meaningful dimensions for best insights (too many dilutes the analysis)
+- Compare periods of similar length (e.g., Jan vs Jun, not Jan 2024 vs Jan 2025)
+- Use month-level granularity for period format (YYYY-MM)
+- Combine with `/analyze` to discover which dimensions are most important
+- Combine with `/forecast` to understand if the change will continue
+- Primary drivers are those with ≥15% absolute contribution
+
+**Interaction Flow**:
+```
+User: /why orders 金额 订单日期 2024-01 2024-06 -d 商品分类,渠道
+Agent: [Runs attribution_engine.py]
+       🔍 归因分析: 金额
+       2024-01 → 2024-06
+       变化: 125000.0 → 158000.0 (+26.4%)
+       
+       📌 主要驱动力:
+         商品分类「电子」: +22,500 (+19.8%)
+         渠道「线上」: +15,800 (+13.9%)
+       
+       ⚖️ 存在抵消效应：3个维度增长、2个维度下降，建议分别分析。
+       
+       💡 建议:
+         🔍 主要增长驱动力是商品分类维度的「电子」...
+         📊 建议深挖该维度的明细数据。
+
+User: 深挖一下电子产品
+Agent: [Uses Context Manager to drill down: filter by 商品分类=电子]
+       [Re-runs analysis with the filter applied]
+```
