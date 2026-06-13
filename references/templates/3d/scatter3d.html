@@ -1,10 +1,7 @@
 <!--
   Template: 3d/scatter3d.html
   Chart Type: Scatter3D (3D散点图)
-  Data Pattern: XYZ_TRIPLES
   Data Format: [[x, y, z], ...]
-  Covers: scatter3D-dataset, scatter3d-globe-population, scatter3d-orthographic,
-          scatter3d-scatter, scatter3d-simplex-noise, scatterGL-gps, scattergl-weibo (7 examples)
   NOTE: Requires echarts-gl extension
 -->
 <!DOCTYPE html>
@@ -23,12 +20,14 @@
 var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: {},
-  {{AXIS_3D}}
+  grid3D: {},
+  xAxis3D: {},
+  yAxis3D: {},
+  zAxis3D: {},
   series: [{
     type: 'scatter3D',
     symbolSize: {{SYMBOL_SIZE}},
-    data: {{DATA}},
-    itemStyle: { opacity: 0.8 }
+    data: {{DATA}}
   }]
 };
 chart.setOption(option);
