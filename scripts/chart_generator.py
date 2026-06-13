@@ -497,36 +497,116 @@ def _auto_build_option(chart_type: str, df: "pd.DataFrame") -> dict:
     }
 
 
+# ---------------------------------------------------------------------------
+# Chart-type minimum requirements — every type MUST satisfy these
+# ---------------------------------------------------------------------------
+
+CHART_REQUIREMENTS = {
+    "bar": {
+        "required_keys": ["xAxis", "yAxis", "series"],
+        "series_type": "bar",
+        "fixups": [
+            ("xAxis", {"type": "category"}),
+            ("yAxis", {"type": "value"}),
+        ],
+    },
+    "line": {
+        "required_keys": ["xAxis", "yAxis", "series"],
+        "series_type": "line",
+        "fixups": [
+            ("xAxis", {"type": "category"}),
+            ("yAxis", {"type": "value"}),
+        ],
+    },
+    "pie": {
+        "required_keys": ["series"],
+        "series_type": "pie",
+        "fixups": [],
+    },
+    "scatter": {
+        "required_keys": ["xAxis", "yAxis", "series"],
+        "series_type": "scatter",
+        "fixups": [
+            ("xAxis", {"type": "value"}),
+            ("yAxis", {"type": "value"}),
+        ],
+    },
+    "map": {
+        "required_keys": ["series", "visualMap"],
+        "series_type": "map",
+        "fixups": [],
+    },
+    "radar": {
+        "required_keys": ["radar", "series"],
+        "series_type": "radar",
+        "fixups": [],
+    },
+}
+
+
 def _validate_and_fix_option(option: dict, chart_type: str, df_columns: list) -> dict:
-    """Hard guarantee: option MUST have a renderable series with a type.
+    """Hard guarantee: option MUST have everything needed to render.
 
-    This is called right before HTML generation. If the option is missing
-    a series type it is auto-repaired — a broken chart is a critical bug,
-    not a missing-config warning.
+    This is the LAST line of defense before HTML generation. It:
+    1. Checks the chart type's minimum required keys exist
+    2. Ensures every series has a ``type``
+    3. Applies type-specific fixups if anything is missing
     """
-    series_list = option.get("series", [])
-
-    # Already valid
-    if series_list and all(s.get("type") for s in series_list):
-        return option
-
-    # Missing or incomplete series — auto-repair
+    ct = chart_type.lower() if chart_type else ""
+    req = CHART_REQUIREMENTS.get(ct, CHART_REQUIREMENTS["bar"])
     repaired = dict(option)
-    cols = list(df_columns)
 
+    # 1. Ensure required top-level keys exist
+    for key in req["required_keys"]:
+        if key not in repaired:
+            repaired[key] = {}
+
+    # 2. Apply fixups for missing sub-structures
+    for key, default_val in req["fixups"]:
+        if key not in repaired or not repaired[key]:
+            repaired[key] = default_val
+            logger.warning(f"自动补齐: {ct} chart 缺少 {key}，已注入默认值")
+
+    # 3. Ensure series exists and every series has a type
+    series_list = repaired.get("series", [])
     if not series_list:
-        if not cols:
-            repaired["series"] = [{"type": "bar", "data": []}]
-        elif len(cols) == 1:
-            repaired["series"] = [{"type": "bar", "encode": {"x": cols[0], "y": cols[0]}}]
+        cols = list(df_columns)
+        if len(cols) >= 2:
+            repaired["series"] = [{"type": req["series_type"],
+                                    "encode": {"x": cols[0], "y": cols[1]}}]
         else:
-            repaired["series"] = [{"type": "bar", "encode": {"x": cols[0], "y": cols[1]}}]
-        logger.warning("自动修复: option 缺少 series，已注入默认 bar 类型")
+            repaired["series"] = [{"type": req["series_type"], "data": []}]
+        logger.warning(f"自动补齐: {ct} chart 缺少 series，已注入 type={req['series_type']}")
     else:
         for i, s in enumerate(series_list):
             if not s.get("type"):
-                repaired["series"][i]["type"] = "bar"
-                logger.warning(f"自动修复: series[{i}] 缺少 type，已设为 bar")
+                repaired["series"][i]["type"] = req["series_type"]
+                logger.warning(f"自动补齐: series[{i}] 缺少 type，已设为 {req['series_type']}")
+
+    # 4. Map-specific: visualMap must have min/max/inRange
+    if ct == "map":
+        vm = repaired.get("visualMap", {})
+        if "min" not in vm or "max" not in vm:
+            # Extract values from series data
+            data_vals = []
+            for s in repaired.get("series", []):
+                for d in s.get("data", []):
+                    if isinstance(d, dict) and "value" in d:
+                        data_vals.append(d["value"])
+            if data_vals:
+                vm["min"] = min(data_vals)
+                vm["max"] = max(data_vals)
+            else:
+                vm["min"] = 0
+                vm["max"] = 100
+            repaired["visualMap"] = vm
+            logger.warning(f"自动补齐: map visualMap min/max 从数据推断")
+        if "inRange" not in vm:
+            vm["inRange"] = {"color": ["#e0f3f8", "#abd9e9", "#74add1", "#4575b4", "#313695"]}
+            repaired["visualMap"] = vm
+        if "calculable" not in vm:
+            vm["calculable"] = True
+            repaired["visualMap"] = vm
 
     return repaired
 
