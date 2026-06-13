@@ -151,12 +151,12 @@ CHARTS.append(("22_Graph_Force", "graph/force.html", {
 # ═══ Tree ═══
 CHARTS.append(("23_Tree", "tree/basic.html", {
     "TITLE":"23 树图","LAYOUT":"orthogonal","ORIENT":"LR","LABEL_POS":"right","EXPAND_COLLAPSE":"true","LEAF_POS":"none",
-    "DATA":D({"name":"CEO","children":[{"name":"CTO","children":[{"name":"工程师A"},{"name":"工程师B"}]},{"name":"CFO","children":[{"name":"会计A"}]}]})}))
+    "DATA":D([{"name": "CEO", "children": [{"name": "CTO", "children": [{"name": "工程师A"}, {"name": "工程师B"}]}, {"name": "CFO", "children": [{"name": "会计A"}]}]}])}))
 
 # ═══ Boxplot ═══
 CHARTS.append(("24_Boxplot", "boxplot/basic.html", {
     "TITLE":"24 箱线图","Y_AXIS_NAME":"","CATEGORIES":D(["A","B"]),
-    "RAW_DATA":D([[850,740,900,1070,930,850,950,980,980,880,1000,980],[960,940,960,940,880,800,850,880,900,840,830,880]])}))
+    "DATA":D([[740,880,935,980,1070],[800,860,900,940,960]])}))
 
 # ═══ Parallel ═══
 CHARTS.append(("25_Parallel", "parallel/basic.html", {

@@ -1,9 +1,10 @@
 <!--
   Template: boxplot/basic.html
   Chart Type: Boxplot (箱线图)
-  Data Pattern: DATASET (raw data + ecStat boxplot transform)
-  Data Format: dataset.source: [[value1, value2, ...], ...]  (each sub-array = one group)
-  Covers: boxplot-multi, boxplot-light-velocity, boxplot-light-velocity2 (3 examples)
+  Data Pattern: FIVE_NUMBER_SUMMARY
+  Data Format: [[min, Q1, median, Q3, max], ...]  (one array per group)
+  Covers: boxplot-multi, boxplot-light-velocity (3 examples)
+  NOTE: Pre-computed 5-number summary — no ecStat required
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -65,20 +66,13 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
-// ecStat transform is expected to be pre-registered via echarts.registerTransform()
 var option = {
   tooltip: { trigger: 'item', axisPointer: { type: 'shadow' } },
   grid: { left: '10%', right: '10%', bottom: '10%' },
   xAxis: { type: 'category', data: ["A", "B"] },
   yAxis: { type: 'value', name: '' },
-  dataset: [
-    { source: [[850, 740, 900, 1070, 930, 850, 950, 980, 980, 880, 1000, 980], [960, 940, 960, 940, 880, 800, 850, 880, 900, 840, 830, 880]] },
-    { transform: { type: 'boxplot' } },
-    { fromDatasetIndex: 1, fromTransformResult: 1 }
-  ],
   series: [
-    { type: 'boxplot', datasetIndex: 1, itemStyle: { color: '#5470c6' } },
-    { type: 'scatter', datasetIndex: 2, symbolSize: 6, itemStyle: { color: '#666' } }
+    { type: 'boxplot', data: [[740, 880, 935, 980, 1070], [800, 860, 900, 940, 960]], itemStyle: { color: '#5470c6' } }
   ]
 };
 chart.setOption(option);
