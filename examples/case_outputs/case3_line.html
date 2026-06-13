@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>各渠道订单数分布</title>
+    <title>Case 3: 各渠道订单数</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"dataset": {"source": [["渠道", "订单数"], ["线下-门店", 31], ["线上-天猫", 23], ["线上-京东", 21], ["线上-官网", 11]]}};
-            var rawData = [{"渠道": "线下-门店", "订单数": 31}, {"渠道": "线上-天猫", "订单数": 23}, {"渠道": "线上-京东", "订单数": 21}, {"渠道": "线上-官网", "订单数": 11}];
+            var option = {"xAxis": {"type": "category"}, "yAxis": {"type": "value"}, "series": [{"type": "bar", "encode": {"x": "name", "y": "value"}}], "dataset": {"source": [["name", "value"], ["线下-门店", 31], ["线上-天猫", 23], ["线上-京东", 21], ["线上-官网", 11]]}};
+            var rawData = [{"name": "线下-门店", "value": 31}, {"name": "线上-天猫", "value": 23}, {"name": "线上-京东", "value": 21}, {"name": "线上-官网", "value": 11}];
 
             
 

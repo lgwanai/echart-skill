@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>各渠道综合指标雷达图</title>
+    <title>Case 6: 各渠道指标雷达图</title>
 </head>
 <body>
     <div id="main" style="width: 100%; height: 800px;"></div>
@@ -61,8 +61,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
     <script type="text/javascript">
         (function() {
             var myChart = echarts.init(document.getElementById('main'));
-            var option = {"dataset": {"source": [["渠道", "平均单价", "总数量", "总金额", "订单数"], ["线上-天猫", 495.9130434782609, 109, 23928.0, 23], ["线上-京东", 838.7619047619048, 84, 30764.0, 21], ["线上-官网", 2290.6363636363635, 29, 34034.0, 11], ["线下-门店", 1283.5483870967741, 61, 51078.0, 31]]}};
-            var rawData = [{"渠道": "线上-天猫", "平均单价": 495.9130434782609, "总数量": 109, "总金额": 23928.0, "订单数": 23}, {"渠道": "线上-京东", "平均单价": 838.7619047619048, "总数量": 84, "总金额": 30764.0, "订单数": 21}, {"渠道": "线上-官网", "平均单价": 2290.6363636363635, "总数量": 29, "总金额": 34034.0, "订单数": 11}, {"渠道": "线下-门店", "平均单价": 1283.5483870967741, "总数量": 61, "总金额": 51078.0, "订单数": 31}];
+            var option = {"radar": {"indicator": [{"name": "平均单价", "max": 150}, {"name": "总数量", "max": 100}, {"name": "总金额", "max": 50000}, {"name": "订单数(归一化)", "max": 50}]}, "series": [{"type": "radar", "encode": {"itemName": "dim", "value": ["avg_price", "total_qty", "total_amt", "total_qty"]}}], "dataset": {"source": [["dim", "avg_price", "total_qty", "total_amt"], ["线上-天猫", 495.9130434782609, 109, 23928.0], ["线上-京东", 838.7619047619048, 84, 30764.0], ["线上-官网", 2290.6363636363635, 29, 34034.0], ["线下-门店", 1283.5483870967741, 61, 51078.0]]}};
+            var rawData = [{"dim": "线上-天猫", "avg_price": 495.9130434782609, "total_qty": 109, "total_amt": 23928.0}, {"dim": "线上-京东", "avg_price": 838.7619047619048, "total_qty": 84, "total_amt": 30764.0}, {"dim": "线上-官网", "avg_price": 2290.6363636363635, "total_qty": 29, "total_amt": 34034.0}, {"dim": "线下-门店", "avg_price": 1283.5483870967741, "total_qty": 61, "total_amt": 51078.0}];
 
             
 
