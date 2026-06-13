@@ -769,6 +769,12 @@ def generate_echarts_html(df, config, output_path):
     if "toolbox" not in option:
         option["toolbox"] = {"feature": {"saveAsImage": {}, "dataView": {"readOnly": False}}}
 
+    # Fix scatter bubble: symbolSize as dimension name → encode.z
+    for s in option.get("series", []):
+        if s.get("type") == "scatter" and isinstance(s.get("symbolSize"), str) and "z" not in s.get("encode", {}):
+            dim = s.pop("symbolSize")
+            s.setdefault("encode", {})["z"] = dim
+
     # Hard guarantee: option MUST have a renderable series type
     option = _validate_and_fix_option(option, chart_type, df.columns)
 
