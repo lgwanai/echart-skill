@@ -1,8 +1,7 @@
-<!-- line-log -->
+<!-- line-log — https://echarts.apache.org/examples/zh/editor.html?c=line-log -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -22,7 +21,7 @@ var option = {
     type: 'category',
     name: 'x',
     splitLine: { show: false },
-    data: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+    data: {{DATA_0}}
   },
   grid: {
     left: '3%',
@@ -41,27 +40,17 @@ var option = {
     {
       name: 'Log2',
       type: 'line',
-      data: [1, 3, 9, 27, 81, 247, 741, 2223, 6669]
+      data: {{DATA_1}}
     },
     {
       name: 'Log3',
       type: 'line',
-      data: [1, 2, 4, 8, 16, 32, 64, 128, 256]
+      data: {{DATA_2}}
     },
     {
       name: 'Log1/2',
       type: 'line',
-      data: [
-        1 / 2,
-        1 / 4,
-        1 / 8,
-        1 / 16,
-        1 / 32,
-        1 / 64,
-        1 / 128,
-        1 / 256,
-        1 / 512
-      ]
+      data: {{DATA_3}}
     }
   ]
 };

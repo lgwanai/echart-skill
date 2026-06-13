@@ -1,15 +1,6 @@
-<!--
-  Template: mix/timeline.html
-  Chart Type: Timeline (时间轴多图表切换)
-  Data Pattern: TIMELINE_OPTIONS
-  Data Format: { timeline: [period1, ...], options: [{series:[{data}]}, ...] }
-  Covers: mix-timeline-finance (1 example)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>timeline</title>
+<!-- mix-timeline-finance — https://echarts.apache.org/examples/zh/editor.html?c=mix-timeline-finance -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>mix-timeline-finance</title>
 <script>
 
 /*
@@ -59,26 +50,260 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">timeline</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
   baseOption: {
-    timeline: { axisType: 'category', autoPlay: true, playInterval: 1000, data: ["2020", "2021", "2022"] },
-    title: { text: 'timeline' },
+    timeline: {
+      axisType: 'category',
+      // realtime: false,
+      // loop: false,
+      autoPlay: true,
+      // currentIndex: 2,
+      playInterval: 1000,
+      // controlStyle: {
+      //     position: 'left'
+      // },
+      data: [120, 200, 150, 80, 70, 110, 130],
+      label: {
+        formatter: function (s) {
+          return new Date(s).getFullYear();
+        }
+      }
+    },
+    title: {
+      subtext: '数据来自国家统计局'
+    },
     tooltip: {},
-    grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-    xAxis: { type: 'category', data: ["A", "B", "C"] },
-    yAxis: { type: 'value', max: 200 },
-    series: [{"name": "sales", "type": "bar", "data": [120, 90, 70]}]
+    legend: {
+      left: 'right',
+      data: [{"xAxis": 1}, {"xAxis": 3}, {"xAxis": 5}, {"xAxis": 7}],
+      selected: {
+        GDP: false,
+        金融: false,
+        房地产: false
+      }
+    },
+    calculable: true,
+    grid: {
+      top: 80,
+      bottom: 100,
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow',
+          label: {
+            show: true,
+            formatter: function (params) {
+              return params.value.replace('\n', '');
+            }
+          }
+        }
+      }
+    },
+    xAxis: [
+      {
+        type: 'category',
+        axisLabel: { interval: 0 },
+        data: [],
+        splitLine: { show: false }
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        name: 'GDP（亿元）'
+      }
+    ],
+    series: [
+      { name: 'GDP', type: 'bar' },
+      { name: '金融', type: 'bar' },
+      { name: '房地产', type: 'bar' },
+      { name: '第一产业', type: 'bar' },
+      { name: '第二产业', type: 'bar' },
+      { name: '第三产业', type: 'bar' },
+      {
+        name: 'GDP占比',
+        type: 'pie',
+        center: ['75%', '35%'],
+        radius: '28%',
+        z: 100
+      }
+    ]
   },
-  options: [{"series": [{"data": [120, 90, 70]}]}, {"series": [{"data": [145, 110, 85]}]}, {"series": [{"data": [170, 130, 100]}]}]
+  options: [
+    {
+      title: { text: '2002全国宏观经济指标' },
+      series: [
+        { data: dataMap.dataGDP['2002'] },
+        { data: dataMap.dataFinancial['2002'] },
+        { data: dataMap.dataEstate['2002'] },
+        { data: dataMap.dataPI['2002'] },
+        { data: dataMap.dataSI['2002'] },
+        { data: dataMap.dataTI['2002'] },
+        {
+          data: [] },
+            { name: '第二产业', value: dataMap.dataSI['2002sum'] },
+            { name: '第三产业', value: dataMap.dataTI['2002sum'] }
+          ]
+        }
+      ]
+    },
+    {
+      title: { text: '2003全国宏观经济指标' },
+      series: [
+        { data: dataMap.dataGDP['2003'] },
+        { data: dataMap.dataFinancial['2003'] },
+        { data: dataMap.dataEstate['2003'] },
+        { data: dataMap.dataPI['2003'] },
+        { data: dataMap.dataSI['2003'] },
+        { data: dataMap.dataTI['2003'] },
+        {
+          data: [] },
+            { name: '第二产业', value: dataMap.dataSI['2003sum'] },
+            { name: '第三产业', value: dataMap.dataTI['2003sum'] }
+          ]
+        }
+      ]
+    },
+    {
+      title: { text: '2004全国宏观经济指标' },
+      series: [
+        { data: dataMap.dataGDP['2004'] },
+        { data: dataMap.dataFinancial['2004'] },
+        { data: dataMap.dataEstate['2004'] },
+        { data: dataMap.dataPI['2004'] },
+        { data: dataMap.dataSI['2004'] },
+        { data: dataMap.dataTI['2004'] },
+        {
+          data: [] },
+            { name: '第二产业', value: dataMap.dataSI['2004sum'] },
+            { name: '第三产业', value: dataMap.dataTI['2004sum'] }
+          ]
+        }
+      ]
+    },
+    {
+      title: { text: '2005全国宏观经济指标' },
+      series: [
+        { data: dataMap.dataGDP['2005'] },
+        { data: dataMap.dataFinancial['2005'] },
+        { data: dataMap.dataEstate['2005'] },
+        { data: dataMap.dataPI['2005'] },
+        { data: dataMap.dataSI['2005'] },
+        { data: dataMap.dataTI['2005'] },
+        {
+          data: [] },
+            { name: '第二产业', value: dataMap.dataSI['2005sum'] },
+            { name: '第三产业', value: dataMap.dataTI['2005sum'] }
+          ]
+        }
+      ]
+    },
+    {
+      title: { text: '2006全国宏观经济指标' },
+      series: [
+        { data: dataMap.dataGDP['2006'] },
+        { data: dataMap.dataFinancial['2006'] },
+        { data: dataMap.dataEstate['2006'] },
+        { data: dataMap.dataPI['2006'] },
+        { data: dataMap.dataSI['2006'] },
+        { data: dataMap.dataTI['2006'] },
+        {
+          data: [] },
+            { name: '第二产业', value: dataMap.dataSI['2006sum'] },
+            { name: '第三产业', value: dataMap.dataTI['2006sum'] }
+          ]
+        }
+      ]
+    },
+    {
+      title: { text: '2007全国宏观经济指标' },
+      series: [
+        { data: dataMap.dataGDP['2007'] },
+        { data: dataMap.dataFinancial['2007'] },
+        { data: dataMap.dataEstate['2007'] },
+        { data: dataMap.dataPI['2007'] },
+        { data: dataMap.dataSI['2007'] },
+        { data: dataMap.dataTI['2007'] },
+        {
+          data: [] },
+            { name: '第二产业', value: dataMap.dataSI['2007sum'] },
+            { name: '第三产业', value: dataMap.dataTI['2007sum'] }
+          ]
+        }
+      ]
+    },
+    {
+      title: { text: '2008全国宏观经济指标' },
+      series: [
+        { data: dataMap.dataGDP['2008'] },
+        { data: dataMap.dataFinancial['2008'] },
+        { data: dataMap.dataEstate['2008'] },
+        { data: dataMap.dataPI['2008'] },
+        { data: dataMap.dataSI['2008'] },
+        { data: dataMap.dataTI['2008'] },
+        {
+          data: [] },
+            { name: '第二产业', value: dataMap.dataSI['2008sum'] },
+            { name: '第三产业', value: dataMap.dataTI['2008sum'] }
+          ]
+        }
+      ]
+    },
+    {
+      title: { text: '2009全国宏观经济指标' },
+      series: [
+        { data: dataMap.dataGDP['2009'] },
+        { data: dataMap.dataFinancial['2009'] },
+        { data: dataMap.dataEstate['2009'] },
+        { data: dataMap.dataPI['2009'] },
+        { data: dataMap.dataSI['2009'] },
+        { data: dataMap.dataTI['2009'] },
+        {
+          data: [] },
+            { name: '第二产业', value: dataMap.dataSI['2009sum'] },
+            { name: '第三产业', value: dataMap.dataTI['2009sum'] }
+          ]
+        }
+      ]
+    },
+    {
+      title: { text: '2010全国宏观经济指标' },
+      series: [
+        { data: dataMap.dataGDP['2010'] },
+        { data: dataMap.dataFinancial['2010'] },
+        { data: dataMap.dataEstate['2010'] },
+        { data: dataMap.dataPI['2010'] },
+        { data: dataMap.dataSI['2010'] },
+        { data: dataMap.dataTI['2010'] },
+        {
+          data: [] },
+            { name: '第二产业', value: dataMap.dataSI['2010sum'] },
+            { name: '第三产业', value: dataMap.dataTI['2010sum'] }
+          ]
+        }
+      ]
+    },
+    {
+      title: { text: '2011全国宏观经济指标' },
+      series: [
+        { data: dataMap.dataGDP['2011'] },
+        { data: dataMap.dataFinancial['2011'] },
+        { data: dataMap.dataEstate['2011'] },
+        { data: dataMap.dataPI['2011'] },
+        { data: dataMap.dataSI['2011'] },
+        { data: dataMap.dataTI['2011'] },
+        {
+          data: [] },
+            { name: '第二产业', value: dataMap.dataSI['2011sum'] },
+            { name: '第三产业', value: dataMap.dataTI['2011sum'] }
+          ]
+        }
+      ]
+    }
+  ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

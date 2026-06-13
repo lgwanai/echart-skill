@@ -1,8 +1,7 @@
-<!-- scatter-aggregate-bar -->
+<!-- scatter-aggregate-bar — https://echarts.apache.org/examples/zh/editor.html?c=scatter-aggregate-bar -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -43,23 +42,14 @@ var option = {
 const barOption = {
   xAxis: {
     type: 'category',
-    data: ['Female', 'Male']
+    data: {{DATA_0}}
   },
   yAxis: {},
   series: [
     {
       type: 'bar',
       id: 'total',
-      data: [
-        {
-          value: calculateAverage(maleDeta, 0),
-          groupId: 'male'
-        },
-        {
-          value: calculateAverage(femaleData, 0),
-          groupId: 'female'
-        }
-      ],
+      data: {{DATA_1}},
       universalTransition: {
         enabled: true,
         seriesKey: ['female', 'male'],

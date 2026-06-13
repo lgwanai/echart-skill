@@ -1,16 +1,6 @@
-<!--
-  Template: bar/waterfall.html
-  Chart Type: Waterfall (瀑布图)
-  Data Pattern: FLAT_ARRAY (3-series with stack: transparent helper + increase + decrease)
-  Data Format: { categories: string[], increase: (number|null)[], decrease: (number|null)[] }
-  Covers: bar-waterfall, bar-waterfall2 (2 examples)
-  IMPORTANT: This template auto-computes the transparent helper series from increase/decrease data
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>bar-waterfall</title>
+<!-- bar-waterfall — https://echarts.apache.org/examples/zh/editor.html?c=bar-waterfall -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>bar-waterfall</title>
 <script>
 
 /*
@@ -60,52 +50,66 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">bar-waterfall</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
-var rawIncrease = [120.0, 200.0, 150.0, 80.0, 0.0, 0.0, 260.0];
-var rawDecrease = [0.0, 0.0, 0.0, 0.0, 110.0, 60.0, 0.0];
-var categories = ["\u542f\u52a8", "\u7814\u53d1", "\u8425\u9500", "\u8fd0\u7ef4", "\u9500\u552e", "\u5229\u6da6", "\u7ed3\u7b97"];
-
-// Auto-compute waterfall helper (transparent base) and split positive/negative
-var helper = [], positive = [], negative = [];
-var sum = 0;
-for (var i = 0; i < categories.length; i++) {
-  var inc = rawIncrease[i], dec = rawDecrease[i];
-  if (i === 0) {
-    helper.push(0);
-    positive.push(inc || 0);
-    negative.push(dec ? Math.abs(dec) : '-');
-  } else {
-    sum += (rawIncrease[i-1] || 0) - (rawDecrease[i-1] || 0);
-    helper.push(sum);
-    positive.push(inc || '-');
-    negative.push(dec ? Math.abs(dec) : '-');
-  }
-}
-
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  title: { text: 'bar-waterfall', left: 'center' },
-  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-  grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-  xAxis: { type: 'category', data: categories },
-  yAxis: { type: 'value' },
+  title: {
+    text: 'Waterfall Chart',
+    subtext: 'Living Expenses in Shenzhen'
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    },
+    formatter: function (params) {
+      var tar = params[1];
+      return tar.name + '<br/>' + tar.seriesName + ' : ' + tar.value;
+    }
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '3%',
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category',
+    splitLine: { show: false },
+    data: [120, 200, 150, 80, 70, 110, 130]
+  },
+  yAxis: {
+    type: 'value'
+  },
   series: [
-    { name: 'helper', type: 'bar', stack: 'total',
-      itemStyle: { color: 'transparent', borderColor: 'transparent' },
-      emphasis: { itemStyle: { color: 'transparent', borderColor: 'transparent' } },
-      data: helper },
-    { name: 'increase', type: 'bar', stack: 'total',
-      itemStyle: { color: '#4CAF50' }, data: positive },
-    { name: 'decrease', type: 'bar', stack: 'total',
-      itemStyle: { color: '#F44336' }, data: negative }
+    {
+      name: 'Placeholder',
+      type: 'bar',
+      stack: 'Total',
+      itemStyle: {
+        borderColor: 'transparent',
+        color: 'transparent'
+      },
+      emphasis: {
+        itemStyle: {
+          borderColor: 'transparent',
+          color: 'transparent'
+        }
+      },
+      data: [{"xAxis": 1}, {"xAxis": 3}, {"xAxis": 5}, {"xAxis": 7}]
+    },
+    {
+      name: 'Life Cost',
+      type: 'bar',
+      stack: 'Total',
+      label: {
+        show: true,
+        position: 'inside'
+      },
+      data: []
+    }
   ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

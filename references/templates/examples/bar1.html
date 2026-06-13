@@ -1,8 +1,7 @@
-<!-- bar1 -->
+<!-- bar1 — https://echarts.apache.org/examples/zh/editor.html?c=bar1 -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -15,7 +14,7 @@ var option = {
     trigger: 'axis'
   },
   legend: {
-    data: ['Rainfall', 'Evaporation']
+    data: {{DATA_0}}
   },
   toolbox: {
     show: true,
@@ -31,7 +30,7 @@ var option = {
     {
       type: 'category',
       // prettier-ignore
-      data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      data: {{DATA_1}}
     }
   ],
   yAxis: [
@@ -43,33 +42,23 @@ var option = {
     {
       name: 'Rainfall',
       type: 'bar',
-      data: [
-        2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-      ],
+      data: {{DATA_2}},
       markPoint: {
-        data: [
-          { type: 'max', name: 'Max' },
-          { type: 'min', name: 'Min' }
-        ]
+        data: {{DATA_3}}
       },
       markLine: {
-        data: [{ type: 'average', name: 'Avg' }]
+        data: {{DATA_4}}
       }
     },
     {
       name: 'Evaporation',
       type: 'bar',
-      data: [
-        2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
-      ],
+      data: {{DATA_5}},
       markPoint: {
-        data: [
-          { name: 'Max', value: 182.2, xAxis: 7, yAxis: 183 },
-          { name: 'Min', value: 2.3, xAxis: 11, yAxis: 3 }
-        ]
+        data: {{DATA_6}}
       },
       markLine: {
-        data: [{ type: 'average', name: 'Avg' }]
+        data: {{DATA_7}}
       }
     }
   ]

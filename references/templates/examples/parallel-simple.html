@@ -1,8 +1,7 @@
-<!-- parallel-simple -->
+<!-- parallel-simple — https://echarts.apache.org/examples/zh/editor.html?c=parallel-simple -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -15,7 +14,7 @@ var option = {
       dim: 3,
       name: 'Score',
       type: 'category',
-      data: ['Excellent', 'Good', 'OK', 'Bad']
+      data: {{DATA_0}}
     }
   ],
   series: {
@@ -23,8 +22,7 @@ var option = {
     lineStyle: {
       width: 4
     },
-    data: [
-      [12.99, 100, 82, 'Good'],
+    data: {{DATA_1}},
       [9.99, 80, 77, 'OK'],
       [20, 120, 60, 'Excellent']
     ]

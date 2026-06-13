@@ -1,8 +1,7 @@
-<!-- gauge-car -->
+<!-- gauge-car — https://echarts.apache.org/examples/zh/editor.html?c=gauge-car -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -64,12 +63,7 @@ var option = {
           color: '#fff'
         }
       },
-      data: [
-        {
-          value: 250,
-          name: 'km/h'
-        }
-      ]
+      data: {{DATA_0}}
     },
     {
       name: 'gauge 1',
@@ -132,12 +126,7 @@ var option = {
       detail: {
         show: false
       },
-      data: [
-        {
-          value: 0,
-          name: '当前位置：\n \n 中科路'
-        }
-      ]
+      data: {{DATA_1}}
     },
     // middle
     {
@@ -210,12 +199,7 @@ var option = {
         fontFamily: 'Arial',
         offsetCenter: [0, '-50%']
       },
-      data: [
-        {
-          value: 0.6,
-          name: '1/min x 1000'
-        }
-      ],
+      data: {{DATA_2}},
       detail: {
         show: false
       }
@@ -272,12 +256,7 @@ var option = {
         }
       },
       // value is speed
-      data: [
-        {
-          value: 0,
-          name: ''
-        }
-      ]
+      data: {{DATA_3}}
     },
     // right
     {
@@ -344,12 +323,7 @@ var option = {
           color: '#fff'
         }
       },
-      data: [
-        {
-          value: 250,
-          name: ''
-        }
-      ]
+      data: {{DATA_4}}
     },
     {
       name: 'gauge 5',
@@ -438,12 +412,7 @@ var option = {
           }
         }
       },
-      data: [
-        {
-          value: 0.85,
-          name: ''
-        }
-      ]
+      data: {{DATA_5}}
     },
     {
       name: 'gauge 6',
@@ -511,12 +480,7 @@ var option = {
       detail: {
         show: false
       },
-      data: [
-        {
-          value: -120,
-          name: ''
-        }
-      ]
+      data: {{DATA_6}}
     }
   ]
 };

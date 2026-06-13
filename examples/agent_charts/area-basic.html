@@ -1,16 +1,6 @@
-<!--
-  Template: line/basic.html
-  Chart Type: Line (折线图)
-  Data Pattern: FLAT_ARRAY
-  Data Format: { categories: string[], values: number[] }
-  Covers: area-basic, area-simple, area-pieces, area-rainfall, area-time-axis, line-simple, line-smooth, line-style, line-marker, line-markline,
-          line-sections, line-log, line-y-category, line-graphic (14 examples)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>area-basic</title>
+<!-- area-basic — https://echarts.apache.org/examples/zh/editor.html?c=area-basic -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>area-basic</title>
 <script>
 
 /*
@@ -60,29 +50,25 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">area-basic</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  tooltip: { trigger: 'axis' },
-  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'category', data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], boundaryGap: true && true },
-  yAxis: { type: 'value' },
-  series: [{
-    type: 'line',
-    smooth: false,     // true | false
-    step: false,          // false | 'start' | 'middle' | 'end'
-    areaStyle: true, // null | {}
-    symbol: 'circle',
-    symbolSize: 6,
-    data: [120.0, 200.0, 150.0, 80.0, 70.0, 110.0, 130.0]
-  }]
+  xAxis: {
+    type: 'category',
+    boundaryGap: false,
+    data: [120, 200, 150, 80, 70, 110, 130]
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      data: [{"xAxis": 1}, {"xAxis": 3}, {"xAxis": 5}, {"xAxis": 7}],
+      type: 'line',
+      areaStyle: {}
+    }
+  ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

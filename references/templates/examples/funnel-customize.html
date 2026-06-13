@@ -1,8 +1,7 @@
-<!-- funnel-customize -->
+<!-- funnel-customize — https://echarts.apache.org/examples/zh/editor.html?c=funnel-customize -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -22,7 +21,7 @@ var option = {
     }
   },
   legend: {
-    data: ['Show', 'Click', 'Visit', 'Inquiry', 'Order']
+    data: {{DATA_0}}
   },
   series: [
     {
@@ -45,13 +44,7 @@ var option = {
           formatter: '{b}Expected: {c}%'
         }
       },
-      data: [
-        { value: 60, name: 'Visit' },
-        { value: 40, name: 'Inquiry' },
-        { value: 20, name: 'Order' },
-        { value: 80, name: 'Click' },
-        { value: 100, name: 'Show' }
-      ]
+      data: {{DATA_1}}
     },
     {
       name: 'Actual',
@@ -75,13 +68,7 @@ var option = {
           formatter: '{b}Actual: {c}%'
         }
       },
-      data: [
-        { value: 30, name: 'Visit' },
-        { value: 10, name: 'Inquiry' },
-        { value: 5, name: 'Order' },
-        { value: 50, name: 'Click' },
-        { value: 80, name: 'Show' }
-      ],
+      data: {{DATA_2}},
       // Ensure outer shape will not be over inner shape when hover.
       z: 100
     }

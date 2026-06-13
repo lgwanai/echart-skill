@@ -1,8 +1,7 @@
-<!-- bar-stack -->
+<!-- bar-stack — https://echarts.apache.org/examples/zh/editor.html?c=bar-stack -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -17,7 +16,7 @@ var option = {
   xAxis: [
     {
       type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      data: {{DATA_0}}
     }
   ],
   yAxis: [
@@ -32,7 +31,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [320, 332, 301, 334, 390, 330, 320]
+      data: {{DATA_1}}
     },
     {
       name: 'Email',
@@ -41,7 +40,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [120, 132, 101, 134, 90, 230, 210]
+      data: {{DATA_2}}
     },
     {
       name: 'Union Ads',
@@ -50,7 +49,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [220, 182, 191, 234, 290, 330, 310]
+      data: {{DATA_3}}
     },
     {
       name: 'Video Ads',
@@ -59,12 +58,12 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [150, 232, 201, 154, 190, 330, 410]
+      data: {{DATA_4}}
     },
     {
       name: 'Search Engine',
       type: 'bar',
-      data: [862, 1018, 964, 1026, 1679, 1600, 1570],
+      data: {{DATA_5}},
       emphasis: {
         focus: 'series'
       },
@@ -72,7 +71,7 @@ var option = {
         lineStyle: {
           type: 'dashed'
         },
-        data: [[{ type: 'min' }, { type: 'max' }]]
+        data: {{DATA_6}}]
       }
     },
     {
@@ -83,7 +82,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [620, 732, 701, 734, 1090, 1130, 1120]
+      data: {{DATA_7}}
     },
     {
       name: 'Google',
@@ -92,7 +91,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [120, 132, 101, 134, 290, 230, 220]
+      data: {{DATA_8}}
     },
     {
       name: 'Bing',
@@ -101,7 +100,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [60, 72, 71, 74, 190, 130, 110]
+      data: {{DATA_9}}
     },
     {
       name: 'Others',
@@ -110,7 +109,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [62, 82, 91, 84, 109, 110, 120]
+      data: {{DATA_10}}
     }
   ]
 };

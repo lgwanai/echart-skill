@@ -1,8 +1,7 @@
-<!-- pictorialBar-velocity -->
+<!-- pictorialBar-velocity — https://echarts.apache.org/examples/zh/editor.html?c=pictorialBar-velocity -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -17,7 +16,7 @@ var option = {
     }
   },
   xAxis: {
-    data: ['驯鹿', '火箭', '飞机', '高铁', '轮船', '汽车', '跑步', '步行'],
+    data: {{DATA_0}},
     axisTick: { show: false },
     axisLine: { show: false },
     axisLabel: {
@@ -46,7 +45,7 @@ var option = {
           opacity: 1
         }
       },
-      data: [123, 60, 25, 18, 12, 9, 2, 1],
+      data: {{DATA_1}},
       z: 10
     },
     {
@@ -56,11 +55,7 @@ var option = {
       symbolPosition: 'end',
       symbolSize: 50,
       symbolOffset: [0, '-120%'],
-      data: [
-        {
-          value: 123,
-          symbol: pathSymbols.reindeer,
-          symbolSize: [60, 60]
+      data: {{DATA_2}}
         },
         {
           value: 60,

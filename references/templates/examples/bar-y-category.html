@@ -1,8 +1,7 @@
-<!-- bar-y-category -->
+<!-- bar-y-category — https://echarts.apache.org/examples/zh/editor.html?c=bar-y-category -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -23,18 +22,18 @@ var option = {
   },
   yAxis: {
     type: 'category',
-    data: ['Brazil', 'Indonesia', 'USA', 'India', 'China', 'World']
+    data: {{DATA_0}}
   },
   series: [
     {
       name: '2011',
       type: 'bar',
-      data: [18203, 23489, 29034, 104970, 131744, 630230]
+      data: {{DATA_1}}
     },
     {
       name: '2012',
       type: 'bar',
-      data: [19325, 23438, 31000, 121594, 134141, 681807]
+      data: {{DATA_2}}
     }
   ]
 };

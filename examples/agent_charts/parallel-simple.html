@@ -1,15 +1,6 @@
-<!--
-  Template: parallel/basic.html
-  Chart Type: Parallel Coordinates (平行坐标图)
-  Data Pattern: DATASET_SOURCE
-  Data Format: [[dim1, dim2, dim3, ...], ...]  (parallelAxis defines each dimension)
-  Covers: parallel-simple, parallel-aqi, parallel-nutrients (3 examples)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>parallel</title>
+<!-- parallel-simple — https://echarts.apache.org/examples/zh/editor.html?c=parallel-simple -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>parallel-simple</title>
 <script>
 
 /*
@@ -59,24 +50,31 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">parallel</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  parallelAxis: [{"dim": 0, "name": "A"}, {"dim": 1, "name": "B"}, {"dim": 2, "name": "C"}, {"dim": 3, "name": "D"}, {"dim": 4, "name": "E"}],       // [{dim: 0, name: '...', type: 'value'}, ...]
-  parallel: { left: '5%', right: '13%', bottom: '10%', top: '15%' },
-  series: [{
+  parallelAxis: [
+    { dim: 0, name: 'Price' },
+    { dim: 1, name: 'Net Weight' },
+    { dim: 2, name: 'Amount' },
+    {
+      dim: 3,
+      name: 'Score',
+      type: 'category',
+      data: [120, 200, 150, 80, 70, 110, 130]
+    }
+  ],
+  series: {
     type: 'parallel',
-    lineStyle: { width: 1.5, opacity: 0.6 },
-    emphasis: { lineStyle: { width: 3, opacity: 0.8 } },
-    data: [[55, 85, 78, 90, 65, "A"], [70, 80, 82, 95, 72, "B"], [60, 75, 68, 85, 58, "C"], [80, 90, 88, 92, 78, "D"], [45, 65, 55, 70, 48, "E"]]
-  }]
+    lineStyle: {
+      width: 4
+    },
+    data: [{"xAxis": 1}, {"xAxis": 3}, {"xAxis": 5}, {"xAxis": 7}],
+      [9.99, 80, 77, 'OK'],
+      [20, 120, 60, 'Excellent']
+    ]
+  }
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

@@ -1,8 +1,7 @@
-<!-- parallel-aqi -->
+<!-- parallel-aqi — https://echarts.apache.org/examples/zh/editor.html?c=parallel-aqi -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -10,7 +9,7 @@ var option = {
   backgroundColor: '#333',
   legend: {
     bottom: 30,
-    data: ['Beijing', 'Shanghai', 'Guangzhou'],
+    data: {{DATA_0}},
     itemGap: 20,
     textStyle: {
       color: '#fff',
@@ -41,7 +40,7 @@ var option = {
       dim: 7,
       name: schema[7].text,
       type: 'category',
-      data: ['优', '良', '轻度污染', '中度污染', '重度污染', '严重污染']
+      data: {{DATA_1}}
     }
   ],
   visualMap: {

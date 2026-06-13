@@ -1,8 +1,7 @@
-<!-- pictorialBar-spirit -->
+<!-- pictorialBar-spirit — https://echarts.apache.org/examples/zh/editor.html?c=pictorialBar-spirit -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -22,7 +21,7 @@ var option = {
     }
   },
   yAxis: {
-    data: ['2013', '2014', '2015', '2016'],
+    data: {{DATA_0}},
     inverse: true,
     axisTick: { show: false },
     axisLine: { show: false },
@@ -48,7 +47,7 @@ var option = {
       symbolClip: true,
       symbolSize: 30,
       symbolBoundingData: maxData,
-      data: [891, 1220, 660, 1670],
+      data: {{DATA_1}},
       markLine: {
         symbol: 'none',
         label: {
@@ -61,11 +60,7 @@ var option = {
           opacity: 0.2,
           width: 2
         },
-        data: [
-          {
-            type: 'max'
-          }
-        ]
+        data: {{DATA_2}}
       },
       z: 10
     },
@@ -91,7 +86,7 @@ var option = {
       symbol: spirit,
       symbolSize: 30,
       symbolBoundingData: maxData,
-      data: [891, 1220, 660, 1670],
+      data: {{DATA_3}},
       z: 5
     }
   ]

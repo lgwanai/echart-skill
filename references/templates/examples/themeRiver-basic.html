@@ -1,8 +1,7 @@
-<!-- themeRiver-basic -->
+<!-- themeRiver-basic — https://echarts.apache.org/examples/zh/editor.html?c=themeRiver-basic -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -19,7 +18,7 @@ var option = {
     }
   },
   legend: {
-    data: ['DQ', 'TY', 'SS', 'QG', 'SY', 'DD'],
+    data: {{DATA_0}},
     top: 15
   },
   singleAxis: {
@@ -51,8 +50,7 @@ var option = {
           shadowColor: 'rgba(0, 0, 0, 0.8)'
         }
       },
-      data: [
-        ['2015/11/08', 10, 'DQ'],
+      data: {{DATA_1}},
         ['2015/11/09', 15, 'DQ'],
         ['2015/11/10', 35, 'DQ'],
         ['2015/11/11', 38, 'DQ'],

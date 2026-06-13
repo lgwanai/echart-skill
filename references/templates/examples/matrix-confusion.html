@@ -1,19 +1,18 @@
-<!-- matrix-confusion -->
+<!-- matrix-confusion — https://echarts.apache.org/examples/zh/editor.html?c=matrix-confusion -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
 var option = {
   matrix: {
     x: {
-      data: ['Positive', 'Negative'],
+      data: {{DATA_0}},
       label
     },
     y: {
-      data: ['Positive', 'Negative'],
+      data: {{DATA_1}},
       label
     },
     top: 80,
@@ -23,8 +22,7 @@ var option = {
   series: {
     type: 'custom',
     coordinateSystem: 'matrix',
-    data: [
-      ['Positive', 'Positive', 10],
+    data: {{DATA_2}},
       ['Positive', 'Negative', 2],
       ['Negative', 'Positive', 3],
       ['Negative', 'Negative', 5]

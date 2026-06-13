@@ -1,22 +1,21 @@
-<!-- bar-polar-stack-radial -->
+<!-- bar-polar-stack-radial — https://echarts.apache.org/examples/zh/editor.html?c=bar-polar-stack-radial -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
 var option = {
   angleAxis: {
     type: 'category',
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    data: {{DATA_0}}
   },
   radiusAxis: {},
   polar: {},
   series: [
     {
       type: 'bar',
-      data: [1, 2, 3, 4, 3, 5, 1],
+      data: {{DATA_1}},
       coordinateSystem: 'polar',
       name: 'A',
       stack: 'a',
@@ -26,7 +25,7 @@ var option = {
     },
     {
       type: 'bar',
-      data: [2, 4, 6, 1, 3, 2, 1],
+      data: {{DATA_2}},
       coordinateSystem: 'polar',
       name: 'B',
       stack: 'a',
@@ -36,7 +35,7 @@ var option = {
     },
     {
       type: 'bar',
-      data: [1, 2, 3, 4, 1, 2, 5],
+      data: {{DATA_3}},
       coordinateSystem: 'polar',
       name: 'C',
       stack: 'a',
@@ -47,7 +46,7 @@ var option = {
   ],
   legend: {
     show: true,
-    data: ['A', 'B', 'C']
+    data: {{DATA_4}}
   }
 };
 chart.setOption(option);

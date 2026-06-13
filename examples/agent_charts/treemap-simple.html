@@ -1,16 +1,6 @@
-<!--
-  Template: treemap/basic.html
-  Chart Type: Treemap (矩形树图)
-  Data Pattern: HIERARCHY
-  Data Format: [{name: string, value?: number, children?: [...]}, ...]
-  Covers: treemap-simple, treemap-drill-down, treemap-show-parent, treemap-visual,
-          treemap-obama, treemap-disk, treemap-sunburst-transition (7 examples)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>treemap</title>
+<!-- treemap-simple — https://echarts.apache.org/examples/zh/editor.html?c=treemap-simple -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>treemap-simple</title>
 <script>
 
 /*
@@ -60,32 +50,34 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">treemap</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  tooltip: { trigger: 'item' },
-  series: [{
-    type: 'treemap',
-    roam: false,
-    width: '100%', height: '100%',
-    top: 0, left: 0, bottom: 0, right: 0,
-    nodeClick: false,    // 'link' | 'zoomToNode' | false
-    breadcrumb: { show: true !== false },
-    label: { show: true, position: 'insideTopLeft' },
-    upperLabel: { show: true !== false, height: 30 },
-    levels: [{
-      itemStyle: { borderWidth: 3, borderColor: '#fff', gapBorderWidth: 1 },
-      upperLabel: { show: true }
-    }],
-    data: [{"name": "\u7535\u5b50", "value": 10000, "children": [{"name": "\u624b\u673a", "value": 6000}, {"name": "\u7535\u8111", "value": 4000}]}, {"name": "\u5bb6\u5c45", "value": 5000, "children": [{"name": "\u5bb6\u5177", "value": 3000}, {"name": "\u706f\u5177", "value": 2000}]}, {"name": "\u670d\u88c5", "value": 5000, "children": [{"name": "\u7537\u88c5", "value": 3500}, {"name": "\u5973\u88c5", "value": 1500}]}]
-  }]
+  series: [
+    {
+      type: 'treemap',
+      data: [120, 200, 150, 80, 70, 110, 130]
+        },
+        {
+          name: 'nodeB',
+          value: 20,
+          children: [
+            {
+              name: 'nodeBa',
+              value: 20,
+              children: [
+                {
+                  name: 'nodeBa1',
+                  value: 20
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

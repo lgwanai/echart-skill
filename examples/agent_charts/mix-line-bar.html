@@ -1,15 +1,6 @@
-<!--
-  Template: mix/line-bar.html
-  Chart Type: Line + Bar Combo (折线柱状混合图)
-  Data Pattern: FLAT_ARRAY (dual yAxis: bar on left, line on right)
-  Data Format: { categories: string[], barData: number[], lineData: number[] }
-  Covers: mix-line-bar, mix-zoom-on-value (2 examples)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>mix-line-bar</title>
+<!-- mix-line-bar — https://echarts.apache.org/examples/zh/editor.html?c=mix-line-bar -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>mix-line-bar</title>
 <script>
 
 /*
@@ -59,29 +50,94 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">mix-line-bar</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-  legend: { data: ['柱状', '折线'] },
-  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'category', data: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"] },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross',
+      crossStyle: {
+        color: '#999'
+      }
+    }
+  },
+  toolbox: {
+    feature: {
+      dataView: { show: true, readOnly: false },
+      magicType: { show: true, type: ['line', 'bar'] },
+      restore: { show: true },
+      saveAsImage: { show: true }
+    }
+  },
+  legend: {
+    data: [120, 200, 150, 80, 70, 110, 130]
+  },
+  xAxis: [
+    {
+      type: 'category',
+      data: [{"xAxis": 1}, {"xAxis": 3}, {"xAxis": 5}, {"xAxis": 7}],
+      axisPointer: {
+        type: 'shadow'
+      }
+    }
+  ],
   yAxis: [
-    { type: 'value', name: '柱状', position: 'left' },
-    { type: 'value', name: '折线', position: 'right' }
+    {
+      type: 'value',
+      name: 'Precipitation',
+      min: 0,
+      max: 250,
+      interval: 50,
+      axisLabel: {
+        formatter: '{value} ml'
+      }
+    },
+    {
+      type: 'value',
+      name: 'Temperature',
+      min: 0,
+      max: 25,
+      interval: 5,
+      axisLabel: {
+        formatter: '{value} °C'
+      }
+    }
   ],
   series: [
-    { name: '柱状', type: 'bar', data: [320, 332, 301, 334, 390, 330], itemStyle: { borderRadius: [4,4,0,0] } },
-    { name: '折线', type: 'line', yAxisIndex: 1, data: [220, 182, 191, 234, 290, 310], smooth: true,
-      symbol: 'circle', symbolSize: 8 }
+    {
+      name: 'Evaporation',
+      type: 'bar',
+      tooltip: {
+        valueFormatter: function (value) {
+          return value + ' ml';
+        }
+      },
+      data: []
+    },
+    {
+      name: 'Precipitation',
+      type: 'bar',
+      tooltip: {
+        valueFormatter: function (value) {
+          return value + ' ml';
+        }
+      },
+      data: []
+    },
+    {
+      name: 'Temperature',
+      type: 'line',
+      yAxisIndex: 1,
+      tooltip: {
+        valueFormatter: function (value) {
+          return value + ' °C';
+        }
+      },
+      data: []
+    }
   ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

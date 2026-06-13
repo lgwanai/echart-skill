@@ -1,14 +1,6 @@
-<!--
-  Template: custom/error-bar.html
-  Chart Type: Error Bar (柱状图 + 自定义误差线)
-  Data Format: [[xIdx, val, lowVal, highVal], ...]
-  Uses official ECharts custom series renderItem for error bars
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>error-bar</title>
+<!-- custom-error-bar — https://echarts.apache.org/examples/zh/editor.html?c=custom-error-bar -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>custom-error-bar</title>
 <script>
 
 /*
@@ -58,53 +50,111 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">error-bar</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
-var rawData = [["A", 50, 45, 55], ["B", 65, 60, 72], ["C", 55, 50, 62], ["D", 70, 65, 80], ["E", 60, 55, 68]];
-var barData = rawData.map(function(d){return d[1]});
-var errorData = rawData.map(function(d,i){return [i, d[2], d[3]]});
-var cats = rawData.map(function(d){return d[0]});
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-  xAxis: { data: cats },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    }
+  },
+  title: {
+    text: 'Error bar chart'
+  },
+  legend: {
+    data: [120, 200, 150, 80, 70, 110, 130],
+    top: 20,
+    right: 30
+  },
+  dataZoom: [
+    {
+      type: 'slider',
+      start: 50,
+      end: 70
+    },
+    {
+      type: 'inside',
+      start: 50,
+      end: 70
+    }
+  ],
+  xAxis: {
+    data: categoryData
+  },
   yAxis: {},
   series: [
     {
-      type: 'bar', name: 'value',
+      type: 'bar',
+      name: 'bar',
       data: barData,
-      itemStyle: { color: '#5470c6' }
+      itemStyle: {
+        color: '#77bef7'
+      }
     },
     {
-      type: 'custom', name: 'error',
-      color: '#e54035',
-      itemStyle: { borderWidth: 1.5 },
-      renderItem: function(params, api) {
+      type: 'custom',
+      name: 'error',
+      itemStyle: {
+        borderWidth: 1.5
+      },
+      renderItem: function (params, api) {
         var xValue = api.value(0);
         var highPoint = api.coord([xValue, api.value(1)]);
         var lowPoint = api.coord([xValue, api.value(2)]);
         var halfWidth = api.size([1, 0])[0] * 0.1;
-        var style = api.style({ stroke: '#e54035', fill: undefined });
+        var style = api.style({
+          stroke: api.visual('color'),
+          fill: undefined
+        });
         return {
           type: 'group',
           children: [
-            { type: 'line', shape: { x1: highPoint[0] - halfWidth, y1: highPoint[1], x2: highPoint[0] + halfWidth, y2: highPoint[1] }, style: style },
-            { type: 'line', shape: { x1: highPoint[0], y1: highPoint[1], x2: lowPoint[0], y2: lowPoint[1] }, style: style },
-            { type: 'line', shape: { x1: lowPoint[0] - halfWidth, y1: lowPoint[1], x2: lowPoint[0] + halfWidth, y2: lowPoint[1] }, style: style }
+            {
+              type: 'line',
+              transition: ['shape'],
+              shape: {
+                x1: highPoint[0] - halfWidth,
+                y1: highPoint[1],
+                x2: highPoint[0] + halfWidth,
+                y2: highPoint[1]
+              },
+              style: style
+            },
+            {
+              type: 'line',
+              transition: ['shape'],
+              shape: {
+                x1: highPoint[0],
+                y1: highPoint[1],
+                x2: lowPoint[0],
+                y2: lowPoint[1]
+              },
+              style: style
+            },
+            {
+              type: 'line',
+              transition: ['shape'],
+              shape: {
+                x1: lowPoint[0] - halfWidth,
+                y1: lowPoint[1],
+                x2: lowPoint[0] + halfWidth,
+                y2: lowPoint[1]
+              },
+              style: style
+            }
           ]
         };
       },
-      encode: { x: 0, y: [1, 2] },
+      encode: {
+        x: 0,
+        y: [1, 2]
+      },
       data: errorData,
       z: 100
     }
   ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

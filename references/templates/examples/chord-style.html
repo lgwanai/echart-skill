@@ -1,8 +1,7 @@
-<!-- chord-style -->
+<!-- chord-style — https://echarts.apache.org/examples/zh/editor.html?c=chord-style -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -15,15 +14,7 @@ var option = {
       padAngle: 1,
       center: ['50%', '48%'],
       radius: ['70%', '80%'],
-      data: [
-        { name: 'A' },
-        { name: 'B' },
-        { name: 'C' },
-        { name: 'D' },
-        { name: 'E' },
-        { name: 'F' },
-        { name: 'G' }
-      ],
+      data: {{DATA_0}},
       itemStyle: {
         borderRadius: [0, 15],
         borderWidth: 2,

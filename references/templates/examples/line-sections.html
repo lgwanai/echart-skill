@@ -1,8 +1,7 @@
-<!-- line-sections -->
+<!-- line-sections — https://echarts.apache.org/examples/zh/editor.html?c=line-sections -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -27,7 +26,7 @@ var option = {
     type: 'category',
     boundaryGap: false,
     // prettier-ignore
-    data: ['00:00', '01:15', '02:30', '03:45', '05:00', '06:15', '07:30', '08:45', '10:00', '11:15', '12:30', '13:45', '15:00', '16:15', '17:30', '18:45', '20:00', '21:15', '22:30', '23:45']
+    data: {{DATA_0}}
   },
   yAxis: {
     type: 'value',
@@ -73,21 +72,12 @@ var option = {
       type: 'line',
       smooth: true,
       // prettier-ignore
-      data: [300, 280, 250, 260, 270, 300, 550, 500, 400, 390, 380, 390, 400, 500, 600, 750, 800, 700, 600, 400],
+      data: {{DATA_1}},
       markArea: {
         itemStyle: {
           color: 'rgba(255, 173, 177, 0.4)'
         },
-        data: [
-          [
-            {
-              name: 'Morning Peak',
-              xAxis: '07:30'
-            },
-            {
-              xAxis: '10:00'
-            }
-          ],
+        data: {{DATA_2}},
           [
             {
               name: 'Evening Peak',

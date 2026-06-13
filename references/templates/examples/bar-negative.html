@@ -1,8 +1,7 @@
-<!-- bar-negative -->
+<!-- bar-negative — https://echarts.apache.org/examples/zh/editor.html?c=bar-negative -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -14,7 +13,7 @@ var option = {
     }
   },
   legend: {
-    data: ['Profit', 'Expenses', 'Income']
+    data: {{DATA_0}}
   },
   xAxis: [
     {
@@ -27,7 +26,7 @@ var option = {
       axisTick: {
         show: false
       },
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      data: {{DATA_1}}
     }
   ],
   series: [
@@ -41,7 +40,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [200, 170, 240, 244, 200, 220, 210]
+      data: {{DATA_2}}
     },
     {
       name: 'Income',
@@ -53,7 +52,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [320, 302, 341, 374, 390, 450, 420]
+      data: {{DATA_3}}
     },
     {
       name: 'Expenses',
@@ -66,7 +65,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: [-120, -132, -101, -134, -190, -230, -210]
+      data: {{DATA_4}}
     }
   ]
 };

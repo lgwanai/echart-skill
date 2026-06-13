@@ -1,15 +1,6 @@
-<!--
-  Template: radar/basic.html
-  Chart Type: Radar (雷达图)
-  Data Pattern: RADAR_VALUE
-  Data Format: { indicators: [{name: string, max: number}, ...], series: [{name: string, value: number[]}, ...] }
-  Covers: radar, radar2, radar-aqi, radar-custom, radar-multiple (5 examples)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>radar</title>
+<!-- radar — https://echarts.apache.org/examples/zh/editor.html?c=radar -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>radar</title>
 <script>
 
 /*
@@ -59,27 +50,41 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">radar</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  legend: { data: ["\u9884\u7b97", "\u5b9e\u9645"] },
-  radar: {
-    indicator: [{"name": "budget", "max": 6000.0}, {"name": "spending", "max": 16800.0}, {"name": "sales", "max": 33600.0}, {"name": "profit", "max": 42000.0}],
-    shape: 'polygon',        // 'polygon' | 'circle'
-    center: ['50%', '50%'],
-    radius: '65%'
+  title: {
+    text: 'Basic Radar Chart'
   },
-  series: [{
-    type: 'radar',
-    data: [{"name": "\u9884\u7b97", "value": [4200.0, 3000.0, 20000.0, 35000.0]}, {"name": "\u5b9e\u9645", "value": [5000.0, 14000.0, 28000.0, 26000.0]}]
-  }]
+  legend: {
+    data: [120, 200, 150, 80, 70, 110, 130]
+  },
+  radar: {
+    // shape: 'circle',
+    indicator: [
+      { name: 'Sales', max: 6500 },
+      { name: 'Administration', max: 16000 },
+      { name: 'Information Technology', max: 30000 },
+      { name: 'Customer Support', max: 38000 },
+      { name: 'Development', max: 52000 },
+      { name: 'Marketing', max: 25000 }
+    ]
+  },
+  series: [
+    {
+      name: 'Budget vs spending',
+      type: 'radar',
+      data: [{"xAxis": 1}, {"xAxis": 3}, {"xAxis": 5}, {"xAxis": 7}],
+          name: 'Allocated Budget'
+        },
+        {
+          value: [5000, 14000, 28000, 26000, 42000, 21000],
+          name: 'Actual Spending'
+        }
+      ]
+    }
+  ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

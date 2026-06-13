@@ -1,15 +1,6 @@
-<!--
-  Template: funnel/basic.html
-  Chart Type: Funnel (漏斗图)
-  Data Pattern: NAMED_VALUE
-  Data Format: [{name: string, value: number}, ...]
-  Covers: funnel, funnel-align, funnel-customize, funnel-mutiple (4 examples)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>funnel-align</title>
+<!-- funnel-align — https://echarts.apache.org/examples/zh/editor.html?c=funnel-align -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>funnel-align</title>
 <script>
 
 /*
@@ -59,29 +50,79 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">funnel-align</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  tooltip: { trigger: 'item', formatter: '{a}<br/>{b}: {c}' },
-  legend: { top: '5%', left: 'center' },
-  series: [{
-    type: 'funnel',
-    left: '10%', top: 60, bottom: 60, width: '80%',
-    min: 1800,            // 0
-    max: 10000,            // 100
-    sort: 'descending',             // 'descending' | 'ascending' | 'none'
-    gap: 2,
-    label: { show: true, position: 'inside' },    // 'inside' | 'outside'
-    emphasis: { label: { fontSize: 20 } },
-    data: [{"name": "\u8bbf\u95ee", "value": 10000}, {"name": "\u6ce8\u518c", "value": 6500}, {"name": "\u6fc0\u6d3b", "value": 4200}, {"name": "\u4e0b\u5355", "value": 2800}, {"name": "\u652f\u4ed8", "value": 1800}]
-  }]
+  title: {
+    text: 'Funnel Compare',
+    subtext: 'Fake Data',
+    left: 'left',
+    top: 'bottom'
+  },
+  tooltip: {
+    trigger: 'item',
+    formatter: '{a} <br/>{b} : {c}%'
+  },
+  toolbox: {
+    show: true,
+    orient: 'vertical',
+    top: 'center',
+    feature: {
+      dataView: { readOnly: false },
+      restore: {},
+      saveAsImage: {}
+    }
+  },
+  legend: {
+    orient: 'vertical',
+    left: 'left',
+    data: [120, 200, 150, 80, 70, 110, 130]
+  },
+  series: [
+    {
+      name: 'Funnel',
+      type: 'funnel',
+      width: '40%',
+      height: '45%',
+      left: '5%',
+      top: '50%',
+      funnelAlign: 'right',
+      data: [{"xAxis": 1}, {"xAxis": 3}, {"xAxis": 5}, {"xAxis": 7}]
+    },
+    {
+      name: 'Pyramid',
+      type: 'funnel',
+      width: '40%',
+      height: '45%',
+      left: '5%',
+      top: '5%',
+      sort: 'ascending',
+      funnelAlign: 'right',
+      data: []
+    },
+    {
+      name: 'Funnel',
+      type: 'funnel',
+      width: '40%',
+      height: '45%',
+      left: '55%',
+      top: '5%',
+      funnelAlign: 'left',
+      data: []
+    },
+    {
+      name: 'Pyramid',
+      type: 'funnel',
+      width: '40%',
+      height: '45%',
+      left: '55%',
+      top: '50%',
+      sort: 'ascending',
+      funnelAlign: 'left',
+      data: []
+    }
+  ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

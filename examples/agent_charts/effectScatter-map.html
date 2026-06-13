@@ -1,15 +1,6 @@
-<!--
-  Template: effectScatter/basic.html
-  Chart Type: EffectScatter (涟漪散点图)
-  Data Pattern: GEO_VALUE (same as scatter/geo, but type: 'effectScatter')
-  Data Format: { geoCoordMap: {"name": [lng,lat]}, data: [{name: string, value: number}, ...] }
-  Covers: effectScatter-bmap, effectScatter-map (2 examples)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>effectScatter</title>
+<!-- effectScatter-map — https://echarts.apache.org/examples/zh/editor.html?c=effectScatter-map -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>effectScatter-map</title>
 <script>
 
 /*
@@ -108,38 +99,112 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 }));
 
 </script>
-<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:700px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">effectScatter</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
-var geoCoordMap = {"\u5317\u4eac": [116.46, 39.92], "\u4e0a\u6d77": [121.48, 31.22], "\u5e7f\u5dde": [113.23, 23.16], "\u6df1\u5733": [114.07, 22.62], "\u6210\u90fd": [104.06, 30.67]} || {};
-var rawData = [{"name": "\u5317\u4eac", "value": 100}, {"name": "\u4e0a\u6d77", "value": 95}, {"name": "\u5e7f\u5dde", "value": 80}, {"name": "\u6df1\u5733", "value": 90}, {"name": "\u6210\u90fd", "value": 70}];
-function convertData(data) {
-  return data.map(function(item) {
-    var result = { name: item.name, value: geoCoordMap[item.name] ? geoCoordMap[item.name].concat(item.value) : [0,0,item.value] }; if (item.itemStyle) result.itemStyle = item.itemStyle; return result;
-  });
-}
+<style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  tooltip: { trigger: 'item', formatter: function(p) { return p.name + ': ' + (p.value[2]||p.value[1]||p.value[0]); } },
-  geo: {
-    map: 'china' || "china", roam: true,
-    label: { show: false },
-    itemStyle: { areaColor: '#323c48', borderColor: '#111' }
+  backgroundColor: '#404a59',
+  title: {
+    text: '全国主要城市空气质量',
+    subtext: 'data from PM25.in',
+    sublink: 'http://www.pm25.in',
+    left: 'center',
+    textStyle: {
+      color: '#fff'
+    }
   },
-  series: [{
-    type: 'effectScatter',
-    coordinateSystem: 'geo',
-    rippleEffect: { brushType: 'stroke', scale: 4 },
-    symbolSize: function(val) { return val[2] / 1 || 10; },
-    data: convertData(rawData),
-    label: { show: true, position: 'right', formatter: '{b}' }
-  }]
+  tooltip: {
+    trigger: 'item'
+  },
+  legend: {
+    orient: 'vertical',
+    top: 'bottom',
+    left: 'right',
+    data: [120, 200, 150, 80, 70, 110, 130],
+    textStyle: {
+      color: '#fff'
+    }
+  },
+  geo: {
+    map: 'china',
+    roam: true,
+    label: {
+      show: false
+    },
+    itemStyle: {
+      areaColor: '#323c48',
+      borderColor: '#111'
+    },
+    emphasis: {
+      itemStyle: {
+        areaColor: '#2a333d'
+      }
+    }
+  },
+  series: [
+    {
+      name: 'pm2.5',
+      type: 'scatter',
+      coordinateSystem: 'geo',
+      data: convertData(data),
+      encode: {
+        value: 2
+      },
+      symbolSize: function (val) {
+        return val[2] / 10;
+      },
+      label: {
+        formatter: '{b}',
+        position: 'right',
+        show: false
+      },
+      itemStyle: {
+        color: '#ddb926'
+      },
+      emphasis: {
+        label: {
+          show: true
+        }
+      }
+    },
+    {
+      name: 'Top 5',
+      type: 'effectScatter',
+      coordinateSystem: 'geo',
+      data: convertData(
+        data
+          .sort(function (a, b) {
+            return b.value - a.value;
+          })
+          .slice(0, 6)
+      ),
+      encode: {
+        value: 2
+      },
+      symbolSize: function (val) {
+        return val[2] / 10;
+      },
+      showEffectOn: 'render',
+      rippleEffect: {
+        brushType: 'stroke'
+      },
+      emphasis: {
+        scale: true
+      },
+      label: {
+        formatter: '{b}',
+        position: 'right',
+        show: true
+      },
+      itemStyle: {
+        color: '#f4e925',
+        shadowBlur: 10,
+        shadowColor: '#333'
+      },
+      zlevel: 1
+    }
+  ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

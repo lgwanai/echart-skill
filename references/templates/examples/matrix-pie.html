@@ -1,8 +1,7 @@
-<!-- matrix-pie -->
+<!-- matrix-pie — https://echarts.apache.org/examples/zh/editor.html?c=matrix-pie -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -13,20 +12,7 @@ var option = {
   },
   matrix: {
     x: {
-      data: [
-        {
-          value: 'Primary School',
-          children: Array.from({ length: 5 }, (_, i) => {
-            return `Grade ${i + 1}`;
-          })
-        },
-        {
-          value: 'High School',
-          children: Array.from({ length: 4 }, (_, i) => {
-            return `Grade ${i + 6}`;
-          })
-        }
-      ]
+      data: {{DATA_0}}
     },
     y: {
       data: Array.from({ length: 6 }, (_, i) => {

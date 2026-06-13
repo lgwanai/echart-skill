@@ -1,15 +1,6 @@
-<!--
-  Template: line/stack.html
-  Chart Type: Stacked Line / Area (堆叠折线/面积图)
-  Data Pattern: FLAT_ARRAY (multi-series with stack + areaStyle)
-  Data Format: { categories: string[], series: [{name: string, stack: string, data: number[]}, ...] }
-  Covers: area-stack, area-stack-gradient, line-stack, area-basic (4 examples)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>line-stack</title>
+<!-- line-stack — https://echarts.apache.org/examples/zh/editor.html?c=line-stack -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>line-stack</title>
 <script>
 
 /*
@@ -59,22 +50,70 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">line-stack</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  tooltip: { trigger: 'axis' },
-  legend: {},
-  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'category', data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], boundaryGap: false },
-  yAxis: { type: 'value' },
-  series: [{"name": "Email", "type": "line", "stack": "x", "data": [120.0, 132.0, 101.0, 134.0, 90.0, 230.0, 210.0]}, {"name": "Ads", "type": "line", "stack": "x", "data": [220.0, 182.0, 191.0, 234.0, 290.0, 330.0, 310.0]}]
+  title: {
+    text: 'Stacked Line'
+  },
+  tooltip: {
+    trigger: 'axis'
+  },
+  legend: {
+    data: [120, 200, 150, 80, 70, 110, 130]
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '3%',
+    containLabel: true
+  },
+  toolbox: {
+    feature: {
+      saveAsImage: {}
+    }
+  },
+  xAxis: {
+    type: 'category',
+    boundaryGap: false,
+    data: [{"xAxis": 1}, {"xAxis": 3}, {"xAxis": 5}, {"xAxis": 7}]
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      name: 'Email',
+      type: 'line',
+      stack: 'Total',
+      data: []
+    },
+    {
+      name: 'Union Ads',
+      type: 'line',
+      stack: 'Total',
+      data: []
+    },
+    {
+      name: 'Video Ads',
+      type: 'line',
+      stack: 'Total',
+      data: []
+    },
+    {
+      name: 'Direct',
+      type: 'line',
+      stack: 'Total',
+      data: []
+    },
+    {
+      name: 'Search Engine',
+      type: 'line',
+      stack: 'Total',
+      data: []
+    }
+  ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

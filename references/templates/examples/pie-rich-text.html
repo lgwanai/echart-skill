@@ -1,8 +1,7 @@
-<!-- pie-rich-text -->
+<!-- pie-rich-text — https://echarts.apache.org/examples/zh/editor.html?c=pie-rich-text -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -19,7 +18,7 @@ var option = {
   legend: {
     bottom: 10,
     left: 'center',
-    data: ['CityA', 'CityB', 'CityD', 'CityC', 'CityE']
+    data: {{DATA_0}}
   },
   series: [
     {
@@ -27,19 +26,7 @@ var option = {
       radius: '65%',
       center: ['50%', '50%'],
       selectedMode: 'single',
-      data: [
-        {
-          value: 1548,
-          name: 'CityE',
-          label: {
-            formatter: [
-              '{title|{b}}{abg|}',
-              '  {weatherHead|Weather}{valueHead|Days}{rateHead|Percent}',
-              '{hr|}',
-              '  {Sunny|}{value|202}{rate|55.3%}',
-              '  {Cloudy|}{value|142}{rate|38.9%}',
-              '  {Showers|}{value|21}{rate|5.8%}'
-            ].join('\n'),
+      data: {{DATA_1}}.join('\n'),
             backgroundColor: '#eee',
             borderColor: '#777',
             borderWidth: 1,

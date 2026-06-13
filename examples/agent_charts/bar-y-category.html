@@ -1,15 +1,6 @@
-<!--
-  Template: bar/horizontal.html
-  Chart Type: Horizontal Bar (横向柱状图)
-  Data Pattern: FLAT_ARRAY (yAxis is category, xAxis is value)
-  Data Format: { categories: string[], values: number[] }
-  Covers: bar-y-category, bar-y-category-stack, bar-race (2 examples)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>bar-y-category</title>
+<!-- bar-y-category — https://echarts.apache.org/examples/zh/editor.html?c=bar-y-category -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>bar-y-category</title>
 <script>
 
 /*
@@ -59,26 +50,40 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">bar-y-category</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
+</head><body><div id="main"></div><script>
+var chart=echarts.init(document.getElementById("main"));
 var option = {
-  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-  grid: { left: '3%', right: '10%', bottom: '3%', containLabel: true },
-  xAxis: { type: 'value' },
-  yAxis: { type: 'category', data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], inverse: true },
-  series: [{
-    type: 'bar',
-    itemStyle: { borderRadius: [0, 4, 4, 0] },
-    label: { show: true, position: 'right' },
-    data: [120.0, 200.0, 150.0, 80.0, 70.0, 110.0, 130.0]
-  }]
+  title: {
+    text: 'World Population'
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    }
+  },
+  legend: {},
+  xAxis: {
+    type: 'value',
+    boundaryGap: [0, 0.01]
+  },
+  yAxis: {
+    type: 'category',
+    data: [120, 200, 150, 80, 70, 110, 130]
+  },
+  series: [
+    {
+      name: '2011',
+      type: 'bar',
+      data: [{"xAxis": 1}, {"xAxis": 3}, {"xAxis": 5}, {"xAxis": 7}]
+    },
+    {
+      name: '2012',
+      type: 'bar',
+      data: []
+    }
+  ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>

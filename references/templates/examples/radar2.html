@@ -1,8 +1,7 @@
-<!-- radar2 -->
+<!-- radar2 — https://echarts.apache.org/examples/zh/editor.html?c=radar2 -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
-<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
@@ -58,15 +57,7 @@ var option = {
             color: 'rgba(0,250,0,0.3)'
           }
         },
-        data: [
-          {
-            value: [
-              (40 - i) * 10,
-              (38 - i) * 4 + 60,
-              i * 5 + 10,
-              i * 9,
-              (i * i) / 2
-            ],
+        data: {{DATA_0}},
             name: i + 2000 + ''
           }
         ]
