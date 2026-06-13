@@ -121,8 +121,8 @@ CHARTS.append(("18_Candlestick", "candlestick/basic.html", {
 # ═══ Treemap ═══
 CHARTS.append(("19_Treemap", "treemap/basic.html", {
     "TITLE":"19 矩形树图","NODE_CLICK":"false","UPPER_LABEL_SHOW":"false","BREADCRUMB_SHOW":"true",
-    "DATA":D([{"name":"电子","children":[{"name":"手机","value":6000},{"name":"电脑","value":4000}]},
-              {"name":"家居","children":[{"name":"家具","value":3000},{"name":"灯具","value":2000}]}])}))
+    "DATA":D([{"name":"电子","value":10000,"children":[{"name":"手机","value":6000},{"name":"电脑","value":4000}]},
+              {"name":"家居","value":5000,"children":[{"name":"家具","value":3000},{"name":"灯具","value":2000}]}])}))
 
 # ═══ Sunburst ═══
 CHARTS.append(("20_Sunburst", "sunburst/basic.html", {
