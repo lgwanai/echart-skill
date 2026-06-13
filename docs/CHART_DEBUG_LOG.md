@@ -279,4 +279,12 @@
 - **现象**：39_Custom_Error_Bar 空白
 - **根因**：(1) `RENDER_ITEM: "false"` → 无渲染函数，custom 类型不知道该画什么；(2) 多行 JS 函数无法通过 Python 字符串占位符传递（换行导致语法错误）
 - **修复**：(1) `renderItem` 直接硬编码在模板中（官方示例的 custom error bar 实现）；(2) 模板简化为只需 `DATA` 占位符；(3) 误差线红色 `#e54035`，柱体蓝色 `#5470c6`
+
+---
+
+## #33 — Geo Lines 与官方示例完全不符
+- **日期**：2026-06-13
+- **现象**：40_Geo_Lines 从空白→线条不可见→纯色线→最终修复
+- **根因**：(1) 多次偏离官方示例，自己创造配置；(2) 官方「模拟迁徙」示例有 3 层 series（粒子飞线+箭头线+涟漪散点）和 planePath 飞机图标
+- **修复**：模板完全按官方 `geo-lines` Migration 示例重写——`backgroundColor: '#404a59'`、3 层 series、planePath SVG、`convertData` 城市名→坐标转换、18 条路线
 | effectScatter | `series.data` | — |
