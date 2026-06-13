@@ -70,15 +70,13 @@ var chart = echarts.init(document.getElementById('main'));
 var option = {
   tooltip: {},
   visualMap: { max: 250, inRange: { color: ['#313695', '#4575b4', '#74add1', '#fee090', '#f46d43', '#d73027'] } },
-  xAxis3D: { type: 'category', data: ['A','B','C'] },
-  yAxis3D: { type: 'category', data: ['Q1','Q2','Q3','Q4'] },
-  zAxis3D: { type: 'value' },
   grid3D: {},
+  xAxis3D: { type: 'category' },
+  yAxis3D: { type: 'category' },
+  zAxis3D: {},
   series: [{
     type: 'bar3D',
-    coordinateSystem: 'cartesian3D',
     shading: 'lambert',
-    barSize: 0.95,
     data: [["A", "Q1", 120], ["A", "Q2", 200], ["B", "Q1", 90], ["B", "Q2", 130], ["C", "Q1", 160], ["C", "Q2", 220]]
   }]
 };
