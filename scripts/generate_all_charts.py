@@ -26,9 +26,9 @@ CHARTS.append(("02_Bar_Horizontal", "bar/horizontal.html", {
 
 CHARTS.append(("03_Bar_Stacked", "bar/stack.html", {
     "TITLE":"03 堆叠柱状图","CATEGORIES":D(["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]),
-    "SERIES":D([{"name":"Email","stack":"x","data":[120,132,101,134,90,230,210]},
-                {"name":"Union Ads","stack":"x","data":[220,182,191,234,290,330,310]},
-                {"name":"Video Ads","stack":"x","data":[150,232,201,154,190,330,410]}])}))
+    "SERIES":D([{"name":"Email","type":"bar","stack":"x","data":[120,132,101,134,90,230,210]},
+                {"name":"Union Ads","type":"bar","stack":"x","data":[220,182,191,234,290,330,310]},
+                {"name":"Video Ads","type":"bar","stack":"x","data":[150,232,201,154,190,330,410]}])}))
 
 CHARTS.append(("04_Bar_Waterfall", "bar/waterfall.html", {
     "TITLE":"04 瀑布图","CATEGORIES":D(["启动","研发","营销","运维","销售","利润","结算"]),
@@ -47,9 +47,9 @@ CHARTS.append(("06_Line_Basic", "line/basic.html", {
 
 CHARTS.append(("07_Line_Stacked", "line/stack.html", {
     "TITLE":"07 堆叠折线","CATEGORIES":D(["Jan","Feb","Mar","Apr","May","Jun"]),
-    "SERIES":D([{"name":"Email","stack":"x","data":[120,132,101,134,90,230]},
-                {"name":"Union Ads","stack":"x","data":[220,182,191,234,290,330]},
-                {"name":"Video Ads","stack":"x","data":[150,232,201,154,190,330]}]),
+    "SERIES":D([{"name":"Email","type":"line","stack":"x","areaStyle":{},"data":[120,132,101,134,90,230]},
+                {"name":"Union Ads","type":"line","stack":"x","areaStyle":{},"data":[220,182,191,234,290,330]},
+                {"name":"Video Ads","type":"line","stack":"x","areaStyle":{},"data":[150,232,201,154,190,330]}]),
     "SMOOTH":"false"}))
 
 CHARTS.append(("08_Line_XY", "line/xy.html", {
