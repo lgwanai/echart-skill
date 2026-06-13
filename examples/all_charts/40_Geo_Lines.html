@@ -116,8 +116,8 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <div id="main"></div>
 <script type="text/javascript">
 var chart = echarts.init(document.getElementById('main'));
-var geoCoordMap = {"\u5317\u4eac": [116.4, 39.9], "\u4e0a\u6d77": [121.5, 31.2], "\u5e7f\u5dde": [113.3, 23.1]};  // {"name": [lng, lat], ...}
-var rawFlights = [{"fromName": "\u5317\u4eac", "toName": "\u4e0a\u6d77", "coords": [[116.4, 39.9], [121.5, 31.2]]}, {"fromName": "\u4e0a\u6d77", "toName": "\u5e7f\u5dde", "coords": [[121.5, 31.2], [113.3, 23.1]]}];         // [["fromName", "toName", value], ...]
+var geoCoordMap = {"\u5317\u4eac": [116.46, 39.92], "\u4e0a\u6d77": [121.48, 31.22], "\u5e7f\u5dde": [113.23, 23.16]};  // {"name": [lng, lat], ...}
+var rawFlights = [["\u5317\u4eac", "\u4e0a\u6d77", 100], ["\u4e0a\u6d77", "\u5e7f\u5dde", 80]];         // [["fromName", "toName", value], ...]
 var effectData = [];     // [{name, value: [lng, lat, num]}, ...] for effectScatter
 
 function convertFlights(flights) {

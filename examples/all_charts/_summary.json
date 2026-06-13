@@ -157,7 +157,7 @@
   {
     "status": "✅",
     "name": "31_Lines_Flights",
-    "detail": "1183156 bytes"
+    "detail": "1120191 bytes"
   },
   {
     "status": "✅",
@@ -202,6 +202,6 @@
   {
     "status": "✅",
     "name": "40_Geo_Lines",
-    "detail": "1183406 bytes"
+    "detail": "1183293 bytes"
   }
 ]

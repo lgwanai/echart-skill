@@ -189,11 +189,9 @@ CHARTS.append(("29_Chord", "chord/basic.html", {
 
 # ═══ Lines (flights) ═══
 CHARTS.append(("31_Lines_Flights", "lines/flights.html", {
-    "GEO_COORD_MAP":D({}),
-    "TITLE":"31 航班线路","MAP_NAME":"china","LINE_SCALE":"1",
-    "FLIGHTS":D([{"fromName":"北京","toName":"上海","coords":[[116.46,39.92],[121.48,31.22]]},
-                 {"fromName":"北京","toName":"广州","coords":[[116.46,39.92],[113.23,23.16]]},
-                 {"fromName":"上海","toName":"深圳","coords":[[121.48,31.22],[114.07,22.62]]}])}))
+    "TITLE":"31 航班线路","MAP_NAME":"china","LINE_SCALE":"1","MAP_INLINE":"",
+    "GEO_COORD_MAP":D({"北京":[116.46,39.92],"上海":[121.48,31.22],"广州":[113.23,23.16],"深圳":[114.07,22.62]}),
+    "FLIGHTS":D([["北京","上海",100],["北京","广州",80],["上海","深圳",90]])}))
 
 # ═══ Mix ═══
 CHARTS.append(("32_Mix_Line_Bar", "mix/line-bar.html", {
@@ -241,10 +239,9 @@ CHARTS.append(("39_Custom_Error_Bar", "custom/error-bar.html", {
     "DATA":D([[50,45,55],[65,60,72],[55,50,62],[70,65,80],[60,55,68]])}))
 
 CHARTS.append(("40_Geo_Lines", "geo/lines.html", {
-    "GEO_COORD_MAP":D({"北京":[116.4,39.9],"上海":[121.5,31.2],"广州":[113.3,23.1]}),
     "TITLE":"40 全国线路","MAP_NAME":"china","SIZE_SCALE":"1","EFFECT_DATA":"[]",
-    "FLIGHTS":D([{"fromName":"北京","toName":"上海","coords":[[116.4,39.9],[121.5,31.2]]},
-                 {"fromName":"上海","toName":"广州","coords":[[121.5,31.2],[113.3,23.1]]}])}))
+    "GEO_COORD_MAP":D({"北京":[116.46,39.92],"上海":[121.48,31.22],"广州":[113.23,23.16]}),
+    "FLIGHTS":D([["北京","上海",100],["上海","广州",80]])}))
 
 # ═════════════════════════════════════════════════════════
 # Validate & Generate
