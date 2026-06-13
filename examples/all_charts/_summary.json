@@ -1,207 +1,207 @@
 [
   {
     "status": "✅",
-    "title": "01_Bar_Basic",
-    "detail": "1118468 bytes"
+    "name": "01_Bar_Basic",
+    "detail": "1119321 bytes"
   },
   {
     "status": "✅",
-    "title": "02_Bar_Horizontal",
-    "detail": "1162611 bytes"
+    "name": "02_Bar_Horizontal",
+    "detail": "1119292 bytes"
   },
   {
     "status": "✅",
-    "title": "03_Bar_Stacked",
-    "detail": "1119434 bytes"
+    "name": "03_Bar_Stacked",
+    "detail": "1119486 bytes"
   },
   {
     "status": "✅",
-    "title": "04_Bar_Waterfall",
-    "detail": "1118426 bytes"
+    "name": "04_Bar_Waterfall",
+    "detail": "1120378 bytes"
   },
   {
     "status": "✅",
-    "title": "05_Bar_Race",
-    "detail": "1163542 bytes"
+    "name": "05_Bar_Race",
+    "detail": "1119508 bytes"
   },
   {
     "status": "✅",
-    "title": "06_Line_Basic",
-    "detail": "1118682 bytes"
+    "name": "06_Line_Basic",
+    "detail": "1119463 bytes"
   },
   {
     "status": "✅",
-    "title": "07_Line_Stacked",
-    "detail": "1118856 bytes"
+    "name": "07_Line_Stacked",
+    "detail": "1119394 bytes"
   },
   {
     "status": "✅",
-    "title": "08_Line_XY",
-    "detail": "1118546 bytes"
+    "name": "08_Line_XY",
+    "detail": "1119238 bytes"
   },
   {
     "status": "✅",
-    "title": "09_Pie_Basic",
-    "detail": "1118380 bytes"
+    "name": "09_Pie_Basic",
+    "detail": "1119634 bytes"
   },
   {
     "status": "✅",
-    "title": "38_Pie_Rose",
-    "detail": "1118536 bytes"
+    "name": "38_Pie_Rose",
+    "detail": "1119674 bytes"
   },
   {
     "status": "✅",
-    "title": "10_Scatter_Basic",
-    "detail": "1118555 bytes"
+    "name": "10_Scatter_Basic",
+    "detail": "1119355 bytes"
   },
   {
     "status": "✅",
-    "title": "11_Scatter_Bubble",
-    "detail": "1154629 bytes"
+    "name": "11_Scatter_Bubble",
+    "detail": "1119778 bytes"
   },
   {
     "status": "✅",
-    "title": "12_Scatter_Geo",
-    "detail": "1199091 bytes"
+    "name": "12_Scatter_Geo",
+    "detail": "1183299 bytes"
   },
   {
     "status": "✅",
-    "title": "30_EffectScatter",
-    "detail": "1154385 bytes"
+    "name": "30_EffectScatter",
+    "detail": "1182750 bytes"
   },
   {
     "status": "✅",
-    "title": "13_Map_China",
-    "detail": "2487394 bytes"
+    "name": "13_Map_China",
+    "detail": "1183371 bytes"
   },
   {
     "status": "✅",
-    "title": "14_Radar_Basic",
-    "detail": "1118556 bytes"
+    "name": "14_Radar_Basic",
+    "detail": "1119231 bytes"
   },
   {
     "status": "✅",
-    "title": "15_Gauge",
-    "detail": "1118163 bytes"
+    "name": "15_Gauge",
+    "detail": "1119594 bytes"
   },
   {
     "status": "✅",
-    "title": "16_Funnel",
-    "detail": "1118481 bytes"
+    "name": "16_Funnel",
+    "detail": "1119454 bytes"
   },
   {
     "status": "✅",
-    "title": "17_Heatmap",
-    "detail": "1119426 bytes"
+    "name": "17_Heatmap",
+    "detail": "1120275 bytes"
   },
   {
     "status": "✅",
-    "title": "18_Candlestick",
-    "detail": "1118830 bytes"
+    "name": "18_Candlestick",
+    "detail": "1119384 bytes"
   },
   {
     "status": "✅",
-    "title": "19_Treemap",
-    "detail": "1118698 bytes"
+    "name": "19_Treemap",
+    "detail": "1119762 bytes"
   },
   {
     "status": "✅",
-    "title": "20_Sunburst",
-    "detail": "1118750 bytes"
+    "name": "20_Sunburst",
+    "detail": "1119802 bytes"
   },
   {
     "status": "✅",
-    "title": "21_Sankey",
-    "detail": "1118958 bytes"
+    "name": "21_Sankey",
+    "detail": "1119363 bytes"
   },
   {
     "status": "✅",
-    "title": "22_Graph_Force",
-    "detail": "1118647 bytes"
+    "name": "22_Graph_Force",
+    "detail": "1119729 bytes"
   },
   {
     "status": "✅",
-    "title": "23_Tree",
-    "detail": "1118449 bytes"
+    "name": "23_Tree",
+    "detail": "1119710 bytes"
   },
   {
     "status": "✅",
-    "title": "24_Boxplot",
-    "detail": "1119022 bytes"
+    "name": "24_Boxplot",
+    "detail": "1119493 bytes"
   },
   {
     "status": "✅",
-    "title": "25_Parallel",
-    "detail": "1118985 bytes"
+    "name": "25_Parallel",
+    "detail": "1119290 bytes"
   },
   {
     "status": "✅",
-    "title": "26_Calendar",
-    "detail": "1118952 bytes"
+    "name": "26_Calendar",
+    "detail": "1119958 bytes"
   },
   {
     "status": "✅",
-    "title": "27_ThemeRiver",
-    "detail": "1119120 bytes"
+    "name": "27_ThemeRiver",
+    "detail": "1119351 bytes"
   },
   {
     "status": "✅",
-    "title": "28_PictorialBar",
-    "detail": "1118424 bytes"
+    "name": "28_PictorialBar",
+    "detail": "1119895 bytes"
   },
   {
     "status": "✅",
-    "title": "29_Chord",
-    "detail": "1154681 bytes"
+    "name": "29_Chord",
+    "detail": "1119102 bytes"
   },
   {
     "status": "✅",
-    "title": "31_Lines_Flights",
-    "detail": "1199335 bytes"
+    "name": "31_Lines_Flights",
+    "detail": "1182900 bytes"
   },
   {
     "status": "✅",
-    "title": "32_Mix_Line_Bar",
-    "detail": "1118734 bytes"
+    "name": "32_Mix_Line_Bar",
+    "detail": "1119548 bytes"
   },
   {
     "status": "✅",
-    "title": "33_3D_Bar",
-    "detail": "1758840 bytes"
+    "name": "41_Mix_Timeline",
+    "detail": "1119176 bytes"
   },
   {
     "status": "✅",
-    "title": "34_3D_Scatter",
-    "detail": "1758453 bytes"
+    "name": "33_3D_Bar",
+    "detail": "1759390 bytes"
   },
   {
     "status": "✅",
-    "title": "35_3D_Surface",
-    "detail": "1759027 bytes"
+    "name": "34_3D_Scatter",
+    "detail": "1758997 bytes"
   },
   {
     "status": "✅",
-    "title": "36_3D_Globe",
-    "detail": "1757992 bytes"
+    "name": "35_3D_Surface",
+    "detail": "1759553 bytes"
   },
   {
     "status": "✅",
-    "title": "37_3D_Lines3D",
-    "detail": "1758401 bytes"
+    "name": "36_3D_Globe",
+    "detail": "1759230 bytes"
   },
   {
     "status": "✅",
-    "title": "39_Custom_Error_Bar",
-    "detail": "1118557 bytes"
+    "name": "37_3D_Lines3D",
+    "detail": "1759439 bytes"
   },
   {
     "status": "✅",
-    "title": "40_Geo_Lines",
-    "detail": "1198757 bytes"
+    "name": "39_Custom_Error_Bar",
+    "detail": "1119587 bytes"
   },
   {
     "status": "✅",
-    "title": "41_Mix_Timeline",
-    "detail": "1118870 bytes"
+    "name": "40_Geo_Lines",
+    "detail": "1183176 bytes"
   }
 ]
