@@ -812,41 +812,41 @@ LIMIT 10;
 **Trigger**: User requests a visualization (bar, pie, line, scatter, map, funnel, 3D charts, Gantt, etc.).
 **Action**:
 
-#### 🎯 ECharts 图表生成工作流 — 9 步硬性约束
+#### 🎯 ECharts 图表生成 — 零模板，纯 .md 驱动
 
-> ⛔ **红线：以下 9 步必须按顺序执行，不可跳过或颠倒。**
+> ⛔ **每个 `.md` 是自包含图表配方——包含完整 JS 代码 + 数据替换点 + HTML 壳。**
 
 ```
 用户请求 "/chart bar 销售额"
  ↓
 Step 1: DuckDB 查询真实数据
-   └─ SQL 查询 → 获取实际数据行
+   └─ SQL → 获取实际数据行
  ↓
 Step 2: 查 references/examples/INDEX.md → 定位 {name}.md
-   └─ 354 个案例覆盖 74 种类型
+   └─ 354 个自包含图表配方
  ↓
-Step 3: 读 {name}.md 获取：
-   ├─ 官方 option 代码（格式参考）
-   ├─ 模板路径（如 bar/basic.html）
-   └─ 官方 URL（https://echarts.apache.org/examples/zh/editor.html?c={name}）
+Step 3: 读 {name}.md → 提取 Complete Code
+   └─ 官方 JS 代码（可直接运行）
  ↓
-Step 4: 结合官方 option 格式 + 真实数据 → 生成正确 data dict
-   └─ 数据来自 DuckDB，格式参考官方 option
+Step 4: 替换 data 数组为 DuckDB 真实数据
+   └─ regex: data: [...] → data: [真实值]
  ↓
-Step 5: 读模板 HTML → 提取 {{PLACEHOLDER}} 列表
-   └─ 确保 data dict 覆盖所有占位符
+Step 5: 包裹 HTML 壳（echarts inline + div#main + script）
+   └─ 见 .md 中的 ## HTML Shell 模板
  ↓
-Step 6: 调用 build_template.py 填充模板 → 输出 HTML
-   └─ python scripts/build_template.py <模板> -d data.json
+Step 6: 对照 docs/CHART_DEBUG_LOG.md 避坑（34 条）
  ↓
-Step 7: 第一次校验 — 对照 docs/CHART_DEBUG_LOG.md 避坑
-   └─ 34 条已知错误模式
- ↓
-Step 8: 第二次校验 — validate_chart.py 硬校验（7 项）
+Step 7: validate_chart.py 硬校验（7 项）
    └─ python scripts/validate_chart.py <output.html>
  ↓
-Step 9: 通过→返回用户  /  失败→对照 debug log 自动修复→重试
+通过→返回用户 / 失败→修复→重试
 ```
+
+**关键原则**：
+- ❌ 不用 `build_template.py`（模板系统已废弃）
+- ❌ 不用 `{{PLACEHOLDER}}`（占位符系统已废弃）
+- ✅ 每个 `.md` = 完整的独立图表配方
+- ✅ Agent 只需：DuckDB + `.md` 代码 + 数据替换 → HTML
 
 ### 🗺️ 生成模式决策树（MUST FOLLOW — 先判断模式，再执行）
 
@@ -1007,8 +1007,7 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 | 知识库索引 | `references/knowledge/INDEX.md` |
 | 案例索引 | `references/knowledge/examples/INDEX.md` |
 | 模板映射索引 | `references/templates/INDEX.md` |
-| 一一对应模板 (NEW) | `references/templates/examples/<chart-name>.html` — 295 个精确匹配官方示例 |
-| 通用模板 | `references/templates/<类型>/<模板>.html` — 41 个常用类型 |
+| 图表配方（自包含）| `references/examples/<chart-name>.md` — 354 个，每个 = 完整 JS + 数据替换点 + HTML 壳 |
 | 模板构建脚本 | `scripts/build_template.py` |
 | 概念文件 | `references/knowledge/concepts/` |
 | 图表类型文件 | `references/knowledge/chart-types/` |
