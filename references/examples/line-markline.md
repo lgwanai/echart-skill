@@ -7,19 +7,19 @@
 
 Columns needed: need **time/category** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['A', 'B', 'C', 'D', 'E']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: xAxis)
+```
+data: ['A', 'B', 'C', 'D', 'E']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [0.3, 1.4, 1.2, 1, 0.6]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: [0.3, 1.4, 1.2, 1, 0.6]
+```
 
 ## Agent Workflow
 

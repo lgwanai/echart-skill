@@ -7,29 +7,29 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **4 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['v', 'w', 'x', 'y', 'z']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: angleAxis)
+```
+data: ['v', 'w', 'x', 'y', 'z']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [4, 3, 2, 1, 0]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: [4, 3, 2, 1, 0]
+```
 
-### data[2]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [4, 3, 2, 1, 0]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [4, 3, 2, 1, 0]
+```
 
-### data[3]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Without Round Cap', 'With Round Cap']`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: legend)
+```
+data: ['Without Round Cap', 'With Round Cap']
+```
 
 ## Agent Workflow
 

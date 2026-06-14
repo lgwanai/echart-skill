@@ -7,33 +7,33 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **4 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `yAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['2013', '2014', '2015', '2016']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: yAxis)
+```
+data: ['2013', '2014', '2015', '2016']
+```
 
-### data[1]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [891, 1220, 660, 1670]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: root)
+```
+data: [891, 1220, 660, 1670]
+```
 
-### data[2]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
           {
             type: 'max'
           }
-        ]`
-- **Replace with**: real data from DuckDB in the same format
+        ]
+```
 
-### data[3]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [891, 1220, 660, 1670]`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: root)
+```
+data: [891, 1220, 660, 1670]
+```
 
 ## Agent Workflow
 

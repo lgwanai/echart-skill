@@ -7,39 +7,28 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-
-## External Data Format
-
-This example uses external data. Format from `wind-barb-hobart.json`:
-
-```json
-[
-  {
-    "time": "2017-06-27T11:00:00.000Z",
-    "windSpeed": 9,
-    "R": "NNW",
-    "waveHeight": 2.64
-  },
-  {
-    "time": "2017-06-27T12:30:00.000Z",
-    "windSpeed": 10,
-    "R": "NNW",
-    "waveHeight": 2.57
-  },
-  {
-    "time": "2017-06-27T14:00:00.000Z",
-    "windSpeed": 12,
-    "R": "NNW",
-    "waveHeight": 2.49
-  }
-]
+### [0] `pieces` (context: visualMap)
+```
+pieces: [
+          {
+            gte: 17,
+            color: '#18BF12',
+            label: '大风（>=17节）'
+          },
+          {
+            gte: 11,
+...
 ```
 
-Agent: build DuckDB query to produce matching data structure.
+### [1] `children` (context: root)
+```
+children: 
+```
+
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

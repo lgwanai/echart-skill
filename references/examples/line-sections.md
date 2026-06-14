@@ -7,29 +7,47 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **3 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `toolbox`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['00:00', '01:15', '02:30', '03:45', '05:00', '06:15', '07:30', '08:45', '10:00', '11:15', '12...`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: xAxis)
+```
+data: ['00:00', '01:15', '02:30', '03:45', '05:00', '06:15', '07:30', '08:45', '10:00', '11:15', '12:30', '13:45', '15:00', '16:15', '17:30', '18:45',...
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [300, 280, 250, 260, 270, 300, 550, 500, 400, 390, 380, 390, 400, 500, 600, 750, 800, 700, 600...`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: [300, 280, 250, 260, 270, 300, 550, 500, 400, 390, 380, 390, 400, 500, 600, 750, 800, 700, 600, 400]
+```
 
-### data[2]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
           [
             {
               name: 'Morning Peak',
               xAxis: '07:30'
- ...`
-- **Replace with**: real data from DuckDB in the same format
+            },
+            {
+              xAxis: '...
+```
+
+### [3] `pieces` (context: yAxis)
+```
+pieces: [
+      {
+        lte: 6,
+        color: 'green'
+      },
+      {
+        gt: 6,
+        lte: 8,
+        color: 'red'
+      },
+      {
+       ...
+```
 
 ## Agent Workflow
 

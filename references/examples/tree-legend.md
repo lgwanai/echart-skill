@@ -7,30 +7,112 @@
 
 Columns needed: need nested **name+children** tree structure
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **3 data array(s)** to replace:
+**15 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: legend)
+```
+data: [
         {
           name: 'tree1',
           icon: 'rectangle'
         },
         {
-        ...`
-- **Replace with**: real data from DuckDB in the same format
+          name: 'tree2',
+          icon: 'rectangle'
+     ...
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [data]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: [data]
+```
 
-### data[2]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [data2]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [data2]
+```
+
+### [3] `children` (context: root)
+```
+children: 
+```
+
+### [4] `children` (context: root)
+```
+children: [
+        {
+          name: 'converters',
+          children: [
+            { name: 'Converters', value: 721 },
+            { name: 'Delimit...
+```
+
+### [5] `children` (context: root)
+```
+children: [
+            { name: 'Converters', value: 721 },
+            { name: 'DelimitedTextConverter', value: 4294 }
+          ]
+```
+
+### [6] `children` (context: root)
+```
+children: [
+        { name: 'DirtySprite', value: 8833 },
+        { name: 'LineSprite', value: 1732 },
+        { name: 'RectSprite', value: 3623 }
+   ...
+```
+
+### [7] `children` (context: root)
+```
+children: [{ name: 'FlareVis', value: 4116 }]
+```
+
+### [8] `children` (context: root)
+```
+children: 
+```
+
+### [9] `children` (context: root)
+```
+children: 
+```
+
+### [10] `children` (context: root)
+```
+children: [
+        { name: 'IScaleMap', value: 2105 },
+        { name: 'LinearScale', value: 1316 },
+        { name: 'LogScale', value: 3151 },
+     ...
+```
+
+### [11] `children` (context: root)
+```
+children: 
+```
+
+### [12] `children` (context: root)
+```
+children: [{ name: 'FlareVis', value: 4116 }]
+```
+
+### [13] `children` (context: root)
+```
+children: [
+        { name: 'IScaleMap', value: 2105 },
+        { name: 'LinearScale', value: 1316 },
+        { name: 'LogScale', value: 3151 },
+     ...
+```
+
+### [14] `children` (context: root)
+```
+children: [{ name: 'DirtySprite', value: 8833 }]
+```
 
 ## Agent Workflow
 

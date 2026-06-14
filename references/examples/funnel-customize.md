@@ -7,30 +7,32 @@
 
 Columns needed: need **stage** + **count** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **3 data array(s)** to replace:
+**3 array(s)** to replace with real data:
 
-### data[0]: `toolbox`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Show', 'Click', 'Visit', 'Inquiry', 'Order']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Show', 'Click', 'Visit', 'Inquiry', 'Order']
+```
 
-### data[1]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: root)
+```
+data: [
         { value: 60, name: 'Visit' },
         { value: 40, name: 'Inquiry' },
-        { valu...`
-- **Replace with**: real data from DuckDB in the same format
+        { value: 20, name: 'Order' },
+        { value: 80, name:...
+```
 
-### data[2]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
         { value: 30, name: 'Visit' },
         { value: 10, name: 'Inquiry' },
-        { valu...`
-- **Replace with**: real data from DuckDB in the same format
+        { value: 5, name: 'Order' },
+        { value: 50, name: ...
+```
 
 ## Agent Workflow
 

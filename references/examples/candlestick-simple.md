@@ -7,20 +7,24 @@
 
 Columns needed: need **open/close/low/high** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['2017-10-24', '2017-10-25', '2017-10-26', '2017-10-27']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: xAxis)
+```
+data: ['2017-10-24', '2017-10-25', '2017-10-26', '2017-10-27']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-        [20, 34, 10, 38]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: [
+        [20, 34, 10, 38],
+        [40, 35, 30, 50],
+        [31, 38, 33, 44],
+        [38, 15, 5, 42]
+      ]
+```
 
 ## Agent Workflow
 

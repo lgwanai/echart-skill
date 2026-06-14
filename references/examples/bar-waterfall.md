@@ -7,24 +7,24 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **3 data array(s)** to replace:
+**3 array(s)** to replace with real data:
 
-### data[0]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Total', 'Rent', 'Utilities', 'Transportation', 'Meals', 'Other']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: xAxis)
+```
+data: ['Total', 'Rent', 'Utilities', 'Transportation', 'Meals', 'Other']
+```
 
-### data[1]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [0, 1700, 1400, 1200, 300, 0]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: root)
+```
+data: [0, 1700, 1400, 1200, 300, 0]
+```
 
-### data[2]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [2900, 1200, 300, 200, 900, 300]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [2900, 1200, 300, 200, 900, 300]
+```
 
 ## Agent Workflow
 

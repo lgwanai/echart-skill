@@ -7,33 +7,33 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **4 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['2016-1', '2016-2', '2016-3', '2016-4', '2016-5', '2016-6', '2016-7', '2016-8', '2016-9', '20...`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: root)
+```
+data: ['2016-1', '2016-2', '2016-3', '2016-4', '2016-5', '2016-6', '2016-7', '2016-8', '2016-9', '2016-10', '2016-11', '2016-12']
+```
 
-### data[1]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['2015-1', '2015-2', '2015-3', '2015-4', '2015-5', '2015-6', '2015-7', '2015-8', '2015-9', '20...`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: root)
+```
+data: ['2015-1', '2015-2', '2015-3', '2015-4', '2015-5', '2015-6', '2015-7', '2015-8', '2015-9', '2015-10', '2015-11', '2015-12']
+```
 
-### data[2]: `series[2]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [2] `data` (context: series)
+```
+data: [
         2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[3]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [3] `data` (context: root)
+```
+data: [
         3.9, 5.9, 11.1, 18.7, 48.3, 69.2, 231.6, 46.6, 55.4, 18.4, 10.3, 0.7
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
 ## Agent Workflow
 

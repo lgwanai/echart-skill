@@ -7,52 +7,53 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **6 data array(s)** to replace:
+**6 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Flow', 'Rainfall']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Flow', 'Rainfall']
+```
 
-### data[1]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-                '2009/6/12 2:00', '2009/6/12 3:00', '2009/6/12 4:00', '2009/6/12 5:00', '200...`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: xAxis)
+```
+data: 
+```
 
-### data[2]: `series`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
           [
             {
               xAxis: '2009/9/12\n7:00'
             },
-            ...`
-- **Replace with**: real data from DuckDB in the same format
+            {
+              xAxis: '2009/9/22\n7:00'
+         ...
+```
 
-### data[3]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-                0.97, 0.96, 0.96, 0.95, 0.95, 0.94, 0.94, 0.94, 0.94, 0.94, 0.94, 0.94, 0.94...`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: xAxis)
+```
+data: 
+```
 
-### data[4]: `series`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [4] `data` (context: root)
+```
+data: [
           [
             {
               xAxis: '2009/9/10\n7:00'
             },
-            ...`
-- **Replace with**: real data from DuckDB in the same format
+            {
+              xAxis: '2009/9/20\n7:00'
+         ...
+```
 
-### data[5]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0...`
-- **Replace with**: real data from DuckDB in the same format
+### [5] `data` (context: xAxis)
+```
+data: 
+```
 
 ## Agent Workflow
 

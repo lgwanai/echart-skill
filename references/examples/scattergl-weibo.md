@@ -7,85 +7,15 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['å¼º', 'ä¸­', 'å¼±']`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `weibo.json`:
-
-```json
-[
-  [
-    73960,
-    39707,
-    132,
-    102,
-    88,
-    -34,
-    263,
-    34,
-    0,
-    -34,
-    88,
-    34,
-    44,
-    202,
-    132,
-    -169,
-    44,
-    -1122,
-    88,
-    -1560,
-    44,
-    1594,
-    0,
-    -550,
-    44,
-    1571,
-    0,
-    -1124,
-    44,
-    0,
-    0,
-    -34,
-    0,
-    -344,
-    0,
-    -69,
-    44,
-    1537,
-    0,
-    -68,
-    44,
-    -271,
-    0,
-    -991,
-    0,
-    -380,
-    87,
-    723,
-    0,
-    -412,
-    0,
-    -346,
-    44,
-    895,
-    0,
-    -377,
-    0,
- 
-...
+### [0] `data` (context: legend)
+```
+data: ['å¼º', 'ä¸­', 'å¼±']
 ```
 
-Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

@@ -7,50 +7,25 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**3 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Dow-Jones index']`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `stock-DJI.json`:
-
-```json
-[
-  [
-    "2004-01-02",
-    10452.74,
-    10409.85,
-    10367.41,
-    10554.96,
-    168890000
-  ],
-  [
-    "2004-01-05",
-    10411.85,
-    10544.07,
-    10411.85,
-    10575.92,
-    221290000
-  ],
-  [
-    "2004-01-06",
-    10543.85,
-    10538.66,
-    10454.37,
-    10584.07,
-    191460000
-  ]
-]
+### [0] `data` (context: legend)
+```
+data: ['Dow-Jones index']
 ```
 
-Agent: build DuckDB query to produce matching data structure.
+### [1] `dimensions` (context: series)
+```
+dimensions: ['-', 'open', 'close', 'lowest', 'highest']
+```
+
+### [2] `children` (context: root)
+```
+children: 
+```
+
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

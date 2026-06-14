@@ -7,26 +7,30 @@
 
 Columns needed: need **name** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `series`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: root)
+```
+data: [
         {
           value: Math.round(Math.random() * 10) + 10,
           name: 'Male'
-     ...`
-- **Replace with**: real data from DuckDB in the same format
+        },
+        {
+          value: Math.round(Math.r...
+```
 
-### data[1]: `legend`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: legend)
+```
+data: [
         {
           value: 'Primary School',
-          children: Array.from({ length: 5 }, (...`
-- **Replace with**: real data from DuckDB in the same format
+          children: Array.from({ length: 5 }, (_, i) => {
+            return `Grade ${i + 1}`;
+  ...
+```
 
 ## Agent Workflow
 

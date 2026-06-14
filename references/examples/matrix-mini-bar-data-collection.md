@@ -7,9 +7,24 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**2 array(s)** to replace with real data:
+
+### [0] `source` (context: dataset)
+```
+source: 
+```
+
+### [1] `children` (context: root)
+```
+children: [
+        {
+          type: 'rect',
+          shape: { x: barX, y: barY, width, height },
+          style: api.style({
+            fill: '#0...
+```
 
 ## Agent Workflow
 

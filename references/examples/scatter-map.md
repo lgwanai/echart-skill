@@ -7,14 +7,14 @@
 
 Columns needed: need **x** + **y** columns (both numeric)
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['pm2.5']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['pm2.5']
+```
 
 ## Agent Workflow
 

@@ -7,9 +7,169 @@
 
 Columns needed: need nested **name+value+children**
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**25 array(s)** to replace with real data:
+
+### [0] `children` (context: root)
+```
+children: 
+```
+
+### [1] `children` (context: root)
+```
+children: [
+          {
+            name: 'Chamomile',
+            value: 1,
+            itemStyle: {
+              color: '#f99e1c'
+            }
+   ...
+```
+
+### [2] `children` (context: root)
+```
+children: 
+```
+
+### [3] `children` (context: root)
+```
+children: 
+```
+
+### [4] `children` (context: root)
+```
+children: [
+          {
+            name: 'Raisin',
+            value: 1,
+            itemStyle: {
+              color: '#b53b54'
+            }
+      ...
+```
+
+### [5] `children` (context: root)
+```
+children: 
+```
+
+### [6] `children` (context: root)
+```
+children: 
+```
+
+### [7] `children` (context: root)
+```
+children: 
+```
+
+### [8] `children` (context: root)
+```
+children: 
+```
+
+### [9] `children` (context: root)
+```
+children: 
+```
+
+### [10] `children` (context: root)
+```
+children: 
+```
+
+### [11] `children` (context: root)
+```
+children: 
+```
+
+### [12] `children` (context: root)
+```
+children: 
+```
+
+### [13] `children` (context: root)
+```
+children: 
+```
+
+### [14] `children` (context: root)
+```
+children: 
+```
+
+### [15] `children` (context: root)
+```
+children: 
+```
+
+### [16] `children` (context: root)
+```
+children: 
+```
+
+### [17] `children` (context: root)
+```
+children: [
+          {
+            name: 'Grain',
+            value: 1,
+            itemStyle: {
+              color: '#b7906f'
+            }
+       ...
+```
+
+### [18] `children` (context: root)
+```
+children: 
+```
+
+### [19] `children` (context: root)
+```
+children: 
+```
+
+### [20] `children` (context: root)
+```
+children: 
+```
+
+### [21] `children` (context: root)
+```
+children: [
+          {
+            name: 'Peanuts',
+            value: 1,
+            itemStyle: {
+              color: '#d4ad12'
+            }
+     ...
+```
+
+### [22] `children` (context: root)
+```
+children: [
+          {
+            name: 'Chocolate',
+            value: 1,
+            itemStyle: {
+              color: '#692a19'
+            }
+   ...
+```
+
+### [23] `children` (context: root)
+```
+children: 
+```
+
+### [24] `children` (context: root)
+```
+children: 
+```
 
 ## Agent Workflow
 

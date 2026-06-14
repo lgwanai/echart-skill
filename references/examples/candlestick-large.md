@@ -7,9 +7,23 @@
 
 Columns needed: need **time/category** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**1 array(s)** to replace with real data:
+
+### [0] `pieces` (context: visualMap)
+```
+pieces: [
+      {
+        value: 1,
+        color: upColor
+      },
+      {
+        value: -1,
+        color: downColor
+      }
+    ]
+```
 
 ## Agent Workflow
 

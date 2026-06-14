@@ -7,44 +7,28 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `markLine`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: markLine)
+```
+data: [
             {
               yAxis: 50
             },
             {
               yAxis: 100
-...`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `aqi-beijing.json`:
-
-```json
-[
-  [
-    "2000-06-05",
-    116
-  ],
-  [
-    "2000-06-06",
-    129
-  ],
-  [
-    "2000-06-07",
-    135
-  ]
-]
+            },
+            {
+              yAxis: ...
 ```
 
-Agent: build DuckDB query to produce matching data structure.
+### [1] `pieces` (context: visualMap)
+```
+pieces: 
+```
+
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

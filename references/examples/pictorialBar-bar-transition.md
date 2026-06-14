@@ -7,37 +7,43 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **4 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['2015', '2016']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['2015', '2016']
+```
 
-### data[1]: `yAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['reindeer', 'ship', 'plane', 'train', 'car']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: yAxis)
+```
+data: ['reindeer', 'ship', 'plane', 'train', 'car']
+```
 
-### data[2]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
           {
             value: 157,
             symbol: symbol || pathSymbols.reindeer
-     ...`
-- **Replace with**: real data from DuckDB in the same format
+          },
+          {
+            value: 21,
+       ...
+```
 
-### data[3]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [3] `data` (context: root)
+```
+data: [
           {
             value: 184,
             symbol: symbol || pathSymbols.reindeer
-     ...`
-- **Replace with**: real data from DuckDB in the same format
+          },
+          {
+            value: 29,
+       ...
+```
 
 ## Agent Workflow
 

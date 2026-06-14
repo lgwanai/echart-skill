@@ -7,13 +7,13 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **6 data array(s)** to replace:
+**6 array(s)** to replace with real data:
 
-### data[0]: `markLine`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: root)
+```
+data: [
     {
       type: 'max',
       label: {
@@ -21,42 +21,61 @@ The code contains **6 data array(s)** to replace:
       }
     },
     {
- ...`
-- **Replace with**: real data from DuckDB in the same format
+      type: 'min',
+      label: {
+        formatter...
+```
 
-### data[1]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['typeA', 'typeB']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: legend)
+```
+data: ['typeA', 'typeB']
+```
 
-### data[2]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['a', 'b', 'c', 'd', 'e']`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: xAxis)
+```
+data: ['a', 'b', 'c', 'd', 'e']
+```
 
-### data[3]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [3] `data` (context: series)
+```
+data: [
         {
           value: 123,
-          symbol: symbols[0]`
-- **Replace with**: real data from DuckDB in the same format
+          symbol: symbols[0]
+        },
+        {
+          value: 34,
+          symbol: symbols[1]
+        },...
+```
 
-### data[4]: `markLine`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [4] `data` (context: markLine)
+```
+data: [
         {
           value: 12,
-          symbol: symbols[0]`
-- **Replace with**: real data from DuckDB in the same format
+          symbol: symbols[0]
+        },
+        {
+          value: 44,
+          symbol: symbols[1]
+        },
+...
+```
 
-### data[5]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [5] `data` (context: root)
+```
+data: [
         {
           value: 1,
-          symbol: symbols[0]`
-- **Replace with**: real data from DuckDB in the same format
+          symbol: symbols[0]
+        },
+        {
+          value: 1,
+          symbol: symbols[1]
+        },
+  ...
+```
 
 ## Agent Workflow
 

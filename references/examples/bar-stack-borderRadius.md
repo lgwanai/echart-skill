@@ -7,39 +7,39 @@
 
 Columns needed: need **category** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **6 data array(s)** to replace:
+**6 array(s)** to replace with real data:
 
-### data[0]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [120, 200, 150, 80, 70, 110, 130]`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: root)
+```
+data: [120, 200, 150, 80, 70, 110, 130]
+```
 
-### data[1]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [10, 46, 64, '-', 0, '-', 0]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: root)
+```
+data: [10, 46, 64, '-', 0, '-', 0]
+```
 
-### data[2]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [30, '-', 0, 20, 10, '-', 0]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [30, '-', 0, 20, 10, '-', 0]
+```
 
-### data[3]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [30, '-', 0, 20, 10, '-', 0]`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: root)
+```
+data: [30, '-', 0, 20, 10, '-', 0]
+```
 
-### data[4]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [10, 20, 150, 0, '-', 50, 10]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: root)
+```
+data: [10, 20, 150, 0, '-', 50, 10]
+```
 
-### data[5]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
-- **Replace with**: real data from DuckDB in the same format
+### [5] `data` (context: xAxis)
+```
+data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+```
 
 ## Agent Workflow
 

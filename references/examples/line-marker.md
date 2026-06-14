@@ -7,51 +7,53 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **7 data array(s)** to replace:
+**7 array(s)** to replace with real data:
 
-### data[0]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: xAxis)
+```
+data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [10, 11, 13, 11, 12, 12, 9]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: [10, 11, 13, 11, 12, 12, 9]
+```
 
-### data[2]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: series)
+```
+data: [
           { type: 'max', name: 'Max' },
           { type: 'min', name: 'Min' }
-        ]`
-- **Replace with**: real data from DuckDB in the same format
+        ]
+```
 
-### data[3]: `markLine`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ type: 'average', name: 'Avg' }]`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: markLine)
+```
+data: [{ type: 'average', name: 'Avg' }]
+```
 
-### data[4]: `markLine`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [1, -2, 2, 5, 3, 2, 0]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: markLine)
+```
+data: [1, -2, 2, 5, 3, 2, 0]
+```
 
-### data[5]: `markLine`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ name: '周最低', value: -2, xAxis: 1, yAxis: -1.5 }]`
-- **Replace with**: real data from DuckDB in the same format
+### [5] `data` (context: markLine)
+```
+data: [{ name: '周最低', value: -2, xAxis: 1, yAxis: -1.5 }]
+```
 
-### data[6]: `markLine`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [6] `data` (context: xAxis)
+```
+data: [
           { type: 'average', name: 'Avg' },
           [
             {
-              symbol: ...`
-- **Replace with**: real data from DuckDB in the same format
+              symbol: 'none',
+              x: '90%',
+              yAxi...
+```
 
 ## Agent Workflow
 

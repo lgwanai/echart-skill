@@ -7,75 +7,15 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Growth', 'Budget 2011', 'Budget 2012']`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `obama_budget_proposal_2012.list.json`:
-
-```json
-{
-  "budget2012List": [
-    0,
-    1000,
-    1000,
-    1000,
-    1000,
-    1000,
-    1000,
-    1000,
-    1000,
-    1000,
-    1000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    2000,
-    3000,
-    3000,
-    3000,
-    3000,
-    3000,
-    3000,
-    3000,
-    4000,
-    4000,
-    4000,
-    4000,
-    5000,
-    5000,
-    5000,
-    5000,
-    6000,
-    6000,
-    6000,
-    6000,
-    6000,
-    7000,
-    7000,
-    7000,
-    8000,
-    8000,
-...
+### [0] `data` (context: legend)
+```
+data: ['Growth', 'Budget 2011', 'Budget 2012']
 ```
 
-Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

@@ -7,53 +7,15 @@
 
 Columns needed: need **region name** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '中西区', value: 20057.34 },
-            { name: '湾仔', value: 15477.48 },
- ...`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `HK.json`:
-
-```json
-{
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Central and Western",
-        "ID_0": 102,
-        "ID_1": 1,
-        "ISO": "HKG"
-      },
-      "geometry": {
-        "type": "MultiPolygon",
-        "coordinates": [
-          [
-            [
-              [
-                114.113747,
-                22.285694
-              ],
-              [
-                114.113747,
-                22.285418
-              ],
-            
-...
+### [0] `data` (context: series)
+```
+data: 
 ```
 
-Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

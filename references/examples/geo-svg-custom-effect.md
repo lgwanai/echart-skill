@@ -7,15 +7,22 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-        [488.2358421078053, 459.70913833075736, 100]`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: series)
+```
+data: [
+        [488.2358421078053, 459.70913833075736, 100],
+        [770.3415644319939, 757.9672194986475, 30],
+        [1180.0329284196291, 743.614...
+```
+
+### [1] `children` (context: root)
+```
+children: 
+```
 
 ## Agent Workflow
 

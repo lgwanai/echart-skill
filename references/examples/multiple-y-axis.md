@@ -7,38 +7,38 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **5 data array(s)** to replace:
+**5 array(s)** to replace with real data:
 
-### data[0]: `toolbox`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Evaporation', 'Precipitation', 'Temperature']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Evaporation', 'Precipitation', 'Temperature']
+```
 
-### data[1]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: xAxis)
+```
+data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+```
 
-### data[2]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [2] `data` (context: series)
+```
+data: [
         2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[3]: `yAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [3] `data` (context: root)
+```
+data: [
         2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[4]: `yAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: root)
+```
+data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
+```
 
 ## Agent Workflow
 

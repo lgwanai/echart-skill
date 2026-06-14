@@ -7,9 +7,21 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**1 array(s)** to replace with real data:
+
+### [0] `source` (context: dataset)
+```
+source: [
+        [1, 4862.4],
+        [2, 5294.7],
+        [3, 5934.5],
+        [4, 7171.0],
+        [5, 8964.4],
+        [6, 10202.2],
+        [7, 1...
+```
 
 ## Agent Workflow
 

@@ -7,20 +7,38 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**3 array(s)** to replace with real data:
 
-### data[0]: `markLine`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ xAxis: 1 }, { xAxis: 3 }, { xAxis: 5 }, { xAxis: 7 }]`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: markLine)
+```
+data: [{ xAxis: 1 }, { xAxis: 3 }, { xAxis: 5 }, { xAxis: 7 }]
+```
 
-### data[1]: `markLine`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-        ['2019-10-10', 200]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: xAxis)
+```
+data: [
+        ['2019-10-10', 200],
+        ['2019-10-11', 560],
+        ['2019-10-12', 750],
+        ['2019-10-13', 580],
+        ['2019-10-14', 250...
+```
+
+### [2] `pieces` (context: yAxis)
+```
+pieces: [
+      {
+        gt: 1,
+        lt: 3,
+        color: 'rgba(0, 0, 180, 0.4)'
+      },
+      {
+        gt: 5,
+        lt: 7,
+        color: 'r...
+```
 
 ## Agent Workflow
 

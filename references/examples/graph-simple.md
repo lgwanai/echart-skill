@@ -7,21 +7,33 @@
 
 Columns needed: need **nodes** [{name,...}] + **links/edges** [{source,target}]
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**3 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: root)
+```
+data: [
         {
           name: 'Node 1',
           x: 300,
           y: 300
         },
         {
-...`
-- **Replace with**: real data from DuckDB in the same format
+          name: 'Node 2',
+          x: 800,
+      ...
+```
+
+### [1] `links` (context: root)
+```
+links: []
+```
+
+### [2] `links` (context: root)
+```
+links: 
+```
 
 ## Agent Workflow
 

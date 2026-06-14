@@ -7,71 +7,15 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: []`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `life-expectancy.json`:
-
-```json
-[
-  [
-    [
-      815,
-      34.05,
-      351014,
-      "Australia",
-      1800
-    ],
-    [
-      1314,
-      39,
-      645526,
-      "Canada",
-      1800
-    ],
-    [
-      985,
-      32,
-      321675013,
-      "China",
-      1800
-    ],
-    [
-      864,
-      32.2,
-      345043,
-      "Cuba",
-      1800
-    ],
-    [
-      1244,
-      36.5731262,
-      977662,
-      "Finland",
-      1800
-    ],
-    [
-      1803,
-      33.96717024,
-      29355111,
-      "France",
-      1800
-    ],
-    [
-      1
-...
+### [0] `data` (context: root)
+```
+data: []
 ```
 
-Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

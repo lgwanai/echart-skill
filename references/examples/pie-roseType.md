@@ -7,37 +7,41 @@
 
 Columns needed: need **name** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **3 data array(s)** to replace:
+**3 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [0] `data` (context: legend)
+```
+data: [
       'rose1',
       'rose2',
       'rose3',
       'rose4',
       'rose5',
       'rose6',
-  ...`
-- **Replace with**: real data from DuckDB in the same format
+      'rose7',
+      'rose8'
+    ]
+```
 
-### data[1]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: root)
+```
+data: [
         { value: 40, name: 'rose 1' },
         { value: 33, name: 'rose 2' },
-        { valu...`
-- **Replace with**: real data from DuckDB in the same format
+        { value: 28, name: 'rose 3' },
+        { value: 22, name...
+```
 
-### data[2]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
         { value: 30, name: 'rose 1' },
         { value: 28, name: 'rose 2' },
-        { valu...`
-- **Replace with**: real data from DuckDB in the same format
+        { value: 26, name: 'rose 3' },
+        { value: 24, name...
+```
 
 ## Agent Workflow
 

@@ -7,41 +7,42 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **6 data array(s)** to replace:
+**6 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['City Alpha', 'City Beta', 'City Gamma']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['City Alpha', 'City Beta', 'City Gamma']
+```
 
-### data[1]: `yAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Sunny', 'Cloudy', 'Showers']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: xAxis)
+```
+data: ['Sunny', 'Cloudy', 'Showers']
+```
 
-### data[2]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [165, 170, 30]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: series)
+```
+data: [165, 170, 30]
+```
 
-### data[3]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [3] `data` (context: root)
+```
+data: [
           { type: 'max', name: 'max days: ' },
-          { type: 'min', name: 'min days: ' }...`
-- **Replace with**: real data from DuckDB in the same format
+          { type: 'min', name: 'min days: ' }
+        ]
+```
 
-### data[4]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [150, 105, 110]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: root)
+```
+data: [150, 105, 110]
+```
 
-### data[5]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [220, 82, 63]`
-- **Replace with**: real data from DuckDB in the same format
+### [5] `data` (context: root)
+```
+data: [220, 82, 63]
+```
 
 ## Agent Workflow
 

@@ -7,34 +7,34 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **5 data array(s)** to replace:
+**5 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: xAxis)
+```
+data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [1500, 2032, 2001, 3154, 2190, 4330, 2410]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: [1500, 2032, 2001, 3154, 2190, 4330, 2410]
+```
 
-### data[2]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [1200, 1320, 1010, 1340, 900, 2300, 2100]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [1200, 1320, 1010, 1340, 900, 2300, 2100]
+```
 
-### data[3]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [103200, 100320, 103010, 102340, 103900, 103300, 103200]`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: root)
+```
+data: [103200, 100320, 103010, 102340, 103900, 103300, 103200]
+```
 
-### data[4]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [3106212, 3102118, 3102643, 3104631, 3106679, 3100130, 3107022]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: root)
+```
+data: [3106212, 3102118, 3102643, 3104631, 3106679, 3100130, 3107022]
+```
 
 ## Agent Workflow
 

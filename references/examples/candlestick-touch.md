@@ -7,14 +7,25 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
+```
+
+### [1] `children` (context: root)
+```
+children: [
+        {
+          id: 'MA5',
+          type: 'text',
+          style: { fill: colorList[1], font: labelFont },
+          left: 0
+       ...
+```
 
 ## Agent Workflow
 

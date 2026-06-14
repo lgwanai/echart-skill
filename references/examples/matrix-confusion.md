@@ -7,25 +7,29 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **3 data array(s)** to replace:
+**3 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Positive', 'Negative']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: root)
+```
+data: ['Positive', 'Negative']
+```
 
-### data[1]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Positive', 'Negative']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: root)
+```
+data: ['Positive', 'Negative']
+```
 
-### data[2]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-      ['Positive', 'Positive', 10]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: series)
+```
+data: [
+      ['Positive', 'Positive', 10],
+      ['Positive', 'Negative', 2],
+      ['Negative', 'Positive', 3],
+      ['Negative', 'Negative', 5]
+  ...
+```
 
 ## Agent Workflow
 

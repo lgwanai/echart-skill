@@ -7,9 +7,220 @@
 
 Columns needed: need nested **name+value+children**
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**22 array(s)** to replace with real data:
+
+### [0] `children` (context: root)
+```
+children: 
+```
+
+### [1] `children` (context: root)
+```
+children: [
+          {
+            value: 1,
+            itemStyle: item1
+          },
+          {
+            value: 2,
+            children: [
+    ...
+```
+
+### [2] `children` (context: root)
+```
+children: [
+              {
+                value: 1,
+                itemStyle: item2
+              }
+            ]
+```
+
+### [3] `children` (context: root)
+```
+children: [
+              {
+                value: 1
+              }
+            ]
+```
+
+### [4] `children` (context: root)
+```
+children: 
+```
+
+### [5] `children` (context: root)
+```
+children: [
+              {
+                value: 1,
+                itemStyle: item1
+              },
+              {
+                value: 1
+     ...
+```
+
+### [6] `children` (context: root)
+```
+children: [
+              {
+                value: 1
+              }
+            ]
+```
+
+### [7] `children` (context: root)
+```
+children: [
+              {
+                value: 1,
+                itemStyle: item2
+              }
+            ]
+```
+
+### [8] `children` (context: root)
+```
+children: 
+```
+
+### [9] `children` (context: root)
+```
+children: [
+          {
+            value: 2,
+            itemStyle: item2
+          },
+          {
+            children: [
+              {
+          ...
+```
+
+### [10] `children` (context: root)
+```
+children: [
+              {
+                value: 1,
+                itemStyle: item1
+              }
+            ]
+```
+
+### [11] `children` (context: root)
+```
+children: [
+          {
+            value: 3,
+            children: [
+              {
+                value: 1
+              },
+              {
+      ...
+```
+
+### [12] `children` (context: root)
+```
+children: [
+              {
+                value: 1
+              },
+              {
+                value: 1,
+                itemStyle: item2
+     ...
+```
+
+### [13] `children` (context: root)
+```
+children: 
+```
+
+### [14] `children` (context: root)
+```
+children: 
+```
+
+### [15] `children` (context: root)
+```
+children: [
+              {
+                value: 1,
+                itemStyle: item2
+              },
+              {
+                value: 1
+     ...
+```
+
+### [16] `children` (context: root)
+```
+children: [
+              {
+                value: 1
+              },
+              {
+                value: 1,
+                itemStyle: item1
+     ...
+```
+
+### [17] `children` (context: root)
+```
+children: 
+```
+
+### [18] `children` (context: root)
+```
+children: [
+          {
+            value: 1,
+            itemStyle: item2
+          },
+          {
+            value: 2,
+            children: [
+    ...
+```
+
+### [19] `children` (context: root)
+```
+children: [
+              {
+                value: 2,
+                itemStyle: item2
+              }
+            ]
+```
+
+### [20] `children` (context: root)
+```
+children: [
+          {
+            value: 1
+          },
+          {
+            children: [
+              {
+                value: 1,
+              ...
+```
+
+### [21] `children` (context: root)
+```
+children: [
+              {
+                value: 1,
+                itemStyle: item2
+              }
+            ]
+```
 
 ## Agent Workflow
 

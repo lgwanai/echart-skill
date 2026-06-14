@@ -7,23 +7,26 @@
 
 Columns needed: need **category** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `yAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [0] `data` (context: xAxis)
+```
+data: [
           'heart',
           'large-intestine',
           'small-intestine',
-          'sple...`
-- **Replace with**: real data from DuckDB in the same format
+          'spleen',
+          'kidney',
+          'lung',
+       ...
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [121, 321, 141, 52, 198, 289, 139]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: [121, 321, 141, 52, 198, 289, 139]
+```
 
 ## Agent Workflow
 

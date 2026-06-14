@@ -7,9 +7,19 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**2 array(s)** to replace with real data:
+
+### [0] `dimensions` (context: series)
+```
+dimensions: ['x', 'y']
+```
+
+### [1] `dimensions` (context: root)
+```
+dimensions: ['x', 'y']
+```
 
 ## Agent Workflow
 

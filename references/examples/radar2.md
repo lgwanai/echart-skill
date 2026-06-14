@@ -7,18 +7,30 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: root)
+```
+data: [
           {
             value: [
               (40 - i) * 10,
-              (38 - i) * 4 + 6...`
-- **Replace with**: real data from DuckDB in the same format
+              (38 - i) * 4 + 60,
+              i * 5 + 10,
+              i * 9,
+...
+```
+
+### [1] `indicator` (context: visualMap)
+```
+indicator: [
+      { text: 'IE8-', max: 400 },
+      { text: 'IE9+', max: 400 },
+      { text: 'Safari', max: 400 },
+      { text: 'Firefox', max: 400...
+```
 
 ## Agent Workflow
 

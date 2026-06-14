@@ -7,28 +7,29 @@
 
 Columns needed: need a single **value** (aggregate)
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: root)
+```
+data: [
         {
           value: 58.46,
           name: 'PLP'
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[1]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: series)
+```
+data: [
           {
             value: +(Math.random() * 100).toFixed(2),
             name: 'PLP'
-  ...`
-- **Replace with**: real data from DuckDB in the same format
+          }
+        ]
+```
 
 ## Agent Workflow
 

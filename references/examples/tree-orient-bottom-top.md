@@ -7,52 +7,15 @@
 
 Columns needed: need nested **name+children** tree structure
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [data]`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `flare.json`:
-
-```json
-[
-  {
-    "name": "analytics",
-    "children": [
-      {
-        "name": "cluster",
-        "children": [
-          {
-            "name": "AgglomerativeCluster",
-            "value": 3938
-          },
-          {
-            "name": "CommunityStructure",
-            "value": 3812
-          },
-          {
-            "name": "HierarchicalCluster",
-            "value": 6714
-          },
-          {
-            "name": "MergeEdge",
-            "value": 743
-          }
-        ]
-      },
-      {
-   
-...
+### [0] `data` (context: series)
+```
+data: [data]
 ```
 
-Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

@@ -7,41 +7,15 @@
 
 Columns needed: need **nodes** [{name,...}] + **links/edges** [{source,target}]
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['HTMLElement', 'WebGL', 'SVG', 'CSS', 'Other']`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `webkit-dep.json`:
-
-```json
-[
-  {
-    "name": "AnalyserNode",
-    "value": 1,
-    "category": 4
-  },
-  {
-    "name": "AudioNode",
-    "value": 1,
-    "category": 4
-  },
-  {
-    "name": "Uint8Array",
-    "value": 1,
-    "category": 4
-  }
-]
+### [0] `data` (context: legend)
+```
+data: ['HTMLElement', 'WebGL', 'SVG', 'CSS', 'Other']
 ```
 
-Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

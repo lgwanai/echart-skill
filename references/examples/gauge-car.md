@@ -7,79 +7,79 @@
 
 Columns needed: need a single **value** (aggregate)
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **7 data array(s)** to replace:
+**7 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: root)
+```
+data: [
         {
           value: 250,
           name: 'km/h'
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[1]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: root)
+```
+data: [
         {
           value: 0,
           name: '当前位置：\n \n 中科路'
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[2]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
         {
           value: 0.6,
           name: '1/min x 1000'
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[3]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [3] `data` (context: root)
+```
+data: [
         {
           value: 0,
           name: ''
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[4]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [4] `data` (context: root)
+```
+data: [
         {
           value: 250,
           name: ''
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[5]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [5] `data` (context: root)
+```
+data: [
         {
           value: 0.85,
           name: ''
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[6]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [6] `data` (context: root)
+```
+data: [
         {
           value: -120,
           name: ''
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
 ## Agent Workflow
 

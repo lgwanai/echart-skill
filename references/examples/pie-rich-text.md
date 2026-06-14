@@ -7,24 +7,19 @@
 
 Columns needed: need **name** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['CityA', 'CityB', 'CityD', 'CityC', 'CityE']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['CityA', 'CityB', 'CityD', 'CityC', 'CityE']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-        {
-          value: 1548,
-          name: 'CityE',
-          label: {
-            for...`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: 
+```
 
 ## Agent Workflow
 

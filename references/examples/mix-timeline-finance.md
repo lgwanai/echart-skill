@@ -7,95 +7,104 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **13 data array(s)** to replace:
+**13 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-        '2002-01-01',
-        '2003-01-01',
-        '2004-01-01',
-        {
-          value:...`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: root)
+```
+data: 
+```
 
-### data[1]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['第一产业', '第二产业', '第三产业', 'GDP', '金融', '房地产']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: legend)
+```
+data: ['第一产业', '第二产业', '第三产业', 'GDP', '金融', '房地产']
+```
 
-### data[2]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-          '北京',
-          '\n天津',
-          '河北',
-          '\n山西',
-          '内蒙古',
-       ...`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: xAxis)
+```
+data: 
+```
 
-### data[3]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '第一产业', value: dataMap.dataPI['2002sum']`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: root)
+```
+data: [
+            { name: '第一产业', value: dataMap.dataPI['2002sum'] },
+            { name: '第二产业', value: dataMap.dataSI['2002sum'] },
+            { ...
+```
 
-### data[4]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '第一产业', value: dataMap.dataPI['2003sum']`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: root)
+```
+data: [
+            { name: '第一产业', value: dataMap.dataPI['2003sum'] },
+            { name: '第二产业', value: dataMap.dataSI['2003sum'] },
+            { ...
+```
 
-### data[5]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '第一产业', value: dataMap.dataPI['2004sum']`
-- **Replace with**: real data from DuckDB in the same format
+### [5] `data` (context: root)
+```
+data: [
+            { name: '第一产业', value: dataMap.dataPI['2004sum'] },
+            { name: '第二产业', value: dataMap.dataSI['2004sum'] },
+            { ...
+```
 
-### data[6]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '第一产业', value: dataMap.dataPI['2005sum']`
-- **Replace with**: real data from DuckDB in the same format
+### [6] `data` (context: root)
+```
+data: [
+            { name: '第一产业', value: dataMap.dataPI['2005sum'] },
+            { name: '第二产业', value: dataMap.dataSI['2005sum'] },
+            { ...
+```
 
-### data[7]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '第一产业', value: dataMap.dataPI['2006sum']`
-- **Replace with**: real data from DuckDB in the same format
+### [7] `data` (context: root)
+```
+data: [
+            { name: '第一产业', value: dataMap.dataPI['2006sum'] },
+            { name: '第二产业', value: dataMap.dataSI['2006sum'] },
+            { ...
+```
 
-### data[8]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '第一产业', value: dataMap.dataPI['2007sum']`
-- **Replace with**: real data from DuckDB in the same format
+### [8] `data` (context: root)
+```
+data: [
+            { name: '第一产业', value: dataMap.dataPI['2007sum'] },
+            { name: '第二产业', value: dataMap.dataSI['2007sum'] },
+            { ...
+```
 
-### data[9]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '第一产业', value: dataMap.dataPI['2008sum']`
-- **Replace with**: real data from DuckDB in the same format
+### [9] `data` (context: root)
+```
+data: [
+            { name: '第一产业', value: dataMap.dataPI['2008sum'] },
+            { name: '第二产业', value: dataMap.dataSI['2008sum'] },
+            { ...
+```
 
-### data[10]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '第一产业', value: dataMap.dataPI['2009sum']`
-- **Replace with**: real data from DuckDB in the same format
+### [10] `data` (context: root)
+```
+data: [
+            { name: '第一产业', value: dataMap.dataPI['2009sum'] },
+            { name: '第二产业', value: dataMap.dataSI['2009sum'] },
+            { ...
+```
 
-### data[11]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '第一产业', value: dataMap.dataPI['2010sum']`
-- **Replace with**: real data from DuckDB in the same format
+### [11] `data` (context: root)
+```
+data: [
+            { name: '第一产业', value: dataMap.dataPI['2010sum'] },
+            { name: '第二产业', value: dataMap.dataSI['2010sum'] },
+            { ...
+```
 
-### data[12]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            { name: '第一产业', value: dataMap.dataPI['2011sum']`
-- **Replace with**: real data from DuckDB in the same format
+### [12] `data` (context: root)
+```
+data: [
+            { name: '第一产业', value: dataMap.dataPI['2011sum'] },
+            { name: '第二产业', value: dataMap.dataSI['2011sum'] },
+            { ...
+```
 
 ## Agent Workflow
 

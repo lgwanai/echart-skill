@@ -7,44 +7,44 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **7 data array(s)** to replace:
+**7 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 5']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 5']
+```
 
-### data[1]: `toolbox`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: xAxis)
+```
+data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+```
 
-### data[2]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [140, 232, 101, 264, 90, 340, 250]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [140, 232, 101, 264, 90, 340, 250]
+```
 
-### data[3]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [120, 282, 111, 234, 220, 340, 310]`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: root)
+```
+data: [120, 282, 111, 234, 220, 340, 310]
+```
 
-### data[4]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [320, 132, 201, 334, 190, 130, 220]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: root)
+```
+data: [320, 132, 201, 334, 190, 130, 220]
+```
 
-### data[5]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [220, 402, 231, 134, 190, 230, 120]`
-- **Replace with**: real data from DuckDB in the same format
+### [5] `data` (context: root)
+```
+data: [220, 402, 231, 134, 190, 230, 120]
+```
 
-### data[6]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [220, 302, 181, 234, 210, 290, 150]`
-- **Replace with**: real data from DuckDB in the same format
+### [6] `data` (context: root)
+```
+data: [220, 302, 181, 234, 210, 290, 150]
+```
 
 ## Agent Workflow
 

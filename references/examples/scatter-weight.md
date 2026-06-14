@@ -7,68 +7,74 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **9 data array(s)** to replace:
+**9 array(s)** to replace with real data:
 
-### data[0]: `toolbox`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Female', 'Male']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Female', 'Male']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[[x,y],...] — XY pairs`
-- **Location**: `data: [[161.2, 51.6]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: 
+```
 
-### data[2]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
           [
             {
               name: 'Female Data Range',
-              xAxis: 'min...`
-- **Replace with**: real data from DuckDB in the same format
+              xAxis: 'min',
+              yAxis: 'min'
+            },
+     ...
+```
 
-### data[3]: `yAxis`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [3] `data` (context: xAxis)
+```
+data: [
           { type: 'max', name: 'Max' },
           { type: 'min', name: 'Min' }
-        ]`
-- **Replace with**: real data from DuckDB in the same format
+        ]
+```
 
-### data[4]: `markLine`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ type: 'average', name: 'AVG' }, { xAxis: 160 }]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: markLine)
+```
+data: [{ type: 'average', name: 'AVG' }, { xAxis: 160 }]
+```
 
-### data[5]: `series`
-- **Format**: `[[x,y],...] — XY pairs`
-- **Location**: `data: [[174.0, 65.6]`
-- **Replace with**: real data from DuckDB in the same format
+### [5] `data` (context: xAxis)
+```
+data: 
+```
 
-### data[6]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [6] `data` (context: root)
+```
+data: [
           [
             {
               name: 'Male Data Range',
-              xAxis: 'min',...`
-- **Replace with**: real data from DuckDB in the same format
+              xAxis: 'min',
+              yAxis: 'min'
+            },
+       ...
+```
 
-### data[7]: `yAxis`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [7] `data` (context: xAxis)
+```
+data: [
           { type: 'max', name: 'Max' },
           { type: 'min', name: 'Min' }
-        ]`
-- **Replace with**: real data from DuckDB in the same format
+        ]
+```
 
-### data[8]: `markLine`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ type: 'average', name: 'Average' }, { xAxis: 170 }]`
-- **Replace with**: real data from DuckDB in the same format
+### [8] `data` (context: markLine)
+```
+data: [{ type: 'average', name: 'Average' }, { xAxis: 170 }]
+```
 
 ## Agent Workflow
 

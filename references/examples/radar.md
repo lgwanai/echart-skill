@@ -7,21 +7,34 @@
 
 Columns needed: need **name** + multiple **dimension** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**3 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Allocated Budget', 'Actual Spending']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Allocated Budget', 'Actual Spending']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: series)
+```
+data: [
         {
-          value: [4200, 3000, 20000, 35000, 50000, 18000]`
-- **Replace with**: real data from DuckDB in the same format
+          value: [4200, 3000, 20000, 35000, 50000, 18000],
+          name: 'Allocated Budget'
+        },
+        {
+          value: ...
+```
+
+### [2] `indicator` (context: legend)
+```
+indicator: [
+      { name: 'Sales', max: 6500 },
+      { name: 'Administration', max: 16000 },
+      { name: 'Information Technology', max: 30000 },
+ ...
+```
 
 ## Agent Workflow
 

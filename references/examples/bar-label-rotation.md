@@ -8,40 +8,38 @@
 ## User Data Requirements
 Columns needed: need **category** + **value** columns (4 series recommended)
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **5 data array(s)** — replace ALL with real data:
+**6 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `['name1','name2',...]` — legend labels (string array, matches series names)
-- **Replace with**: real series names from DuckDB
+### [0] `data` (context: legend)
+```
+data: ['Forest', 'Steppe', 'Desert', 'Wetland']
+```
 
-### data[1]: `xAxis`
-- **Format**: `['cat1','cat2',...]` — x-axis category labels (string array)
-- **Replace with**: real category labels from DuckDB
+### [1] `data` (context: xAxis)
+```
+data: ['2012', '2013', '2014', '2015', '2016']
+```
 
-### data[2-5]: `series[0-3].data`
-- **Format**: `[n1,n2,...]` — flat numeric value array
-- **Replace with**: real numeric values from DuckDB
+### [2] `data` (context: series)
+```
+data: [320, 332, 301, 334, 390]
+```
 
-## Clean Code (app.config references removed)
+### [3] `data` (context: root)
+```
+data: [220, 182, 191, 234, 290]
+```
 
-```javascript
-const posList = ['left','right','top','bottom','inside','insideTop','insideLeft','insideRight','insideBottom','insideTopLeft','insideTopRight','insideBottomLeft','insideBottomRight'];
+### [4] `data` (context: root)
+```
+data: [150, 232, 201, 154, 190]
+```
 
-const labelOption = { show: true, position: 'insideBottom', distance: 15, align: 'left', verticalAlign: 'middle', rotate: 90, formatter: '{c}  {name|{a}}', fontSize: 16, rich: { name: {} } };
-
-option = {
-  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-  legend: { data: {{LEGEND}} },
-  toolbox: { show: true, orient: 'vertical', left: 'right', top: 'center',
-    feature: { mark: { show: true }, dataView: { show: true, readOnly: false },
-      magicType: { show: true, type: ['line','bar','stack'] },
-      restore: { show: true }, saveAsImage: { show: true } } },
-  xAxis: [{ type: 'category', axisTick: { show: false }, data: {{CATEGORIES}} }],
-  yAxis: [{ type: 'value' }],
-  series: {{SERIES}}
-};
+### [5] `data` (context: root)
+```
+data: [98, 77, 101, 99, 40]
 ```
 
 ## Agent Workflow

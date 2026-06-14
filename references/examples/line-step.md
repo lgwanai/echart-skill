@@ -7,34 +7,34 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **5 data array(s)** to replace:
+**5 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Step Start', 'Step Middle', 'Step End']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Step Start', 'Step Middle', 'Step End']
+```
 
-### data[1]: `toolbox`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: xAxis)
+```
+data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+```
 
-### data[2]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [120, 132, 101, 134, 90, 230, 210]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: series)
+```
+data: [120, 132, 101, 134, 90, 230, 210]
+```
 
-### data[3]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [220, 282, 201, 234, 290, 430, 410]`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: root)
+```
+data: [220, 282, 201, 234, 290, 430, 410]
+```
 
-### data[4]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [450, 432, 401, 454, 590, 530, 510]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: root)
+```
+data: [450, 432, 401, 454, 590, 530, 510]
+```
 
 ## Agent Workflow
 

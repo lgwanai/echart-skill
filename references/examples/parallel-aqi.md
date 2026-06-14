@@ -7,19 +7,19 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Beijing', 'Shanghai', 'Guangzhou']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Beijing', 'Shanghai', 'Guangzhou']
+```
 
-### data[1]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['优', '良', '轻度污染', '中度污染', '重度污染', '严重污染']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: root)
+```
+data: ['优', '良', '轻度污染', '中度污染', '重度污染', '严重污染']
+```
 
 ## Agent Workflow
 

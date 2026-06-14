@@ -7,29 +7,29 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **4 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Expenses', 'Income']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Expenses', 'Income']
+```
 
-### data[1]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [0, 900, 1245, 1530, 1376, 1376, 1511, 1689, 1856, 1495, 1292]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: root)
+```
+data: [0, 900, 1245, 1530, 1376, 1376, 1511, 1689, 1856, 1495, 1292]
+```
 
-### data[2]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [900, 345, 393, '-', '-', 135, 178, 286, '-', '-', '-']`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [900, 345, 393, '-', '-', 135, 178, 286, '-', '-', '-']
+```
 
-### data[3]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['-', '-', '-', 108, 154, '-', '-', '-', 119, 361, 203]`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: root)
+```
+data: ['-', '-', '-', 108, 154, '-', '-', '-', 119, 361, 203]
+```
 
 ## Agent Workflow
 

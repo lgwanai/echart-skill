@@ -7,19 +7,19 @@
 
 Columns needed: need a single **value** (aggregate)
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: root)
+```
+data: [
         {
           value: 0.7,
           name: 'Grade Rating'
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
 ## Agent Workflow
 

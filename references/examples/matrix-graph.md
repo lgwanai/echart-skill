@@ -7,25 +7,42 @@
 
 Columns needed: need **nodes** [{name,...}] + **links/edges** [{source,target}]
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **3 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Data Analysis', 'Programming', 'Algorithms']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: root)
+```
+data: ['Data Analysis', 'Programming', 'Algorithms']
+```
 
-### data[1]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['1st Year', '2nd Year', '3rd Year', '4th Year']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: root)
+```
+data: ['1st Year', '2nd Year', '3rd Year', '4th Year']
+```
 
-### data[2]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-        ['Programming', '1st Year', 1, 'Intro to Computer Science']`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [
+        ['Programming', '1st Year', 1, 'Intro to Computer Science'],
+        ['Data Analysis', '2nd Year', 1, 'Intro to Data Analysis'],
+     ...
+```
+
+### [3] `links` (context: series)
+```
+links: [
+        {
+          source: 1,
+          target: 0
+        },
+        {
+          source: 2,
+          target: 0
+        },
+        {
+       ...
+```
 
 ## Agent Workflow
 

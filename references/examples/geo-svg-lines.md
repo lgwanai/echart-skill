@@ -7,17 +7,14 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-            {
-              coords: [
-                [110.6189462165178, 456.64349563895087...`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: root)
+```
+data: 
+```
 
 ## Agent Workflow
 

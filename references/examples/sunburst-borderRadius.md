@@ -7,9 +7,74 @@
 
 Columns needed: need nested **name+value+children**
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**6 array(s)** to replace with real data:
+
+### [0] `children` (context: root)
+```
+children: 
+```
+
+### [1] `children` (context: root)
+```
+children: [
+          {
+            name: 'Cousin Jack',
+            value: 2
+          },
+          {
+            name: 'Cousin Mary',
+            va...
+```
+
+### [2] `children` (context: root)
+```
+children: [
+              {
+                name: 'Jackson',
+                value: 2
+              }
+            ]
+```
+
+### [3] `children` (context: root)
+```
+children: [
+          {
+            name: 'Me',
+            value: 5
+          },
+          {
+            name: 'Brother Peter',
+            value: 1
+...
+```
+
+### [4] `children` (context: root)
+```
+children: [
+      {
+        name: 'Uncle Nike',
+        children: [
+          {
+            name: 'Cousin Betty',
+            value: 1
+          },
+  ...
+```
+
+### [5] `children` (context: root)
+```
+children: [
+          {
+            name: 'Cousin Betty',
+            value: 1
+          },
+          {
+            name: 'Cousin Jenny',
+            ...
+```
 
 ## Agent Workflow
 

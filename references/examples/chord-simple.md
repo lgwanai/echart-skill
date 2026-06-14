@@ -7,14 +7,22 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `series[0]`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ name: 'A' }, { name: 'B' }, { name: 'C' }, { name: 'D' }]`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: series)
+```
+data: [{ name: 'A' }, { name: 'B' }, { name: 'C' }, { name: 'D' }]
+```
+
+### [1] `links` (context: root)
+```
+links: [
+        { source: 'A', target: 'B', value: 40 },
+        { source: 'A', target: 'C', value: 20 },
+        { source: 'B', target: 'D', value: ...
+```
 
 ## Agent Workflow
 

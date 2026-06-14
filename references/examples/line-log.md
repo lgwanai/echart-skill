@@ -7,35 +7,38 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **4 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: xAxis)
+```
+data: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [1, 3, 9, 27, 81, 247, 741, 2223, 6669]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: [1, 3, 9, 27, 81, 247, 741, 2223, 6669]
+```
 
-### data[2]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [1, 2, 4, 8, 16, 32, 64, 128, 256]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: series)
+```
+data: [1, 2, 4, 8, 16, 32, 64, 128, 256]
+```
 
-### data[3]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [3] `data` (context: root)
+```
+data: [
         1 / 2,
         1 / 4,
         1 / 8,
         1 / 16,
         1 / 32,
-        1 / 64,...`
-- **Replace with**: real data from DuckDB in the same format
+        1 / 64,
+        1 / 128,
+        1 / 256,
+        1 / 512...
+```
 
 ## Agent Workflow
 

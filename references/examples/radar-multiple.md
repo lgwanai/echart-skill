@@ -7,42 +7,70 @@
 
 Columns needed: need **name** + multiple **dimension** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **4 data array(s)** to replace:
+**6 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [0] `data` (context: legend)
+```
+data: [
       'A Software',
       'A Phone',
       'Another Phone',
       'Precipitation',
-      'Ev...`
-- **Replace with**: real data from DuckDB in the same format
+      'Evaporation'
+    ]
+```
 
-### data[1]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: series)
+```
+data: [
         {
-          value: [60, 73, 85, 40]`
-- **Replace with**: real data from DuckDB in the same format
+          value: [60, 73, 85, 40],
+          name: 'A Software'
+        }
+      ]
+```
 
-### data[2]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
         {
-          value: [85, 90, 90, 95, 95]`
-- **Replace with**: real data from DuckDB in the same format
+          value: [85, 90, 90, 95, 95],
+          name: 'A Phone'
+        },
+        {
+          value: [95, 80, 95, 90, 93],
+       ...
+```
 
-### data[3]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [3] `data` (context: root)
+```
+data: [
         {
           name: 'Precipitation',
           value: [
-            2.6, 5.9, 9.0, 26....`
-- **Replace with**: real data from DuckDB in the same format
+            2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 75.6, 82.2, 48.7, 18.8, 6.0, 2.3
+  ...
+```
+
+### [4] `indicator` (context: legend)
+```
+indicator: [
+        { text: 'Brand', max: 100 },
+        { text: 'Content', max: 100 },
+        { text: 'Usability', max: 100 },
+        { text: 'Fun...
+```
+
+### [5] `indicator` (context: root)
+```
+indicator: [
+        { text: 'Look', max: 100 },
+        { text: 'Photo', max: 100 },
+        { text: 'System', max: 100 },
+        { text: 'Performan...
+```
 
 ## Agent Workflow
 

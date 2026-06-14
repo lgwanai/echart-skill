@@ -7,46 +7,50 @@
 
 Columns needed: need **stage** + **count** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **5 data array(s)** to replace:
+**5 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Prod A', 'Prod B', 'Prod C', 'Prod D', 'Prod E']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Prod A', 'Prod B', 'Prod C', 'Prod D', 'Prod E']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: series)
+```
+data: [
         { value: 60, name: 'Prod C' },
         { value: 30, name: 'Prod D' },
-        { valu...`
-- **Replace with**: real data from DuckDB in the same format
+        { value: 10, name: 'Prod E' },
+        { value: 80, name...
+```
 
-### data[2]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
         { value: 60, name: 'Prod C' },
         { value: 30, name: 'Prod D' },
-        { valu...`
-- **Replace with**: real data from DuckDB in the same format
+        { value: 10, name: 'Prod E' },
+        { value: 80, name...
+```
 
-### data[3]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [3] `data` (context: root)
+```
+data: [
         { value: 60, name: 'Prod C' },
         { value: 30, name: 'Prod D' },
-        { valu...`
-- **Replace with**: real data from DuckDB in the same format
+        { value: 10, name: 'Prod E' },
+        { value: 80, name...
+```
 
-### data[4]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [4] `data` (context: root)
+```
+data: [
         { value: 60, name: 'Prod C' },
         { value: 30, name: 'Prod D' },
-        { valu...`
-- **Replace with**: real data from DuckDB in the same format
+        { value: 10, name: 'Prod E' },
+        { value: 80, name...
+```
 
 ## Agent Workflow
 

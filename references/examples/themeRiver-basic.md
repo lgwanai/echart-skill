@@ -7,20 +7,19 @@
 
 Columns needed: need **time/category** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['DQ', 'TY', 'SS', 'QG', 'SY', 'DD']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['DQ', 'TY', 'SS', 'QG', 'SY', 'DD']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-        ['2015/11/08', 10, 'DQ']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: 
+```
 
 ## Agent Workflow
 

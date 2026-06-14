@@ -7,14 +7,14 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: []`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: root)
+```
+data: []
+```
 
 ## Agent Workflow
 

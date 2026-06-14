@@ -7,20 +7,47 @@
 
 Columns needed: need nested **name+value** or **name+children**
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-        {
-          name: 'nodeA',
-          value: 10,
-          children: [
+### [0] `data` (context: series)
+```
+data: 
+```
+
+### [1] `children` (context: series)
+```
+children: [
             {
-...`
-- **Replace with**: real data from DuckDB in the same format
+              name: 'nodeAa',
+              value: 4
+            },
+            {
+              name: 'nodeAb',
+            ...
+```
+
+### [2] `children` (context: root)
+```
+children: [
+            {
+              name: 'nodeBa',
+              value: 20,
+              children: [
+                {
+                  name: '...
+```
+
+### [3] `children` (context: root)
+```
+children: [
+                {
+                  name: 'nodeBa1',
+                  value: 20
+                }
+              ]
+```
 
 ## Agent Workflow
 

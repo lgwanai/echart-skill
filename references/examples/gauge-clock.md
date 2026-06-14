@@ -7,51 +7,51 @@
 
 Columns needed: need a single **value** (aggregate)
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **6 data array(s)** to replace:
+**6 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: root)
+```
+data: [
         {
           value: 0
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[1]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: root)
+```
+data: [
         {
           value: 0
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[2]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [2] `data` (context: root)
+```
+data: [
         {
           value: 0
         }
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[3]: `series[0]`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ value: hour }]`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: series)
+```
+data: [{ value: hour }]
+```
 
-### data[4]: `series[0]`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ value: minute }]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: series)
+```
+data: [{ value: minute }]
+```
 
-### data[5]: `unknown`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ value: second }]`
-- **Replace with**: real data from DuckDB in the same format
+### [5] `data` (context: root)
+```
+data: [{ value: second }]
+```
 
 ## Agent Workflow
 

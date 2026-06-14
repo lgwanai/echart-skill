@@ -7,24 +7,24 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **3 data array(s)** to replace:
+**3 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Altitude (km) vs. temperature (°C)']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Altitude (km) vs. temperature (°C)']
+```
 
-### data[1]: `yAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['0', '10', '20', '30', '40', '50', '60', '70', '80']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: yAxis)
+```
+data: ['0', '10', '20', '30', '40', '50', '60', '70', '80']
+```
 
-### data[2]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [15, -50, -56.5, -46.5, -22.1, -2.5, -27.7, -55.7, -76.5]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [15, -50, -56.5, -46.5, -22.1, -2.5, -27.7, -55.7, -76.5]
+```
 
 ## Agent Workflow
 

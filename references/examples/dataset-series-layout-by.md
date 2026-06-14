@@ -7,9 +7,17 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**1 array(s)** to replace with real data:
+
+### [0] `source` (context: legend)
+```
+source: [
+      ['product', '2012', '2013', '2014', '2015'],
+      ['Matcha Latte', 41.1, 30.4, 65.1, 53.3],
+      ['Milk Tea', 86.5, 92.1, 85.7, 83.1...
+```
 
 ## Agent Workflow
 

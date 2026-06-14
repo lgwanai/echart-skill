@@ -7,19 +7,19 @@
 
 Columns needed: need **source**, **target**, **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-        {
-          name: 'Werne',
-          itemStyle: {
-            color: '#f18bbf',
-    ...`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: series)
+```
+data: 
+```
+
+### [1] `links` (context: root)
+```
+links: 
+```
 
 ## Agent Workflow
 

@@ -7,17 +7,14 @@
 
 Columns needed: need **region name** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-          { name: 'Queue', value: 15 },
-          { name: 'Langue', value: 35 },
-          {...`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: root)
+```
+data: 
+```
 
 ## Agent Workflow
 

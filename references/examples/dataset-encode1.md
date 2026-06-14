@@ -7,42 +7,20 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-
-## External Data Format
-
-This example uses external data. Format from `life-expectancy-table.json`:
-
-```json
-[
-  [
-    "Income",
-    "Life Expectancy",
-    "Population",
-    "Country",
-    "Year"
-  ],
-  [
-    815,
-    34.05,
-    351014,
-    "Australia",
-    1800
-  ],
-  [
-    1314,
-    39,
-    645526,
-    "Canada",
-    1800
-  ]
-]
+### [0] `dimensions` (context: dataset)
+```
+dimensions: [
+          'Income',
+          'Life Expectancy',
+          'Population',
+          'Country',
+          { name: 'Year', type: 'ordinal' ...
 ```
 
-Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

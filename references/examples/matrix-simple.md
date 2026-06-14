@@ -7,31 +7,56 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **3 data array(s)** to replace:
+**5 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: root)
+```
+data: [
         {
           value: 'A',
           children: [
             'A1',
             'A2',
-  ...`
-- **Replace with**: real data from DuckDB in the same format
+            {
+              value: 'A3',
+           ...
+```
 
-### data[1]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['U', 'V']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: root)
+```
+data: ['U', 'V']
+```
 
-### data[2]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-      ['A1', 'U', 10]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: series)
+```
+data: [
+      ['A1', 'U', 10],
+      ['A1', 'V', 20],
+      ['A2', 'U', 30],
+      ['A2', 'V', 40],
+      ['A31', 'U', 50],
+      ['A3', 'V', 60]
+    ...
+```
+
+### [3] `children` (context: root)
+```
+children: [
+            'A1',
+            'A2',
+            {
+              value: 'A3',
+              children: ['A31', 'A32']
+            }
+        ...
+```
+
+### [4] `children` (context: root)
+```
+children: ['A31', 'A32']
+```
 
 ## Agent Workflow
 

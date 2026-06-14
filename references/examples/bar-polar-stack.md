@@ -7,34 +7,34 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **5 data array(s)** to replace:
+**5 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Mon', 'Tue', 'Wed', 'Thu']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: angleAxis)
+```
+data: ['Mon', 'Tue', 'Wed', 'Thu']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [1, 2, 3, 4]`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: series)
+```
+data: [1, 2, 3, 4]
+```
 
-### data[2]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [2, 4, 6, 8]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [2, 4, 6, 8]
+```
 
-### data[3]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [1, 2, 3, 4]`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: root)
+```
+data: [1, 2, 3, 4]
+```
 
-### data[4]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['A', 'B', 'C']`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: legend)
+```
+data: ['A', 'B', 'C']
+```
 
 ## Agent Workflow
 

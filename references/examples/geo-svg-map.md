@@ -7,15 +7,17 @@
 
 Columns needed: need **x** + **y** columns (both numeric)
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-          [0, 0, 'route1']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: root)
+```
+data: [
+          [0, 0, 'route1'],
+          [1, 0, 'route2']
+        ]
+```
 
 ## Agent Workflow
 

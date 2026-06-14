@@ -7,58 +7,59 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **8 data array(s)** to replace:
+**8 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Rainfall', 'Evaporation']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Rainfall', 'Evaporation']
+```
 
-### data[1]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']`
-- **Replace with**: real data from DuckDB in the same format
+### [1] `data` (context: xAxis)
+```
+data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+```
 
-### data[2]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [2] `data` (context: series)
+```
+data: [
         2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[3]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [3] `data` (context: series)
+```
+data: [
           { type: 'max', name: 'Max' },
           { type: 'min', name: 'Min' }
-        ]`
-- **Replace with**: real data from DuckDB in the same format
+        ]
+```
 
-### data[4]: `markLine`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ type: 'average', name: 'Avg' }]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: markLine)
+```
+data: [{ type: 'average', name: 'Avg' }]
+```
 
-### data[5]: `markLine`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [5] `data` (context: markLine)
+```
+data: [
         2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
-      ]`
-- **Replace with**: real data from DuckDB in the same format
+      ]
+```
 
-### data[6]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [6] `data` (context: root)
+```
+data: [
           { name: 'Max', value: 182.2, xAxis: 7, yAxis: 183 },
-          { name: 'Min', valu...`
-- **Replace with**: real data from DuckDB in the same format
+          { name: 'Min', value: 2.3, xAxis: 11, yAxis: 3 }
+        ]
+```
 
-### data[7]: `markLine`
-- **Format**: `[{name,value},...] — named items`
-- **Location**: `data: [{ type: 'average', name: 'Avg' }]`
-- **Replace with**: real data from DuckDB in the same format
+### [7] `data` (context: xAxis)
+```
+data: [{ type: 'average', name: 'Avg' }]
+```
 
 ## Agent Workflow
 

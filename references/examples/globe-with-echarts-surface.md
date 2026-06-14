@@ -7,16 +7,14 @@
 
 Columns needed: need **region name** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**1 array(s)** to replace with real data:
 
-### data[0]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-        { name: 'Afghanistan', value: 28397.812 },
-        { name: 'Angola', value: 19549.12...`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: series)
+```
+data: 
+```
 
 ## Agent Workflow
 

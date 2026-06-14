@@ -7,62 +7,27 @@
 
 Columns needed: need **x** + **y** columns (both numeric)
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `series`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-          [-21.9348415, 64.1334671, 14523]`
-- **Replace with**: real data from DuckDB in the same format
-
-### data[1]: `series`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
-          { name: 'Austurland', value: 423 },
-          { name: 'Suðurland', value: 256 },
- ...`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `iceland.geo.json`:
-
-```json
-{
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              -14.6146,
-              65.9863
-            ],
-            [
-              -14.663,
-              65.9811
-            ],
-            [
-              -14.6941,
-              65.9438
-            ],
-            [
-              -15.1014,
-              65.922
-            ],
-            [
-              -15.1263,
-
-...
+### [0] `data` (context: tooltip)
+```
+data: [
+          [-21.9348415, 64.1334671, 14523],
+          [-19.028531, 63.710241, 45126],
+          [-17.089925, 65.37887072, 12345],
+          [-...
 ```
 
-Agent: build DuckDB query to produce matching data structure.
+### [1] `data` (context: root)
+```
+data: [
+          { name: 'Austurland', value: 423 },
+          { name: 'Suðurland', value: 256 },
+          { name: 'Norðurland vestra', value: 489 }...
+```
+
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

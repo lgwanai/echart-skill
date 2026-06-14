@@ -7,14 +7,70 @@
 
 Columns needed: need nested **name+children** tree structure
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**9 array(s)** to replace with real data:
 
-### data[0]: `series[0]`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [data]`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: series)
+```
+data: [data]
+```
+
+### [1] `children` (context: root)
+```
+children: 
+```
+
+### [2] `children` (context: root)
+```
+children: [
+        {
+          name: 'converters',
+          children: [
+            { name: 'Converters', value: 721 },
+            { name: 'Delimit...
+```
+
+### [3] `children` (context: root)
+```
+children: [
+            { name: 'Converters', value: 721 },
+            { name: 'DelimitedTextConverter', value: 4294 }
+          ]
+```
+
+### [4] `children` (context: root)
+```
+children: [
+        { name: 'DirtySprite', value: 8833 },
+        { name: 'LineSprite', value: 1732 },
+        { name: 'RectSprite', value: 3623 }
+   ...
+```
+
+### [5] `children` (context: root)
+```
+children: [{ name: 'FlareVis', value: 4116 }]
+```
+
+### [6] `children` (context: root)
+```
+children: 
+```
+
+### [7] `children` (context: root)
+```
+children: 
+```
+
+### [8] `children` (context: root)
+```
+children: [
+        { name: 'IScaleMap', value: 2105 },
+        { name: 'LinearScale', value: 1316 },
+        { name: 'LogScale', value: 3151 },
+     ...
+```
 
 ## Agent Workflow
 

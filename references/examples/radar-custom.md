@@ -7,23 +7,45 @@
 
 Columns needed: need **name** + multiple **dimension** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: series)
+```
+data: [
         {
-          value: [100, 8, 0.4, -80, 2000]`
-- **Replace with**: real data from DuckDB in the same format
-
-### data[1]: `unknown`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+          value: [100, 8, 0.4, -80, 2000],
+          name: 'Data A'
+        },
         {
-          value: [120, 118, 130, 100, 99, 70]`
-- **Replace with**: real data from DuckDB in the same format
+          value: [60, 5, 0.3, -100, 1500],
+...
+```
+
+### [1] `data` (context: root)
+```
+data: 
+```
+
+### [2] `indicator` (context: legend)
+```
+indicator: [
+        { text: 'Indicator1' },
+        { text: 'Indicator2' },
+        { text: 'Indicator3' },
+        { text: 'Indicator4' },
+        {...
+```
+
+### [3] `indicator` (context: root)
+```
+indicator: [
+        { text: 'Indicator1', max: 150 },
+        { text: 'Indicator2', max: 150 },
+        { text: 'Indicator3', max: 150 },
+        { t...
+```
 
 ## Agent Workflow
 

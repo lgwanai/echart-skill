@@ -7,72 +7,40 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **4 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
+### [0] `data` (context: root)
+```
+data: [
       // 'Region', 'Data A', 'Data B'
-      ['Valais', 1212, 2321]`
-- **Replace with**: real data from DuckDB in the same format
-
-### data[1]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-      // 'Region', 'Data A', 'Data B'
-      ['Valais', 1010, 2221]`
-- **Replace with**: real data from DuckDB in the same format
-
-### data[2]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: []`
-- **Replace with**: real data from DuckDB in the same format
-
-### data[3]: `series`
-- **Format**: `[[x,y],...] — XY pairs`
-- **Location**: `data: [[dataSource.data[dataRowIdx]`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `ch.geo.json`:
-
-```json
-{
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              6.7881,
-              46.405
-            ],
-            [
-              6.7821,
-              46.3785
-            ],
-            [
-              6.7504,
-              46.3455
-            ],
-            [
-              6.8277,
-              46.2695
-            ],
-            [
-              6.7922,
-         
-...
+      ['Valais', 1212, 2321],
+      ['Ticino', 7181, 2114],
+      ['Graubünden', 2763, 4212],
+      ['Ur...
 ```
 
-Agent: build DuckDB query to produce matching data structure.
+### [1] `data` (context: root)
+```
+data: [
+      // 'Region', 'Data A', 'Data B'
+      ['Valais', 1010, 2221],
+      ['Ticino', 7040, 1810],
+      ['Graubünden', 2313, 4011],
+      ['Ur...
+```
+
+### [2] `data` (context: root)
+```
+data: []
+```
+
+### [3] `data` (context: root)
+```
+data: [[dataSource.data[dataRowIdx][dataColIdx], '']]
+```
+
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

@@ -7,9 +7,24 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **0 data array(s)** to replace:
+**1 array(s)** to replace with real data:
+
+### [0] `pieces` (context: visualMap)
+```
+pieces: [
+      {
+        value: 0,
+        color: COLORS[0]
+      },
+      {
+        value: 1,
+        color: COLORS[1]
+      },
+      {
+        valu...
+```
 
 ## Agent Workflow
 

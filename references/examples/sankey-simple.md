@@ -7,13 +7,13 @@
 
 Columns needed: need **source**, **target**, **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [0] `data` (context: series)
+```
+data: [
       {
         name: 'a'
       },
@@ -21,8 +21,27 @@ The code contains **1 data array(s)** to replace:
         name: 'b'
       },
       {
-        name: ...`
-- **Replace with**: real data from DuckDB in the same format
+        name: 'a1'
+      },
+      {
+        name: 'a2'
+      },
+...
+```
+
+### [1] `links` (context: root)
+```
+links: [
+      {
+        source: 'a',
+        target: 'a1',
+        value: 5
+      },
+      {
+        source: 'a',
+        target: 'a2',
+        value...
+```
 
 ## Agent Workflow
 

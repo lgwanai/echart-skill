@@ -7,23 +7,25 @@
 
 Columns needed: need **x** + **y** columns (both numeric)
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Female', 'Male']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: xAxis)
+```
+data: ['Female', 'Male']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: series)
+```
+data: [
         {
           value: calculateAverage(maleDeta, 0),
           groupId: 'male'
-        ...`
-- **Replace with**: real data from DuckDB in the same format
+        },
+        {
+          value: calculateAverage(fem...
+```
 
 ## Agent Workflow
 

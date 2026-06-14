@@ -7,67 +7,42 @@
 
 Columns needed: check data arrays in reference code for required format
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **2 data array(s)** to replace:
+**4 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['bar', 'error']`
-- **Replace with**: real data from DuckDB in the same format
-
-### data[1]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [0]`
-- **Replace with**: real data from DuckDB in the same format
-
-
-## External Data Format
-
-This example uses external data. Format from `kawhi-leonard-16-17-regular.json`:
-
-```json
-[
-  [
-    "Shot Chart Detail",
-    "0021600003",
-    "13",
-    "202695",
-    "Kawhi Leonard",
-    "1610612759",
-    "San Antonio Spurs",
-    "1",
-    "9",
-    "41",
-    "Missed Shot",
-    "Jump Shot",
-    "3PT Field Goal",
-    "Above the Break 3",
-    "Center(C)",
-    "24+ ft.",
-    24,
-    -5.5,
-    29.15,
-    1,
-    "missed",
-    "20161025",
-    "GSW",
-    "SAS",
-    0,
-    3
-  ],
-  [
-    "Shot Chart Detail",
-    "0021600003",
-    "27",
-    "202695",
-    "Kawhi Leonard",
-    "1610612759",
-    
-...
+### [0] `data` (context: legend)
+```
+data: ['bar', 'error']
 ```
 
-Agent: build DuckDB query to produce matching data structure.
+### [1] `data` (context: root)
+```
+data: [0]
+```
+
+### [2] `dimensions` (context: series)
+```
+dimensions: [
+          null,
+          null,
+          'Field Goals Attempted (hexagon size)',
+          'Field Goal Percentage (color)'
+        ]
+```
+
+### [3] `children` (context: root)
+```
+children: [
+        {
+          type: 'polygon',
+          shape: {
+            points: points
+          },
+          style: {
+            stroke: '#c...
+```
+
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

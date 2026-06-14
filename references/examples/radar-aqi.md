@@ -7,14 +7,24 @@
 
 Columns needed: need **name** + multiple **dimension** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **1 data array(s)** to replace:
+**2 array(s)** to replace with real data:
 
-### data[0]: `legend`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Beijing', 'Shanghai', 'Guangzhou']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: legend)
+```
+data: ['Beijing', 'Shanghai', 'Guangzhou']
+```
+
+### [1] `indicator` (context: radar)
+```
+indicator: [
+      { name: 'AQI', max: 300 },
+      { name: 'PM2.5', max: 250 },
+      { name: 'PM10', max: 300 },
+      { name: 'CO', max: 5 },
+     ...
+```
 
 ## Agent Workflow
 

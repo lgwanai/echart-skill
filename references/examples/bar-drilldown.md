@@ -7,44 +7,57 @@
 
 Columns needed: need **category** + **value** columns
 
-## Data Arrays — Replacement Guide
+## Data Arrays — Complete Replacement Guide
 
-The code contains **5 data array(s)** to replace:
+**5 array(s)** to replace with real data:
 
-### data[0]: `xAxis`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: ['Animals', 'Fruits', 'Cars']`
-- **Replace with**: real data from DuckDB in the same format
+### [0] `data` (context: xAxis)
+```
+data: ['Animals', 'Fruits', 'Cars']
+```
 
-### data[1]: `series[0]`
-- **Format**: `[{...},...] — object array`
-- **Location**: `data: [
+### [1] `data` (context: series)
+```
+data: [
       {
         value: 5,
         groupId: 'animals'
       },
       {
         value: 2,
-    ...`
-- **Replace with**: real data from DuckDB in the same format
+        groupId: 'fruits'
+      },
+      {
+        val...
+```
 
-### data[2]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-      ['Cats', 4]`
-- **Replace with**: real data from DuckDB in the same format
+### [2] `data` (context: root)
+```
+data: [
+      ['Cats', 4],
+      ['Dogs', 2],
+      ['Cows', 1],
+      ['Sheep', 2],
+      ['Pigs', 1]
+    ]
+```
 
-### data[3]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-      ['Apples', 4]`
-- **Replace with**: real data from DuckDB in the same format
+### [3] `data` (context: root)
+```
+data: [
+      ['Apples', 4],
+      ['Oranges', 2]
+    ]
+```
 
-### data[4]: `unknown`
-- **Format**: `[n1,n2,...] — flat value array`
-- **Location**: `data: [
-      ['Toyota', 4]`
-- **Replace with**: real data from DuckDB in the same format
+### [4] `data` (context: root)
+```
+data: [
+      ['Toyota', 4],
+      ['Opel', 2],
+      ['Volkswagen', 2]
+    ]
+```
 
 ## Agent Workflow
 
