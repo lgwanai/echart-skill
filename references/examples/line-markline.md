@@ -1,13 +1,17 @@
-# 折线图的标记线
+# 折线图的标记线 / Line with Marklines
 
 **Category:** `line`
+**Difficulty:** 6
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-markline
 **Template:** examples/line-markline.html
-**Data Format:** `{ categories: string[], values: number[] }`
-**Features:** markLine for reference lines, labels displayed
+
+## Important
+- **Full official code preserved** — markLine generation loop with 12 position variants
+- `splitArea`, `textStyle`, `animation: false`
+- type: `line`, stack: `all`
+- 12 markLine entries demonstrating start/middle/end/inside positions
 
 ## Official Option Code
-
 ```javascript
 /*
 title: Line with Marklines
@@ -100,4 +104,3 @@ option = {
 ## Usage
 - Build: `scripts/build_template.py examples/line-markline.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues

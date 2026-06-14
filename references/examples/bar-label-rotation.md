@@ -6,9 +6,10 @@
 **Template:** examples/bar-label-rotation.html
 
 ## Important
-- **Multi-data complex chart** — 4 series + toolbox + 13 label positions
-- Template keeps FULL official option (app.config + app.configParameters NOT included — static display only)
-- Data arrays MUST NOT be replaced with single placeholder (would break xAxis/series/label data)
+- **Hand-crafted standalone HTML** — 4 series (Forest/Steppe/Desert/Wetland) + toolbox + magicType
+- `labelOption` values inlined (rotate:90, insideBottom, left, middle, 15)
+- Type: `bar` (magicType can switch to line/stack)
+- Static display (interactive app.config removed)
 
 ## Official Option Code
 ```javascript
@@ -185,9 +186,6 @@ option = {
 };
 ```
 
-## Key Points
-- 4 series: Forest/Steppe/Desert/Wetland with individual data
-- Toolbox: mark/dataView/magicType/restore/saveAsImage
-- Rich label text with rotate/align/position/distance
+## Usage
 - Build: `scripts/build_template.py examples/bar-label-rotation.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
