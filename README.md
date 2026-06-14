@@ -197,9 +197,8 @@
 | `<!-- {{GL_INLINE}} -->` | echarts-gl.min.js (625KB) | 5 个 3D 模板 |
 
 ```bash
-# 生成自包含 HTML：
-python scripts/build_template.py references/templates/bar/basic.html \
-  -d data.json -o outputs/html/chart.html
+# Agent 自动生成自包含 HTML（inline ECharts + div#main + script）：
+# Agent: DuckDB 查询 → md 参考结构 → 替换数据 → 生成 HTML
 # 输出：单个 .html 文件，双击浏览器即可打开，零外部依赖
 ```
 
@@ -411,42 +410,30 @@ references/
 3. 智能布局排版
 4. 生成专业仪表盘
 
-#### 方法二：简化 API（Python）
+#### 方法二：Agent 驱动（推荐）
 
-```python
-from scripts.simple_dashboard import SimpleDashboard
-
-# 创建仪表盘
-dashboard = SimpleDashboard(
-    title="销售数据分析",
-    db_path="workspace.duckdb"
-)
-
-# 添加图表（一行代码一个图表）
-dashboard.add_chart("bar", "地区销售额", group_by="region")
-dashboard.add_chart("pie", "品类占比", group_by="category")
-dashboard.add_chart("line", "月度趋势", time_column="month")
-dashboard.add_chart("map", "全国分布", geo_column="province")
-
-# 生成
-dashboard.generate("outputs/html/dashboard.html")
+```
+用户: /dashboard 创建销售分析仪表盘，包含地区柱状图和品类饼图
+  → Agent 解析意图 → DuckDB 查询 → 配置 DashboardConfig → 生成 HTML
 ```
 
-#### 方法三：一行代码生成
+#### 方法三：Python API
 
 ```python
-from scripts.simple_dashboard import create_dashboard_from_text
+from scripts.dashboard_schema import DashboardConfig, ChartConfig
 
-create_dashboard_from_text(
-    """
-    创建电商数据仪表盘，包含：
-    - 各渠道销售柱状图
-    - 产品类别饼图
-    - 日销售趋势折线图
-    - 全国订单分布地图
-    """,
-    output_path="outputs/html/dashboard.html"
+# 编程方式配置仪表盘
+config = DashboardConfig(
+    title="销售数据分析",
+    charts=[
+        ChartConfig(type="bar", title="地区销售额", group_by="region"),
+        ChartConfig(type="pie", title="品类占比", group_by="category"),
+    ]
 )
+```
+    """
+# 自然语言示例 — Agent 自动解析生成仪表盘
+/dashboard 创建电商数据仪表盘，包含：各渠道销售柱状图、产品类别饼图、日销售趋势折线图、全国订单分布地图
 ```
 
 #### 支持的图表类型
@@ -917,7 +904,7 @@ A: 支持主题切换（深色/浅色）、自动刷新、导出 PDF、图表搜
 | 历史查看 | `scripts/history_viewer.py` | 查看导入历史、表结构、表关联关系 |
 | 外部数据库 | `scripts/db_cli.py` | MySQL/PostgreSQL/MongoDB 连接与查询 |
 | 数据轮询 | `scripts/polling_cli.py` | 定时刷新 HTTP API 或数据库数据 |
-| 图表 CLI | `scripts/chart_cli.py` | 命令行图表导出工具 |
+| 图表生成 | Agent 驱动 | DuckDB → md 参考 → 数据替换 → HTML |
 | Dashboard UI | `assets/dashboard/` | 专业 CSS/JS 模板 |
 
 ---
