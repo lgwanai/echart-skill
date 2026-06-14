@@ -1,19 +1,10 @@
-# 香港18区人口密度 （2011）
+# map-HK
 
-**Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=map-HK
-**Template:** map/basic.html
-**Data Format:** `[{name: string, value: number}, ...]`
-**Features:** visualMap component required, labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Population Density of HongKong (2011)
-category: map
-titleCN: 香港18区人口密度 （2011）
-*/
 myChart.showLoading();
 $.get(ROOT_PATH + '/data/asset/geo/HK.json', function (geoJson) {
   myChart.hideLoading();
@@ -107,13 +98,21 @@ $.get(ROOT_PATH + '/data/asset/geo/HK.json', function (geoJson) {
 });
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `show: true
+          },...`
 
-## Usage
-- Build: `scripts/build_template.py map/basic.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

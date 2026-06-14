@@ -1,22 +1,10 @@
-# 气温仪表盘
+# gauge-temperature
 
-**Category:** `gauge`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=gauge-temperature
-**Template:** examples/gauge-temperature.html
-**Data Format:** `N/A`
-**Features:** per-item colors via itemStyle
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Temperature Gauge chart
-titleCN: 气温仪表盘
-category: gauge
-difficulty: 4
-videoStart: 2000
-videoEnd: 5000
-*/
 option = {
   series: [
     {
@@ -149,13 +137,31 @@ setInterval(function () {
 }, 2000);
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `color: 'inherit'
+      },...`
+- `data[1]`: `l: {
+        show: false
+      },...`
+- `data[2]`: `tOption({
+    series: [
+      {...`
+- `data[3]`: `}
+        ]
+      },
+      {...`
 
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

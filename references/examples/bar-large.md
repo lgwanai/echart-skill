@@ -1,19 +1,10 @@
-# 大数据量柱图
+# bar-large
 
-**Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-large
-**Template:** examples/bar-large.html
-**Data Format:** `{ categories: string[], values: number[] }`
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Large Scale Bar Chart
-category: bar
-titleCN: 大数据量柱图
-difficulty: 5
-*/
 const dataCount = 5e5;
 const data = generateData(dataCount);
 option = {
@@ -100,13 +91,16 @@ function generateData(count) {
 }
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py examples/bar-large.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

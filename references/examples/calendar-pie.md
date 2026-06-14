@@ -1,20 +1,10 @@
-# 日历饼图
+# calendar-pie
 
-**Category:** `'calendar, pie'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=calendar-pie
-**Template:** examples/calendar-pie.html
-**Data Format:** `[[dateString, value], ...]  (dateString: 'YYYY-MM-DD')`
-**Features:** labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Calendar Pie
-category: 'calendar, pie'
-titleCN: 日历饼图
-difficulty: 6
-*/
 // This example requires ECharts v5.4.0 or later
 const cellSize = [80, 80];
 const pieRadius = 30;
@@ -96,13 +86,25 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `}',
+      position: 'inside'
+    },...`
+- `data[1]`: `tion = {
+  tooltip: {},
+  legend: {...`
 
-## Usage
-- Build: `scripts/build_template.py examples/calendar-pie.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

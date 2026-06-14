@@ -1,19 +1,10 @@
-# 内脏数据（SVG）
+# geo-organ
 
-**Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-organ
-**Template:** examples/geo-organ.html
-**Data Format:** `N/A`
-**Features:** per-item colors via itemStyle, emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Organ Data with SVG
-category: map
-titleCN: 内脏数据（SVG）
-*/
 $.get(
   ROOT_PATH + '/data/asset/geo/Veins_Medical_Diagram_clip_art.svg',
   function (svg) {
@@ -95,13 +86,23 @@ $.get(
 );
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `xAxis: {},
+      yAxis: {...`
+- `data[1]`: `focus: 'self'
+          },...`
 
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

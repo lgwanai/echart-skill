@@ -1,19 +1,10 @@
-# 堆叠折线图
+# line-stack
 
-**Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-stack
-**Template:** examples/line-stack.html
-**Data Format:** `{ categories: string[], series: [{name: string, stack: string, data: number[]}, ...] }`
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Stacked Line Chart
-category: line
-titleCN: 堆叠折线图
-difficulty: 1
-*/
 option = {
   title: {
     text: 'Stacked Line'
@@ -78,13 +69,30 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `trigger: 'axis'
+  },
+  legend: {...`
+- `data[1]`: `'category',
+    boundaryGap: false,...`
+- `data[2]`: `pe: 'line',
+      stack: 'Total',...`
+- `data[3]`: `pe: 'line',
+      stack: 'Total',...`
+- `data[4]`: `pe: 'line',
+      stack: 'Total',...`
 
-## Usage
-- Build: `scripts/build_template.py examples/line-stack.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

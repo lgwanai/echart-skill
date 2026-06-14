@@ -1,20 +1,10 @@
-# 关系图自动隐藏重叠标签
+# graph-label-overlap
 
-**Category:** `graph`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=graph-label-overlap
-**Template:** examples/graph-label-overlap.html
-**Data Format:** `{ nodes: [{id?, name, symbolSize?, category?, x?, y?}, ...], links: [{source, target, value?}, ...], categories?: [{name}, ...] }`
-**Features:** labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Hide Overlapped Label
-category: graph
-titleCN: 关系图自动隐藏重叠标签
-difficulty: 3
-*/
 myChart.showLoading();
 $.getJSON(ROOT_PATH + '/data/asset/data/les-miserables.json', function (graph) {
   myChart.hideLoading();
@@ -59,13 +49,16 @@ $.getJSON(ROOT_PATH + '/data/asset/data/les-miserables.json', function (graph) {
 });
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py examples/graph-label-overlap.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

@@ -1,20 +1,10 @@
-# 多 X 轴
+# multiple-x-axis
 
-**Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=multiple-x-axis
-**Template:** examples/multiple-x-axis.html
-**Data Format:** `N/A`
-**Features:** emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Multiple X Axes
-category: line
-titleCN: 多 X 轴
-difficulty: 4
-*/
 const colors = ['#5470C6', '#EE6666'];
 option = {
   color: colors,
@@ -114,13 +104,27 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `},
+      // prettier-ignore...`
+- `data[1]`: `},
+      // prettier-ignore...`
+- `data[2]`: `focus: 'series'
+      },...`
+- `data[3]`: `focus: 'series'
+      },...`
 
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

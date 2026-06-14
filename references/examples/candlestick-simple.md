@@ -1,19 +1,10 @@
-# 基础 K 线图
+# candlestick-simple
 
-**Category:** `candlestick`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=candlestick-simple
-**Template:** examples/candlestick-simple.html
-**Data Format:** `{ dates: string[], values: [[open, close, low, high], ...] }`
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Basic Candlestick
-category: candlestick
-titleCN: 基础 K 线图
-difficulty: 0
-*/
 option = {
   xAxis: {
     data: ['2017-10-24', '2017-10-25', '2017-10-26', '2017-10-27']
@@ -33,13 +24,23 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `option = {
+  xAxis: {...`
+- `data[1]`: `{
+      type: 'candlestick',...`
 
-## Usage
-- Build: `scripts/build_template.py examples/candlestick-simple.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

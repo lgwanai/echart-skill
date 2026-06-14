@@ -1,24 +1,10 @@
-# 折线图的标记线 / Line with Marklines
+# line-markline
 
-**Category:** `line`
-**Difficulty:** 6
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-markline
-**Template:** examples/line-markline.html
 
-## Important
-- **Full official code preserved** — markLine generation loop with 12 position variants
-- `splitArea`, `textStyle`, `animation: false`
-- type: `line`, stack: `all`
-- 12 markLine entries demonstrating start/middle/end/inside positions
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
-## Official Option Code
 ```javascript
-/*
-title: Line with Marklines
-titleCN: 折线图的标记线
-category: line
-difficulty: 6
-*/
 const markLine = [];
 const positions = [
   'start',
@@ -101,6 +87,25 @@ option = {
 };
 ```
 
-## Usage
-- Build: `scripts/build_template.py examples/line-markline.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
+## Data Arrays (replace with DuckDB real data)
+
+- `data[0]`: `{
+    fontSize: 14
+  },
+  xAxis: {...`
+- `data[1]`: `tack: 'all',
+      symbolSize: 6,...`
+
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

@@ -1,21 +1,10 @@
-# 全国主要城市空气质量 - 百度地图
+# effectScatter-bmap
 
-**Category:** `'scatter, map'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=effectScatter-bmap
-**Template:** examples/effectScatter-bmap.html
-**Data Format:** `{ geoCoordMap: {"name": [lng,lat]}, data: [{name: string, value: number}, ...] }`
-**Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), emphasis/hover effects, labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Air Quality - Baidu Map
-category: 'scatter, map'
-tags: bmap
-titleCN: 全国主要城市空气质量 - 百度地图
-difficulty: 10
-*/
 const data = [
   { name: '海门', value: 9 },
   { name: '鄂尔多斯', value: 12 },
@@ -607,13 +596,16 @@ option = {
 };
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py examples/effectScatter-bmap.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

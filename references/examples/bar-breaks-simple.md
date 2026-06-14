@@ -1,21 +1,10 @@
-# 断轴上的柱状图
+# bar-breaks-simple
 
-**Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-breaks-simple
-**Template:** examples/bar-breaks-simple.html
-**Data Format:** `{ categories: string[], values: number[] }`
-**Features:** per-item colors via itemStyle, emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Bar Chart with Axis Breaks
-titleCN: 断轴上的柱状图
-category: bar
-difficulty: 3
-since: 6.0.0
-*/
 var _currentAxisBreaks = [
   {
     start: 5000,
@@ -106,12 +95,7 @@ option = {
     }
   ]
 };
-/**
- * This is some interaction logic with axis break:
- *  - Click to expand and reset button.
- *
- * You can ignore this part if you do not need it.
- */
+
 function initAxisBreakInteraction() {
   myChart.on('axisbreakchanged', function (params) {
     updateCollapseButton(params);
@@ -170,13 +154,30 @@ function initAxisBreakInteraction() {
 setTimeout(initAxisBreakInteraction, 0);
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `: [
+    {
+      type: 'category',...`
+- `data[1]`: `focus: 'series'
+      },...`
+- `data[2]`: `focus: 'series'
+      },...`
+- `data[3]`: `focus: 'series'
+      },...`
+- `data[4]`: `ame: 'Data D',
+      type: 'bar',...`
 
-## Usage
-- Build: `scripts/build_template.py examples/bar-breaks-simple.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

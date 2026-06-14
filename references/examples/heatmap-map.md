@@ -1,21 +1,10 @@
-# 全国主要城市空气质量
+# heatmap-map
 
-**Category:** `heatmap`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=heatmap-map
-**Template:** examples/heatmap-map.html
-**Data Format:** `{ xLabels: string[], yLabels: string[], data: [[xIdx, yIdx, value], ...] }`
-**Features:** per-item colors via itemStyle, visualMap component required, emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Air Qulity
-category: heatmap
-titleCN: 全国主要城市空气质量
-noExplore: true
-difficulty: 3
-*/
 var geoCoordMap = {
   海门: [121.15, 31.89],
   鄂尔多斯: [109.781327, 39.608266],
@@ -458,13 +447,16 @@ option = {
 };
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py examples/heatmap-map.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

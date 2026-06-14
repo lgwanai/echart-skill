@@ -1,20 +1,10 @@
-# 旭日图标签旋转
+# sunburst-label-rotate
 
-**Category:** `sunburst`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=sunburst-label-rotate
-**Template:** examples/sunburst-label-rotate.html
-**Data Format:** `[{name?: string, value?: number, itemStyle?: {}, children?: [...]}, ...]`
-**Features:** per-item colors via itemStyle, emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Sunburst Label Rotate
-category: sunburst
-titleCN: 旭日图标签旋转
-difficulty: 2
-*/
 option = {
   silent: true,
   series: [
@@ -136,13 +126,21 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `focus: 'ancestor'
+      },...`
 
-## Usage
-- Build: `scripts/build_template.py examples/sunburst-label-rotate.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

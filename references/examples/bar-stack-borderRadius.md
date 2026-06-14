@@ -1,19 +1,10 @@
-# 带圆角的堆积柱状图
+# bar-stack-borderRadius
 
-**Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-stack-borderRadius
-**Template:** examples/bar-stack-borderRadius.html
-**Data Format:** `{ categories: string[], series: [{name: string, stack: string, data: number[]}, ...] }`
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Stacked Bar with borderRadius
-category: bar
-titleCN: 带圆角的堆积柱状图
-difficulty: 3
-*/
 var series = [
   {
     data: [120, 200, 150, 80, 70, 110, 130],
@@ -97,13 +88,37 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `var series = [
+  {...`
+- `data[1]`: `stack: 'a',
+    name: 'a'
+  },
+  {...`
+- `data[2]`: `stack: 'a',
+    name: 'b'
+  },
+  {...`
+- `data[3]`: `stack: 'a',
+    name: 'c'
+  },
+  {...`
+- `data[4]`: `stack: 'b',
+    name: 'd'
+  },
+  {...`
 
-## Usage
-- Build: `scripts/build_template.py examples/bar-stack-borderRadius.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

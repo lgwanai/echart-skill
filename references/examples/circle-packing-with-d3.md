@@ -1,20 +1,10 @@
-# 基于 d3 的圆形包络图
+# circle-packing-with-d3
 
-**Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=circle-packing-with-d3
-**Template:** examples/circle-packing-with-d3.html
-**Data Format:** `N/A`
-**Features:** visualMap component required, uses encode (dataset dimension mapping), uses dataset (not series.data), emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Circle Packing with d3
-category: custom
-titleCN: 基于 d3 的圆形包络图
-difficulty: 11
-*/
 $.when(
   $.get(ROOT_PATH + '/data/asset/data/option-view.json'),
   $.getScript(CDN_PATH + 'd3-hierarchy@2.0.0/dist/d3-hierarchy.min.js')
@@ -208,13 +198,16 @@ function initChart(seriesData, maxDepth) {
 }
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

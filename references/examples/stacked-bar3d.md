@@ -1,19 +1,10 @@
-# ä¸ç»´å å æ±ç¶å¾
+# stacked-bar3d
 
-**Category:** `bar3D`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=stacked-bar3d
-**Template:** NONE — use knowledge base
-**Data Format:** `N/A`
-**Features:** emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Stacked Bar3D
-category: bar3D
-titleCN: ä¸ç»´å å æ±ç¶å¾
-*/
 $.getScript(CDN_PATH + 'simplex-noise@2.4.0/simplex-noise.js').done(
   function () {
     function generateData() {
@@ -69,13 +60,16 @@ $.getScript(CDN_PATH + 'simplex-noise@2.4.0/simplex-noise.js').done(
 );
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

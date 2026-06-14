@@ -1,22 +1,10 @@
-# 波浪动画
+# graphic-wave-animation
 
-**Category:** `graphic`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=graphic-wave-animation
-**Template:** examples/graphic-wave-animation.html
-**Data Format:** `N/A`
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Wave Animation
-category: graphic
-titleCN: 波浪动画
-difficulty: 10
-videoStart: 1000
-videoEnd: 5000
-shotWidth: 1000
-*/
 let noise = getNoiseHelper();
 let config = (app.config = {
   frequency: 500,
@@ -210,13 +198,16 @@ function getNoiseHelper() {
 }
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

@@ -1,33 +1,86 @@
-# 阶梯折线图 / Step Line
+# line-step
 
-**Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-step
-**Template:** examples/line-step.html
-**Data Format:** `{values_start: [], values_middle: [], values_end: []}` — 3 series with different step values
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+
 ```javascript
 option = {
-  title: { text: 'Step Line' },
-  tooltip: { trigger: 'axis' },
-  legend: { data: ['Step Start', 'Step Middle', 'Step End'] },
-  xAxis: { type: 'category', data: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
-  yAxis: { type: 'value' },
+  title: {
+    text: 'Step Line'
+  },
+  tooltip: {
+    trigger: 'axis'
+  },
+  legend: {
+    data: ['Step Start', 'Step Middle', 'Step End']
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '3%',
+    containLabel: true
+  },
+  toolbox: {
+    feature: {
+      saveAsImage: {}
+    }
+  },
+  xAxis: {
+    type: 'category',
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  },
+  yAxis: {
+    type: 'value'
+  },
   series: [
-    { name: 'Step Start', type: 'line', step: 'start', data: [120,132,101,134,90,230,210] },
-    { name: 'Step Middle', type: 'line', step: 'middle', data: [220,282,201,234,290,430,410] },
-    { name: 'Step End', type: 'line', step: 'end', data: [450,432,401,454,590,530,510] }
+    {
+      name: 'Step Start',
+      type: 'line',
+      step: 'start',
+      data: [120, 132, 101, 134, 90, 230, 210]
+    },
+    {
+      name: 'Step Middle',
+      type: 'line',
+      step: 'middle',
+      data: [220, 282, 201, 234, 290, 430, 410]
+    },
+    {
+      name: 'Step End',
+      type: 'line',
+      step: 'end',
+      data: [450, 432, 401, 454, 590, 530, 510]
+    }
   ]
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `trigger: 'axis'
+  },
+  legend: {...`
+- `data[1]`: `},
+  xAxis: {
+    type: 'category',...`
+- `data[2]`: `ype: 'line',
+      step: 'start',...`
+- `data[3]`: `pe: 'line',
+      step: 'middle',...`
+- `data[4]`: `type: 'line',
+      step: 'end',...`
 
-## Key Points
-- Requires **3 separate series** with step: 'start'/'middle'/'end'
-- Template: `examples/line-step.html` (NOT line/basic.html)
-- Build: `scripts/build_template.py line/step.html -d data.json`
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

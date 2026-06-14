@@ -1,21 +1,10 @@
-# 自定义特效
+# geo-svg-custom-effect
 
-**Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-svg-custom-effect
-**Template:** examples/geo-svg-custom-effect.html
-**Data Format:** `N/A`
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: GEO SVG with Customized Effect
-category: custom
-titleCN: 自定义特效
-videoStart: 1000
-videoEnd: 3000
-shotWidth: 400
-*/
 $.get(ROOT_PATH + '/data/asset/geo/Map_of_Iceland.svg', function (svg) {
   echarts.registerMap('iceland_svg', { svg: svg });
   option = {
@@ -131,13 +120,21 @@ $.get(ROOT_PATH + '/data/asset/geo/Map_of_Iceland.svg', function (svg) {
 });
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `geoIndex: 0,
+      zlevel: 1,...`
 
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

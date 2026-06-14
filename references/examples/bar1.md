@@ -1,20 +1,10 @@
-# 某地区蒸发量和降水量
+# bar1
 
-**Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar1
-**Template:** examples/bar1.html
-**Data Format:** `{ categories: string[], values: number[] }`
-**Features:** markLine for reference lines
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Rainfall and Evaporation
-category: bar
-titleCN: 某地区蒸发量和降水量
-difficulty: 4
-*/
 option = {
   title: {
     text: 'Rainfall vs Evaporation',
@@ -85,13 +75,32 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `trigger: 'axis'
+  },
+  legend: {...`
+- `data[1]`: `tegory',
+      // prettier-ignore...`
+- `data[2]`: `e: 'Rainfall',
+      type: 'bar',...`
+- `data[3]`: `3.3
+      ],
+      markPoint: {...`
+- `data[4]`: `]
+      },
+      markLine: {...`
 
-## Usage
-- Build: `scripts/build_template.py examples/bar1.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

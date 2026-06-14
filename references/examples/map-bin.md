@@ -1,21 +1,10 @@
-# 在地图上显示分箱图
+# map-bin
 
-**Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=map-bin
-**Template:** examples/map-bin.html
-**Data Format:** `[{name: string, value: number}, ...]`
-**Features:** per-item colors via itemStyle, visualMap component required, uses encode (dataset dimension mapping), emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Binning on Map
-category: map
-tags: bmap
-titleCN: 在地图上显示分箱图
-noExplore: true
-*/
 var COLORS = ['#070093', '#1c3fbf', '#1482e5', '#70b4eb', '#b4e0f3', '#ffffff'];
 var lngExtent = [39.5, 40.6];
 var latExtent = [115.9, 116.8];
@@ -248,13 +237,16 @@ option = {
 };
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py examples/map-bin.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

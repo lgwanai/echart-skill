@@ -1,19 +1,10 @@
-# 垂直折线图（Y轴为类目轴）
+# line-y-category
 
-**Category:** `line`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-y-category
-**Template:** examples/line-y-category.html
-**Data Format:** `{ categories: string[], values: number[] }`
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Line Y Category
-category: line
-titleCN: 垂直折线图（Y轴为类目轴）
-difficulty: 8
-*/
 option = {
   legend: {
     data: ['Altitude (km) vs. temperature (°C)']
@@ -62,13 +53,26 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `option = {
+  legend: {...`
+- `data[1]`: `km'
+    },
+    boundaryGap: false,...`
+- `data[2]`: `shadowOffsetY: 8
+      },...`
 
-## Usage
-- Build: `scripts/build_template.py examples/line-y-category.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

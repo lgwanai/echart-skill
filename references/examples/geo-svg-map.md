@@ -1,19 +1,10 @@
-# 地图（SVG）
+# geo-svg-map
 
-**Category:** `map`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-svg-map
-**Template:** examples/geo-svg-map.html
-**Data Format:** `N/A`
-**Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), emphasis/hover effects, labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: GEO SVG Map
-category: map
-titleCN: 地图（SVG）
-*/
 $.get(
   ROOT_PATH + '/data/asset/geo/Sicily_prehellenic_topographic_map.svg',
   function (svg) {
@@ -216,13 +207,22 @@ $.get(
 );
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `: '#555'
+          }
+        },...`
 
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

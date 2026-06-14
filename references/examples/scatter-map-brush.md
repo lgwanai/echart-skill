@@ -1,20 +1,10 @@
-# Scatter Map Brush
+# scatter-map-brush
 
-**Category:** `scatter`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-map-brush
-**Template:** examples/scatter-map-brush.html
-**Data Format:** `[{name: string, value: [lng, lat, val?]}, ...]`
-**Features:** per-item colors via itemStyle, emphasis/hover effects, labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Scatter Map Brush
-category: scatter
-titleCN: Scatter Map Brush
-noExplore: true
-*/
 const geoCoordMap = {
   海门: [121.15, 31.89],
   鄂尔多斯: [109.781327, 39.608266],
@@ -831,13 +821,22 @@ function renderBrushed(params) {
 }
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `el: { interval: 0, color: '#ddd' },...`
+- `data[1]`: `color: '#ddb926'
+      },...`
 
-## Usage
-- Build: `scripts/build_template.py examples/scatter-map-brush.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

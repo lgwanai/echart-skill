@@ -1,21 +1,10 @@
-# 在地图上显示饼图
+# map-iceland-pie
 
-**Category:** `map, pie`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=map-iceland-pie
-**Template:** examples/map-iceland-pie.html
-**Data Format:** `[{name: string, value: number}, ...]`
-**Features:** emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Pie Charts on GEO Map
-category: map, pie
-titleCN: 在地图上显示饼图
-since: 5.4.0
-difficulty: 5
-*/
 myChart.showLoading();
 $.get(ROOT_PATH + '/data/asset/geo/iceland.geo.json', function (geoJSON) {
   echarts.registerMap('iceland', geoJSON);
@@ -78,13 +67,16 @@ $.get(ROOT_PATH + '/data/asset/geo/iceland.geo.json', function (geoJSON) {
 });
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py examples/map-iceland-pie.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

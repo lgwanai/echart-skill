@@ -1,20 +1,10 @@
-# 直方图（自定义系列）
+# bar-histogram
 
-**Category:** `custom`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-histogram
-**Template:** examples/bar-histogram.html
-**Data Format:** `{ categories: string[], values: number[] }`
-**Features:** uses encode (dataset dimension mapping), uses dataset (not series.data), labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Histogram with Custom Series
-category: custom
-titleCN: 直方图（自定义系列）
-difficulty: 0
-*/
 // See https://github.com/ecomfe/echarts-stat
 echarts.registerTransform(ecStat.transform.histogram);
 option = {
@@ -155,13 +145,16 @@ option = {
 };
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py examples/bar-histogram.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

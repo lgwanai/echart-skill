@@ -1,25 +1,10 @@
-# 矩阵中响应式网格布局
+# matrix-grid-layout
 
-**Category:** `matrix`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-grid-layout
-**Template:** examples/matrix-grid-layout.html
-**Data Format:** `N/A`
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Responsive grid layout based on matrix
-category: matrix
-titleCN: 矩阵中响应式网格布局
-difficulty: 3
-since: 6.0.0
-*/
-/**
- * Use a matrix coordinate system to layout multiple charts and components,
- * following the similar idea of CSS grid layout, and provide responsiveness
- * by media queries.
- */
 let _idBase = 1;
 const _mediaDefinitionList = [
   {
@@ -65,9 +50,7 @@ const _mediaDefinitionList = [
     }
   }
 ];
-/**
- * Each section contains some charts and components.
- */
+
 const _sectionDefinitionMap = {
   section_title_1: {
     option: {
@@ -292,10 +275,7 @@ option = {
 initFloatingControlPanel();
 assembleIntoEChartsOption(option, _sectionDefinitionMap, _mediaDefinitionList);
 console.log(option);
-/**
- * Merge those definitions into the single echarts option.
- * @param option The target echarts option to be written to.
- */
+
 function assembleIntoEChartsOption(
   option,
   sectionDefinitionMap,
@@ -350,9 +330,7 @@ function assembleIntoEChartsOption(
     );
   });
 }
-/**
- * If no component id, generate one, and immutablely return a new component object.
- */
+
 function ensureComponentId(component, sectionId, componentMainType) {
   if (component.id != null) {
     return component;
@@ -361,15 +339,11 @@ function ensureComponentId(component, sectionId, componentMainType) {
   component.id = sectionId + '_' + componentMainType + '_' + _idBase++;
   return component;
 }
-/**
- * `{}` is converted to `[{}]`; null/undefined is converted to `[]`.
- */
+
 function normalizeToArray(value) {
   return Array.isArray(value) ? value : value != null ? [value] : [];
 }
-/**
- * Generate some random data for a single series.
- */
+
 function generateSingleSeriesData(dayCount, inverseXY) {
   const dayStart = new Date('2025-05-05T00:00:00.000Z'); // Monday
   const timeStart = dayStart.getTime();
@@ -401,10 +375,7 @@ function generateSingleSeriesData(dayCount, inverseXY) {
   }
   return seriesData;
 }
-/**
- * Note: The floating control panel are not relevant to echarts API,
- *  just for illustration purposes.
- */
+
 function initFloatingControlPanel() {
   app.config = {};
   app.configParameters = {};
@@ -422,13 +393,24 @@ function initFloatingControlPanel() {
 }
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `ents.
+  matrix: {
+    x: { show: false,...`
+- `data[1]`: `alse, data: [] },
+    y: { show: false,...`
 
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

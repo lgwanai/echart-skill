@@ -1,20 +1,10 @@
-# 阶梯瀑布图（柱状图模拟）
+# bar-waterfall2
 
-**Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-waterfall2
-**Template:** examples/bar-waterfall2.html
-**Data Format:** `{ categories: string[], values: number[] }`
-**Features:** per-item colors via itemStyle, emphasis/hover effects, labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Waterfall Chart
-titleCN: 阶梯瀑布图（柱状图模拟）
-category: bar
-difficulty: 3
-*/
 option = {
   title: {
     text: 'Accumulated Waterfall Chart'
@@ -98,13 +88,30 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `+ tar.value;
+    }
+  },
+  legend: {...`
+- `data[1]`: `'transparent'
+        }
+      },...`
+- `data[2]`: `position: 'top'
+      },...`
+- `data[3]`: `position: 'bottom'
+      },...`
 
-## Usage
-- Build: `scripts/build_template.py examples/bar-waterfall2.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

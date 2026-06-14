@@ -1,20 +1,10 @@
-# å¾®åç­¾å°æ°æ®ç¹äº®ä¸­å½
+# scattergl-weibo
 
-**Category:** `scatterGL`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scattergl-weibo
-**Template:** NONE — use knowledge base
-**Data Format:** `N/A`
-**Features:** per-item colors via itemStyle, emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: å¾®åç­¾å°æ°æ®ç¹äº®ä¸­å½
-category: scatterGL
-theme: dark
-titleCN: å¾®åç­¾å°æ°æ®ç¹äº®ä¸­å½
-*/
 $.getJSON(ROOT_PATH + '/data/asset/data/weibo.json', function (weiboData) {
   weiboData = weiboData.map(function (serieData, idx) {
     var px = serieData[0] / 1000;
@@ -112,13 +102,21 @@ $.getJSON(ROOT_PATH + '/data/asset/data/weibo.json', function (weiboData) {
 });
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `legend: {
+        left: 'left',...`
 
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

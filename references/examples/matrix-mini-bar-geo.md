@@ -1,21 +1,10 @@
-# 矩阵坐标系下的微型条形图和地图
+# matrix-mini-bar-geo
 
-**Category:** `matrix, bar, geo`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-mini-bar-geo
-**Template:** examples/matrix-mini-bar-geo.html
-**Data Format:** `N/A`
-**Features:** per-item colors via itemStyle, uses encode (dataset dimension mapping), labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Mini Bars and Geo in Matrix
-category: matrix, bar, geo
-titleCN: 矩阵坐标系下的微型条形图和地图
-difficulty: 6
-since: 6.0.0
-*/
 var _colHeaders = ['Region and Time', 'Data A', 'Data B', 'Location'];
 var _regionColIdx = 0;
 var _geoColIdx = 3;
@@ -248,13 +237,31 @@ function fetchGeoJSON() {
 fetchGeoJSON();
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `ourceList = [
+  {
+    name: '2021',...`
+- `data[1]`: `1]
+    ]
+  },
+  {
+    name: '2020',...`
+- `data[2]`: `w: false
+      },
+      body: {...`
+- `data[3]`: `re) for better bar series layout....`
 
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

@@ -1,20 +1,10 @@
-# 笛卡尔坐标系上的 Graph
+# graph-grid
 
-**Category:** `graph`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=graph-grid
-**Template:** examples/graph-grid.html
-**Data Format:** `{ nodes: [{name, x, y, symbolSize?}, ...], links: [{source, target}, ...] }`
-**Features:** labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Graph on Cartesian
-category: graph
-titleCN: 笛卡尔坐标系上的 Graph
-difficulty: 2
-*/
 const axisData = ['Mon', 'Tue', 'Wed', 'Very Loooong Thu', 'Fri', 'Sat', 'Sun'];
 const data = axisData.map(function (item, i) {
   return Math.round(Math.random() * 1000 * (i + 1));
@@ -60,13 +50,16 @@ option = {
 };
 ```
 
-## Placeholders
-
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
-
-## Usage
-- Build: `scripts/build_template.py graph/static.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

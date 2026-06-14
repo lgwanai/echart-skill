@@ -1,20 +1,10 @@
-# 极坐标系下的堆叠柱状图
+# bar-polar-stack-radial
 
-**Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-polar-stack-radial
-**Template:** examples/bar-polar-stack-radial.html
-**Data Format:** `{ categories: string[], values: number[] }`
-**Features:** emphasis/hover effects
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Stacked Bar Chart on Polar(Radial)
-titleCN: 极坐标系下的堆叠柱状图
-category: bar
-difficulty: 7
-*/
 option = {
   angleAxis: {
     type: 'category',
@@ -61,13 +51,36 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `angleAxis: {
+    type: 'category',...`
+- `data[1]`: `eries: [
+    {
+      type: 'bar',...`
+- `data[2]`: `}
+    },
+    {
+      type: 'bar',...`
+- `data[3]`: `}
+    },
+    {
+      type: 'bar',...`
+- `data[4]`: `}
+  ],
+  legend: {
+    show: true,...`
 
-## Usage
-- Build: `scripts/build_template.py examples/bar-polar-stack-radial.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

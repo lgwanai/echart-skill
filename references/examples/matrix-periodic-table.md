@@ -1,21 +1,10 @@
-# 元素周期表
+# matrix-periodic-table
 
-**Category:** `matrix`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-periodic-table
-**Template:** examples/matrix-periodic-table.html
-**Data Format:** `N/A`
-**Features:** per-item colors via itemStyle, labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Periodic Table
-category: matrix
-titleCN: 元素周期表
-difficulty: 10
-since: 6.0.0
-*/
 const colors = {
   red: '#f88',
   green: '#8f8',
@@ -273,13 +262,21 @@ setTimeout(function () {
 });
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `m',
+    coordinateSystem: 'matrix',...`
 
-## Usage
-- Build: `scripts/build_template.py N/A -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

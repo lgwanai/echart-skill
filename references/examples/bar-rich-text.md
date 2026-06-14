@@ -1,20 +1,10 @@
-# 天气统计（富文本）
+# bar-rich-text
 
-**Category:** `'bar, rich'`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-rich-text
-**Template:** examples/bar-rich-text.html
-**Data Format:** `{ categories: string[], values: number[] }`
-**Features:** labels displayed
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Weather Statistics
-category: 'bar, rich'
-titleCN: 天气统计（富文本）
-difficulty: 6
-*/
 const weatherIcons = {
   Sunny: ROOT_PATH + '/data/asset/img/weather/sunny_128.png',
   Cloudy: ROOT_PATH + '/data/asset/img/weather/cloudy_128.png',
@@ -158,13 +148,32 @@ option = {
 };
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `pe: 'shadow'
+    }
+  },
+  legend: {...`
+- `data[1]`: `ype: 'category',
+    inverse: true,...`
+- `data[2]`: `'City Alpha',
+      type: 'bar',...`
+- `data[3]`: `}
+          }
+        },...`
+- `data[4]`: `'bar',
+      label: seriesLabel,...`
 
-## Usage
-- Build: `scripts/build_template.py examples/bar-rich-text.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```

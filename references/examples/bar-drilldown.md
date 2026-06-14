@@ -1,19 +1,10 @@
-# 柱状图下钻动画
+# bar-drilldown
 
-**Category:** `bar`
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-drilldown
-**Template:** examples/bar-drilldown.html
-**Data Format:** `{ categories: string[], values: number[] }`
 
-## Official Option Code
+## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
 
 ```javascript
-/*
-title: Bar Chart Drilldown Animation
-category: bar
-titleCN: 柱状图下钻动画
-difficulty: 5
-*/
 option = {
   xAxis: {
     data: ['Animals', 'Fruits', 'Cars']
@@ -116,13 +107,34 @@ myChart.on('click', function (event) {
 });
 ```
 
-## Placeholders
+## Data Arrays (replace with DuckDB real data)
 
-| Placeholder | Type | Description |
-|-------------|------|-------------|
-| `{{{TITLE}}}` | string | title |
+- `data[0]`: `option = {
+  xAxis: {...`
+- `data[1]`: `{
+    type: 'bar',
+    id: 'sales',...`
+- `data[2]`: `= [
+  {
+    dataGroupId: 'animals',...`
+- `data[3]`: `},
+  {
+    dataGroupId: 'fruits',...`
+- `data[4]`: `]
+  },
+  {
+    dataGroupId: 'cars',...`
 
-## Usage
-- Build: `scripts/build_template.py examples/bar-drilldown.html -d data.json`
-- Validate: `scripts/validate_chart.py output.html`
-- Check `docs/CHART_DEBUG_LOG.md` for known issues
+## HTML Shell
+```html
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>TITLE</title>
+<script>/* ECHARTS_INLINE */</script>
+<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
+chart.setOption(option);
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
+```
