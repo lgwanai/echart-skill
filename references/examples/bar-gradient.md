@@ -2,9 +2,20 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-gradient
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Clickable Column Chart with Gradient
+titleCN: 特性示例：渐变色 阴影 点击缩放
+category: bar
+difficulty: 3
+*/
 // prettier-ignore
 let dataAxis = ['点', '击', '柱', '子', '或', '者', '两', '指', '在', '触', '屏', '上', '滑', '动', '能', '够', '自', '动', '缩', '放'];
 // prettier-ignore
@@ -86,16 +97,9 @@ myChart.on('click', function (params) {
 });
 ```
 
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+## Agent Workflow
+
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

@@ -2,9 +2,28 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-breaks-brush
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**5 data arrays** to replace:
+- `data[0]`: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
+- `data[1]`: `data: [1500, 2032, 2001, 3154, 2190, 4330, 2410]`
+- `data[2]`: `data: [1200, 1320, 1010, 1340, 900, 2300, 2100]`
+- `data[3]`: `data: [103200, 100320, 103010, 102340, 103900, 103300, 103200]`
+- `data[4]`: `data: [106212, 102118, 102643, 104631, 106679, 100130, 107022]`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Bar Chart with Axis Breaks (Brush-enabled)
+titleCN: 断轴上的柱状图（可刷选）
+category: bar
+difficulty: 8
+since: 6.0.0
+*/
 var GRID_TOP = 120;
 var GRID_BOTTOM = 80;
 var Y_DATA_ROUND_PRECISION = 0;
@@ -96,7 +115,12 @@ option = {
     }
   ]
 };
-
+/**
+ * This is some interaction logic with axis break:
+ *  - Brush to create a axis break.
+ *
+ * You can ignore this part if you do not need it.
+ */
 function initAxisBreakInteraction() {
   var _brushingEl = null;
   myChart.getZr().on('mousedown', function (params) {
@@ -208,30 +232,9 @@ function initAxisBreakInteraction() {
 setTimeout(initAxisBreakInteraction, 0);
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `: [
-    {
-      type: 'category',...`
-- `data[1]`: `focus: 'series'
-      },...`
-- `data[2]`: `focus: 'series'
-      },...`
-- `data[3]`: `focus: 'series'
-      },...`
-- `data[4]`: `ame: 'Data D',
-      type: 'bar',...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

@@ -2,9 +2,27 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=matrix-graph
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**3 data arrays** to replace:
+- `data[0]`: `data: ['Data Analysis', 'Programming', 'Algorithms']`
+- `data[1]`: `data: ['1st Year', '2nd Year', '3rd Year', '4th Year']`
+- `data[2]`: `data: [
+        ['Programming', '1st Year', 1, 'Intro to Computer Science']`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Graph Chart in Matrix
+category: matrix
+titleCN: 矩阵布局下的关系图
+difficulty: 2
+since: 6.0.0
+*/
 const margin = [150, 80];
 const width = myChart.getWidth() - margin[1] * 2;
 const height = myChart.getHeight() - margin[0] * 2;
@@ -122,29 +140,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `isites'
-  },
-  matrix: {
-    x: {...`
-- `data[1]`: `g', 'Algorithms']
-    },
-    y: {...`
-- `data[2]`: `target: 3
-        }
-      ],...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

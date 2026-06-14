@@ -2,9 +2,29 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-marker
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**7 data arrays** to replace:
+- `data[0]`: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
+- `data[1]`: `data: [10, 11, 13, 11, 12, 12, 9]`
+- `data[2]`: `data: [
+          { type: 'max', name: 'Max' },
+          { type: 'min', name: '...`
+- `data[3]`: `data: [{ type: 'average', name: 'Avg' }]`
+- `data[4]`: `data: [1, -2, 2, 5, 3, 2, 0]`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Temperature Change in the Coming Week
+category: line
+titleCN: 未来一周气温变化
+difficulty: 2
+*/
 option = {
   title: {
     text: 'Temperature Change in the Coming Week'
@@ -84,30 +104,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `'category',
-    boundaryGap: false,...`
-- `data[1]`: `e: 'Highest',
-      type: 'line',...`
-- `data[2]`: `12, 12, 9],
-      markPoint: {...`
-- `data[3]`: `]
-      },
-      markLine: {...`
-- `data[4]`: `me: 'Lowest',
-      type: 'line',...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

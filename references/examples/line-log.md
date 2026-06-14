@@ -2,9 +2,31 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-log
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**4 data arrays** to replace:
+- `data[0]`: `data: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']`
+- `data[1]`: `data: [1, 3, 9, 27, 81, 247, 741, 2223, 6669]`
+- `data[2]`: `data: [1, 2, 4, 8, 16, 32, 64, 128, 256]`
+- `data[3]`: `data: [
+        1 / 2,
+        1 / 4,
+        1 / 8,
+        1 / 16,
+        1 /...`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Log Axis
+category: line
+titleCN: 对数轴示例
+difficulty: 7
+*/
 option = {
   title: {
     text: 'Log Axis',
@@ -66,27 +88,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `x',
-    splitLine: { show: false },...`
-- `data[1]`: `name: 'Log2',
-      type: 'line',...`
-- `data[2]`: `name: 'Log3',
-      type: 'line',...`
-- `data[3]`: `me: 'Log1/2',
-      type: 'line',...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

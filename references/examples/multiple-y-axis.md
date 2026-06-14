@@ -2,9 +2,29 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=multiple-y-axis
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**5 data arrays** to replace:
+- `data[0]`: `data: ['Evaporation', 'Precipitation', 'Temperature']`
+- `data[1]`: `data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'No...`
+- `data[2]`: `data: [
+        2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, ...`
+- `data[3]`: `data: [
+        2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, ...`
+- `data[4]`: `data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Multiple Y Axes
+category: bar
+titleCN: 多 Y 轴示例
+difficulty: 4
+*/
 const colors = ['#5070dd', '#b6d634', '#505372'];
 option = {
   color: colors,
@@ -111,31 +131,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `show: true }
-    }
-  },
-  legend: {...`
-- `data[1]`: `},
-      // prettier-ignore...`
-- `data[2]`: `'Evaporation',
-      type: 'bar',...`
-- `data[3]`: `type: 'bar',
-      yAxisIndex: 1,...`
-- `data[4]`: `ype: 'line',
-      yAxisIndex: 2,...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

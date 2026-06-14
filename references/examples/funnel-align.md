@@ -2,9 +2,34 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=funnel-align
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**5 data arrays** to replace:
+- `data[0]`: `data: ['Prod A', 'Prod B', 'Prod C', 'Prod D', 'Prod E']`
+- `data[1]`: `data: [
+        { value: 60, name: 'Prod C' },
+        { value: 30, name: 'Prod ...`
+- `data[2]`: `data: [
+        { value: 60, name: 'Prod C' },
+        { value: 30, name: 'Prod ...`
+- `data[3]`: `data: [
+        { value: 60, name: 'Prod C' },
+        { value: 30, name: 'Prod ...`
+- `data[4]`: `data: [
+        { value: 60, name: 'Prod C' },
+        { value: 30, name: 'Prod ...`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Funnel Compare
+category: funnel
+titleCN: 漏斗图(对比)
+*/
 option = {
   title: {
     text: 'Funnel Compare',
@@ -102,29 +127,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `ient: 'vertical',
-    left: 'left',...`
-- `data[1]`: `50%',
-      funnelAlign: 'right',...`
-- `data[2]`: `ing',
-      funnelAlign: 'right',...`
-- `data[3]`: `'5%',
-      funnelAlign: 'left',...`
-- `data[4]`: `ding',
-      funnelAlign: 'left',...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

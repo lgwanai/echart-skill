@@ -2,9 +2,37 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=area-rainfall
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**6 data arrays** to replace:
+- `data[0]`: `data: ['Flow', 'Rainfall']`
+- `data[1]`: `data: [
+                '2009/6/12 2:00', '2009/6/12 3:00', '2009/6/12 4:00', '2...`
+- `data[2]`: `data: [
+          [
+            {
+              xAxis: '2009/9/12\n7:00'
+       ...`
+- `data[3]`: `data: [
+                0.97, 0.96, 0.96, 0.95, 0.95, 0.94, 0.94, 0.94, 0.94, 0....`
+- `data[4]`: `data: [
+          [
+            {
+              xAxis: '2009/9/10\n7:00'
+       ...`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Rainfall
+titleCN: 雨量流量关系图
+category: line
+difficulty: 5
+*/
 option = {
   title: {
     text: 'Rainfall and Flow Relationship',
@@ -144,32 +172,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `765'
-      }
-    }
-  },
-  legend: {...`
-- `data[1]`: `false },
-      // prettier-ignore...`
-- `data[2]`: `opacity: 0.3
-        },...`
-- `data[3]`: `},
-      // prettier-ignore...`
-- `data[4]`: `opacity: 0.3
-        },...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

@@ -2,9 +2,27 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=area-stack-gradient
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**7 data arrays** to replace:
+- `data[0]`: `data: ['Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 5']`
+- `data[1]`: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
+- `data[2]`: `data: [140, 232, 101, 264, 90, 340, 250]`
+- `data[3]`: `data: [120, 282, 111, 234, 220, 340, 310]`
+- `data[4]`: `data: [320, 132, 201, 334, 190, 130, 220]`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Gradient Stacked Area Chart
+titleCN: 渐变堆叠面积图
+category: line
+difficulty: 2
+*/
 option = {
   color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
   title: {
@@ -183,32 +201,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `985'
-      }
-    }
-  },
-  legend: {...`
-- `data[1]`: `egory',
-      boundaryGap: false,...`
-- `data[2]`: `focus: 'series'
-      },...`
-- `data[3]`: `focus: 'series'
-      },...`
-- `data[4]`: `focus: 'series'
-      },...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

@@ -2,9 +2,31 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=gauge-stage
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**2 data arrays** to replace:
+- `data[0]`: `data: [
+        {
+          value: 70
+        }
+      ]`
+- `data[1]`: `data: [
+          {
+            value: +(Math.random() * 100).toFixed(2)
+       ...`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Stage Speed Gauge
+titleCN: 阶段速度仪表盘
+category: gauge
+difficulty: 3
+*/
 option = {
   series: [
     {
@@ -73,24 +95,9 @@ setInterval(function () {
 }, 2000);
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `color: 'inherit'
-      },...`
-- `data[1]`: `tOption({
-    series: [
-      {...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

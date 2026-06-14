@@ -2,9 +2,29 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-rich-text
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**6 data arrays** to replace:
+- `data[0]`: `data: ['City Alpha', 'City Beta', 'City Gamma']`
+- `data[1]`: `data: ['Sunny', 'Cloudy', 'Showers']`
+- `data[2]`: `data: [165, 170, 30]`
+- `data[3]`: `data: [
+          { type: 'max', name: 'max days: ' },
+          { type: 'min', ...`
+- `data[4]`: `data: [150, 105, 110]`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Weather Statistics
+category: 'bar, rich'
+titleCN: 天气统计（富文本）
+difficulty: 6
+*/
 const weatherIcons = {
   Sunny: ROOT_PATH + '/data/asset/img/weather/sunny_128.png',
   Cloudy: ROOT_PATH + '/data/asset/img/weather/cloudy_128.png',
@@ -148,32 +168,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `pe: 'shadow'
-    }
-  },
-  legend: {...`
-- `data[1]`: `ype: 'category',
-    inverse: true,...`
-- `data[2]`: `'City Alpha',
-      type: 'bar',...`
-- `data[3]`: `}
-          }
-        },...`
-- `data[4]`: `'bar',
-      label: seriesLabel,...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

@@ -2,9 +2,25 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-y-category
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**3 data arrays** to replace:
+- `data[0]`: `data: ['Brazil', 'Indonesia', 'USA', 'India', 'China', 'World']`
+- `data[1]`: `data: [18203, 23489, 29034, 104970, 131744, 630230]`
+- `data[2]`: `data: [19325, 23438, 31000, 121594, 134141, 681807]`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: World Population
+category: bar
+titleCN: 世界人口总量 - 条形图
+difficulty: 2
+*/
 option = {
   title: {
     text: 'World Population'
@@ -39,26 +55,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `},
-  yAxis: {
-    type: 'category',...`
-- `data[1]`: `name: '2011',
-      type: 'bar',...`
-- `data[2]`: `name: '2012',
-      type: 'bar',...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

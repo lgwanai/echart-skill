@@ -2,9 +2,29 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=line-sections
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**3 data arrays** to replace:
+- `data[0]`: `data: ['00:00', '01:15', '02:30', '03:45', '05:00', '06:15', '07:30', '08:45', '...`
+- `data[1]`: `data: [300, 280, 250, 260, 270, 300, 550, 500, 400, 390, 380, 390, 400, 500, 600...`
+- `data[2]`: `data: [
+          [
+            {
+              name: 'Morning Peak',
+          ...`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Distribution of Electricity
+category: line
+titleCN: 一天用电量分布
+difficulty: 3
+*/
 option = {
   title: {
     text: 'Distribution of Electricity',
@@ -103,25 +123,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `yGap: false,
-    // prettier-ignore...`
-- `data[1]`: `h: true,
-      // prettier-ignore...`
-- `data[2]`: `255, 173, 177, 0.4)'
-        },...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`

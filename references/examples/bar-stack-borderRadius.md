@@ -2,9 +2,27 @@
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-stack-borderRadius
 
-## Complete Code (copy-paste to HTML shell, replace data arrays with DuckDB real data)
+## ⚠️ Real Data REQUIRED
+
+Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
+Never output the official example data — it is for format reference only.
+
+**6 data arrays** to replace:
+- `data[0]`: `data: [120, 200, 150, 80, 70, 110, 130]`
+- `data[1]`: `data: [10, 46, 64, '-', 0, '-', 0]`
+- `data[2]`: `data: [30, '-', 0, 20, 10, '-', 0]`
+- `data[3]`: `data: [30, '-', 0, 20, 10, '-', 0]`
+- `data[4]`: `data: [10, 20, 150, 0, '-', 50, 10]`
+
+## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
 
 ```javascript
+/*
+title: Stacked Bar with borderRadius
+category: bar
+titleCN: 带圆角的堆积柱状图
+difficulty: 3
+*/
 var series = [
   {
     data: [120, 200, 150, 80, 70, 110, 130],
@@ -88,37 +106,9 @@ option = {
 };
 ```
 
-## Data Arrays (replace with DuckDB real data)
+## Agent Workflow
 
-- `data[0]`: `var series = [
-  {...`
-- `data[1]`: `stack: 'a',
-    name: 'a'
-  },
-  {...`
-- `data[2]`: `stack: 'a',
-    name: 'b'
-  },
-  {...`
-- `data[3]`: `stack: 'a',
-    name: 'c'
-  },
-  {...`
-- `data[4]`: `stack: 'b',
-    name: 'd'
-  },
-  {...`
-
-## HTML Shell
-```html
-<!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>TITLE</title>
-<script>/* ECHARTS_INLINE */</script>
-<style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style>
-</head><body><div id="main"></div><script>
-var chart = echarts.init(document.getElementById("main"));
-// PASTE COMPLETE CODE HERE, replace data arrays with DuckDB real data
-chart.setOption(option);
-window.addEventListener("resize",function(){chart.resize();});
-</script></body></html>
-```
+1. Query DuckDB for real data
+2. Replace each `data: [...]` array with real JSON data
+3. Wrap in HTML shell with inline ECharts
+4. Validate: `python scripts/validate_chart.py output.html`
