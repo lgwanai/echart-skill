@@ -40511,7 +40511,7 @@ var data = [
     0.148,
     30784
   ],
-  [
+  
     "Gourd, dishcloth (towelgourd), raw",
     "Vegetables and Vegetable Products",
     1.2,
@@ -40521,7 +40521,7 @@ var data = [
     0.012,
     0.139,
     // ... (16 total entries — truncated, keep first 8 as sample. Agent: query DuckDB)
-      ](calabash), cooked, boiled, drained, without salt",
+      , cooked, boiled, drained, without salt",
     "Vegetables and Vegetable Products",
     0.6,
     0.024,
@@ -51486,7 +51486,7 @@ var data = [
     1.04,
     31757
   ],
-  [
+  
     "Beef, rib, small end (ribs 10-12), separable lean and fat, trimmed to 1/8\" fat, select, cooked, broiled",
     "Beef Products",
     27.17,
@@ -51499,7 +51499,7 @@ var data = [
     null,
    
     // ... (17 total entries — truncated, keep first 8 as sample. Agent: query DuckDB)
-      ](ribs 10-12), separable lean and fat, trim
+      , separable lean and fat, trim
     // ... (17 total entries — truncated, keep first 8 as sample. Agent: query DuckDB)
       ]null,
     18,
