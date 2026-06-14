@@ -1,28 +1,91 @@
 # sankey-simple
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=sankey-simple
+**Chart Type:** `sankey`
 
-## ⚠️ TWO data arrays must be replaced
-- `series.data` = **nodes**: `[{name: "a"}, {name: "b"}, ...]`
-- `series.links` = **links**: `[{source: "a", target: "a1", value: 5}, ...]`
-Both come from DuckDB `test_sankey_data` (src, tgt, val columns).
+## IMPORTANT
 
-## Reference Code (DO NOT use as-is — replace data + links)
+Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
+
+## Agent Workflow
+
+1. **Analyze user data**: need **source**, **target**, **value** columns
+2. **Query DuckDB**: Build SQL against the user's actual table and columns
+3. **Transform**: Map query results to match the data array format below
+4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
+5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
+6. **Validate**: `python scripts/validate_chart.py output.html`
+
+Data arrays to replace: **1**
+
+## Reference Code
+
 ```javascript
+/*
+title: Basic Sankey
+category: sankey
+titleCN: 基础桑基图
+difficulty: 0
+*/
 option = {
   series: {
     type: 'sankey',
     layout: 'none',
-    emphasis: { focus: 'adjacency' },
-    data: [{name:'a'},{name:'b'},{name:'a1'},{name:'a2'},{name:'b1'},{name:'c'}],
-    links: [{source:'a',target:'a1',value:5},{source:'a',target:'a2',value:3},{source:'b',target:'b1',value:8},{source:'a',target:'b1',value:3},{source:'b1',target:'a1',value:1},{source:'b1',target:'c',value:2}]
+    emphasis: {
+      focus: 'adjacency'
+    },
+    data: [
+      {
+        name: 'a'
+      },
+      {
+        name: 'b'
+      },
+      {
+        name: 'a1'
+      },
+      {
+        name: 'a2'
+      },
+      {
+        name: 'b1'
+      },
+      {
+        name: 'c'
+      }
+    ],
+    links: [
+      {
+        source: 'a',
+        target: 'a1',
+        value: 5
+      },
+      {
+        source: 'a',
+        target: 'a2',
+        value: 3
+      },
+      {
+        source: 'b',
+        target: 'b1',
+        value: 8
+      },
+      {
+        source: 'a',
+        target: 'b1',
+        value: 3
+      },
+      {
+        source: 'b1',
+        target: 'a1',
+        value: 1
+      },
+      {
+        source: 'b1',
+        target: 'c',
+        value: 2
+      }
+    ]
   }
 };
 ```
-
-## Agent Workflow
-1. Query DuckDB: `SELECT src, tgt, val FROM test_sankey_data`
-2. Extract unique node names → `[{name}, ...]`
-3. Build links → `[{source, target, value}, ...]`
-4. Replace BOTH `data:` AND `links:` arrays in option
-5. Wrap in HTML → validate

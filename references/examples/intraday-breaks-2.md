@@ -1,13 +1,22 @@
 # intraday-breaks-2
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=intraday-breaks-2
+**Chart Type:** `time`
 
-## ⚠️ Real Data REQUIRED
+## IMPORTANT
 
-Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
-Never output the official example data — it is for format reference only.
+Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
 
-## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
+## Agent Workflow
+
+1. **Analyze user data**: check data arrays in reference code
+2. **Query DuckDB**: Build SQL against the user's actual table and columns
+3. **Transform**: Map query results to match the data array format below
+4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
+5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
+6. **Validate**: `python scripts/validate_chart.py output.html`
+
+## Reference Code
 
 ```javascript
 /*
@@ -121,10 +130,3 @@ function generateData1() {
   };
 }
 ```
-
-## Agent Workflow
-
-1. Query DuckDB for real data
-2. Replace each `data: [...]` array with real JSON data
-3. Wrap in HTML shell with inline ECharts
-4. Validate: `python scripts/validate_chart.py output.html`

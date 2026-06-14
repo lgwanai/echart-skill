@@ -1,20 +1,24 @@
 # bar-negative
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-negative
+**Chart Type:** `shadow`
 
-## ⚠️ Real Data REQUIRED
+## IMPORTANT
 
-Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
-Never output the official example data — it is for format reference only.
+Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
 
-**5 data arrays** to replace:
-- `data[0]`: `data: ['Profit', 'Expenses', 'Income']`
-- `data[1]`: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
-- `data[2]`: `data: [200, 170, 240, 244, 200, 220, 210]`
-- `data[3]`: `data: [320, 302, 341, 374, 390, 450, 420]`
-- `data[4]`: `data: [-120, -132, -101, -134, -190, -230, -210]`
+## Agent Workflow
 
-## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
+1. **Analyze user data**: check data arrays in reference code
+2. **Query DuckDB**: Build SQL against the user's actual table and columns
+3. **Transform**: Map query results to match the data array format below
+4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
+5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
+6. **Validate**: `python scripts/validate_chart.py output.html`
+
+Data arrays to replace: **5**
+
+## Reference Code
 
 ```javascript
 /*
@@ -88,10 +92,3 @@ option = {
   ]
 };
 ```
-
-## Agent Workflow
-
-1. Query DuckDB for real data
-2. Replace each `data: [...]` array with real JSON data
-3. Wrap in HTML shell with inline ECharts
-4. Validate: `python scripts/validate_chart.py output.html`

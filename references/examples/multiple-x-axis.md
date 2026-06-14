@@ -1,21 +1,24 @@
 # multiple-x-axis
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=multiple-x-axis
+**Chart Type:** `cross`
 
-## ⚠️ Real Data REQUIRED
+## IMPORTANT
 
-Code below contains **OFFICIAL DISPLAY DATA ONLY**. Agent MUST replace all `data: [...]` arrays with **real DuckDB data** before generating HTML.
-Never output the official example data — it is for format reference only.
+Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
 
-**4 data arrays** to replace:
-- `data[0]`: `data: ['2016-1', '2016-2', '2016-3', '2016-4', '2016-5', '2016-6', '2016-7', '20...`
-- `data[1]`: `data: ['2015-1', '2015-2', '2015-3', '2015-4', '2015-5', '2015-6', '2015-7', '20...`
-- `data[2]`: `data: [
-        2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, ...`
-- `data[3]`: `data: [
-        3.9, 5.9, 11.1, 18.7, 48.3, 69.2, 231.6, 46.6, 55.4, 18.4, 10.3,...`
+## Agent Workflow
 
-## Reference Code (REPLACE DATA ARRAYS BEFORE USE)
+1. **Analyze user data**: check data arrays in reference code
+2. **Query DuckDB**: Build SQL against the user's actual table and columns
+3. **Transform**: Map query results to match the data array format below
+4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
+5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
+6. **Validate**: `python scripts/validate_chart.py output.html`
+
+Data arrays to replace: **4**
+
+## Reference Code
 
 ```javascript
 /*
@@ -122,10 +125,3 @@ option = {
   ]
 };
 ```
-
-## Agent Workflow
-
-1. Query DuckDB for real data
-2. Replace each `data: [...]` array with real JSON data
-3. Wrap in HTML shell with inline ECharts
-4. Validate: `python scripts/validate_chart.py output.html`
