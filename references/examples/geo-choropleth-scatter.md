@@ -25,6 +25,44 @@ The code contains **2 data array(s)** to replace:
  ...`
 - **Replace with**: real data from DuckDB in the same format
 
+
+## External Data Format
+
+This example uses external data. Format from `iceland.geo.json`:
+
+```json
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -14.6146,
+              65.9863
+            ],
+            [
+              -14.663,
+              65.9811
+            ],
+            [
+              -14.6941,
+              65.9438
+            ],
+            [
+              -15.1014,
+              65.922
+            ],
+            [
+              -15.1263,
+
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

@@ -11,6 +11,29 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `masterPainterColorChoice.json`:
+
+```json
+[
+  {
+    "uid": "12a671",
+    "text": [
+      "Perikopenbuch Heinrichs II., Szene by Unknown.",
+      "Aufklrung nach dem Schneefall am Flu by NA",
+      " by Cui Bai",
+      " by Guo Xi",
+      "Herbst im Flutal by Guo Xi",
+      "Predigtsammlungen des Mnchs Johannes von Kokkinobaphos ber die Jungfrau Maria, Szene by Unknown.",
+      "Predigtsammlungen des Mnchs Johannes von Kokkinobaphos ber die Jungfrau Maria, Szene by Unknown.",
+      "Koran, Szene by Unknown.",
+      "Kitb ad-Diryq (Buch d
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

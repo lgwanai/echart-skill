@@ -11,6 +11,45 @@ Columns needed: need nested **name+value** or **name+children**
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `echarts-package-size.json`:
+
+```json
+[
+  {
+    "name": "action",
+    "size": 2307,
+    "children": [
+      {
+        "name": "action/roamHelper.ts",
+        "size": 2307,
+        "value": 2307
+      }
+    ],
+    "value": 2307
+  },
+  {
+    "name": "animation",
+    "size": 44515,
+    "children": [
+      {
+        "name": "animation/basicTrasition.ts",
+        "size": 11322,
+        "value": 11322
+      },
+      {
+        "name": "animation/morphTransitionHelper.ts",
+        "size": 8706,
+        "value": 8706
+      },
+      {
+       
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

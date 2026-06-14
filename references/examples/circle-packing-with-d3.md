@@ -11,6 +11,52 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `option-view.json`:
+
+```json
+{
+  "dataZoom": {
+    "$count": 6229
+  },
+  "legend": {
+    "$count": 9273,
+    "align": {
+      "$count": 942
+    },
+    "right": {
+      "$count": 634
+    },
+    "z": {
+      "$count": 567
+    },
+    "orient": {
+      "$count": 1356
+    },
+    "show": {
+      "$count": 1181
+    },
+    "zlevel": {
+      "$count": 634
+    },
+    "left": {
+      "$count": 1137
+    },
+    "itemHeight": {
+      "$count": 455
+    },
+    "bottom": {
+      "$count": 788
+    },
+    "itemGap": {
+      "$count": 761
+    
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

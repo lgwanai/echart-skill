@@ -19,6 +19,41 @@ The code contains **1 data array(s)** to replace:
  ...`
 - **Replace with**: real data from DuckDB in the same format
 
+
+## External Data Format
+
+This example uses external data. Format from `HK.json`:
+
+```json
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Central and Western",
+        "ID_0": 102,
+        "ID_1": 1,
+        "ISO": "HKG"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                114.113747,
+                22.285694
+              ],
+              [
+                114.113747,
+                22.285418
+              ],
+            
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

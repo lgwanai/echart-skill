@@ -11,6 +11,40 @@ Columns needed: need nested **name+value** or **name+children**
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `disk.tree.json`:
+
+```json
+[
+  {
+    "value": 40,
+    "name": "Accessibility",
+    "path": "Accessibility"
+  },
+  {
+    "value": 180,
+    "name": "Accounts",
+    "path": "Accounts",
+    "children": [
+      {
+        "value": 76,
+        "name": "Access",
+        "path": "Accounts/Access",
+        "children": [
+          {
+            "value": 12,
+            "name": "DefaultAccessPlugin.bundle",
+            "path": "Accounts/Access/DefaultAccessPlugin.bundle"
+          },
+          {
+            "value": 28,
+            "
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

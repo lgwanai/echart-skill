@@ -17,6 +17,44 @@ The code contains **1 data array(s)** to replace:
           { name: 'a', value: [7.667821250000001, 46.791734269956265]`
 - **Replace with**: real data from DuckDB in the same format
 
+
+## External Data Format
+
+This example uses external data. Format from `ch.geo.json`:
+
+```json
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.7881,
+              46.405
+            ],
+            [
+              6.7821,
+              46.3785
+            ],
+            [
+              6.7504,
+              46.3455
+            ],
+            [
+              6.8277,
+              46.2695
+            ],
+            [
+              6.7922,
+         
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

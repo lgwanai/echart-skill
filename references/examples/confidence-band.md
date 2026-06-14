@@ -11,6 +11,35 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `confidence-band.json`:
+
+```json
+[
+  {
+    "value": -1.1618426259,
+    "date": "2012-08-28",
+    "l": -2.6017329022,
+    "u": 0.2949717757
+  },
+  {
+    "value": -0.5828247293,
+    "date": "2012-08-29",
+    "l": -1.3166963635,
+    "u": 0.1324086347
+  },
+  {
+    "value": -0.3790770636,
+    "date": "2012-08-30",
+    "l": -0.8712221305,
+    "u": 0.0956413566
+  }
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

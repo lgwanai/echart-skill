@@ -11,6 +11,29 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `winds.json`:
+
+```json
+[
+  [
+    -2.9,
+    4.2
+  ],
+  [
+    -3,
+    4.1
+  ],
+  [
+    -3,
+    4.1
+  ]
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

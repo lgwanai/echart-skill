@@ -11,6 +11,51 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `nutrients.json`:
+
+```json
+[
+  [
+    "Beverage, instant breakfast powder, chocolate, not reconstituted",
+    "Dairy and Egg Products",
+    19.9,
+    0.285,
+    0.385,
+    0.4,
+    0.07690000000000001,
+    0.947,
+    66.2,
+    65.8,
+    1.4,
+    7.4,
+    357,
+    0.56,
+    0.314,
+    0.278,
+    27481
+  ],
+  [
+    "Beverage, instant breakfast powder, chocolate, sugar-free, not reconstituted",
+    "Dairy and Egg Products",
+    35.8,
+    0.5,
+    0.717,
+    2,
+    0.138,
+    1.705,
+    41,
+    39,
+    5.1,
+    7.4,
+    358,
+ 
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

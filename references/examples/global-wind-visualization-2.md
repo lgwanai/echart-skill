@@ -11,6 +11,33 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `gfs.json`:
+
+```json
+[
+  {
+    "header": {
+      "discipline": 0,
+      "disciplineName": "Meteorological products",
+      "gribEdition": 2,
+      "gribLength": 133963,
+      "center": 7,
+      "centerName": "US National Weather Service - NCEP(WMC)",
+      "subcenter": 0,
+      "refTime": "2014-11-30T06:00:00.000Z",
+      "significanceOfRT": 1,
+      "significanceOfRTName": "Start of forecast",
+      "productStatus": 0,
+      "productStatusName": "Operational products",
+      "productType": 1,
+      "productTypeName
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

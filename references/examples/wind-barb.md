@@ -11,6 +11,35 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `wind-barb-hobart.json`:
+
+```json
+[
+  {
+    "time": "2017-06-27T11:00:00.000Z",
+    "windSpeed": 9,
+    "R": "NNW",
+    "waveHeight": 2.64
+  },
+  {
+    "time": "2017-06-27T12:30:00.000Z",
+    "windSpeed": 10,
+    "R": "NNW",
+    "waveHeight": 2.57
+  },
+  {
+    "time": "2017-06-27T14:00:00.000Z",
+    "windSpeed": 12,
+    "R": "NNW",
+    "waveHeight": 2.49
+  }
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

@@ -11,6 +11,52 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `flights.json`:
+
+```json
+{
+  "airportsFields": [
+    "name",
+    "city",
+    "country",
+    "longitude",
+    "latitude"
+  ],
+  "airlineFields": [
+    "name",
+    "country"
+  ],
+  "airports": [
+    [
+      "Goroka",
+      "Goroka",
+      "Papua New Guinea",
+      145.391881,
+      -6.081689
+    ],
+    [
+      "Madang",
+      "Madang",
+      "Papua New Guinea",
+      145.7887,
+      -5.207083
+    ],
+    [
+      "Mount Hagen",
+      "Mount Hagen",
+      "Papua New Guinea",
+      144.295861,
+      -5.826789
+    ],
+    [
+   
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

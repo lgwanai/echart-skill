@@ -11,6 +11,58 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `airport-schedule.json`:
+
+```json
+{
+  "parkingApron": {
+    "dimensions": [
+      "Name",
+      "Type",
+      "Near Bridge"
+    ],
+    "data": [
+      [
+        "AB94",
+        "W",
+        true
+      ],
+      [
+        "AB95",
+        "W",
+        true
+      ],
+      [
+        "AB96",
+        "W",
+        true
+      ],
+      [
+        "AB97",
+        "W",
+        true
+      ],
+      [
+        "AB98",
+        "W",
+        true
+      ],
+      [
+        "AS3",
+        "W",
+        true
+      ],
+      [
+        "AS4",
+        "W",
+
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

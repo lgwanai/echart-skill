@@ -11,6 +11,35 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `internet.graph.json`:
+
+```json
+[
+  [
+    249,
+    -33,
+    4,
+    4
+  ],
+  [
+    251,
+    -143,
+    4,
+    4
+  ],
+  [
+    -715,
+    234,
+    4,
+    0
+  ]
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

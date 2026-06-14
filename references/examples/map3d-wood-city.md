@@ -11,6 +11,45 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `buildings.json`:
+
+```json
+{
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "0",
+        "height": 0.7
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          "@@Ӽѻ࡮ϐ˥ɾ؝ʳmpȓǮʣĻ"
+        ],
+        "encodeOffsets": [
+          [
+            13368440,
+            52534490
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "1",
+        "height": 0
+      },
+      "geometry": {
+        "type": "Polygo
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

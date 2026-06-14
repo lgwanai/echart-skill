@@ -11,6 +11,38 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `stack-trace.json`:
+
+```json
+[
+  {
+    "name": "genunix syscall_mstate",
+    "id": "b25b0d27-ce7b-44e9-b2b6-ff168a6fa36c",
+    "value": 89
+  },
+  {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                               
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

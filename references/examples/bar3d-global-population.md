@@ -11,6 +11,32 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `population.json`:
+
+```json
+[
+  [
+    -83,
+    76.5,
+    1.1
+  ],
+  [
+    -85.5,
+    73.5,
+    2.9
+  ],
+  [
+    -78,
+    73,
+    1.5
+  ]
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

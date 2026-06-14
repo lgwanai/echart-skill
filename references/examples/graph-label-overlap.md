@@ -11,6 +11,44 @@ Columns needed: need **nodes** [{name,...}] + **links/edges** [{source,target}]
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `les-miserables.json`:
+
+```json
+[
+  {
+    "id": "0",
+    "name": "Myriel",
+    "symbolSize": 19.12381,
+    "x": -266.82776,
+    "y": 299.6904,
+    "value": 28.685715,
+    "category": 0
+  },
+  {
+    "id": "1",
+    "name": "Napoleon",
+    "symbolSize": 2.6666666666666665,
+    "x": -418.08344,
+    "y": 446.8853,
+    "value": 4,
+    "category": 0
+  },
+  {
+    "id": "2",
+    "name": "MlleBaptistine",
+    "symbolSize": 6.323809333333333,
+    "x": -212.76357,
+    "y": 245.29176,
+    "value": 9.485714,
+    "category": 1
+  }
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

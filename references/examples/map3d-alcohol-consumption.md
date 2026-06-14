@@ -11,6 +11,29 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `alcohol.json`:
+
+```json
+[
+  [
+    "Afghanistan",
+    "0.01"
+  ],
+  [
+    "Albania",
+    "2.01"
+  ],
+  [
+    "Algeria",
+    "0.15"
+  ]
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

@@ -11,6 +11,75 @@ Columns needed: check data arrays in reference code for required format
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `lines-bus.json`:
+
+```json
+[
+  [
+    1164383,
+    401471,
+    -11,
+    -13,
+    1,
+    -49,
+    -26,
+    -14,
+    99,
+    -170,
+    4,
+    -36,
+    87,
+    -2,
+    16,
+    -141,
+    -2,
+    -15,
+    -47,
+    -6,
+    -168,
+    -9,
+    -2,
+    22,
+    -74,
+    -4,
+    -138,
+    10,
+    12,
+    -152,
+    9,
+    -55,
+    -17,
+    -111,
+    13,
+    -176,
+    -20,
+    -38,
+    1,
+    -57,
+    31,
+    -54,
+    28,
+    -85,
+    -5,
+    -126,
+    -13,
+    -62,
+    1,
+    -34,
+    -84,
+    1,
+    -3,
+    -218,
+    15,
+    6,
+    78
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

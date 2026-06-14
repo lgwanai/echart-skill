@@ -11,6 +11,42 @@ Columns needed: need nested **name+value** or **name+children**
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `obama_budget_proposal_2012.json`:
+
+```json
+[
+  {
+    "value": [
+      1226629000,
+      null,
+      null
+    ],
+    "name": "Health and Human Services",
+    "id": "branch-8",
+    "discretion": null,
+    "children": [
+      {
+        "value": [
+          1105220000,
+          1071808000,
+          3.11734937600765
+        ],
+        "name": "Centers for Medicare and Medicaid Services",
+        "id": "leaf-135",
+        "discretion": "mandatory"
+      },
+      {
+        "value": [
+          34502000,
+          34325000,
+          0.5156591
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

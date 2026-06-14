@@ -11,6 +11,45 @@ Columns needed: need nested **name+value** or **name+children**
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `ec-option-doc-statistics-201604.json`:
+
+```json
+{
+  "xAxis": {
+    "axisLabel": {
+      "$count": 2534,
+      "show": {
+        "$count": 444
+      },
+      "interval": {
+        "$count": 950
+      },
+      "rotate": {
+        "$count": 584
+      },
+      "inside": {
+        "$count": 416
+      },
+      "formatter": {
+        "$count": 886
+      },
+      "textStyle": {
+        "$count": 490,
+        "color": {
+          "$count": 142
+        },
+        "fontStyle": {
+          "$count": 107
+        },
+        "fontWeight": {
+          "$coun
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

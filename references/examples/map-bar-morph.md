@@ -11,6 +11,43 @@ Columns needed: need **region name** + **value** columns
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `USA.json`:
+
+```json
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "01",
+      "properties": {
+        "name": "Alabama"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -87.359296,
+              35.00118
+            ],
+            [
+              -85.606675,
+              34.984749
+            ],
+            [
+              -85.431413,
+              34.124869
+            ],
+            [
+           
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

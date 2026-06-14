@@ -11,6 +11,26 @@ Columns needed: need **source**, **target**, **value** columns
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `energy.json`:
+
+```json
+[
+  {
+    "name": "Agricultural 'waste'"
+  },
+  {
+    "name": "Bio-conversion"
+  },
+  {
+    "name": "Liquid"
+  }
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

@@ -11,6 +11,50 @@ Columns needed: need **x**, **y**, **value** columns
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `hangzhou-tracks.json`:
+
+```json
+[
+  [
+    {
+      "coord": [
+        120.14322240845,
+        30.236064370321
+      ],
+      "elevation": 21
+    },
+    {
+      "coord": [
+        120.14280555506,
+        30.23633761213
+      ],
+      "elevation": 5
+    },
+    {
+      "coord": [
+        120.14307598649,
+        30.236125905084
+      ],
+      "elevation": 30.7
+    },
+    {
+      "coord": [
+        120.14301682797,
+        30.236035316745
+      ],
+      "elevation": 15.4
+    },
+    {
+      "coord": [
+        120.1428734612,
+     
+...
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

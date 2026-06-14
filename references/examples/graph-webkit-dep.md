@@ -16,6 +16,32 @@ The code contains **1 data array(s)** to replace:
 - **Location**: `data: ['HTMLElement', 'WebGL', 'SVG', 'CSS', 'Other']`
 - **Replace with**: real data from DuckDB in the same format
 
+
+## External Data Format
+
+This example uses external data. Format from `webkit-dep.json`:
+
+```json
+[
+  {
+    "name": "AnalyserNode",
+    "value": 1,
+    "category": 4
+  },
+  {
+    "name": "AudioNode",
+    "value": 1,
+    "category": 4
+  },
+  {
+    "name": "Uint8Array",
+    "value": 1,
+    "category": 4
+  }
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

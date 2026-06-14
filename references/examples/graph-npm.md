@@ -11,6 +11,44 @@ Columns needed: need **nodes** [{name,...}] + **links/edges** [{source,target}]
 
 The code contains **0 data array(s)** to replace:
 
+
+## External Data Format
+
+This example uses external data. Format from `npmdepgraph.min10.json`:
+
+```json
+[
+  {
+    "color": "#4f19c7",
+    "label": "jquery",
+    "attributes": {},
+    "y": -404.26147,
+    "x": -739.36383,
+    "id": "jquery",
+    "size": 4.7252817
+  },
+  {
+    "color": "#c71969",
+    "label": "backbone",
+    "attributes": {},
+    "y": -862.7517,
+    "x": -134.2215,
+    "id": "backbone",
+    "size": 6.1554675
+  },
+  {
+    "color": "#c71969",
+    "label": "underscore",
+    "attributes": {},
+    "y": -734.4221,
+    "x": -75.53079,
+    "id": "underscore",
+    "size": 100.0
+  }
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above

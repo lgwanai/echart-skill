@@ -22,6 +22,29 @@ The code contains **1 data array(s)** to replace:
 ...`
 - **Replace with**: real data from DuckDB in the same format
 
+
+## External Data Format
+
+This example uses external data. Format from `aqi-beijing.json`:
+
+```json
+[
+  [
+    "2000-06-05",
+    116
+  ],
+  [
+    "2000-06-06",
+    129
+  ],
+  [
+    "2000-06-07",
+    135
+  ]
+]
+```
+
+Agent: build DuckDB query to produce matching data structure.
 ## Agent Workflow
 
 1. **Analyze** user table → identify columns matching the required format above
