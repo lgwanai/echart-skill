@@ -4,8 +4,8 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   title: {
     text: 'World Population'
   },
@@ -22,21 +22,21 @@ var option = {
   },
   yAxis: {
     type: 'category',
-    data: {{DATA_0}}
+    data: ['Brazil', 'Indonesia', 'USA', 'India', 'China', 'World']
   },
   series: [
     {
       name: '2011',
       type: 'bar',
-      data: {{DATA_1}}
+      data: [18203, 23489, 29034, 104970, 131744, 630230]
     },
     {
       name: '2012',
       type: 'bar',
-      data: {{DATA_2}}
+      data: [19325, 23438, 31000, 121594, 134141, 681807]
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

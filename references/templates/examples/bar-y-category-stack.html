@@ -4,8 +4,8 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   tooltip: {
     trigger: 'axis',
     axisPointer: {
@@ -19,7 +19,7 @@ var option = {
   },
   yAxis: {
     type: 'category',
-    data: {{DATA_0}}
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   },
   series: [
     {
@@ -32,7 +32,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_1}}
+      data: [320, 302, 301, 334, 390, 330, 320]
     },
     {
       name: 'Mail Ad',
@@ -44,7 +44,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_2}}
+      data: [120, 132, 101, 134, 90, 230, 210]
     },
     {
       name: 'Affiliate Ad',
@@ -56,7 +56,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_3}}
+      data: [220, 182, 191, 234, 290, 330, 310]
     },
     {
       name: 'Video Ad',
@@ -68,7 +68,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_4}}
+      data: [150, 212, 201, 154, 190, 330, 410]
     },
     {
       name: 'Search Engine',
@@ -80,10 +80,10 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_5}}
+      data: [820, 832, 901, 934, 1290, 1330, 1320]
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

@@ -4,10 +4,28 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+let xAxisData = [];
+let data1 = [];
+let data2 = [];
+let data3 = [];
+let data4 = [];
+for (let i = 0; i < 10; i++) {
+  xAxisData.push('Class' + i);
+  data1.push(+(Math.random() * 2).toFixed(2));
+  data2.push(+(Math.random() * 5).toFixed(2));
+  data3.push(+(Math.random() + 0.3).toFixed(2));
+  data4.push(+Math.random().toFixed(2));
+}
+var emphasisStyle = {
+  itemStyle: {
+    shadowBlur: 10,
+    shadowColor: 'rgba(0,0,0,0.3)'
+  }
+};
+option = {
   legend: {
-    data: {{DATA_0}},
+    data: ['bar', 'bar2', 'bar3', 'bar4'],
     left: '10%'
   },
   brush: {
@@ -65,6 +83,27 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+myChart.on('brushSelected', function (params) {
+  var brushed = [];
+  var brushComponent = params.batch[0];
+  for (var sIdx = 0; sIdx < brushComponent.selected.length; sIdx++) {
+    var rawIndices = brushComponent.selected[sIdx].dataIndex;
+    brushed.push('[Series ' + sIdx + '] ' + rawIndices.join(', '));
+  }
+  myChart.setOption({
+    title: {
+      backgroundColor: '#333',
+      text: 'SELECTED DATA INDICES: \n' + brushed.join('\n'),
+      bottom: 0,
+      right: '10%',
+      width: 100,
+      textStyle: {
+        fontSize: 12,
+        color: '#fff'
+      }
+    }
+  });
+});
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

@@ -2,10 +2,17 @@
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+const colors = {
+  red: '#f88',
+  green: '#8f8',
+  blue: '#8bf',
+  yellow: '#ff8'
+};
+option = {
   matrix: {
     x: {
       data: Array.from({ length: 19 }, (_, i) => i + 1 + ''),
@@ -45,7 +52,8 @@ var option = {
   series: {
     type: 'custom',
     coordinateSystem: 'matrix',
-    data: {{DATA_0}},
+    data: [
+      ['1', '1', '1', 'H', colors.red],
       ['19', '1', '2', 'He', colors.red],
       ['1', '2', '3', 'Li', colors.red],
       ['2', '2', '4', 'Be', colors.red],
@@ -210,6 +218,49 @@ var option = {
     }
   }
 };
-chart.setOption(option);
+setTimeout(function () {
+  const elements = [
+    ['2', '9', 'Lanthanides', 20],
+    ['2', '10', 'Actinides', 20],
+    ['1', '1', 'Nonmetals', -70],
+    ['1', '2', 'Metals', -70],
+    ['19', '1', 'Noble gases', 0, -40],
+    ['9', '3', 'Transition metals\n(somtimes excl. group 12)', -25],
+    ['1', '8', 's-block\n(incl. He)', 20, -3],
+    ['3', '8', 'f-block', 0, -10],
+    ['9', '8', 'd-block', -25, -10],
+    ['17', '8', 'p-block (excl. He)', -25, -10],
+    [
+      '16',
+      '1',
+      'Some elements near\nthe dashed staircase are\nsometimes called metalloids'
+    ]
+  ].map((row) => {
+    const center = myChart.convertToPixel(
+      {
+        matrixIndex: 0
+      },
+      row.slice(0, 2)
+    );
+    return {
+      type: 'text',
+      style: {
+        text: row[2],
+        fill: '#333',
+        font: 'italic bold 14px sans-serif',
+        textAlign: 'center',
+        textVerticalAlign: 'middle'
+      },
+      x: center[0] + (row[3] || 0),
+      y: center[1] + (row[4] || 0)
+    };
+  });
+  myChart.setOption({
+    graphic: {
+      elements
+    }
+  });
+});
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

@@ -6,8 +6,89 @@
 <!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+$.getScript(CDN_PATH + 'simplex-noise@2.4.0/simplex-noise.js').done(
+  function () {
+    var simplex = new SimplexNoise();
+    var UPDATE_DURATION = 1000;
+    function initVisualizer() {
+      var config = {
+        numWaves: 2,
+        randomize: randomize,
+        color1: '#000',
+        color2: '#300',
+        color3: '#fff',
+        size: 150,
+        roughness: 0.5,
+        metalness: 0
+      };
+      for (var i = 0; i < 2; i++) {
+        config['wave' + i + 'axis' + 'x'] = Math.random();
+        config['wave' + i + 'axis' + 'y'] = Math.random();
+        config['wave' + i + 'rounding'] = Math.random();
+        config['wave' + i + 'square'] = Math.random();
+      }
+      function randomize() {
+        for (var i = 0; i < 2; i++) {
+          config['wave' + i + 'axis' + 'x'] = Math.random();
+          config['wave' + i + 'axis' + 'y'] = Math.random();
+          config['wave' + i + 'rounding'] = Math.random();
+          config['wave' + i + 'square'] = Math.random();
+        }
+        for (var i in gui.__controllers) {
+          gui.__controllers[i].updateDisplay();
+        }
+        update();
+      }
+      function update() {
+        var item = [];
+        var dataProvider = [];
+        var mod = 0.1;
+        for (var s = 0; s < config.size * config.size; s++) {
+          var x = s % config.size;
+          var y = Math.floor(s / config.size);
+          var output = 0;
+          for (var i = 0; i < config.numWaves; i++) {
+            var n = simplex.noise2D(
+              i * 213 +
+                (-50 + x) * mod * (1 - config['wave' + i + 'axis' + 'x']) * 0.5,
+              i * 3124 +
+                (-50 + y) * mod * (1 - config['wave' + i + 'axis' + 'y']) * 0.5
+            );
+            n = Math.pow(n, 1.95 - 1.9 * config['wave' + i + 'rounding']);
+            var square = Math.floor(
+              (1.1 - config['wave' + i + 'square']) * 100
+            );
+            n = Math.round(n * square) / square;
+            if (output < n) output = n;
+          }
+          dataProvider.push([x, y, (output + 0.1) * 2]);
+        }
+        myChart.setOption({
+          visualMap: {
+            inRange: {
+              barSize: 100 / config.size,
+              color: [config.color1, config.color2, config.color3]
+            }
+          },
+          series: [
+            {
+              data: dataProvider,
+              realisticMaterial: {
+                roughness: config.roughness,
+                metalness: config.metalness
+              }
+            }
+          ]
+        });
+      }
+      update();
+    }
+    var focalRange = 40;
+    var blurRadius = 4;
+    myChart.setOption(
+      (
+option = {
         toolbox: {
           left: 20,
           iconStyle: {
@@ -76,7 +157,7 @@ var option = {
               intensity: 0
             },
             ambientCubemap: {
-              texture: ROOT_PATH + '/data-gl/asset/pisa.hdr',
+// ROOT_PATH removed
               exposure: 2,
               diffuseIntensity: 1,
               specularIntensity: 1
@@ -94,7 +175,7 @@ var option = {
             },
             instancing: true,
             barSize: 0.6,
-            data: {{DATA_0}},
+            data: [],
             lineStyle: {
               width: 4
             },
@@ -105,7 +186,13 @@ var option = {
             animationDurationUpdate: UPDATE_DURATION
           }
         ]
-      };
-chart.setOption(option);
+      })
+    );
+    setTimeout(function () {
+      initVisualizer();
+    });
+  }
+);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

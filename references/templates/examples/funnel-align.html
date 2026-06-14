@@ -4,8 +4,8 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   title: {
     text: 'Funnel Compare',
     subtext: 'Fake Data',
@@ -29,7 +29,7 @@ var option = {
   legend: {
     orient: 'vertical',
     left: 'left',
-    data: {{DATA_0}}
+    data: ['Prod A', 'Prod B', 'Prod C', 'Prod D', 'Prod E']
   },
   series: [
     {
@@ -40,7 +40,13 @@ var option = {
       left: '5%',
       top: '50%',
       funnelAlign: 'right',
-      data: {{DATA_1}}
+      data: [
+        { value: 60, name: 'Prod C' },
+        { value: 30, name: 'Prod D' },
+        { value: 10, name: 'Prod E' },
+        { value: 80, name: 'Prod B' },
+        { value: 100, name: 'Prod A' }
+      ]
     },
     {
       name: 'Pyramid',
@@ -51,7 +57,13 @@ var option = {
       top: '5%',
       sort: 'ascending',
       funnelAlign: 'right',
-      data: {{DATA_2}}
+      data: [
+        { value: 60, name: 'Prod C' },
+        { value: 30, name: 'Prod D' },
+        { value: 10, name: 'Prod E' },
+        { value: 80, name: 'Prod B' },
+        { value: 100, name: 'Prod A' }
+      ]
     },
     {
       name: 'Funnel',
@@ -61,7 +73,13 @@ var option = {
       left: '55%',
       top: '5%',
       funnelAlign: 'left',
-      data: {{DATA_3}}
+      data: [
+        { value: 60, name: 'Prod C' },
+        { value: 30, name: 'Prod D' },
+        { value: 10, name: 'Prod E' },
+        { value: 80, name: 'Prod B' },
+        { value: 100, name: 'Prod A' }
+      ]
     },
     {
       name: 'Pyramid',
@@ -72,10 +90,16 @@ var option = {
       top: '50%',
       sort: 'ascending',
       funnelAlign: 'left',
-      data: {{DATA_4}}
+      data: [
+        { value: 60, name: 'Prod C' },
+        { value: 30, name: 'Prod D' },
+        { value: 10, name: 'Prod E' },
+        { value: 80, name: 'Prod B' },
+        { value: 100, name: 'Prod A' }
+      ]
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

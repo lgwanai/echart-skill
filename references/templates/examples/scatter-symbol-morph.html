@@ -1,19 +1,10 @@
 <!-- scatter-symbol-morph — https://echarts.apache.org/examples/zh/editor.html?c=scatter-symbol-morph -->
 <!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>{TITLE}</title>
-<!-- {ECHARTS_INLINE} -->
-
+<head><meta charset="utf-8"><title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-chart.setOption(/*
-title: Symbol Shape Morph
-category: scatter
-titleCN: 散点图变形动画
-difficulty: 4
-videoStart: 1000
-videoEnd: 8000
-*/
+var chart = echarts.init(document.getElementById("main"));
 let xData = [];
 let yData = [];
 let data = [];
@@ -64,7 +55,6 @@ const options = [
     ]
   },
   {
-    // heart
     series: [
       {
         symbol:
@@ -73,7 +63,6 @@ const options = [
     ]
   },
   {
-    // happy
     series: [
       {
         symbol:
@@ -82,7 +71,6 @@ const options = [
     ]
   },
   {
-    // evil
     series: [
       {
         symbol:
@@ -91,7 +79,6 @@ const options = [
     ]
   },
   {
-    // hipster
     series: [
       {
         symbol:
@@ -100,7 +87,6 @@ const options = [
     ]
   },
   {
-    // shocked
     series: [
       {
         symbol:
@@ -109,7 +95,6 @@ const options = [
     ]
   },
   {
-    // pie chart
     series: [
       {
         symbol:
@@ -118,7 +103,6 @@ const options = [
     ]
   },
   {
-    // users
     series: [
       {
         symbol:
@@ -127,7 +111,6 @@ const options = [
     ]
   },
   {
-    // mug
     series: [
       {
         symbol:
@@ -136,7 +119,6 @@ const options = [
     ]
   },
   {
-    // plane
     series: [
       {
         symbol:
@@ -150,6 +132,7 @@ option = options[optionIndex];
 setInterval(function () {
   optionIndex = (optionIndex + 1) % options.length;
   myChart.setOption(options[optionIndex]);
-}, 700););
+}, 700);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

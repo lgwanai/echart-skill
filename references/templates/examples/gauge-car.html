@@ -4,8 +4,8 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   backgroundColor: '#000',
   tooltip: {
     formatter: '{a} <br/>{b} : {c}%'
@@ -63,7 +63,12 @@ var option = {
           color: '#fff'
         }
       },
-      data: {{DATA_0}}
+      data: [
+        {
+          value: 250,
+          name: 'km/h'
+        }
+      ]
     },
     {
       name: 'gauge 1',
@@ -126,7 +131,12 @@ var option = {
       detail: {
         show: false
       },
-      data: {{DATA_1}}
+      data: [
+        {
+          value: 0,
+          name: '当前位置：\n \n 中科路'
+        }
+      ]
     },
     // middle
     {
@@ -199,7 +209,12 @@ var option = {
         fontFamily: 'Arial',
         offsetCenter: [0, '-50%']
       },
-      data: {{DATA_2}},
+      data: [
+        {
+          value: 0.6,
+          name: '1/min x 1000'
+        }
+      ],
       detail: {
         show: false
       }
@@ -256,7 +271,12 @@ var option = {
         }
       },
       // value is speed
-      data: {{DATA_3}}
+      data: [
+        {
+          value: 0,
+          name: ''
+        }
+      ]
     },
     // right
     {
@@ -323,7 +343,12 @@ var option = {
           color: '#fff'
         }
       },
-      data: {{DATA_4}}
+      data: [
+        {
+          value: 250,
+          name: ''
+        }
+      ]
     },
     {
       name: 'gauge 5',
@@ -412,7 +437,12 @@ var option = {
           }
         }
       },
-      data: {{DATA_5}}
+      data: [
+        {
+          value: 0.85,
+          name: ''
+        }
+      ]
     },
     {
       name: 'gauge 6',
@@ -480,10 +510,15 @@ var option = {
       detail: {
         show: false
       },
-      data: {{DATA_6}}
+      data: [
+        {
+          value: -120,
+          name: ''
+        }
+      ]
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

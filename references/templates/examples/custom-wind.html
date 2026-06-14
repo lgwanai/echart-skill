@@ -5,8 +5,44 @@
 <!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+function shuffle(array) {
+  var currentIndex = array.length;
+  var temporaryValue;
+  var randomIndex;
+  while (0 !== currentIndex) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
+}
+  var p = 0;
+  var maxMag = 0;
+  var minMag = Infinity;
+  var data = [];
+  for (var j = 0; j < windData.ny; j++) {
+    for (var i = 0; i < windData.nx; i++, p++) {
+      var vx = windData.data[p][0];
+      var vy = windData.data[p][1];
+      var mag = Math.sqrt(vx * vx + vy * vy);
+      data.push([
+        (i / windData.nx) * 360 - 180,
+        (j / windData.ny) * 180 - 90,
+        vx,
+        vy,
+        mag
+      ]);
+      maxMag = Math.max(mag, maxMag);
+      minMag = Math.min(mag, minMag);
+    }
+  }
+  shuffle(data);
+  myChart.setOption(
+    (
+option = {
       backgroundColor: '#333',
       visualMap: {
         left: 'center',
@@ -70,6 +106,12 @@ var option = {
               stroke: api.visual('color')
             }
           };
-chart.setOption(option);
+        },
+        progressive: 2000
+      }
+    })
+  );
+});
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

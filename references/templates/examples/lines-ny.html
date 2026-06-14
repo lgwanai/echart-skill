@@ -5,8 +5,45 @@
 <!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+var CHUNK_COUNT = 32;
+var dataCount = 0;
+function fetchData(idx) {
+  if (idx >= CHUNK_COUNT) {
+    return;
+  }
+  var dataURL =
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', dataURL, true);
+  xhr.responseType = 'arraybuffer';
+  xhr.onload = function (e) {
+    var rawData = new Float32Array(this.response);
+    var data = new Float64Array(rawData.length - 2);
+    var offsetX = rawData[0];
+    var offsetY = rawData[1];
+    var off = 0;
+    var addedDataCount = 0;
+    for (var i = 2; i < rawData.length; ) {
+      var count = rawData[i++];
+      data[off++] = count;
+      for (var k = 0; k < count; k++) {
+        var x = rawData[i++] + offsetX;
+        var y = rawData[i++] + offsetY;
+        data[off++] = x;
+        data[off++] = y;
+        addedDataCount++;
+      }
+    }
+    myChart.appendData({
+      seriesIndex: 0,
+      data: data
+    });
+    dataCount += addedDataCount;
+    fetchData(idx + 1);
+  };
+  xhr.send();
+}
+option = {
   progressive: 20000,
   backgroundColor: '#111',
   geo: {
@@ -38,6 +75,7 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+fetchData(0);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

@@ -4,10 +4,10 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   legend: {
-    data: {{DATA_0}}
+    data: ['Altitude (km) vs. temperature (°C)']
   },
   tooltip: {
     trigger: 'axis',
@@ -32,7 +32,7 @@ var option = {
       formatter: '{value} km'
     },
     boundaryGap: false,
-    data: {{DATA_1}}
+    data: ['0', '10', '20', '30', '40', '50', '60', '70', '80']
   },
   series: [
     {
@@ -47,10 +47,10 @@ var option = {
         shadowBlur: 10,
         shadowOffsetY: 8
       },
-      data: {{DATA_2}}
+      data: [15, -50, -56.5, -46.5, -22.1, -2.5, -27.7, -55.7, -76.5]
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

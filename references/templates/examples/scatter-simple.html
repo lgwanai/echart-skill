@@ -4,14 +4,15 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   xAxis: {},
   yAxis: {},
   series: [
     {
       symbolSize: 20,
-      data: {{DATA_0}},
+      data: [
+        [10.0, 8.04],
         [8.07, 6.95],
         [13.0, 7.58],
         [9.05, 8.81],
@@ -38,6 +39,6 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

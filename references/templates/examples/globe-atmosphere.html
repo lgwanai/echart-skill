@@ -5,13 +5,13 @@
 <!-- {{GL_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   backgroundColor: '#000',
   globe: {
-    baseTexture: ROOT_PATH + '/data-gl/asset/earth.jpg',
+// ROOT_PATH removed
     shading: 'lambert',
-    environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
+// ROOT_PATH removed
     atmosphere: {
       show: true
     },
@@ -26,6 +26,6 @@ var option = {
   },
   series: []
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

@@ -4,8 +4,10 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+var formatTime = echarts.time.format;
+var _data = generateData1();
+option = {
   // Choose axis ticks based on UTC time.
   useUTC: true,
   title: {
@@ -80,6 +82,30 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+
+function generateData1() {
+  var seriesData = [];
+  var time = new Date('2024-04-09T09:30:00Z');
+  var endTime = new Date('2024-04-09T15:00:00Z').getTime();
+  var breakStart = new Date('2024-04-09T11:30:00Z').getTime();
+  var breakEnd = new Date('2024-04-09T13:00:00Z').getTime();
+  for (var val = 1669; time.getTime() <= endTime; ) {
+    if (time.getTime() <= breakStart || time.getTime() >= breakEnd) {
+      val =
+        val +
+        Math.floor((Math.random() - 0.5 * Math.sin(val / 1000)) * 20 * 100) /
+          100;
+      val = +val.toFixed(2);
+      seriesData.push([time.getTime(), val]);
+    }
+    time.setMinutes(time.getMinutes() + 1);
+  }
+  return {
+    seriesData: seriesData,
+    breakStart: breakStart,
+    breakEnd: breakEnd
+  };
+}
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

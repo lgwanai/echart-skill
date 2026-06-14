@@ -1,17 +1,10 @@
 <!-- parallel-nutrients — https://echarts.apache.org/examples/zh/editor.html?c=parallel-nutrients -->
 <!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>{TITLE}</title>
-<!-- {ECHARTS_INLINE} -->
-
+<head><meta charset="utf-8"><title>{{TITLE}}</title>
+<!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-chart.setOption(/*
-title: Parallel Nutrients
-category: parallel
-titleCN: 营养结构（平行坐标）
-difficulty: 4
-*/
+var chart = echarts.init(document.getElementById("main"));
 const indices = {
   name: 0,
   group: 1,
@@ -38,9 +31,9 @@ const schema = [
 ];
 const groupCategories = [];
 const groupColors = [];
-$.get(ROOT_PATH + '/data/asset/data/nutrients.json', function (data) {
   normalizeData(data);
-  myChart.setOption((option = getOption(data)));
+  myChart.setOption((
+option = getOption(data)));
 });
 function normalizeData(originData) {
   const groupMap = {};
@@ -178,6 +171,7 @@ function getOption(data) {
       }
     ]
   };
-});
+}
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

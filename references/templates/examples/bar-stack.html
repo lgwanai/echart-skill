@@ -4,8 +4,8 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   tooltip: {
     trigger: 'axis',
     axisPointer: {
@@ -16,7 +16,7 @@ var option = {
   xAxis: [
     {
       type: 'category',
-      data: {{DATA_0}}
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     }
   ],
   yAxis: [
@@ -31,7 +31,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_1}}
+      data: [320, 332, 301, 334, 390, 330, 320]
     },
     {
       name: 'Email',
@@ -40,7 +40,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_2}}
+      data: [120, 132, 101, 134, 90, 230, 210]
     },
     {
       name: 'Union Ads',
@@ -49,7 +49,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_3}}
+      data: [220, 182, 191, 234, 290, 330, 310]
     },
     {
       name: 'Video Ads',
@@ -58,12 +58,12 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_4}}
+      data: [150, 232, 201, 154, 190, 330, 410]
     },
     {
       name: 'Search Engine',
       type: 'bar',
-      data: {{DATA_5}},
+      data: [862, 1018, 964, 1026, 1679, 1600, 1570],
       emphasis: {
         focus: 'series'
       },
@@ -71,7 +71,7 @@ var option = {
         lineStyle: {
           type: 'dashed'
         },
-        data: {{DATA_6}}]
+        data: [[{ type: 'min' }, { type: 'max' }]]
       }
     },
     {
@@ -82,7 +82,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_7}}
+      data: [620, 732, 701, 734, 1090, 1130, 1120]
     },
     {
       name: 'Google',
@@ -91,7 +91,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_8}}
+      data: [120, 132, 101, 134, 290, 230, 220]
     },
     {
       name: 'Bing',
@@ -100,7 +100,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_9}}
+      data: [60, 72, 71, 74, 190, 130, 110]
     },
     {
       name: 'Others',
@@ -109,10 +109,10 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_10}}
+      data: [62, 82, 91, 84, 109, 110, 120]
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

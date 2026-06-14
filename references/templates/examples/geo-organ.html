@@ -5,8 +5,10 @@
 <!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+  function (svg) {
+    echarts.registerMap('organ_diagram', { svg: svg });
+option = {
       tooltip: {},
       geo: {
         left: 10,
@@ -44,7 +46,15 @@ var option = {
       },
       xAxis: {},
       yAxis: {
-        data: {{DATA_0}}
+        data: [
+          'heart',
+          'large-intestine',
+          'small-intestine',
+          'spleen',
+          'kidney',
+          'lung',
+          'liver'
+        ]
       },
       series: [
         {
@@ -52,10 +62,27 @@ var option = {
           emphasis: {
             focus: 'self'
           },
-          data: {{DATA_1}}
+          data: [121, 321, 141, 52, 198, 289, 139]
         }
       ]
     };
-chart.setOption(option);
+    myChart.setOption(option);
+    myChart.on('mouseover', { seriesIndex: 0 }, function (event) {
+      myChart.dispatchAction({
+        type: 'highlight',
+        geoIndex: 0,
+        name: event.name
+      });
+    });
+    myChart.on('mouseout', { seriesIndex: 0 }, function (event) {
+      myChart.dispatchAction({
+        type: 'downplay',
+        geoIndex: 0,
+        name: event.name
+      });
+    });
+  }
+);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

@@ -4,8 +4,8 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   title: {
     text: 'Log Axis',
     left: 'center'
@@ -21,7 +21,7 @@ var option = {
     type: 'category',
     name: 'x',
     splitLine: { show: false },
-    data: {{DATA_0}}
+    data: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
   },
   grid: {
     left: '3%',
@@ -40,20 +40,30 @@ var option = {
     {
       name: 'Log2',
       type: 'line',
-      data: {{DATA_1}}
+      data: [1, 3, 9, 27, 81, 247, 741, 2223, 6669]
     },
     {
       name: 'Log3',
       type: 'line',
-      data: {{DATA_2}}
+      data: [1, 2, 4, 8, 16, 32, 64, 128, 256]
     },
     {
       name: 'Log1/2',
       type: 'line',
-      data: {{DATA_3}}
+      data: [
+        1 / 2,
+        1 / 4,
+        1 / 8,
+        1 / 16,
+        1 / 32,
+        1 / 64,
+        1 / 128,
+        1 / 256,
+        1 / 512
+      ]
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

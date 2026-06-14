@@ -4,8 +4,8 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   title: {
     text: 'Funnel'
   },
@@ -21,7 +21,7 @@ var option = {
     }
   },
   legend: {
-    data: {{DATA_0}}
+    data: ['Show', 'Click', 'Visit', 'Inquiry', 'Order']
   },
   series: [
     {
@@ -44,7 +44,13 @@ var option = {
           formatter: '{b}Expected: {c}%'
         }
       },
-      data: {{DATA_1}}
+      data: [
+        { value: 60, name: 'Visit' },
+        { value: 40, name: 'Inquiry' },
+        { value: 20, name: 'Order' },
+        { value: 80, name: 'Click' },
+        { value: 100, name: 'Show' }
+      ]
     },
     {
       name: 'Actual',
@@ -68,12 +74,18 @@ var option = {
           formatter: '{b}Actual: {c}%'
         }
       },
-      data: {{DATA_2}},
+      data: [
+        { value: 30, name: 'Visit' },
+        { value: 10, name: 'Inquiry' },
+        { value: 5, name: 'Order' },
+        { value: 50, name: 'Click' },
+        { value: 80, name: 'Show' }
+      ],
       // Ensure outer shape will not be over inner shape when hover.
       z: 100
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

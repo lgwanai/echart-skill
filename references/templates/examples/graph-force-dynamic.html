@@ -4,8 +4,18 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+const data = [
+  {
+    fixed: true,
+    x: myChart.getWidth() / 2,
+    y: myChart.getHeight() / 2,
+    symbolSize: 20,
+    id: '-1'
+  }
+];
+const edges = [];
+option = {
   series: [
     {
       type: 'graph',
@@ -22,6 +32,30 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+setInterval(function () {
+  data.push({
+    id: data.length + ''
+  });
+  var source = Math.round((data.length - 1) * Math.random());
+  var target = Math.round((data.length - 1) * Math.random());
+  if (source !== target) {
+    edges.push({
+      source: source,
+      target: target
+    });
+  }
+  myChart.setOption({
+    series: [
+      {
+        roam: true,
+        data: data,
+        edges: edges
+      }
+    ]
+  });
+  // console.log('nodes: ' + data.length);
+  // console.log('links: ' + data.length);
+}, 200);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

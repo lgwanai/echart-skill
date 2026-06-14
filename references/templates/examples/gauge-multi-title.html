@@ -4,8 +4,40 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+const gaugeData = [
+  {
+    value: 20,
+    name: 'Good',
+    title: {
+      offsetCenter: ['-40%', '80%']
+    },
+    detail: {
+      offsetCenter: ['-40%', '95%']
+    }
+  },
+  {
+    value: 40,
+    name: 'Better',
+    title: {
+      offsetCenter: ['0%', '80%']
+    },
+    detail: {
+      offsetCenter: ['0%', '95%']
+    }
+  },
+  {
+    value: 60,
+    name: 'Perfect',
+    title: {
+      offsetCenter: ['40%', '80%']
+    },
+    detail: {
+      offsetCenter: ['40%', '95%']
+    }
+  }
+];
+option = {
   series: [
     {
       type: 'gauge',
@@ -47,6 +79,18 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+setInterval(function () {
+  gaugeData[0].value = +(Math.random() * 100).toFixed(2);
+  gaugeData[1].value = +(Math.random() * 100).toFixed(2);
+  gaugeData[2].value = +(Math.random() * 100).toFixed(2);
+  myChart.setOption({
+    series: [
+      {
+        data: gaugeData
+      }
+    ]
+  });
+}, 2000);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

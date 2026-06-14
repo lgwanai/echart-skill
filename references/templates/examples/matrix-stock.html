@@ -2,10 +2,225 @@
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
+<!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+const lastClose = 50; // Close value of yesterday
+const colorGreen = '#47b262';
+const colorRed = '#eb5454';
+const colorGray = '#888';
+const colorGreenOpacity = 'rgba(71, 178, 98, 0.2)';
+const colorRedOpacity = 'rgba(235, 84, 84, 0.2)';
+const matrixMargin = 10;
+const chartWidth = myChart.getWidth();
+const chartHeight = myChart.getHeight();
+const matrixWidth = chartWidth - matrixMargin * 2;
+const matrixHeight = chartHeight - matrixMargin * 2;
+const getPriceColor = (price) => {
+  return price === lastClose
+    ? colorGray
+    : price > lastClose
+    ? colorRed
+    : colorGreen;
+};
+const priceFormatter = (value) => {
+  const result = Math.round(value * 100) / 100 + '';
+  let dotIndex = result.indexOf('.');
+  if (dotIndex < 0) {
+    return result + '.00';
+  } else if (dotIndex === result.length - 2) {
+    return result + '0';
+  }
+  return result;
+};
+const priceData = [];
+const volumeData = [];
+const averageData = []; // Volume weighted average price
+const macdData = []; // MACD histogram data
+const macdLineData = []; // MACD line (DIF) data
+const signalLineData = []; // Signal line (DEA) data
+let sumPrice = 0;
+let sumVolume = 0;
+const sTime = new Date('2025-10-16 09:30:00').getTime();
+const eTime = new Date('2025-10-16 15:00:00').getTime();
+const breakStartTime = new Date('2025-10-16 11:30:00').getTime();
+const breakEndTime = new Date('2025-10-16 13:00:00').getTime();
+const shortPeriod = 12; // Short-term EMA period, typically 12
+const longPeriod = 26; // Long-term EMA period, typically 26
+const signalPeriod = 9; // Signal line EMA period, typically 9
+let time = sTime;
+let price = 0;
+let direction = 1; // 1 for up, -1 for down
+let maxAbs = 0;
+while (time < eTime) {
+  const volume = Math.random() * 1000 + 500;
+  volumeData.push([time, volume]);
+  sumVolume += volume;
+  if (time === sTime) {
+    direction = Math.random() < 0.5 ? 1 : -1;
+    price = lastClose * (1 + (Math.random() - 0.5) * 0.02);
+  } else {
+    direction = Math.random() < 0.8 ? direction : -direction;
+    price = Math.round((price + direction * (Math.random() * 0.1)) * 100) / 100;
+  }
+  priceData.push([time, price]);
+  sumPrice += price * volume;
+  averageData.push([time, sumPrice / sumVolume]);
+  maxAbs = Math.max(maxAbs, Math.abs(price - lastClose));
+  if (time === breakStartTime) {
+    time = breakEndTime;
+  } else {
+    time += 60 * 1000; // increment by 1 minute
+  }
+}
+function calculateEMA(prices, period) {
+  let ema = [];
+  const k = 2 / (period + 1);
+  if (prices.length >= period) {
+    let sum = 0;
+    for (let i = 0; i < period; i++) {
+      sum += prices[i][1];
+    }
+    const firstEMA = sum / period;
+    ema.push([prices[period - 1][0], firstEMA]);
+    for (let i = period; i < prices.length; i++) {
+      const newEMA = prices[i][1] * k + ema[ema.length - 1][1] * (1 - k);
+      ema.push([prices[i][0], newEMA]);
+    }
+  }
+  return ema;
+}
+if (priceData.length >= longPeriod) {
+  const shortEMA = calculateEMA(priceData, shortPeriod);
+  const longEMA = calculateEMA(priceData, longPeriod);
+  const macdLine = [];
+  let startIndex = longPeriod - 1;
+  const shortEMAMap = new Map(shortEMA.map((item) => [item[0], item[1]]));
+  const longEMAMap = new Map(longEMA.map((item) => [item[0], item[1]]));
+  for (let i = startIndex; i < priceData.length; i++) {
+    const time = priceData[i][0];
+    if (shortEMAMap.has(time) && longEMAMap.has(time)) {
+      const diff = (shortEMAMap.get(time) || 0) - (longEMAMap.get(time) || 0);
+      macdLine.push([time, diff]);
+    }
+  }
+  const signalLine = calculateEMA(macdLine, signalPeriod);
+  macdLineData.length = 0;
+  signalLineData.length = 0;
+  macdData.length = 0;
+  const startTimestamp = signalLine.length > 0 ? signalLine[0][0] : null;
+  if (startTimestamp !== null) {
+    const macdMap = new Map();
+    for (const item of macdLine) {
+      macdMap.set(item[0], item[1]);
+    }
+    const signalMap = new Map();
+    for (const item of signalLine) {
+      signalMap.set(item[0], item[1]);
+    }
+    const commonTimestamps = [];
+    for (const time of macdMap.keys()) {
+      if (signalMap.has(time)) {
+        commonTimestamps.push(time);
+      }
+    }
+    commonTimestamps.sort((a, b) => a - b);
+    for (const time of commonTimestamps) {
+      const macdValue = macdMap.get(time);
+      const signalValue = signalMap.get(time);
+      macdLineData.push([time, macdValue]);
+      signalLineData.push([time, signalValue]);
+      const histogram = macdValue - signalValue;
+      const color = histogram > 0 ? colorRed : colorGreen;
+      macdData.push({
+        value: [time, histogram],
+        itemStyle: {
+          color: color
+        }
+      });
+    }
+  }
+}
+const orderData = [];
+const orderCat = [];
+const orderCount = 10;
+let orderPrice = price - (0.01 * orderCount) / 2;
+for (let i = 0; i < orderCount; ++i) {
+  if (price === orderPrice) {
+    continue;
+  }
+  orderPrice += 0.01;
+  orderCat.push(orderPrice);
+  const amount = Math.round(Math.random() * 200) + 10;
+  const isLower = orderPrice < price;
+  orderData.push({
+    value: amount,
+    itemStyle: {
+      color: isLower ? colorGreenOpacity : colorRedOpacity
+    },
+    label: {
+      formatter:
+        `{name|${isLower ? 'Bid' : 'Ask'}} ` +
+        `{${isLower ? 'green' : 'red'}|${priceFormatter(orderPrice)}} ` +
+        `{amount|(${amount})}`,
+      rich: {
+        red: {
+          color: colorRed
+        },
+        green: {
+          color: colorGreen
+        },
+        amount: {
+          color: '#666'
+        },
+        name: {
+          fontWeight: 'bold',
+          color: '#444'
+        }
+      }
+    }
+  });
+}
+const depthCount = 20;
+const depthHighData = [];
+const depthLowData = [];
+let cumulativeHighVolume = 0;
+let cumulativeLowVolume = 0;
+for (let i = 0; i < depthCount; ++i) {
+  depthHighData[depthCount + i] = cumulativeHighVolume;
+  cumulativeHighVolume += Math.round(Math.random() * 1000);
+  depthLowData[depthCount - i - 1] = cumulativeLowVolume;
+  cumulativeLowVolume += Math.round(Math.random() * 1000);
+}
+const getTitle = (text, subtext, coord) => {
+  return {
+    text: text,
+    subtext: subtext,
+    left: 2,
+    top: 2,
+    padding: 0,
+    textStyle: {
+      fontSize: 12,
+      fontWeight: 'bold',
+      color: '#444'
+    },
+    subtextStyle: {
+      fontSize: 10,
+      color: '#666'
+    },
+    itemGap: 0,
+    coordinateSystem: 'matrix',
+    coord: coord
+  };
+};
+const titles = [
+  getTitle('Volume', Math.round(sumVolume / 1000) + 'B', [0, 5]),
+  getTitle('MACD', '', [0, 4]),
+  getTitle('Order Book', '', [4, 0]),
+  getTitle('Depth', '', [4, 5])
+];
+option = {
   title: titles,
   xAxis: [
     {
@@ -138,7 +353,82 @@ var option = {
       markPoint: {
         symbolSize: 0,
         symbol: 'circle',
-        data: {{DATA_0}}
+        data: [
+          {
+            relativeTo: 'coordinate',
+            x: 0,
+            y: 0,
+            name: 'max',
+            type: 'max',
+            label: {
+              align: 'left',
+              verticalAlign: 'top',
+              formatter: priceFormatter(lastClose + maxAbs),
+              color: getPriceColor(lastClose + maxAbs)
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: 0,
+            y: '50%',
+            name: lastClose + '',
+            label: {
+              align: 'left',
+              verticalAlign: 'middle',
+              formatter: priceFormatter(lastClose),
+              color: getPriceColor(lastClose)
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: 0,
+            y: '100%',
+            name: 'min',
+            type: 'min',
+            label: {
+              align: 'left',
+              verticalAlign: 'bottom',
+              formatter: priceFormatter(lastClose - maxAbs),
+              color: getPriceColor(lastClose - maxAbs)
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: '100%',
+            y: 0,
+            name: priceFormatter((maxAbs / lastClose) * 100) + '%',
+            label: {
+              align: 'right',
+              verticalAlign: 'top',
+              color: colorRed,
+              formatter: '{b}'
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: '100%',
+            y: '50%',
+            name: '0%',
+            label: {
+              align: 'right',
+              verticalAlign: 'middle',
+              color: colorGray,
+              formatter: '{b}'
+            }
+          },
+          {
+            relativeTo: 'coordinate',
+            x: '100%',
+            y: '100%',
+            name: '-' + priceFormatter((maxAbs / lastClose) * 100) + '%',
+            label: {
+              align: 'right',
+              verticalAlign: 'bottom',
+              color: colorGreen,
+              formatter: '{b}'
+            }
+          }
+        ]
       }
     },
     {
@@ -273,7 +563,10 @@ var option = {
       data: Array(6).fill(null)
     },
     body: {
-      data: {{DATA_1}},
+      data: [
+        {
+          coord: [
+            [0, 3],
             [0, 3]
           ],
           mergeCells: true
@@ -348,6 +641,6 @@ var option = {
     )
   }
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

@@ -4,8 +4,13 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+const xhr = new XMLHttpRequest();
+xhr.open('GET', dataURL, true);
+xhr.responseType = 'arraybuffer';
+xhr.onload = function (e) {
+  var rawData = new Float32Array(this.response);
+option = {
     title: {
       left: 'center',
       text:
@@ -67,6 +72,7 @@ var option = {
   };
   myChart.setOption(option);
 };
-chart.setOption(option);
+xhr.send();
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

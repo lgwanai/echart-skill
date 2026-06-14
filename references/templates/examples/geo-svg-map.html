@@ -5,8 +5,10 @@
 <!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+  function (svg) {
+    echarts.registerMap('sicily', { svg: svg });
+option = {
       tooltip: {
         formatter: function (params) {
           console.log(params);
@@ -166,13 +168,42 @@ var option = {
             backgroundColor: '#555'
           }
         },
-        data: {{DATA_0}},
+        data: [
+          [0, 0, 'route1'],
           [1, 0, 'route2']
         ]
       }
       // Make buttons end
       // -----------------
     };
-chart.setOption(option);
+    myChart.setOption(option);
+    myChart.on('selectchanged', function (params) {
+      if (!params.selected.length) {
+        myChart.dispatchAction({
+          type: 'hideTip'
+        });
+        myChart.dispatchAction({
+          type: 'geoSelect',
+          geoIndex: 0
+          // Use no name to unselect.
+        });
+      } else {
+        var btnDataIdx = params.selected[0].dataIndex[0];
+        var name = option.series.data[btnDataIdx][2];
+        myChart.dispatchAction({
+          type: 'geoSelect',
+          geoIndex: 0,
+          name: name
+        });
+        myChart.dispatchAction({
+          type: 'showTip',
+          geoIndex: 0,
+          name: name
+        });
+      }
+    });
+  }
+);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

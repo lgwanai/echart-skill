@@ -4,8 +4,22 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+let category = [];
+let dottedBase = +new Date();
+let lineData = [];
+let barData = [];
+for (let i = 0; i < 20; i++) {
+  let date = new Date((dottedBase += 3600 * 24 * 1000));
+  category.push(
+    [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-')
+  );
+  let b = Math.random() * 200;
+  let d = Math.random() * 200;
+  barData.push(b);
+  lineData.push(d + b);
+}
+option = {
   backgroundColor: '#0f375f',
   tooltip: {
     trigger: 'axis',
@@ -14,7 +28,7 @@ var option = {
     }
   },
   legend: {
-    data: {{DATA_0}},
+    data: ['line', 'bar'],
     textStyle: {
       color: '#ccc'
     }
@@ -88,6 +102,6 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

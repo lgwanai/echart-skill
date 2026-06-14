@@ -4,8 +4,10 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+const weatherIcons = {
+};
+option = {
   title: {
     text: 'Weather Statistics',
     subtext: 'Fake Data',
@@ -18,7 +20,7 @@ var option = {
   legend: {
     bottom: 10,
     left: 'center',
-    data: {{DATA_0}}
+    data: ['CityA', 'CityB', 'CityD', 'CityC', 'CityE']
   },
   series: [
     {
@@ -26,7 +28,19 @@ var option = {
       radius: '65%',
       center: ['50%', '50%'],
       selectedMode: 'single',
-      data: {{DATA_1}}.join('\n'),
+      data: [
+        {
+          value: 1548,
+          name: 'CityE',
+          label: {
+            formatter: [
+              '{title|{b}}{abg|}',
+              '  {weatherHead|Weather}{valueHead|Days}{rateHead|Percent}',
+              '{hr|}',
+              '  {Sunny|}{value|202}{rate|55.3%}',
+              '  {Cloudy|}{value|142}{rate|38.9%}',
+              '  {Showers|}{value|21}{rate|5.8%}'
+            ].join('\n'),
             backgroundColor: '#eee',
             borderColor: '#777',
             borderWidth: 1,
@@ -115,6 +129,6 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

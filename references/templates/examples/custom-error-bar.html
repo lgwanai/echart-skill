@@ -4,8 +4,22 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+var categoryData = [];
+var errorData = [];
+var barData = [];
+var dataCount = 100;
+for (var i = 0; i < dataCount; i++) {
+  var val = Math.random() * 1000;
+  categoryData.push('category' + i);
+  errorData.push([
+    i,
+    echarts.number.round(Math.max(0, val - Math.random() * 100)),
+    echarts.number.round(val + Math.random() * 80)
+  ]);
+  barData.push(echarts.number.round(val, 2));
+}
+option = {
   tooltip: {
     trigger: 'axis',
     axisPointer: {
@@ -16,7 +30,7 @@ var option = {
     text: 'Error bar chart'
   },
   legend: {
-    data: {{DATA_0}},
+    data: ['bar', 'error'],
     top: 20,
     right: 30
   },
@@ -108,6 +122,6 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

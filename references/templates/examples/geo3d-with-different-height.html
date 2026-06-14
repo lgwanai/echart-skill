@@ -5,14 +5,30 @@
 <!-- {{MAP_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+$.getJSON(
+  function (populationData) {
+    var max = -Infinity;
+    var min = Infinity;
+    populationData.forEach(function (item) {
+      max = Math.max(Math.log(item.value), max);
+      min = Math.min(Math.log(item.value), min);
+    });
+    var regions = populationData.map(function (item) {
+      return {
+        name: item.name,
+        height: ((Math.log(item.value) - min) / (max - min)) * 3
+      };
+    });
+    myChart.setOption(
+      (
+option = {
         backgroundColor: '#cdcfd5',
         geo3D: {
           map: 'world',
           shading: 'lambert',
           lambertMaterial: {
-            detailTexture: ROOT_PATH + '/data-gl/asset/woods.jpg',
+// ROOT_PATH removed
             textureTiling: 20
           },
           postEffect: {
@@ -37,7 +53,7 @@ var option = {
               intensity: 0
             },
             ambientCubemap: {
-              texture: ROOT_PATH + '/data-gl/asset/canyon.hdr',
+// ROOT_PATH removed
               exposure: 2,
               diffuseIntensity: 0.3
             }
@@ -48,7 +64,10 @@ var option = {
           regionHeight: 0.5,
           regions: regions
         }
-      };
-chart.setOption(option);
+      })
+    );
+  }
+);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

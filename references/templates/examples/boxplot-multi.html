@@ -4,8 +4,22 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+function makeData() {
+  let data = [];
+  for (let i = 0; i < 18; i++) {
+    let cate = [];
+    for (let j = 0; j < 100; j++) {
+      cate.push(Math.random() * 200);
+    }
+    data.push(cate);
+  }
+  return data;
+}
+const data0 = makeData();
+const data1 = makeData();
+const data2 = makeData();
+option = {
   title: {
     text: 'Multiple Categories',
     left: 'center'
@@ -101,6 +115,6 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

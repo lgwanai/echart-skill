@@ -4,8 +4,31 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+const colorList = [
+  '#4f81bd',
+  '#c0504d',
+  '#9bbb59',
+  '#604a7b',
+  '#948a54',
+  '#e46c0b'
+];
+const data = [
+  [10, 16, 3, 'A'],
+  [16, 18, 15, 'B'],
+  [18, 26, 12, 'C'],
+  [26, 32, 22, 'D'],
+  [32, 56, 7, 'E'],
+  [56, 62, 17, 'F']
+].map(function (item, index) {
+  return {
+    value: item,
+    itemStyle: {
+      color: colorList[index]
+    }
+  };
+});
+option = {
   title: {
     text: 'Profit',
     left: 'center'
@@ -49,6 +72,6 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

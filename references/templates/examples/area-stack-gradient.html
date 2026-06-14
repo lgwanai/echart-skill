@@ -4,8 +4,8 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
   title: {
     text: 'Gradient Stacked Area Chart'
@@ -20,7 +20,7 @@ var option = {
     }
   },
   legend: {
-    data: {{DATA_0}}
+    data: ['Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 5']
   },
   toolbox: {
     feature: {
@@ -31,7 +31,7 @@ var option = {
     {
       type: 'category',
       boundaryGap: false,
-      data: {{DATA_1}}
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     }
   ],
   yAxis: [
@@ -65,7 +65,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_2}}
+      data: [140, 232, 101, 264, 90, 340, 250]
     },
     {
       name: 'Line 2',
@@ -92,7 +92,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_3}}
+      data: [120, 282, 111, 234, 220, 340, 310]
     },
     {
       name: 'Line 3',
@@ -119,7 +119,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_4}}
+      data: [320, 132, 201, 334, 190, 130, 220]
     },
     {
       name: 'Line 4',
@@ -146,7 +146,7 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_5}}
+      data: [220, 402, 231, 134, 190, 230, 120]
     },
     {
       name: 'Line 5',
@@ -177,10 +177,10 @@ var option = {
       emphasis: {
         focus: 'series'
       },
-      data: {{DATA_6}}
+      data: [220, 302, 181, 234, 210, 290, 150]
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

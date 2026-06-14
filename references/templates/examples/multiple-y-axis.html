@@ -4,8 +4,9 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+const colors = ['#5070dd', '#b6d634', '#505372'];
+option = {
   color: colors,
   tooltip: {
     trigger: 'axis',
@@ -24,7 +25,7 @@ var option = {
     }
   },
   legend: {
-    data: {{DATA_0}}
+    data: ['Evaporation', 'Precipitation', 'Temperature']
   },
   xAxis: [
     {
@@ -33,7 +34,7 @@ var option = {
         alignWithLabel: true
       },
       // prettier-ignore
-      data: {{DATA_1}}
+      data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     }
   ],
   yAxis: [
@@ -88,22 +89,26 @@ var option = {
     {
       name: 'Evaporation',
       type: 'bar',
-      data: {{DATA_2}}
+      data: [
+        2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
+      ]
     },
     {
       name: 'Precipitation',
       type: 'bar',
       yAxisIndex: 1,
-      data: {{DATA_3}}
+      data: [
+        2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
+      ]
     },
     {
       name: 'Temperature',
       type: 'line',
       yAxisIndex: 2,
-      data: {{DATA_4}}
+      data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

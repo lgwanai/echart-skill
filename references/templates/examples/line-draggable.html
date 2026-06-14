@@ -4,8 +4,16 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+const symbolSize = 20;
+const data = [
+  [40, -10],
+  [-30, -5],
+  [-76.5, 20],
+  [-63.5, 40],
+  [-22.1, 50]
+];
+option = {
   title: {
     text: 'Try Dragging these Points',
     left: 'center'
@@ -69,6 +77,69 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+setTimeout(function () {
+  // Add shadow circles (which is not visible) to enable drag.
+  myChart.setOption({
+    graphic: data.map(function (item, dataIndex) {
+      return {
+        type: 'circle',
+        position: myChart.convertToPixel('grid', item),
+        shape: {
+          cx: 0,
+          cy: 0,
+          r: symbolSize / 2
+        },
+        invisible: true,
+        draggable: true,
+        ondrag: function (dx, dy) {
+          onPointDragging(dataIndex, [this.x, this.y]);
+        },
+        onmousemove: function () {
+          showTooltip(dataIndex);
+        },
+        onmouseout: function () {
+          hideTooltip(dataIndex);
+        },
+        z: 100
+      };
+    })
+  });
+}, 0);
+window.addEventListener('resize', updatePosition);
+myChart.on('dataZoom', updatePosition);
+function updatePosition() {
+  myChart.setOption({
+    graphic: data.map(function (item, dataIndex) {
+      return {
+        position: myChart.convertToPixel('grid', item)
+      };
+    })
+  });
+}
+function showTooltip(dataIndex) {
+  myChart.dispatchAction({
+    type: 'showTip',
+    seriesIndex: 0,
+    dataIndex: dataIndex
+  });
+}
+function hideTooltip(dataIndex) {
+  myChart.dispatchAction({
+    type: 'hideTip'
+  });
+}
+function onPointDragging(dataIndex, pos) {
+  data[dataIndex] = myChart.convertFromPixel('grid', pos);
+  // Update data
+  myChart.setOption({
+    series: [
+      {
+        id: 'a',
+        data: data
+      }
+    ]
+  });
+}
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

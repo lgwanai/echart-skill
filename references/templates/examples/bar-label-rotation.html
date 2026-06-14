@@ -1,6 +1,6 @@
-<!-- bar-label-rotation -->
+<!-- bar-label-rotation — https://echarts.apache.org/examples/zh/editor.html?c=bar-label-rotation -->
 <!DOCTYPE html><html lang="zh-CN">
-<head><meta charset="utf-8"><title>bar-label-rotation</title>
+<head><meta charset="utf-8"><title>{{TITLE}}</title>
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
@@ -20,15 +20,73 @@ const posList = [
   'insideBottomLeft',
   'insideBottomRight'
 ];
-
-
-const labelOption = {
-  show: true,
-  position: 'inside',
-  distance: 15,
+  rotate: {
+    min: -90,
+    max: 90
+  },
+  align: {
+    options: {
+      left: 'left',
+      center: 'center',
+      right: 'right'
+    }
+  },
+  verticalAlign: {
+    options: {
+      top: 'top',
+      middle: 'middle',
+      bottom: 'bottom'
+    }
+  },
+  position: {
+    options: posList.reduce(function (map, pos) {
+      map[pos] = pos;
+      return map;
+    }, {})
+  },
+  distance: {
+    min: 0,
+    max: 100
+  }
+};
+  rotate: 90,
   align: 'left',
   verticalAlign: 'middle',
-  rotate: 90,
+  position: 'insideBottom',
+  distance: 15,
+  onChange: function () {
+    const labelOption = {
+      rotate: app.config.rotate,
+      align: app.config.align,
+      verticalAlign: app.config.verticalAlign,
+      position: app.config.position,
+      distance: app.config.distance
+    };
+    myChart.setOption({
+      series: [
+        {
+          label: labelOption
+        },
+        {
+          label: labelOption
+        },
+        {
+          label: labelOption
+        },
+        {
+          label: labelOption
+        }
+      ]
+    });
+  }
+};
+const labelOption = {
+  show: true,
+  position: app.config.position,
+  distance: app.config.distance,
+  align: app.config.align,
+  verticalAlign: app.config.verticalAlign,
+  rotate: app.config.rotate,
   formatter: '{c}  {name|{a}}',
   fontSize: 16,
   rich: {
@@ -73,7 +131,7 @@ option = {
   series: [
     {
       name: 'Forest',
-      type: 'line',
+      type: 'bar',
       barGap: 0,
       label: labelOption,
       emphasis: {
@@ -83,7 +141,7 @@ option = {
     },
     {
       name: 'Steppe',
-      type: 'line',
+      type: 'bar',
       label: labelOption,
       emphasis: {
         focus: 'series'
@@ -92,7 +150,7 @@ option = {
     },
     {
       name: 'Desert',
-      type: 'line',
+      type: 'bar',
       label: labelOption,
       emphasis: {
         focus: 'series'
@@ -101,7 +159,7 @@ option = {
     },
     {
       name: 'Wetland',
-      type: 'line',
+      type: 'bar',
       label: labelOption,
       emphasis: {
         focus: 'series'
@@ -110,6 +168,6 @@ option = {
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

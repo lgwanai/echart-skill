@@ -4,8 +4,8 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   title: {
     text: 'Multiple Radar'
   },
@@ -14,7 +14,13 @@ var option = {
   },
   legend: {
     left: 'center',
-    data: {{DATA_0}}
+    data: [
+      'A Software',
+      'A Phone',
+      'Another Phone',
+      'Precipitation',
+      'Evaporation'
+    ]
   },
   radar: [
     {
@@ -57,7 +63,9 @@ var option = {
         trigger: 'item'
       },
       areaStyle: {},
-      data: {{DATA_1}},
+      data: [
+        {
+          value: [60, 73, 85, 40],
           name: 'A Software'
         }
       ]
@@ -66,7 +74,9 @@ var option = {
       type: 'radar',
       radarIndex: 1,
       areaStyle: {},
-      data: {{DATA_2}},
+      data: [
+        {
+          value: [85, 90, 90, 95, 95],
           name: 'A Phone'
         },
         {
@@ -79,7 +89,12 @@ var option = {
       type: 'radar',
       radarIndex: 2,
       areaStyle: {},
-      data: {{DATA_3}}
+      data: [
+        {
+          name: 'Precipitation',
+          value: [
+            2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 75.6, 82.2, 48.7, 18.8, 6.0, 2.3
+          ]
         },
         {
           name: 'Evaporation',
@@ -91,6 +106,6 @@ var option = {
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

@@ -4,8 +4,8 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+option = {
   title: {
     text: 'Funnel',
     left: 'left',
@@ -27,7 +27,7 @@ var option = {
   legend: {
     orient: 'vertical',
     left: 'left',
-    data: {{DATA_0}}
+    data: ['Show', 'Click', 'Visit', 'Inquiry', 'Order']
   },
   series: [
     {
@@ -37,7 +37,13 @@ var option = {
       height: '45%',
       left: '5%',
       top: '50%',
-      data: {{DATA_1}}
+      data: [
+        { value: 60, name: 'Visit' },
+        { value: 30, name: 'Inquiry' },
+        { value: 10, name: 'Order' },
+        { value: 80, name: 'Click' },
+        { value: 100, name: 'Show' }
+      ]
     },
     {
       name: 'Pyramid',
@@ -47,7 +53,13 @@ var option = {
       left: '5%',
       top: '5%',
       sort: 'ascending',
-      data: {{DATA_2}}
+      data: [
+        { value: 60, name: 'Visit' },
+        { value: 30, name: 'Inquiry' },
+        { value: 10, name: 'Order' },
+        { value: 80, name: 'Click' },
+        { value: 100, name: 'Show' }
+      ]
     },
     {
       name: 'Funnel',
@@ -59,7 +71,13 @@ var option = {
       label: {
         position: 'left'
       },
-      data: {{DATA_3}}
+      data: [
+        { value: 60, name: 'Visit' },
+        { value: 30, name: 'Inquiry' },
+        { value: 10, name: 'Order' },
+        { value: 80, name: 'Click' },
+        { value: 100, name: 'Show' }
+      ]
     },
     {
       name: 'Pyramid',
@@ -72,10 +90,16 @@ var option = {
       label: {
         position: 'left'
       },
-      data: {{DATA_4}}
+      data: [
+        { value: 60, name: 'Visit' },
+        { value: 30, name: 'Inquiry' },
+        { value: 10, name: 'Order' },
+        { value: 80, name: 'Click' },
+        { value: 100, name: 'Show' }
+      ]
     }
   ]
 };
-chart.setOption(option);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

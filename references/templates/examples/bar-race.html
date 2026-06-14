@@ -4,14 +4,18 @@
 <!-- {{ECHARTS_INLINE}} -->
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
-var chart=echarts.init(document.getElementById("main"));
-var option = {
+var chart = echarts.init(document.getElementById("main"));
+const data = [];
+for (let i = 0; i < 5; ++i) {
+  data.push(Math.round(Math.random() * 200));
+}
+option = {
   xAxis: {
     max: 'dataMax'
   },
   yAxis: {
     type: 'category',
-    data: {{DATA_0}},
+    data: ['A', 'B', 'C', 'D', 'E'],
     inverse: true,
     animationDuration: 300,
     animationDurationUpdate: 300,
@@ -38,6 +42,29 @@ var option = {
   animationEasing: 'linear',
   animationEasingUpdate: 'linear'
 };
-chart.setOption(option);
+function run() {
+  for (var i = 0; i < data.length; ++i) {
+    if (Math.random() > 0.9) {
+      data[i] += Math.round(Math.random() * 2000);
+    } else {
+      data[i] += Math.round(Math.random() * 200);
+    }
+  }
+  myChart.setOption({
+    series: [
+      {
+        type: 'bar',
+        data
+      }
+    ]
+  });
+}
+setTimeout(function () {
+  run();
+}, 0);
+setInterval(function () {
+  run();
+}, 3000);
+if(typeof option !== "undefined") chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>
