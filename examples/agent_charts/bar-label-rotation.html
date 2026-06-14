@@ -1,4 +1,4 @@
-<!-- bar-label-rotation — standalone HTML -->
+<!-- bar-label-rotation — {{PLACEHOLDER}} approach for reliable data injection -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>bar-label-rotation</title>
 <script>
@@ -52,41 +52,17 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
 </head><body><div id="main"></div><script>
 var chart = echarts.init(document.getElementById("main"));
-
-var app = {};
-var myChart = echarts.init(document.getElementById("main"));
-
-const posList = ["left","right","top","bottom","inside","insideTop","insideLeft","insideRight","insideBottom","insideTopLeft","insideTopRight","insideBottomLeft","insideBottomRight"];
-
-const labelOption = {
-  show: true,
-  position: "insideBottom",
-  distance: 15,
-  align: "left",
-  verticalAlign: "middle",
-  rotate: 90,
-  formatter: "{c}  {name|{a}}",
-  fontSize: 16,
-  rich: { name: {} }
-};
-
 var option = {
   tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-  legend: { data: ["Forest","Steppe","Desert","Wetland"] },
+  legend: { data: ["Email", "Ads", "Video", "Direct"] },
   toolbox: { show: true, orient: "vertical", left: "right", top: "center",
     feature: { mark: { show: true }, dataView: { show: true, readOnly: false },
       magicType: { show: true, type: ["line","bar","stack"] },
       restore: { show: true }, saveAsImage: { show: true } } },
-  xAxis: [{ type: "category", axisTick: { show: false }, data: ["2012","2013","2014","2015","2016"] }],
+  xAxis: [{ type: "category", axisTick: { show: false }, data: ["Mon", "Tue", "Wed", "Thu", "Fri"] }],
   yAxis: [{ type: "value" }],
   series: [{"name": "Email", "type": "bar", "barGap": 0, "label": {"show": true, "position": "insideBottom", "distance": 15, "align": "left", "verticalAlign": "middle", "rotate": 90, "formatter": "{c}  {name|{a}}", "fontSize": 16, "rich": {"name": {}}}, "emphasis": {"focus": "series"}, "data": [120.0, 132.0, 101.0, 134.0, 90.0]}, {"name": "Ads", "type": "bar", "label": {"show": true, "position": "insideBottom", "distance": 15, "align": "left", "verticalAlign": "middle", "rotate": 90, "formatter": "{c}  {name|{a}}", "fontSize": 16, "rich": {"name": {}}}, "emphasis": {"focus": "series"}, "data": [220.0, 182.0, 191.0, 234.0, 290.0]}, {"name": "Video", "type": "bar", "label": {"show": true, "position": "insideBottom", "distance": 15, "align": "left", "verticalAlign": "middle", "rotate": 90, "formatter": "{c}  {name|{a}}", "fontSize": 16, "rich": {"name": {}}}, "emphasis": {"focus": "series"}, "data": [150.0, 232.0, 201.0, 154.0, 190.0]}, {"name": "Direct", "type": "bar", "label": {"show": true, "position": "insideBottom", "distance": 15, "align": "left", "verticalAlign": "middle", "rotate": 90, "formatter": "{c}  {name|{a}}", "fontSize": 16, "rich": {"name": {}}}, "emphasis": {"focus": "series"}, "data": [320.0, 332.0, 301.0, 334.0, 330.0]}]
-  },
-    { name: "Steppe", type: "bar", label: labelOption, emphasis: { focus: "series" }, data: [220,182,191,234,290] },
-    { name: "Desert", type: "bar", label: labelOption, emphasis: { focus: "series" }, data: [150,232,201,154,190] },
-    { name: "Wetland", type: "bar", label: labelOption, emphasis: { focus: "series" }, data: [98,77,101,99,40] }
-  ]
 };
-
 chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>
