@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>gauge-progress</title><script>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>pie-roseType-simple</title><script>
 
 /*
 * Licensed to the Apache Software Foundation (ASF) under one
@@ -48,57 +48,36 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 </script><style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style></head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
 /*
-title: Progress Gauge
-titleCN: 进度仪表盘
-category: gauge
+title: Nightingale Chart
+category: pie
+titleCN: 基础南丁格尔玫瑰图
 shotWidth: 800
-difficulty: 3
+difficulty: 2
 */
 option = {
+  legend: {
+    top: 'bottom'
+  },
+  toolbox: {
+    show: true,
+    feature: {
+      mark: { show: true },
+      dataView: { show: true, readOnly: false },
+      restore: { show: true },
+      saveAsImage: { show: true }
+    }
+  },
   series: [
     {
-      type: 'gauge',
-      progress: {
-        show: true,
-        width: 18
+      name: 'Nightingale Chart',
+      type: 'pie',
+      radius: [50, 250],
+      center: ['50%', '50%'],
+      roseType: 'area',
+      itemStyle: {
+        borderRadius: 8
       },
-      axisLine: {
-        lineStyle: {
-          width: 18
-        }
-      },
-      axisTick: {
-        show: false
-      },
-      splitLine: {
-        length: 15,
-        lineStyle: {
-          width: 2,
-          color: '#999'
-        }
-      },
-      axisLabel: {
-        distance: 25,
-        color: '#999',
-        fontSize: 20
-      },
-      anchor: {
-        show: true,
-        showAbove: true,
-        size: 25,
-        itemStyle: {
-          borderWidth: 10
-        }
-      },
-      title: {
-        show: false
-      },
-      detail: {
-        valueAnimation: true,
-        fontSize: 80,
-        offsetCenter: [0, '70%']
-      },
-      data: [{"value": 629.4, "name": "Avg"}]
+      data: [{"name": "\u641c\u7d22", "value": 1048.0}, {"name": "\u76f4\u63a5", "value": 735.0}, {"name": "\u90ae\u4ef6", "value": 580.0}, {"name": "\u8054\u76df", "value": 484.0}, {"name": "\u89c6\u9891", "value": 300.0}]
     }
   ]
 };
