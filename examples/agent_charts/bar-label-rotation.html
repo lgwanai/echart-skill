@@ -1,17 +1,6 @@
-<!--
-  Template: bar/basic.html
-  Chart Type: Bar (柱状图)
-  Data Pattern: FLAT_ARRAY
-  Data Format: { categories: string[], values: number[] }
-  Covers: bar-simple, bar-background, bar1, bar-brush, bar-gradient, bar-label-rotation,
-          bar-tick-align, bar-animation-delay, bar-negative, bar-polar-*
-          bar-breaks-*, bar-data-color, bar-rich-text (23 examples)
--->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>bar-label-rotation</title>
+<!-- bar-label-rotation — inline labelOption, no external refs -->
+<!DOCTYPE html><html lang="zh-CN">
+<head><meta charset="utf-8"><title>bar-label-rotation</title>
 <script>
 
 /*
@@ -61,25 +50,113 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script>
 <style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}#main{width:100%;height:600px}</style>
-</head>
-<body>
-<div id="title" style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:8px">bar-label-rotation</div>
-<div id="main"></div>
-<script type="text/javascript">
-var chart = echarts.init(document.getElementById('main'));
-var option = {
-  tooltip: { trigger: 'axis' },
-  grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-  xAxis: { type: 'category', data: ["2012", "2013", "2014", "2015", "2016"], axisLabel: { rotate: 45 } },
-  yAxis: { type: 'value' },
-  series: [{
-    type: 'bar',
-    itemStyle: { borderRadius: [4, 4, 0, 0] },
-    data: [320, 332, 301, 334, 390]
-  }]
+</head><body><div id="main"></div><script>
+var chart = echarts.init(document.getElementById("main"));
+const posList = [
+  'left',
+  'right',
+  'top',
+  'bottom',
+  'inside',
+  'insideTop',
+  'insideLeft',
+  'insideRight',
+  'insideBottom',
+  'insideTopLeft',
+  'insideTopRight',
+  'insideBottomLeft',
+  'insideBottomRight'
+];
+
+
+const labelOption = {
+  show: true,
+  position: 'insideBottom',
+  distance: 15,
+  align: 'left',
+  verticalAlign: 'middle',
+  rotate: 90,
+  formatter: '{c}  {name|{a}}',
+  fontSize: 16,
+  rich: {
+    name: {}
+  }
+};
+option = {
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    }
+  },
+  legend: {
+    data: ['Forest', 'Steppe', 'Desert', 'Wetland']
+  },
+  toolbox: {
+    show: true,
+    orient: 'vertical',
+    left: 'right',
+    top: 'center',
+    feature: {
+      mark: { show: true },
+      dataView: { show: true, readOnly: false },
+      magicType: { show: true, type: ['line', 'bar', 'stack'] },
+      restore: { show: true },
+      saveAsImage: { show: true }
+    }
+  },
+  xAxis: [
+    {
+      type: 'category',
+      axisTick: { show: false },
+      data: ['2012', '2013', '2014', '2015', '2016']
+    }
+  ],
+  yAxis: [
+    {
+      type: 'value'
+    }
+  ],
+  series: [
+    {
+      name: 'Forest',
+      type: 'bar',
+      barGap: 0,
+      label: labelOption,
+      emphasis: {
+        focus: 'series'
+      },
+      data: [320, 332, 301, 334, 390]
+    },
+    {
+      name: 'Steppe',
+      type: 'bar',
+      label: labelOption,
+      emphasis: {
+        focus: 'series'
+      },
+      data: [220, 182, 191, 234, 290]
+    },
+    {
+      name: 'Desert',
+      type: 'bar',
+      label: labelOption,
+      emphasis: {
+        focus: 'series'
+      },
+      data: [150, 232, 201, 154, 190]
+    },
+    {
+      name: 'Wetland',
+      type: 'bar',
+      label: labelOption,
+      emphasis: {
+        focus: 'series'
+      },
+      data: [98, 77, 101, 99, 40]
+    }
+  ]
 };
 chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
-</body>
-</html>
+window.addEventListener("resize",function(){chart.resize();});
+</script></body></html>
