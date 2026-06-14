@@ -59,6 +59,12 @@ $.getJSON(ROOT_PATH + '/data/asset/data/les-miserables.json', function (graph) {
 });
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py examples/graph-label-overlap.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

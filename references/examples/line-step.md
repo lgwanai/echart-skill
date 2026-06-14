@@ -21,6 +21,12 @@ option = {
 };
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Key Points
 - Requires **3 separate series** with step: 'start'/'middle'/'end'
 - Template: `examples/line-step.html` (NOT line/basic.html)

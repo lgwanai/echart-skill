@@ -4,15 +4,6 @@
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-label-rotation
 **Template:** examples/bar-label-rotation.html
 
-## Placeholders
-
-| Placeholder | Type | Format | Example |
-|-------------|------|--------|---------|
-| `{{TITLE}}` | string | 图表标题 | `"bar-label-rotation"` |
-| `{{LEGEND}}` | JSON array | 系列名称列表，与 SERIES 中 name 一一对应 | `["Email","Ads","Video","Direct"]` |
-| `{{CATEGORIES}}` | JSON array | X 轴分类标签 | `["Mon","Tue","Wed","Thu","Fri"]` |
-| `{{SERIES}}` | JSON array | 系列对象数组，每个包含 name/type/data/label | 见下方 |
-
 ### SERIES 格式
 ```json
 [{
@@ -55,3 +46,12 @@ option = {
   ]
 };
 ```
+
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{CATEGORIES}}}` | JSON array | categories |
+| `{{{LEGEND}}}` | JSON array | legend |
+| `{{{SERIES}}}` | JSON array | series |
+| `{{{TITLE}}}` | string | title |

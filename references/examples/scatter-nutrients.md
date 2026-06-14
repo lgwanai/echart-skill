@@ -179,6 +179,12 @@ app.configParameters = {
 };
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py scatter/basic.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

@@ -245,6 +245,12 @@ for (var i = 1, stepResult; !(stepResult = step.next()).isEnd; i++) {
 }
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py examples/scatter-clustering-process.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

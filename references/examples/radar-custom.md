@@ -139,6 +139,12 @@ option = {
 };
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py examples/radar-custom.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

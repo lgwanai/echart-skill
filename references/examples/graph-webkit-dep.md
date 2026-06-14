@@ -66,6 +66,12 @@ $.get(ROOT_PATH + '/data/asset/data/webkit-dep.json', function (webkitDep) {
 });
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py examples/graph-webkit-dep.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

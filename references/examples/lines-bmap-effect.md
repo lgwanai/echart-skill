@@ -211,6 +211,12 @@ $.get(ROOT_PATH + '/data/asset/data/lines-bus.json', function (data) {
 });
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py lines/flights.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

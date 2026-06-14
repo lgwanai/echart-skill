@@ -74,6 +74,12 @@ window.addEventListener('keydown', function () {
 });
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py 3d/lines3d.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

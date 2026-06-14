@@ -170,6 +170,12 @@ function initAxisBreakInteraction() {
 setTimeout(initAxisBreakInteraction, 0);
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py examples/bar-breaks-simple.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

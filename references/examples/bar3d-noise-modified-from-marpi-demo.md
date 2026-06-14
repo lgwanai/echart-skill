@@ -211,6 +211,12 @@ $.getScript(CDN_PATH + 'simplex-noise@2.4.0/simplex-noise.js').done(
 );
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py N/A -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

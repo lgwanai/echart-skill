@@ -68,6 +68,12 @@ setInterval(function () {
 }, 200);
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py examples/graph-force-dynamic.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

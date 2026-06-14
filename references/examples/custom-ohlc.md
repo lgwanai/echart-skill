@@ -173,6 +173,12 @@ $.get(ROOT_PATH + '/data/asset/data/stock-DJI.json', function (rawData) {
 });
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py N/A -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

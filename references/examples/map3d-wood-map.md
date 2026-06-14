@@ -82,6 +82,12 @@ $.getJSON(ROOT_PATH + '/data-gl/asset/data/alcohol.json', function (data) {
 });
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py examples/map3d-wood-map.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

@@ -78,6 +78,12 @@ $.get(ROOT_PATH + '/data/asset/geo/iceland.geo.json', function (geoJSON) {
 });
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py examples/map-iceland-pie.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

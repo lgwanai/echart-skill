@@ -136,6 +136,12 @@ option = {
 };
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py examples/sunburst-label-rotate.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

@@ -62,6 +62,12 @@ $.get(ROOT_PATH + '/data/asset/data/hangzhou-tracks.json', function (data) {
 });
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py heatmap/basic.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`

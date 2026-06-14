@@ -151,6 +151,12 @@ $.get(ROOT_PATH + '/data/asset/geo/USA.json', function (usaJson) {
 });
 ```
 
+## Placeholders
+
+| Placeholder | Type | Description |
+|-------------|------|-------------|
+| `{{{TITLE}}}` | string | title |
+
 ## Usage
 - Build: `scripts/build_template.py examples/map-usa.html -d data.json`
 - Validate: `scripts/validate_chart.py output.html`
