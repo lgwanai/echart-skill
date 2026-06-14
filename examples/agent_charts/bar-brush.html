@@ -47,112 +47,22 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script><style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style></head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-/*
-title: Brush Select on Column Chart
-titleCN: 柱状图框选
-category: bar
-difficulty: 4
-*/
-let xAxisData = [];
-let data1 = [];
-let data2 = [];
-let data3 = [];
-let data4 = [];
-for (let i = 0; i < 10; i++) {
-  xAxisData.push('Class' + i);
-  data1.push(+(Math.random() * 2).toFixed(2));
-  data2.push(+(Math.random() * 5).toFixed(2));
-  data3.push(+(Math.random() + 0.3).toFixed(2));
-  data4.push(+Math.random().toFixed(2));
-}
-var emphasisStyle = {
-  itemStyle: {
-    shadowBlur: 10,
-    shadowColor: 'rgba(0,0,0,0.3)'
-  }
-};
+
+
 option = {
-  legend: {
-    data: [120.0, 200.0, 150.0, 80.0, 70.0, 110.0, 130.0],
-    left: '10%'
-  },
-  brush: {
-    toolbox: ['rect', 'polygon', 'lineX', 'lineY', 'keep', 'clear'],
-    xAxisIndex: 0
-  },
-  toolbox: {
-    feature: {
-      magicType: {
-        type: ['stack']
-      },
-      dataView: {}
-    }
-  },
-  tooltip: {},
-  xAxis: {
-    data: xAxisData,
-    name: 'X Axis',
-    axisLine: { onZero: true },
-    splitLine: { show: false },
-    splitArea: { show: false }
-  },
+  legend: { data: ['bar','bar2','bar3','bar4'], left: '10%' },
+  brush: { toolbox: ['rect','polygon','clear'], xAxisIndex: 0 },
+  toolbox: { feature: { brush: { type: ['rect','polygon','clear'] } } },
+  xAxis: { data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], name: 'X' },
   yAxis: {},
-  grid: {
-    bottom: 100
-  },
   series: [
-    {
-      name: 'bar',
-      type: 'bar',
-      stack: 'one',
-      emphasis: emphasisStyle,
-      data: data1
-    },
-    {
-      name: 'bar2',
-      type: 'bar',
-      stack: 'one',
-      emphasis: emphasisStyle,
-      data: data2
-    },
-    {
-      name: 'bar3',
-      type: 'bar',
-      stack: 'two',
-      emphasis: emphasisStyle,
-      data: data3
-    },
-    {
-      name: 'bar4',
-      type: 'bar',
-      stack: 'two',
-      emphasis: emphasisStyle,
-      data: data4
-    }
+    { name: 'bar', type: 'bar', data: [120.0, 132.0, 101.0, 134.0, 90.0, 230.0, 210.0] },
+    { name: 'bar2', type: 'bar', data: [220.0, 182.0, 191.0, 234.0, 290.0, 330.0, 310.0] },
+    { name: 'bar3', type: 'bar', data: [150.0, 232.0, 201.0, 154.0, 190.0, 330.0, 290.0] },
+    { name: 'bar4', type: 'bar', data: [320.0, 332.0, 301.0, 334.0, 330.0, 380.0, 410.0] }
   ]
 };
-myChart.on('brushSelected', function (params) {
-  var brushed = [];
-  var brushComponent = params.batch[0];
-  for (var sIdx = 0; sIdx < brushComponent.selected.length; sIdx++) {
-    var rawIndices = brushComponent.selected[sIdx].dataIndex;
-    brushed.push('[Series ' + sIdx + '] ' + rawIndices.join(', '));
-  }
-  myChart.setOption({
-    title: {
-      backgroundColor: '#333',
-      text: 'SELECTED DATA INDICES: \n' + brushed.join('\n'),
-      bottom: 0,
-      right: '10%',
-      width: 100,
-      textStyle: {
-        fontSize: 12,
-        color: '#fff'
-      }
-    }
-  });
-});
 
-if(typeof option!=="undefined")chart.setOption(option);
+chart.setOption(option);
 window.addEventListener("resize",function(){chart.resize();});
 </script></body></html>

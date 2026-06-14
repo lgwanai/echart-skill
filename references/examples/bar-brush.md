@@ -3,40 +3,24 @@
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-brush
 **Chart Type:** `bar`
 
-## User Data Requirements
+## ⚠️ Data generated via loop — NOT static arrays
 
-Columns needed: need **category** + **value** columns
+Official code uses `let data1=[]; for(...){data1.push(...)}`. The option references VARIABLES (`data: data1`), not literals (`data: [...]`). Standard bracket-counting won't work.
 
-## Data Arrays — Complete Replacement Guide
+## Fix: Replace variable references with real array literals
 
-**1 array(s)** to replace with real data:
+In the option block, replace:
+- `data: data1` → `data: [real_values_1]`
+- `data: data2` → `data: [real_values_2]`
+- `data: data3` → `data: [real_values_3]`
+- `data: data4` → `data: [real_values_4]`
+- `data: xAxisData` → `data: ["cat1","cat2",...]`
 
-### [0] `data` (context: legend)
-```
-data: ['bar', 'bar2', 'bar3', 'bar4']
-```
-
-## Agent Workflow
-
-1. **Analyze** user table → identify columns matching the required format above
-2. **Query DuckDB** → transform to match each data array's format
-3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
-4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
+Remove the `for` loop and variable declarations (`let data1=[];`) — no longer needed.
 
 ## Reference Code
-
 ```javascript
-/*
-title: Brush Select on Column Chart
-titleCN: 柱状图框选
-category: bar
-difficulty: 4
-*/
-let xAxisData = [];
-let data1 = [];
-let data2 = [];
-let data3 = [];
-let data4 = [];
+let xAxisData = []; let data1 = []; let data2 = []; let data3 = []; let data4 = [];
 for (let i = 0; i < 10; i++) {
   xAxisData.push('Class' + i);
   data1.push(+(Math.random() * 2).toFixed(2));
@@ -44,91 +28,23 @@ for (let i = 0; i < 10; i++) {
   data3.push(+(Math.random() + 0.3).toFixed(2));
   data4.push(+Math.random().toFixed(2));
 }
-var emphasisStyle = {
-  itemStyle: {
-    shadowBlur: 10,
-    shadowColor: 'rgba(0,0,0,0.3)'
-  }
-};
 option = {
-  legend: {
-    data: ['bar', 'bar2', 'bar3', 'bar4'],
-    left: '10%'
-  },
-  brush: {
-    toolbox: ['rect', 'polygon', 'lineX', 'lineY', 'keep', 'clear'],
-    xAxisIndex: 0
-  },
-  toolbox: {
-    feature: {
-      magicType: {
-        type: ['stack']
-      },
-      dataView: {}
-    }
-  },
-  tooltip: {},
-  xAxis: {
-    data: xAxisData,
-    name: 'X Axis',
-    axisLine: { onZero: true },
-    splitLine: { show: false },
-    splitArea: { show: false }
-  },
+  legend: { data: ['bar','bar2','bar3','bar4'], left: '10%' },
+  brush: { toolbox: ['rect','polygon','clear'], xAxisIndex: 0 },
+  toolbox: { feature: { brush: { type: ['rect','polygon','clear'] } } },
+  xAxis: { data: xAxisData, name: 'X' },
   yAxis: {},
-  grid: {
-    bottom: 100
-  },
   series: [
-    {
-      name: 'bar',
-      type: 'bar',
-      stack: 'one',
-      emphasis: emphasisStyle,
-      data: data1
-    },
-    {
-      name: 'bar2',
-      type: 'bar',
-      stack: 'one',
-      emphasis: emphasisStyle,
-      data: data2
-    },
-    {
-      name: 'bar3',
-      type: 'bar',
-      stack: 'two',
-      emphasis: emphasisStyle,
-      data: data3
-    },
-    {
-      name: 'bar4',
-      type: 'bar',
-      stack: 'two',
-      emphasis: emphasisStyle,
-      data: data4
-    }
+    { name: 'bar', type: 'bar', data: data1 },
+    { name: 'bar2', type: 'bar', data: data2 },
+    { name: 'bar3', type: 'bar', data: data3 },
+    { name: 'bar4', type: 'bar', data: data4 }
   ]
 };
-myChart.on('brushSelected', function (params) {
-  var brushed = [];
-  var brushComponent = params.batch[0];
-  for (var sIdx = 0; sIdx < brushComponent.selected.length; sIdx++) {
-    var rawIndices = brushComponent.selected[sIdx].dataIndex;
-    brushed.push('[Series ' + sIdx + '] ' + rawIndices.join(', '));
-  }
-  myChart.setOption({
-    title: {
-      backgroundColor: '#333',
-      text: 'SELECTED DATA INDICES: \n' + brushed.join('\n'),
-      bottom: 0,
-      right: '10%',
-      width: 100,
-      textStyle: {
-        fontSize: 12,
-        color: '#fff'
-      }
-    }
-  });
-});
 ```
+
+## Agent Workflow
+1. Query DuckDB for 4 numeric columns + category labels
+2. Use string replace: `data: data1` → `data: [1.2, 3.4, ...]`
+3. Remove the `for` loop and `let data1=[]` lines
+4. Wrap in HTML → validate
