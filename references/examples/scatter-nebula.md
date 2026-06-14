@@ -32,7 +32,8 @@ category: scatter
 titleCN: 大规模星云散点图
 difficulty: 5
 */
-const dataURL = ROOT_PATH + '/data/asset/data/fake-nebula.bin';
+const dataURL = /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data/asset/data/fake-nebula.bin'';
 const xhr = new XMLHttpRequest();
 xhr.open('GET', dataURL, true);
 xhr.responseType = 'arraybuffer';

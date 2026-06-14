@@ -30,7 +30,8 @@ var TILING = [4, 2];
 var heightImg = new Image();
 heightImg.onload = update;
 heightImg.crossOrigin = 'anonymous';
-heightImg.src = ROOT_PATH + '/data-gl/asset/leather/leather_height.jpg';
+heightImg.src = /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL';
 function update() {
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
@@ -97,7 +98,8 @@ function update() {
           intensity: 0
         },
         ambientCubemap: {
-          texture: ROOT_PATH + '/data-gl/asset/pisa.hdr',
+          texture: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
           exposure: 1,
           diffuseIntensity: 1,
           specularIntensity: 2
@@ -119,9 +121,11 @@ function update() {
         },
         realisticMaterial: {
           // detailTexture: 'asset/leather/leather_albedo.jpg',
-          roughness: ROOT_PATH + '/data-gl/asset/leather/leather_roughness.jpg',
+          roughness: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
           normalTexture:
-            ROOT_PATH + '/data-gl/asset/leather/leather_normal.jpg',
+            /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/leather/leather_normal.jpg'',
           textureTiling: TILING
         },
         itemStyle: {

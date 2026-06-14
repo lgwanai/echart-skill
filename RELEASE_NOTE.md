@@ -87,8 +87,8 @@
 - **标识符验证** (`simple_dashboard.py`)：所有 SQL 标识符经 `_validate_identifier()` + `_quote_id()` 双重保护
 
 #### XSS 跨站脚本修复
-- **chart_generator.py**: 图表 title HTML 转义 (`html.escape()`)
-- **dashboard_generator.py**: 所有用户输入 title/id 经 `html.escape()` + `json.dumps()` 安全输出
+- ~~chart_generator.py~~（已废弃，由 Agent 直接生成替代）: 图表 title HTML 转义 (`html.escape()`)
+- ~~dashboard_generator.py~~（已废弃，由 Agent 直接生成替代）: 所有用户输入 title/id 经 `html.escape()` + `json.dumps()` 安全输出
 - **html_exporter.py**: title 转义 + JSON `</script>` 序列防护
 - **dashboard.js**: `showToast()` 改用 `textContent` 替代 `innerHTML`
 

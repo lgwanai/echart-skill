@@ -168,7 +168,8 @@ option = {
         intensity: 0
       },
       ambientCubemap: {
-        texture: ROOT_PATH + '/data-gl/asset/pisa.hdr',
+        texture: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
         exposure: 1,
         diffuseIntensity: 1,
         specularIntensity: 1

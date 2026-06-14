@@ -67,8 +67,23 @@ function shuffle(array) {
   }
   return array;
 }
-$.getJSON(ROOT_PATH + '/data-gl/asset/data/winds.json', function (windData) {
-  var p = 0;
+var windData = {
+  "nx": 360,
+  "ny": 181,
+  "max": 28.700000762939453,
+  "data": [
+    [-2.9, 4.2],
+    [-3, 4.1],
+    [-3, 4.1],
+    [-3.1, 4],
+    [-3.2, 4],
+    [-3.2, 3.9],
+    [-3.3, 3.9],
+    [-3.4, 3.8],
+    // ... (65159 total entries — truncated, keep first 8 as sample. Agent: query DuckDB)
+      ]
+};
+var p = 0;
   var maxMag = 0;
   var minMag = Infinity;
   var data = [];
@@ -161,5 +176,5 @@ $.getJSON(ROOT_PATH + '/data-gl/asset/data/winds.json', function (windData) {
       }
     })
   );
-});
+
 ```

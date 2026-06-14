@@ -75,7 +75,8 @@ $.getScript(CDN_PATH + 'simplex-noise@2.4.0/simplex-noise.js').done(
               intensity: 3
             },
             ambientCubemap: {
-              texture: ROOT_PATH + '/data-gl/asset/pisa.hdr',
+              texture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/leather/leather_height.jpg'',
               exposure: 1,
               diffuseIntensity: 0.5,
               specularIntensity: 2

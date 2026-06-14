@@ -9,33 +9,32 @@ Columns needed: need a single **value** (aggregate)
 
 ## Data Arrays — Complete Replacement Guide
 
-**1 array(s)** to replace with real data:
+**2 values** to set from real data:
 
-### [0] `data` (context: root)
+### [0] `max` — Gauge scale maximum (currently 240, MUST update for your data!)
+
+```javascript
+max: 240   // ⚠️ Update to a round number above your data value
 ```
-data: [
-        {
-          value: 100
-        }
-      ]
+
+### [1] `data.value` — Speed value
+
+```javascript
+data: [{ value: 100 }]
 ```
 
 ## Agent Workflow
 
-1. **Analyze** user table → identify columns matching the required format above
-2. **Query DuckDB** → transform to match each data array's format
-3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
-4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
+1. **Query DuckDB** → aggregate value
+2. **Compute max**: round up to nice number above value (e.g., 629 → 800)
+3. **Replace max**: find `max: 240` → replace with computed max
+4. **Replace data.value**: `data: [{ value: N }]` → replace N
+5. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
+6. **⚠️ VERIFY**: `max >= data.value`
 
 ## Reference Code
 
 ```javascript
-/*
-title: Speed Gauge
-titleCN: 速度仪表盘
-category: gauge
-difficulty: 2
-*/
 option = {
   series: [
     {

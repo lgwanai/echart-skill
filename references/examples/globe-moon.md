@@ -28,11 +28,14 @@ titleCN: æç
 */
 option = {
   globe: {
-    baseTexture: ROOT_PATH + '/data-gl/asset/moon-base.jpg',
-    heightTexture: ROOT_PATH + '/data-gl/asset/moon-bump.jpg',
+    baseTexture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/moon-base.jpg'',
+    heightTexture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/moon-bump.jpg'',
     displacementScale: 0.05,
     displacementQuality: 'medium',
-    environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
+    environment: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/starfield.jpg'',
     shading: 'realistic',
     realisticMaterial: {
       roughness: 0.8,
@@ -59,7 +62,8 @@ option = {
         shadow: true
       },
       ambientCubemap: {
-        texture: ROOT_PATH + '/data-gl/asset/pisa.hdr',
+        texture: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
         exposure: 0,
         diffuseIntensity: 0.02
       }

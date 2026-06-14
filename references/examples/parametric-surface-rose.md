@@ -152,7 +152,8 @@ option = {
         intensity: 0
       },
       ambientCubemap: {
-        texture: ROOT_PATH + '/data-gl/asset/canyon.hdr',
+        texture: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
         exposure: 0,
         diffuseIntensity: 1,
         specularIntensity: 0.5
@@ -173,7 +174,7 @@ option = {
       },
       realisticMaterial: {
         baseTexture:
-          ROOT_PATH + '/asset/get/s/data-1494250104909-SkZtfeAyZ.jpg',
+          'https://echarts.apache.org/examples/asset/get/s/data-1494250104909-SkZtfeAyZ.jpg',
         roughness: 0.7,
         metalness: 0,
         textureTiling: [200, 20]

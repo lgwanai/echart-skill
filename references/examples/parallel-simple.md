@@ -29,8 +29,9 @@ data: [
 
 1. **Analyze** user table → identify columns matching the required format above
 2. **Query DuckDB** → transform to match each data array's format
-3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
-4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
+3. **Replace xAxis.data first** (strings), then **series.data** (numbers) — ⚠️ do NOT swap!
+4. **⚠️ VERIFY**: xAxis has string labels, series has numbers; BOTH must have same length
+5. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
 
 ## Reference Code
 

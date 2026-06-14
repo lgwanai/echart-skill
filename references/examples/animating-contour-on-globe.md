@@ -48,7 +48,8 @@ $.when(
   $.getScript(CDN_PATH + 'd3-geo@2.0.1/dist/d3-geo.js'),
   $.getScript(CDN_PATH + 'd3-timer@2.0.0/dist/d3-timer.js')
 ).done(function () {
-  image(ROOT_PATH + '/data-gl/asset/bathymetry_bw_composite_4k.jpg').then(
+  image(/* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL').then(
     function (image) {
       var m = image.height,
         n = image.width,
@@ -132,9 +133,11 @@ $.when(
     myChart.setOption({
       backgroundColor: '#000',
       globe: {
-        environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
+        environment: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/starfield.jpg'',
         heightTexture:
-          ROOT_PATH + '/data-gl/asset/bathymetry_bw_composite_4k.jpg',
+          /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/world.topo.bathy.200401.jpg'',
         displacementScale: 0.05,
         displacementQuality: 'high',
         baseColor: '#000',
@@ -158,7 +161,8 @@ $.when(
             shadow: false
           },
           ambientCubemap: {
-            texture: ROOT_PATH + '/data-gl/asset/lake.hdr',
+            texture: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
             exposure: 1,
             diffuseIntensity: 0.5,
             specularIntensity: 2

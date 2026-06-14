@@ -29,7 +29,8 @@ titleCN: å°å½¢ä½ç§»
 option = {
   globe: {
     displacementTexture:
-      ROOT_PATH + '/data-gl/asset/bathymetry_bw_composite_4k.jpg',
+      /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
     displacementScale: 0.1,
     displacementQuality: 'ultra',
     shading: 'realistic',
@@ -58,7 +59,8 @@ option = {
         shadow: true
       },
       ambientCubemap: {
-        texture: ROOT_PATH + '/data-gl/asset/pisa.hdr',
+        texture: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
         exposure: 1,
         diffuseIntensity: 0.2
       }

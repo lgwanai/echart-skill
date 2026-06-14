@@ -256,7 +256,8 @@ mapChart.setOption({
 option = {
   globe: {
     baseTexture: mapChart,
-    heightTexture: ROOT_PATH + '/data-gl/asset/bathymetry_bw_composite_4k.jpg',
+    heightTexture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/earth.jpg'',
     displacementScale: 0.1,
     shading: 'lambert',
     light: {

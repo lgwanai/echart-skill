@@ -58,10 +58,31 @@ titleCN: GraphGL - å¤§è§æ¨¡äºèç½å¾è°±
 shotDelay: 10000
 shotWidth: 1920
 */
-$.getJSON(
-  ROOT_PATH + '/data-gl/asset/data/internet.graph.json',
-  function (graph) {
-    var edges = graph.edges.map(function (edge) {
+var graph = {
+  "nodes": [
+    [249, -33, 4, 4],
+    [251, -143, 4, 4],
+    [-715, 234, 4, 0],
+    [-717, 290, 4, 0],
+    [308, 1190, 4, 13],
+    [-227, 1474, 4, 13],
+    [143, 502, 4, 15],
+    [738, -1719, 4, 5],
+    // ... (22962 total entries — truncated, keep first 8 as sample. Agent: query DuckDB)
+      ],
+  "edges": [
+    [1, 0],
+    [2, 0],
+    [3, 2],
+    [4, 3],
+    [5, 4],
+    [6, 2],
+    [6, 3],
+    [6, 4],
+    // ... (48435 total entries — truncated, keep first 8 as sample. Agent: query DuckDB)
+      ]
+};
+var edges = graph.edges.map(function (edge) {
       return {
         source: edge[0],
         target: edge[1],
@@ -99,27 +120,7 @@ $.getJSON(
         'rgb(239,15,58)',
         'rgb(15,239,174)',
         'rgb(239,102,15)',
-        'rgb(239,15,15)',
-        'rgb(15,44,239)',
-        'rgb(239,145,15)',
-        'rgb(30,239,15)',
-        'rgb(239,188,15)',
-        'rgb(159,239,15)',
-        'rgb(159,15,239)',
-        'rgb(15,239,44)',
-        'rgb(15,239,87)',
-        'rgb(15,239,217)',
-        'rgb(203,15,239)',
-        'rgb(239,15,188)',
-        'rgb(239,15,102)',
-        'rgb(239,58,15)',
-        'rgb(239,15,145)',
-        'rgb(116,15,239)',
-        'rgb(15,131,239)',
-        'rgb(73,239,15)',
-        'rgb(15,239,131)',
-        'rgb(15,87,239)',
-        'rgb(239,15,231)'
+      // ... (30 total entries — truncated, Agent: query DuckDB)
       ],
       series: [
         {
@@ -147,6 +148,7 @@ $.getJSON(
         }
       ]
     });
-  }
-);
+
+        // ... (31 total entries — truncated, keep first 8 as sample. Agent: query DuckDB)
+          ]
 ```

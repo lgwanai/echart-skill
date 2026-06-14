@@ -56,8 +56,22 @@ titleCN: Global Wind Visualization 2
 videoStart: 2000
 videoEnd: 10000
 */
-$.getJSON(ROOT_PATH + '/data-gl/asset/data/gfs.json', function (windData) {
-  buildGrid(windData, function (header, grid) {
+var windData = [
+  {
+    "header": {
+      "discipline": 0,
+      "disciplineName": "Meteorological products",
+      "gribEdition": 2,
+      "gribLength": 133963,
+      "center": 7,
+      "centerName": "US National Weather Service - NCEP(WMC)",
+      "subcenter": 0,
+      "refTime": "2014-11-30T06:00:00.000Z",
+      "significanceOfRT": 1,
+      "significanceOfRTName": "Start of forecast",
+    // ... (101 total entries — truncated, Agent: query DuckDB for real data)
+    ],
+buildGrid(windData, function (header, grid) {
     var data = [];
     var p = 0;
     var maxMag = 0;
@@ -253,7 +267,7 @@ $.getJSON(ROOT_PATH + '/data-gl/asset/data/gfs.json', function (windData) {
       ]
     });
   });
-});
+
 // https://github.com/Esri/wind-js/blob/master/windy.js#L41
 var createWindBuilder = function (uComp, vComp) {
   var uData = uComp.data,

@@ -33,11 +33,14 @@ videoEnd: 6000
 option = {
   backgroundColor: '#000',
   globe: {
-    baseTexture: ROOT_PATH + '/data-gl/asset/world.topo.bathy.200401.jpg',
-    heightTexture: ROOT_PATH + '/data-gl/asset/world.topo.bathy.200401.jpg',
+    baseTexture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/earth.jpg'',
+    heightTexture: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
     displacementScale: 0.04,
     shading: 'realistic',
-    environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
+    environment: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/starfield.jpg'',
     realisticMaterial: {
       roughness: 0.9
     },
@@ -50,7 +53,8 @@ option = {
         shadow: true
       },
       ambientCubemap: {
-        texture: ROOT_PATH + '/data-gl/asset/pisa.hdr',
+        texture: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
         diffuseIntensity: 0.2
       }
     }

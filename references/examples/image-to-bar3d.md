@@ -76,7 +76,8 @@ img.onload = function () {
             intensity: 2
           },
           ambientCubemap: {
-            texture: ROOT_PATH + '/data-gl/asset/canyon.hdr',
+            texture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/sample.jpg'',
             exposure: 2,
             diffuseIntensity: 0.2,
             specularIntensity: 1

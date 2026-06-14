@@ -38,7 +38,7 @@ function fetchData(idx) {
   if (idx >= CHUNK_COUNT) {
     return;
   }
-  var dataURL = ROOT_PATH + '/data/asset/data/gps/gps_' + idx + '.bin';
+  var dataURL = 'https://echarts.apache.org/examples/data/asset/data/gps/gps_' + idx + '.bin';
   var xhr = new XMLHttpRequest();
   xhr.open('GET', dataURL, true);
   xhr.responseType = 'arraybuffer';

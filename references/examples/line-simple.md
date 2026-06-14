@@ -9,24 +9,20 @@ Columns needed: check data arrays in reference code for required format
 
 ## Data Arrays — Complete Replacement Guide
 
-**2 array(s)** to replace with real data:
+**2 `data: [...]` arrays** — ⚠️ careful: xAxis = string labels, series = numbers
 
-### [0] `data` (context: xAxis)
-```
-data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-```
-
-### [1] `data` (context: series)
-```
-data: [150, 230, 224, 218, 135, 147, 260]
-```
+| # | Context | Format | Example |
+|---|---------|--------|---------|
+| 0 | `xAxis.data` | string labels (category) | `['Mon','Tue','Wed','Thu','Fri','Sat','Sun']` |
+| 1 | `series[0].data` | number array (values) | `[150, 230, 224, 218, 135, 147, 260]` |
 
 ## Agent Workflow
 
-1. **Analyze** user table → identify columns matching the required format above
-2. **Query DuckDB** → transform to match each data array's format
-3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
-4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
+1. **Query DuckDB** → `SELECT category_col, value_col FROM ...`
+2. **Replace xAxis.data first**: find `xAxis: { ... data: [...]` → replace with category strings from query
+3. **Replace series.data second**: find `series: [{ ... data: [...]` → replace with numeric values from query
+4. **⚠️ VERIFY**: xAxis has strings, series has numbers; both arrays have same length
+5. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
 
 ## Reference Code
 

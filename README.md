@@ -180,7 +180,7 @@
 ### 🟢 模板模式（优先 — 27 种图表 × 41 个模板）
 
 ```
-用户请求 → 查 templates/INDEX.md → 定位模板 → 读占位符 → 生成 data JSON → build_template.py → 输出
+用户请求 → Agent 查 references/examples/INDEX.md → 定位 md 参考 → DuckDB 查数据 → 替换 data → 生成 HTML
 ```
 
 **Agent 只需生成 data JSON，不需要写任何 ECharts option 代码：**
@@ -906,9 +906,9 @@ A: 支持主题切换（深色/浅色）、自动刷新、导出 PDF、图表搜
 |---------|------|------|
 | 数据导入 | `scripts/data_importer.py` | 支持 CSV/Excel/URL 导入，流式处理大文件 |
 | 数据导出 | `scripts/data_exporter.py` | 导出为 CSV/Excel，支持 SQL 查询导出 |
-| 图表生成 | `scripts/chart_generator.py` | 支持 ECharts 6.0 全量图表类型 |
-| 仪表盘生成 | `scripts/dashboard_generator.py` | 多图表网格布局，专业 UI/UX 模板 |
-| 甘特图生成 | `scripts/gantt_chart.py` | 简化 API，支持任务数组输入 |
+| 图表生成 | Agent 内联生成（参考 references/examples/） | DuckDB → md 参考 → 替换数据 → HTML |
+| 仪表盘生成 | Agent + SimpleDashboard API | 多图表网格布局，专业 UI/UX |
+| 甘特图生成 | Agent 直接生成 | 简化 API，支持任务数组输入 |
 | 数据合并 | `scripts/data_merger.py` | 合并多个表格，支持导出和入库 |
 | 数据清洗 | `scripts/data_cleaner.py` | 清洗、去重、标准化 |
 | 本地服务 | `scripts/server.py` | 本地 HTTP 服务，预览图表 |

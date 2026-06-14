@@ -39,7 +39,7 @@ function fetchData(idx) {
     return;
   }
   var dataURL =
-    ROOT_PATH + '/data/asset/data/links-ny/links_ny_' + idx + '.bin';
+    'https://echarts.apache.org/examples/data/asset/data/links-ny/links_ny_' + idx + '.bin';
   var xhr = new XMLHttpRequest();
   xhr.open('GET', dataURL, true);
   xhr.responseType = 'arraybuffer';

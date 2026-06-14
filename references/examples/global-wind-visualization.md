@@ -52,8 +52,23 @@ titleCN: Global wind visualization
 videoStart: 2000
 videoEnd: 10000
 */
-$.getJSON(ROOT_PATH + '/data-gl/asset/data/winds.json', function (windData) {
-  var data = [];
+var windData = {
+  "nx": 360,
+  "ny": 181,
+  "max": 28.700000762939453,
+  "data": [
+    [-2.9, 4.2],
+    [-3, 4.1],
+    [-3, 4.1],
+    [-3.1, 4],
+    [-3.2, 4],
+    [-3.2, 3.9],
+    [-3.3, 3.9],
+    [-3.4, 3.8],
+    // ... (65159 total entries — truncated, keep first 8 as sample. Agent: query DuckDB)
+      ]
+};
+var data = [];
   var p = 0;
   var maxMag = 0;
   var minMag = Infinity;
@@ -253,5 +268,5 @@ $.getJSON(ROOT_PATH + '/data-gl/asset/data/winds.json', function (windData) {
       ]
     })
   );
-});
+
 ```

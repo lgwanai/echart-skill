@@ -57,7 +57,8 @@ mapChart.setOption({
 option = {
   globe: {
     baseTexture: mapChart,
-    heightTexture: ROOT_PATH + '/data-gl/asset/bathymetry_bw_composite_4k.jpg',
+    heightTexture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/world.topo.bathy.200401.jpg'',
     displacementScale: 0.1,
     shading: 'realistic',
     realisticMaterial: {
@@ -79,7 +80,8 @@ option = {
         shadow: true
       },
       ambientCubemap: {
-        texture: ROOT_PATH + '/data-gl/asset/lake.hdr',
+        texture: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
         exposure: 1,
         diffuseIntensity: 0.2
       }

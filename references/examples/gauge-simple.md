@@ -9,36 +9,32 @@ Columns needed: need a single **value** (aggregate)
 
 ## Data Arrays — Complete Replacement Guide
 
-**1 array(s)** to replace with real data:
+**2 values** to set from real data:
 
-### [0] `data` (context: series)
+### [0] `max` — Gauge scale maximum (default 100, must update!)
+
+```javascript
+max: 100   // ⚠️ MUST be >= data value; set to value * 1.2 rounded up
 ```
-data: [
-        {
-          value: 50,
-          name: 'SCORE'
-        }
-      ]
+
+### [1] `data.value` — Needle position
+
+```javascript
+data: [{ value: 50, name: 'SCORE' }]
 ```
 
 ## Agent Workflow
 
-1. **Analyze** user table → identify columns matching the required format above
-2. **Query DuckDB** → transform to match each data array's format
-3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
-4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
+1. **Query DuckDB** → aggregate value
+2. **Compute max**: round up to nice number above value (e.g., 629 → 800)
+3. **Replace max**: find `max: N` in the option → replace with computed max
+4. **Replace data.value**: find `value: N` inside `data: [{ value: N, name: ... }]` → replace
+5. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
+6. **⚠️ VERIFY**: `max >= data.value`
 
 ## Reference Code
 
 ```javascript
-/*
-title: Simple Gauge
-titleCN: 带标签数字动画的基础仪表盘
-category: gauge
-difficulty: 1
-videoStart: 0
-videoEnd: 1000
-*/
 option = {
   tooltip: {
     formatter: '{a} <br/>{b} : {c}%'
@@ -47,6 +43,7 @@ option = {
     {
       name: 'Pressure',
       type: 'gauge',
+      max: 100,
       progress: {
         show: true
       },

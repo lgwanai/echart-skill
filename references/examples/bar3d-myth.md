@@ -85,14 +85,16 @@ img.onload = function () {
         },
         boxDepth: 100,
         boxHeight: 20,
-        environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
+        environment: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/starfield.jpg'',
         light: {
           main: {
             shadow: true,
             intensity: 2
           },
           ambientCubemap: {
-            texture: ROOT_PATH + '/data-gl/asset/canyon.hdr',
+            texture: /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL',
             exposure: 2,
             diffuseIntensity: 0.2
           }
@@ -124,6 +126,7 @@ img.onload = function () {
     })
   );
 };
-img.src = ROOT_PATH + '/data-gl/asset/sample.jpg';
+img.src = /* Base64 data replaced — insert real URL here */
+'PLACEHOLDER_URL';
 img.crossOrigin = 'Anonymous';
 ```

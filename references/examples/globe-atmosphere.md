@@ -30,9 +30,11 @@ difficulty: 1
 option = {
   backgroundColor: '#000',
   globe: {
-    baseTexture: ROOT_PATH + '/data-gl/asset/earth.jpg',
+    baseTexture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/world.topo.bathy.200401.jpg'',
     shading: 'lambert',
-    environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
+    environment: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/starfield.jpg'',
     atmosphere: {
       show: true
     },

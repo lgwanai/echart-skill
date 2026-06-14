@@ -864,7 +864,7 @@ Step 7: validate_chart.py 硬校验（7 项）
     │   │       1. 查 knowledge/INDEX.md → 读知识片段
     │   │       2. 查 examples/INDEX.md → 读案例 main.js
     │   │       3. 知识 + 案例 → 生成完整 option
-    │   │       4. 用 chart_generator.py 生成 HTML
+    │   │       4. Agent 内联 ECharts + 包裹 HTML 壳 → 输出
     │   │
     │   └── 需要自定义系列？(custom series)
     │       └── 🟡 知识库模式 + custom/error-bar.html 模板
@@ -894,7 +894,7 @@ Step 7: validate_chart.py 硬校验（7 项）
 1. 用户请求 → 提取图表类型 + 特征词 → 查 `templates/INDEX.md` → 定位模板
 2. 读模板 HTML 文件 → 获取 `{{占位符}}` 列表和 data 格式
 3. 从 DuckDB 查询数据 → 按模板格式生成 JSON
-4. 填充占位符 → `chart_generator.py` 内联 JS 库 → 输出
+4. Agent 填充占位符 → 内联 ECharts JS 库 → 输出
 
 ### 🔵 组合模式（多图表）
 
@@ -922,7 +922,7 @@ c2.setOption({{OPTION2}});
 1. 查 `knowledge/INDEX.md` → 读知识片段
 2. 查 `examples/INDEX.md` → 读案例 main.js
 3. 知识 + 案例代码一起作为上下文 → 生成完整 echarts option
-4. 通过 chart_generator.py 生成 HTML
+4. Agent 生成 HTML（内联 ECharts + div#main + script）
 
 ### 🗺️ 检索决策树（知识库模式专用）
 
@@ -1008,7 +1008,6 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 | 案例索引 | `references/knowledge/examples/INDEX.md` |
 | 模板映射索引 | `references/templates/INDEX.md` |
 | 图表配方（自包含）| `references/examples/<chart-name>.md` — 354 个，每个 = 完整 JS + 数据替换点 + HTML 壳 |
-| 模板构建脚本 | `scripts/build_template.py` |
 | 概念文件 | `references/knowledge/concepts/` |
 | 图表类型文件 | `references/knowledge/chart-types/` |
 | API 文件 | `references/knowledge/api/` |
@@ -1022,7 +1021,7 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 #### 📋 图表配置生成（原有流程）
 
 1. 执行上述 4 步工作流获取语法约束和参考代码。
-2. Do NOT write custom Python scripts from scratch. We have a powerful template-based rendering engine. Use the built-in `scripts/chart_generator.py` script.
+2. Do NOT write custom Python scripts for chart generation. Use the Agent-driven workflow: DuckDB query → md reference → data replace → inline ECharts → HTML output.
 3. Formulate the SQL query that aggregates the data correctly.
 4. Generate the `custom_js` and `echarts_option` based on the knowledge + examples.
 5. Construct a JSON configuration file (save it in `outputs/configs/`) matching this structure:
@@ -1064,7 +1063,6 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 ```
 
 **实现方式**：
-- `chart_generator.py` 会自动将 `echarts.min.js`、地图 JS 等依赖内联注入到 HTML 中
 - 生成 ECharts option 时，**不写任何 `<script src=...>` 或 `<link href=...>`**
 - 地图数据（china.js, world.js 等）由 generator 自动处理内联，不在 option 中引用
 - 百度地图 SDK 是唯一例外（必须远程加载），仅在用户配置了 `BAIDU_AK` 且使用 bmap 模式时才允许
@@ -1100,11 +1098,7 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
     
     3. **Baidu AK Types**: If the user provides a Baidu Map AK, remember there are two types: 1) JavaScript API (Frontend) and 2) Geocoding API (Backend Python). If backend Python geocoding fails with "status 240", it means the AK is a Browser-type AK and lacks Backend Geocoding permissions. Fallback to hardcoded coordinates in JS or ask for a "Server-side" AK.
     
-    4. **Gantt Chart**: Uses a dedicated simplified API (see Scenario 9) rather than the template-based approach. Use `scripts/gantt_chart.py` for timeline visualizations.
- 7. Execute the command:
-    ```bash
-    python scripts/chart_generator.py --config outputs/configs/your_config.txt
-    ```
+     7. Execute the command:
 
  8. **[CRITICAL] Return Chart Access**: After generating the chart, check the server configuration:
 
@@ -1176,37 +1170,13 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 ### Scenario 9: Gantt Chart Generation
 **Trigger**: User requests project timeline or task schedule visualization.
 **Action**:
-1. Use the built-in Gantt chart wrapper for simplified API:
-   ```python
-   from scripts.gantt_chart import generate_gantt_chart
+1. Agent reads `references/examples/custom-gantt-flight.md` for Gantt chart structure reference
+2. Agent queries DuckDB for task data (name, start, end dates)
+3. Agent generates ECharts Gantt option with `type: 'custom'` + renderItem function
+4. Agent wraps in HTML shell (inline ECharts + div#main + script)
+5. Auto-start server → return URL
 
-   config = {
-       "title": "Project Timeline",
-       "tasks": [
-           {"name": "Design", "start": "2024-01-01", "end": "2024-01-15"},
-           {"name": "Development", "start": "2024-01-10", "end": "2024-02-01"},
-           {"name": "Testing", "start": "2024-01-25", "end": "2024-02-10"}
-       ]
-   }
-    output_path = generate_gantt_chart(config)
-    ```
-
- 2. **[CRITICAL] Auto-start Server**: After generating the Gantt chart, ensure server is running:
-    ```bash
-    python scripts/server_cli.py start  # Auto-starts if not running
-    ```
-
- 3. Return the access URL:
-    ```
-    ✅ Gantt chart generated: outputs/html/project_gantt.html
-    📊 View chart: http://localhost:{port}/project_gantt.html
-    ```
-
- 4. Tasks support optional fields:
-    - `category`: For grouping tasks in rows
-    - `color`: Custom bar color (hex code)
-
- **Note**: Dates can be ISO strings or datetime objects. End date must be after start date.
+**Note**: Gantt charts use ECharts `custom` series type. Dates can be ISO strings or datetime objects.
 
 ### Scenario 10: View Import History & Table Structure
 **Trigger**: User asks to view import history, check table structures, or see table relationships.
@@ -1238,87 +1208,26 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 ### Scenario 11: Export Charts for Offline Sharing
 **Trigger**: User wants to share charts/dashboards as standalone HTML files that work offline.
 
-**Action**:
-
-**Export Chart:**
-```python
-from scripts.chart_generator import export_standalone_chart
-
-config = {
-    "db_path": "workspace.duckdb",
-    "query": "SELECT category, value FROM sales",
-    "title": "Sales by Category",
-    "echarts_option": {
-        "xAxis": {"type": "category"},
-        "yAxis": {"type": "value"},
-        "series": [{"type": "bar"}]
-    }
-}
-export_standalone_chart(config, "sales_chart.html", theme="default")
-```
-
-**Export Dashboard:**
-```python
-from scripts.dashboard_generator import export_standalone_dashboard
-
-export_standalone_dashboard("dashboard_config.txt", "my_dashboard.html")
-```
-
-**Export Gantt Chart:**
-```python
-from scripts.gantt_chart import export_standalone_gantt
-
-config = {
-    "title": "Project Timeline",
-    "tasks": [
-        {"name": "Design", "start": "2024-01-01", "end": "2024-01-15"},
-        {"name": "Development", "start": "2024-01-10", "end": "2024-02-01"},
-        {"name": "Testing", "start": "2024-02-01", "end": "2024-02-15"},
-    ]
-}
-export_standalone_gantt(config, "project_timeline.html", theme="dark")
-```
+**Action**: Agent generates standalone HTML by inlining ECharts library (~1.1MB). Same workflow as Scenario 4:
+1. DuckDB query → real data
+2. Read md reference → chart structure
+3. Replace data → generate option
+4. Wrap with inline ECharts + div#main + script → standalone HTML
 
 **Key Features:**
 - Exported files are self-contained (~1.2MB with ECharts library)
 - Work offline without any server
 - Can be shared via email or file transfer
 - Open in any modern browser
-- Support themes: `default`, `dark`
 
-### Scenario 12: CLI Export (Command Line)
-**Trigger**: User needs to export charts via command line for batch processing or automation.
+### Scenario 12: Batch Export (Agent-driven)
+**Trigger**: User needs to export multiple charts for batch processing or automation.
 
-**Export Chart:**
-```bash
-# Basic usage (auto-generates filename with timestamp)
-python scripts/chart_cli.py export-chart config.txt
+**Action**: Agent executes Scenario 4 workflow for each chart in batch:
+1. For each config, read md reference → DuckDB query → replace data → generate HTML
+2. Auto-start server → return list of URLs
 
-# Specify output path
-python scripts/chart_cli.py export-chart config.txt --output reports/sales.html
-
-# Use dark theme
-python scripts/chart_cli.py export-chart config.txt --theme dark
-```
-
-**Export Dashboard:**
-```bash
-python scripts/chart_cli.py export-dashboard dashboard_config.txt
-
-# With custom output
-python scripts/chart_cli.py export-dashboard dashboard_config.txt --output monthly_report.html --theme dark
-```
-
-**Export Gantt Chart:**
-```bash
-# Gantt chart config is a JSON array of tasks
-python scripts/chart_cli.py export-gantt tasks.txt --title "项目进度"
-
-# With output path
-python scripts/chart_cli.py export-gantt tasks.txt --title "Project Timeline" --output timeline.html
-```
-
-**Config File Format (for export-chart):**
+**Config File Format:**
 ```json
 {
     "title": "销售数据图表",
@@ -1349,20 +1258,18 @@ python scripts/chart_cli.py export-gantt tasks.txt --title "Project Timeline" --
 
 **View Help:**
 ```bash
-python scripts/chart_cli.py --help
-python scripts/chart_cli.py export-chart --help
 ```
 
 **Batch Export Example:**
 ```bash
-# Export multiple charts
+# Batch chart generation (Agent-driven)
+# Agent: for each config, read md → DuckDB → replace → generate HTML
 for config in outputs/configs/*.json; do
-    python scripts/chart_cli.py export-chart "$config"
+    # Use /chart command or Scenario 4 workflow
 done
 
-# Automated daily report
-python scripts/chart_cli.py export-dashboard daily_dashboard.txt \
-    --output "reports/report_$(date +%Y%m%d).html"
+# Automated daily report (Agent-driven)
+# Agent: /dashboard with date parameter
 ```
 
 **Notes:**
@@ -1495,7 +1402,6 @@ Simply describe what you want in plain language:
 **Method 2: Simplified Python API**
 
 ```python
-from scripts.simple_dashboard import SimpleDashboard
 
 # Create dashboard with simplified API
 dashboard = SimpleDashboard(
@@ -1516,7 +1422,6 @@ dashboard.generate("outputs/html/dashboard.html")
 **Method 3: Direct Text-to-Dashboard**
 
 ```python
-from scripts.simple_dashboard import create_dashboard_from_text
 
 create_dashboard_from_text(
     """
@@ -1627,7 +1532,6 @@ For complex dashboards requiring full control, use JSON config:
 
 Generate:
 ```bash
-python scripts/dashboard_generator.py --config config.txt --output dashboard.html
 ```
 **Trigger**: User needs to automatically refresh data from HTTP APIs or databases on a schedule.
 

@@ -9,38 +9,37 @@ Columns needed: need a single **value** (aggregate)
 
 ## Data Arrays — Complete Replacement Guide
 
-**1 array(s)** to replace with real data:
+**2 values** to set from real data:
 
-### [0] `data` (context: root)
+### [0] `max` — Gauge scale maximum (default 100, must update!)
+
+```javascript
+max: 100   // ⚠️ MUST be >= data value; set to value * 1.2 rounded up
 ```
-data: [
-        {
-          value: 70
-        }
-      ]
+
+### [1] `data.value` — Progress value
+
+```javascript
+data: [{ value: 70 }]
 ```
 
 ## Agent Workflow
 
-1. **Analyze** user table → identify columns matching the required format above
-2. **Query DuckDB** → transform to match each data array's format
-3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
-4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
+1. **Query DuckDB** → aggregate value
+2. **Compute max**: round up to nice number above value
+3. **Replace max**: find `max: N` in the option → replace
+4. **Replace data.value**: `data: [{ value: N }]` → replace N
+5. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
+6. **⚠️ VERIFY**: `max >= data.value`
 
 ## Reference Code
 
 ```javascript
-/*
-title: Progress Gauge
-titleCN: 进度仪表盘
-category: gauge
-shotWidth: 800
-difficulty: 3
-*/
 option = {
   series: [
     {
       type: 'gauge',
+      max: 100,
       progress: {
         show: true,
         width: 18

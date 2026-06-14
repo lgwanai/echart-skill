@@ -5,65 +5,39 @@
 
 ## User Data Requirements
 
-Columns needed: need nested **name+value** or **name+children**
+Columns needed: need nested **name+value** or **name+children** tree structure
 
-## Data Arrays — Complete Replacement Guide
+## Data Arrays — Replacement Guide
 
-**4 array(s)** to replace with real data:
+**1 data array** — the entire `data: [...]` block inside series:
 
-### [0] `data` (context: series)
-```
-data: 
-```
+Each node: `{name, value, children?}`. `value` at parent level = sum of children values.
 
-### [1] `children` (context: series)
-```
-children: [
-            {
-              name: 'nodeAa',
-              value: 4
-            },
-            {
-              name: 'nodeAb',
-            ...
-```
-
-### [2] `children` (context: root)
-```
-children: [
-            {
-              name: 'nodeBa',
-              value: 20,
-              children: [
-                {
-                  name: '...
-```
-
-### [3] `children` (context: root)
-```
-children: [
-                {
-                  name: 'nodeBa1',
-                  value: 20
-                }
-              ]
+```javascript
+data: [
+  { name: 'nodeA', value: 10, children: [
+    { name: 'nodeAa', value: 4 },
+    { name: 'nodeAb', value: 6 }
+  ]},
+  { name: 'nodeB', value: 20, children: [{
+    name: 'nodeBa', value: 20, children: [
+      { name: 'nodeBa1', value: 20 }
+    ]
+  }]}
+]
 ```
 
 ## Agent Workflow
 
-1. **Analyze** user table → identify columns matching the required format above
-2. **Query DuckDB** → transform to match each data array's format
-3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
-4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
+1. **Query DuckDB** → recursive CTE for parent-child hierarchy
+2. **Build nested tree**: `{name, value, children: [{...}, ...]}` — value at each parent = sum of direct children
+3. **Replace data block**: find `data: [` inside `type: 'treemap'` → bracket-counting → replace entire tree
+4. **Wrap HTML** + validate_chart.py
+5. **⚠️ VERIFY**: `parent.value == sum(children.values)` at every level
 
 ## Reference Code
 
 ```javascript
-/*
-title: Basic Treemap
-category: treemap
-titleCN: 基础矩形树图
-*/
 option = {
   series: [
     {

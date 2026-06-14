@@ -32,11 +32,14 @@ videoEnd: 6000
 option = {
   backgroundColor: '#000',
   globe: {
-    baseTexture: ROOT_PATH + '/data-gl/asset/earth.jpg',
-    heightTexture: ROOT_PATH + '/data-gl/asset/bathymetry_bw_composite_4k.jpg',
+    baseTexture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/world.topo.bathy.200401.jpg'',
+    heightTexture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/world.topo.bathy.200401.jpg'',
     displacementScale: 0.1,
     shading: 'lambert',
-    environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
+    environment: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/starfield.jpg'',
     light: {
       ambient: {
         intensity: 0.1
@@ -49,11 +52,13 @@ option = {
       {
         type: 'blend',
         blendTo: 'emission',
-        texture: ROOT_PATH + '/data-gl/asset/night.jpg'
+        texture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/pisa.hdr''
       },
       {
         type: 'overlay',
-        texture: ROOT_PATH + '/data-gl/asset/clouds.png',
+        texture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/pisa.hdr'',
         shading: 'lambert',
         distance: 5
       }

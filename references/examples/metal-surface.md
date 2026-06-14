@@ -85,7 +85,8 @@ option = {
         intensity: 0
       },
       ambientCubemap: {
-        texture: ROOT_PATH + '/data-gl/asset/canyon.hdr',
+        texture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/leather/leather_roughness.jpg'',
         exposure: 2,
         diffuseIntensity: 0.2,
         specularIntensity: 3

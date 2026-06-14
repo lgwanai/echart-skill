@@ -29,14 +29,17 @@ titleCN: éè´¨æå°ç
 option = {
   backgroundColor: '#000',
   globe: {
-    baseTexture: ROOT_PATH + '/data-gl/asset/world.topo.bathy.200401.jpg',
-    heightTexture: ROOT_PATH + '/data-gl/asset/bathymetry_bw_composite_4k.jpg',
+    baseTexture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/earth.jpg'',
+    heightTexture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/earth.jpg'',
     displacementScale: 0.2,
     shading: 'realistic',
-    environment: ROOT_PATH + '/data-gl/asset/starfield.jpg',
+    environment: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/starfield.jpg'',
     realisticMaterial: {
-      roughness: ROOT_PATH + '/asset/get/s/data-1497599804873-H1SHkG-mZ.jpg',
-      metalness: ROOT_PATH + '/asset/get/s/data-1497599800643-BJbHyGWQW.jpg',
+      roughness: 'https://echarts.apache.org/examples/asset/get/s/data-1497599804873-H1SHkG-mZ.jpg',
+      metalness: 'https://echarts.apache.org/examples/asset/get/s/data-1497599800643-BJbHyGWQW.jpg',
       textureTiling: [8, 4]
     },
     postEffect: {
@@ -51,7 +54,8 @@ option = {
         shadow: true
       },
       ambientCubemap: {
-        texture: ROOT_PATH + '/data-gl/asset/pisa.hdr',
+        texture: /* Base64 data replaced — load from server */
+'ROOT_PATH + '/data-gl/asset/earth.jpg'',
         exposure: 2,
         diffuseIntensity: 2,
         specularIntensity: 2
