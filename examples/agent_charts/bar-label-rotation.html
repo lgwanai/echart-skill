@@ -1,4 +1,4 @@
-<!-- bar-label-rotation — inline labelOption, no external refs -->
+<!-- bar-label-rotation -->
 <!DOCTYPE html><html lang="zh-CN">
 <head><meta charset="utf-8"><title>bar-label-rotation</title>
 <script>
@@ -71,7 +71,7 @@ const posList = [
 
 const labelOption = {
   show: true,
-  position: 'insideBottom',
+  position: 'inside',
   distance: 15,
   align: 'left',
   verticalAlign: 'middle',
@@ -120,7 +120,7 @@ option = {
   series: [
     {
       name: 'Forest',
-      type: 'bar',
+      type: 'line',
       barGap: 0,
       label: labelOption,
       emphasis: {
@@ -130,7 +130,7 @@ option = {
     },
     {
       name: 'Steppe',
-      type: 'bar',
+      type: 'line',
       label: labelOption,
       emphasis: {
         focus: 'series'
@@ -139,7 +139,7 @@ option = {
     },
     {
       name: 'Desert',
-      type: 'bar',
+      type: 'line',
       label: labelOption,
       emphasis: {
         focus: 'series'
@@ -148,7 +148,7 @@ option = {
     },
     {
       name: 'Wetland',
-      type: 'bar',
+      type: 'line',
       label: labelOption,
       emphasis: {
         focus: 'series'
