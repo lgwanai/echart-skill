@@ -3,20 +3,50 @@
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-stack-borderRadius
 **Chart Type:** `bar`
 
-## IMPORTANT
+## User Data Requirements
 
-Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
+Columns needed: need **category** + **value** columns
+
+## Data Arrays — Replacement Guide
+
+The code contains **6 data array(s)** to replace:
+
+### data[0]: `series`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [120, 200, 150, 80, 70, 110, 130]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[1]: `series`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [10, 46, 64, '-', 0, '-', 0]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[2]: `unknown`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [30, '-', 0, 20, 10, '-', 0]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[3]: `unknown`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [30, '-', 0, 20, 10, '-', 0]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[4]: `unknown`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [10, 20, 150, 0, '-', 50, 10]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[5]: `xAxis`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
+- **Replace with**: real data from DuckDB in the same format
 
 ## Agent Workflow
 
-1. **Analyze user data**: need **category** + **value** columns
-2. **Query DuckDB**: Build SQL against the user's actual table and columns
-3. **Transform**: Map query results to match the data array format below
-4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
-5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
-6. **Validate**: `python scripts/validate_chart.py output.html`
-
-Data arrays to replace: **6**
+1. **Analyze** user table → identify columns matching the required format above
+2. **Query DuckDB** → transform to match each data array's format
+3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
+4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
 
 ## Reference Code
 

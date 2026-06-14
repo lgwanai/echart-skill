@@ -3,20 +3,79 @@
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=scatter-weight
 **Chart Type:** `cross`
 
-## IMPORTANT
+## User Data Requirements
 
-Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
+Columns needed: check data arrays in reference code for required format
+
+## Data Arrays — Replacement Guide
+
+The code contains **9 data array(s)** to replace:
+
+### data[0]: `toolbox`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: ['Female', 'Male']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[1]: `series[0]`
+- **Format**: `[[x,y],...] — XY pairs`
+- **Location**: `data: [[161.2, 51.6]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[2]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+          [
+            {
+              name: 'Female Data Range',
+              xAxis: 'min...`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[3]: `yAxis`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+          { type: 'max', name: 'Max' },
+          { type: 'min', name: 'Min' }
+        ]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[4]: `markLine`
+- **Format**: `[{name,value},...] — named items`
+- **Location**: `data: [{ type: 'average', name: 'AVG' }, { xAxis: 160 }]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[5]: `series`
+- **Format**: `[[x,y],...] — XY pairs`
+- **Location**: `data: [[174.0, 65.6]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[6]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+          [
+            {
+              name: 'Male Data Range',
+              xAxis: 'min',...`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[7]: `yAxis`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+          { type: 'max', name: 'Max' },
+          { type: 'min', name: 'Min' }
+        ]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[8]: `markLine`
+- **Format**: `[{name,value},...] — named items`
+- **Location**: `data: [{ type: 'average', name: 'Average' }, { xAxis: 170 }]`
+- **Replace with**: real data from DuckDB in the same format
 
 ## Agent Workflow
 
-1. **Analyze user data**: check data arrays in reference code
-2. **Query DuckDB**: Build SQL against the user's actual table and columns
-3. **Transform**: Map query results to match the data array format below
-4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
-5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
-6. **Validate**: `python scripts/validate_chart.py output.html`
-
-Data arrays to replace: **9**
+1. **Analyze** user table → identify columns matching the required format above
+2. **Query DuckDB** → transform to match each data array's format
+3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
+4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
 
 ## Reference Code
 

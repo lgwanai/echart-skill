@@ -3,20 +3,55 @@
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=area-stack
 **Chart Type:** `cross`
 
-## IMPORTANT
+## User Data Requirements
 
-Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
+Columns needed: check data arrays in reference code for required format
+
+## Data Arrays — Replacement Guide
+
+The code contains **7 data array(s)** to replace:
+
+### data[0]: `legend`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[1]: `toolbox`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[2]: `series[0]`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [120, 132, 101, 134, 90, 230, 210]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[3]: `series`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [220, 182, 191, 234, 290, 330, 310]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[4]: `series`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [150, 232, 201, 154, 190, 330, 410]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[5]: `series`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [320, 332, 301, 334, 390, 330, 320]`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[6]: `series`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [820, 932, 901, 934, 1290, 1330, 1320]`
+- **Replace with**: real data from DuckDB in the same format
 
 ## Agent Workflow
 
-1. **Analyze user data**: check data arrays in reference code
-2. **Query DuckDB**: Build SQL against the user's actual table and columns
-3. **Transform**: Map query results to match the data array format below
-4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
-5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
-6. **Validate**: `python scripts/validate_chart.py output.html`
-
-Data arrays to replace: **7**
+1. **Analyze** user table → identify columns matching the required format above
+2. **Query DuckDB** → transform to match each data array's format
+3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
+4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
 
 ## Reference Code
 

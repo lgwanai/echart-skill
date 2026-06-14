@@ -3,9 +3,28 @@
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-label-rotation
 **Chart Type:** `bar`
 
-## Clean Standalone Code
+## ⚠️ CLEANED FOR STANDALONE — app.config inlined
 
-All `app.config.*` replaced with actual values. Uses {{PLACEHOLDER}} for reliable data injection.
+## User Data Requirements
+Columns needed: need **category** + **value** columns (4 series recommended)
+
+## Data Arrays — Replacement Guide
+
+The code contains **5 data array(s)** — replace ALL with real data:
+
+### data[0]: `legend`
+- **Format**: `['name1','name2',...]` — legend labels (string array, matches series names)
+- **Replace with**: real series names from DuckDB
+
+### data[1]: `xAxis`
+- **Format**: `['cat1','cat2',...]` — x-axis category labels (string array)
+- **Replace with**: real category labels from DuckDB
+
+### data[2-5]: `series[0-3].data`
+- **Format**: `[n1,n2,...]` — flat numeric value array
+- **Replace with**: real numeric values from DuckDB
+
+## Clean Code (app.config references removed)
 
 ```javascript
 const posList = ['left','right','top','bottom','inside','insideTop','insideLeft','insideRight','insideBottom','insideTopLeft','insideTopRight','insideBottomLeft','insideBottomRight'];
@@ -26,8 +45,8 @@ option = {
 ```
 
 ## Agent Workflow
-1. Query DuckDB for multiple series data
+1. Query DuckDB for 4 numeric columns
 2. LEGEND = JSON array of series names
-3. CATEGORIES = JSON array of x-axis labels  
-4. SERIES = JSON array of series objects with labelOption inlined
-5. Use build_template.py to fill {{PLACEHOLDER}} → validate_chart.py
+3. CATEGORIES = JSON array of x-axis labels
+4. SERIES = JSON array of `{name, type:'bar', barGap:0, label:{...}, emphasis:{focus:'series'}, data:[...]}`
+5. Use build_template.py → fill {{PLACEHOLDER}} → validate_chart.py

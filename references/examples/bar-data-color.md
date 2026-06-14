@@ -3,20 +3,35 @@
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-data-color
 **Chart Type:** `category`
 
-## IMPORTANT
+## User Data Requirements
 
-Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
+Columns needed: check data arrays in reference code for required format
+
+## Data Arrays — Replacement Guide
+
+The code contains **2 data array(s)** to replace:
+
+### data[0]: `xAxis`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[1]: `series[0]`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+        120,
+        {
+          value: 200,
+          itemStyle: {
+            color: '#505...`
+- **Replace with**: real data from DuckDB in the same format
 
 ## Agent Workflow
 
-1. **Analyze user data**: check data arrays in reference code
-2. **Query DuckDB**: Build SQL against the user's actual table and columns
-3. **Transform**: Map query results to match the data array format below
-4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
-5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
-6. **Validate**: `python scripts/validate_chart.py output.html`
-
-Data arrays to replace: **2**
+1. **Analyze** user table → identify columns matching the required format above
+2. **Query DuckDB** → transform to match each data array's format
+3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
+4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
 
 ## Reference Code
 

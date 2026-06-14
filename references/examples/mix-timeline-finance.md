@@ -3,20 +3,106 @@
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=mix-timeline-finance
 **Chart Type:** `shadow`
 
-## IMPORTANT
+## User Data Requirements
 
-Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
+Columns needed: check data arrays in reference code for required format
+
+## Data Arrays — Replacement Guide
+
+The code contains **13 data array(s)** to replace:
+
+### data[0]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+        '2002-01-01',
+        '2003-01-01',
+        '2004-01-01',
+        {
+          value:...`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[1]: `legend`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: ['第一产业', '第二产业', '第三产业', 'GDP', '金融', '房地产']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[2]: `xAxis`
+- **Format**: `[n1,n2,...] — flat value array`
+- **Location**: `data: [
+          '北京',
+          '\n天津',
+          '河北',
+          '\n山西',
+          '内蒙古',
+       ...`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[3]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+            { name: '第一产业', value: dataMap.dataPI['2002sum']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[4]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+            { name: '第一产业', value: dataMap.dataPI['2003sum']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[5]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+            { name: '第一产业', value: dataMap.dataPI['2004sum']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[6]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+            { name: '第一产业', value: dataMap.dataPI['2005sum']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[7]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+            { name: '第一产业', value: dataMap.dataPI['2006sum']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[8]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+            { name: '第一产业', value: dataMap.dataPI['2007sum']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[9]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+            { name: '第一产业', value: dataMap.dataPI['2008sum']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[10]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+            { name: '第一产业', value: dataMap.dataPI['2009sum']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[11]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+            { name: '第一产业', value: dataMap.dataPI['2010sum']`
+- **Replace with**: real data from DuckDB in the same format
+
+### data[12]: `unknown`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+            { name: '第一产业', value: dataMap.dataPI['2011sum']`
+- **Replace with**: real data from DuckDB in the same format
 
 ## Agent Workflow
 
-1. **Analyze user data**: check data arrays in reference code
-2. **Query DuckDB**: Build SQL against the user's actual table and columns
-3. **Transform**: Map query results to match the data array format below
-4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
-5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
-6. **Validate**: `python scripts/validate_chart.py output.html`
-
-Data arrays to replace: **13**
+1. **Analyze** user table → identify columns matching the required format above
+2. **Query DuckDB** → transform to match each data array's format
+3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
+4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
 
 ## Reference Code
 

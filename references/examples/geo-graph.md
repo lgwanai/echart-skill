@@ -3,20 +3,26 @@
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=geo-graph
 **Chart Type:** `graph`
 
-## IMPORTANT
+## User Data Requirements
 
-Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
+Columns needed: need **nodes** [{name,...}] + **links/edges** [{source,target}]
+
+## Data Arrays — Replacement Guide
+
+The code contains **1 data array(s)** to replace:
+
+### data[0]: `series[0]`
+- **Format**: `[{...},...] — object array`
+- **Location**: `data: [
+          { name: 'a', value: [7.667821250000001, 46.791734269956265]`
+- **Replace with**: real data from DuckDB in the same format
 
 ## Agent Workflow
 
-1. **Analyze user data**: check data arrays in reference code
-2. **Query DuckDB**: Build SQL against the user's actual table and columns
-3. **Transform**: Map query results to match the data array format below
-4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
-5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
-6. **Validate**: `python scripts/validate_chart.py output.html`
-
-Data arrays to replace: **1**
+1. **Analyze** user table → identify columns matching the required format above
+2. **Query DuckDB** → transform to match each data array's format
+3. **Replace**: use **bracket-counting** to find each `data: [...]` → replace with real data
+4. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
 
 ## Reference Code
 
