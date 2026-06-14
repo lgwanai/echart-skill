@@ -1,32 +1,21 @@
 # bar-label-rotation
 
 **Official:** https://echarts.apache.org/examples/zh/editor.html?c=bar-label-rotation
-**Chart Type:** `shadow`
+**Chart Type:** `bar`
 
 ## IMPORTANT
-
-Code below shows OFFICIAL DISPLAY DATA. Agent MUST replace all `data: [...]` arrays with the user's real DuckDB data using **bracket-counting** (not simple regex).
+Code is CLEANED for standalone HTML — all `app.config` references are INLINED with default values.
+No external dependencies. Ready to use with bracket-counting data replacement.
 
 ## Agent Workflow
+1. **Analyze**: need **category** (xAxis) + **value** (series data) columns
+2. **Query DuckDB**: multiple series recommended — one query per series name
+3. **Transform**: build series array with label config (rotate:90, insideBottom)
+4. **Replace data**: bracket-counting on each `data: [...]` in series array
+5. **Wrap HTML**: ECharts inline + div#main + script + validate_chart.py
 
-1. **Analyze user data**: check data arrays in reference code
-2. **Query DuckDB**: Build SQL against the user's actual table and columns
-3. **Transform**: Map query results to match the data array format below
-4. **Replace data**: Find `data: [` → count brackets [ ] to find complete array → replace with real JSON
-5. **Wrap HTML**: ECharts script inline + div#main + init + setOption + resize
-6. **Validate**: `python scripts/validate_chart.py output.html`
-
-Data arrays to replace: **6**
-
-## Reference Code
-
+## Clean Code (READY FOR STANDALONE)
 ```javascript
-/*
-title: Bar Label Rotation
-titleCN: 柱状图标签旋转
-category: bar
-difficulty: 3
-*/
 const posList = [
   'left',
   'right',
@@ -42,7 +31,7 @@ const posList = [
   'insideBottomLeft',
   'insideBottomRight'
 ];
-app.configParameters = {
+nullParameters = {
   rotate: {
     min: -90,
     max: 90
@@ -72,20 +61,7 @@ app.configParameters = {
     max: 100
   }
 };
-app.config = {
-  rotate: 90,
-  align: 'left',
-  verticalAlign: 'middle',
-  position: 'insideBottom',
-  distance: 15,
-  onChange: function () {
-    const labelOption = {
-      rotate: app.config.rotate,
-      align: app.config.align,
-      verticalAlign: app.config.verticalAlign,
-      position: app.config.position,
-      distance: app.config.distance
-    };
+
     myChart.setOption({
       series: [
         {
@@ -106,11 +82,11 @@ app.config = {
 };
 const labelOption = {
   show: true,
-  position: app.config.position,
-  distance: app.config.distance,
-  align: app.config.align,
-  verticalAlign: app.config.verticalAlign,
-  rotate: app.config.rotate,
+  position: 'insideBottom',
+  distance: 15,
+  align: 'left',
+  verticalAlign: 'middle',
+  rotate: 90,
   formatter: '{c}  {name|{a}}',
   fontSize: 16,
   rich: {

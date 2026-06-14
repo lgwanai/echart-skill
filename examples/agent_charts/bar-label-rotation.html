@@ -47,12 +47,6 @@ var eo={},no={};var io,ro=function(){function t(t,e,n){var i=this;this._sleepAft
 
 </script><style>body{margin:0;padding:16px;font-family:sans-serif}#main{width:100%;height:600px}</style></head><body><div id="main"></div><script>
 var chart=echarts.init(document.getElementById("main"));
-/*
-title: Bar Label Rotation
-titleCN: 柱状图标签旋转
-category: bar
-difficulty: 3
-*/
 const posList = [
   'left',
   'right',
@@ -68,7 +62,7 @@ const posList = [
   'insideBottomLeft',
   'insideBottomRight'
 ];
-app.configParameters = {
+nullParameters = {
   rotate: {
     min: -90,
     max: 90
@@ -98,20 +92,7 @@ app.configParameters = {
     max: 100
   }
 };
-app.config = {
-  rotate: 90,
-  align: 'left',
-  verticalAlign: 'middle',
-  position: 'insideBottom',
-  distance: 15,
-  onChange: function () {
-    const labelOption = {
-      rotate: app.config.rotate,
-      align: app.config.align,
-      verticalAlign: app.config.verticalAlign,
-      position: app.config.position,
-      distance: app.config.distance
-    };
+
     myChart.setOption({
       series: [
         {
@@ -132,11 +113,11 @@ app.config = {
 };
 const labelOption = {
   show: true,
-  position: app.config.position,
-  distance: app.config.distance,
-  align: app.config.align,
-  verticalAlign: app.config.verticalAlign,
-  rotate: app.config.rotate,
+  position: 'insideBottom',
+  distance: 15,
+  align: 'left',
+  verticalAlign: 'middle',
+  rotate: 90,
   formatter: '{c}  {name|{a}}',
   fontSize: 16,
   rich: {
@@ -151,7 +132,7 @@ option = {
     }
   },
   legend: {
-    data: [120.0, 200.0, 150.0, 80.0, 70.0, 110.0, 130.0]
+    data: [120.0, 132.0, 101.0, 134.0, 90.0]
   },
   toolbox: {
     show: true,
@@ -170,7 +151,7 @@ option = {
     {
       type: 'category',
       axisTick: { show: false },
-      data: ['2012', '2013', '2014', '2015', '2016']
+      data: [220.0, 182.0, 191.0, 234.0, 290.0]
     }
   ],
   yAxis: [
@@ -187,7 +168,7 @@ option = {
       emphasis: {
         focus: 'series'
       },
-      data: [320, 332, 301, 334, 390]
+      data: [150.0, 232.0, 201.0, 154.0, 190.0], 332, 301, 334, 390]
     },
     {
       name: 'Steppe',
@@ -196,7 +177,7 @@ option = {
       emphasis: {
         focus: 'series'
       },
-      data: [220, 182, 191, 234, 290]
+      data: [320.0, 332.0, 301.0, 334.0, 330.0]
     },
     {
       name: 'Desert',
