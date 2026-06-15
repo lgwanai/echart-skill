@@ -12,7 +12,9 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 2. **DuckDB as the Engine**: All CSV/Excel files should be imported into a local DuckDB database (default: `workspace.duckdb`). Rely on SQL for robust data manipulation (filtering, joining, grouping). DuckDB's columnar storage delivers superior analytical performance.
 3. **Non-Destructive Operations (Undo Mechanism)**: Do not overwrite original tables. When modifying data, create a new table (e.g., `CREATE TABLE table_v2 AS SELECT ...`) or a View. This guarantees the user can always say "undo the last step".
 4. **Data Privacy**: Keep data local. Only send aggregated statistics or schema info into the context window.
-5. **Auto-start Server**: After generating ANY HTML chart/dashboard, ALWAYS ensure the local server is running and return the access URL. Use `python scripts/server_cli.py start` to auto-start if not running.
+5. **Chart Output**: After generating ANY HTML chart/dashboard output, follow the server config:
+	   - **Default (`server.enabled=false`)**: Return the local file path only. The chart is a self-contained HTML file that works offline.
+	   - **If enabled (`server.enabled=true`)**: Start the server and return the access URL. Use `python scripts/server_cli.py start` to auto-start if not running. See Scenario 4 for detailed server check instructions.
 
 ---
 
@@ -168,6 +170,8 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   - ✅ 自动刷新、导出 PDF
   - ✅ 图表搜索、单独下载
   - ✅ 智能数据洞察卡片（NEW v2.0 — 使用 --insights 启用）
+
+⚠️ **重要**: 仪表盘 HTML 必须为**自包含单文件**（无外部 CSS/JS 引用，无硬编码端口号）。详见 Scenario 15 的 "Dashboard Single File 铁律"。
 
 选项:
   --insights                    启用数据洞察卡片（自动分析表数据并展示关键发现）
@@ -616,7 +620,7 @@ start 选项:
 |------|-----------|---------------|
 | 数据导入 | 上传、导入、import、load、打开文件、读取 | Scenario 1 |
 | SQL 查询 | 查询、筛选、统计、分组、排序、select、group by | Scenario 2 |
-| 图表生成 | 图表、可视化、画图、chart、plot、展示、可视化 | Scenario 4 + 自动启动服务 |
+| 图表生成 | 图表、可视化、画图、chart、plot、展示、可视化 | Scenario 4 |
 | 数据导出 | 导出、下载、export、保存、输出 | Scenario 6 |
 | 表结构 | 表结构、字段、列、describe、schema | Scenario 10 |
 | 导入历史 | 历史、导入记录、history | Scenario 10 |
@@ -836,7 +840,7 @@ Step 5: 包裹 HTML 壳（echarts inline + div#main + script）
  ↓
 Step 6: 对照 docs/CHART_DEBUG_LOG.md 避坑（34 条）
  ↓
-Step 7: validate_chart.py 硬校验（7 项）
+Step 7: validate_chart.py 硬校验（Single File + Dashboard + 渲染）
    └─ python scripts/validate_chart.py <output.html>
  ↓
 通过→返回用户 / 失败→修复→重试
@@ -1130,6 +1134,19 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 
     **IMPORTANT**: All generated HTML files are now **self-contained** — they embed the ECharts library and all map scripts inline, so they work offline without any server.
 
+ 9. **[MANDATORY] Validate the generated HTML** before returning to the user:
+
+    ```bash
+    python scripts/validate_chart.py "outputs/html/sales_chart.html"
+    ```
+
+    The validator checks:
+    - **Single File compliance**: NO external `<script src=...>`, NO external `<link href=...>`, NO hardcoded IP:port URLs
+    - **Dashboard integrity** (if applicable): DashboardController, html2canvas, jsPDF must all be inlined
+    - **Basic rendering**: echarts.init, setOption, chart type, data must be present
+
+    ⛔ **If validation fails (exit code 1): FIX the errors and re-validate BEFORE returning to user.** This is the last line of defense — validation errors that reach the user are bugs.
+
 ### Scenario 5: File Merging & Splitting
 **Trigger**: User needs to combine multiple identical reports or split a master sheet by department.
 **Action**:
@@ -1174,7 +1191,7 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 2. Agent queries DuckDB for task data (name, start, end dates)
 3. Agent generates ECharts Gantt option with `type: 'custom'` + renderItem function
 4. Agent wraps in HTML shell (inline ECharts + div#main + script)
-5. Auto-start server → return URL
+5. Return chart access: follow server config — file path by default (server.enabled=false), URL only if server.enabled=true (see Scenario 4 step 8)
 
 **Note**: Gantt charts use ECharts `custom` series type. Dates can be ISO strings or datetime objects.
 
@@ -1225,7 +1242,7 @@ Step 2.5: 根据图表类型+特征 → 选择 HTML 模板
 
 **Action**: Agent executes Scenario 4 workflow for each chart in batch:
 1. For each config, read md reference → DuckDB query → replace data → generate HTML
-2. Auto-start server → return list of URLs
+2. Return chart access: follow server config — file paths by default, URLs only if server.enabled=true
 
 **Config File Format:**
 ```json
@@ -1481,6 +1498,53 @@ The system automatically:
 - ✅ **Export PDF**: Export entire dashboard as PDF file
 - ✅ **Chart Search**: Filter charts by title
 - ✅ **Download Charts**: Download individual charts as PNG images
+
+### 🔒 Dashboard Single File 铁律（硬性要求）
+
+> ⛔ **Dashboard HTML MUST be self-contained — same Single File rules as individual charts.**
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    Dashboard HTML Construction Rules                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ❌ 禁止: <link rel="stylesheet" href="http://127.0.0.1:8101/...">     │
+│  ❌ 禁止: <script src="http://127.0.0.1:8101/..."></script>            │
+│  ❌ 禁止: 硬编码端口号（8101 或任何端口）                                 │
+│  ❌ 禁止: 任何外部 src/href 引用                                         │
+│  ❌ 禁止: 依赖本地文件系统中的 JS/CSS 文件                                │
+│                                                                         │
+│  ✅ 必须: 将 echarts.min.js 完整内联到 <script> 标签中                   │
+│  ✅ 必须: 将 dashboard.css 完整内联到 <style> 标签中                     │
+│  ✅ 必须: 将 dashboard.js 完整内联到 <script> 标签中                     │
+│  ✅ 必须: 地图数据 JS 文件完整内联到 <script> 标签中                      │
+│  ✅ 必须: 输出单个 .html 文件，双击即可在浏览器中打开                      │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**PDF Export 实现要求：**
+- `html2canvas` 和 `jsPDF` 库必须**内联**到 HTML 中（从 `assets/` 目录读取并嵌入）
+- 在 `<script>` 标签中内联 html2canvas 库（约 50KB minified）
+- 在 `<script>` 标签中内联 jsPDF 库（约 200KB minified）
+- `exportDashboard()` 函数检查 `typeof html2canvas !== 'undefined'` 时必须找到内联的库
+- 如果内联库不可用，回退到浏览器的 `window.print()` 作为最低兜底
+
+**Chart Download 实现要求：**
+- `downloadChart()` 使用 ECharts 内置的 `chart.getDataURL()` API（无需外部库）
+- 所有 chart 实例存入 `charts` 数组，通过 chart ID 查找
+- DashboardController 的 `charts` 参数由 HTML 中的 IIFE 自动填充
+
+**实现方式：**
+1. 读取 `assets/echarts/echarts.min.js` → 内联为 `<script>/* echarts 代码 */</script>`
+2. 读取 `assets/dashboard/dashboard.css` → 内联为 `<style>/* 所有 CSS */</style>`
+3. 读取 `assets/dashboard/dashboard.js` → 内联为 `<script>/* DashboardController 代码 */</script>`
+4. 读取 `assets/dashboard/html2canvas.min.js` → 内联为 `<script>/* html2canvas 代码 */</script>`
+5. 读取 `assets/dashboard/jspdf.umd.min.js` → 内联为 `<script>/* jsPDF 代码 */</script>`
+6. 读取所需地图 JS 文件（`assets/echarts/china.js` 等）→ 内联到 `<script>` 标签
+7. 图表的 option + 数据 → 使用 IIFE 模式内联到 `<script>` 标签
+8. 初始化: `var dashboard = new DashboardController({ charts: charts, config: {...} });`
+9. ⛔ **[MANDATORY]** 运行 `python scripts/validate_chart.py <output.html>` — 必须通过所有检查才能返回给用户
 
 **Example Use Cases:**
 

@@ -62,6 +62,8 @@ EXCLUDES=(
     "config.txt"
     "echart_config.txt"
     "*.skill"
+    # generated chart outputs (not reference templates — see references/examples/*.md)
+    "examples/agent_charts/*"
 )
 
 # Exclude wheels unless --offline
