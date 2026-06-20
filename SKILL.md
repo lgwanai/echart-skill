@@ -163,13 +163,15 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 功能:
   - ✅ 自然语言描述自动解析
   - ✅ 智能布局算法自动排版
-  - ✅ 简化 API，无需编写 SQL
+  - ✅ Agent 自动规划 SQL、KPI 树、布局和图表
   - ✅ 专业卡片式布局
   - ✅ 深色/浅色主题切换
   - ✅ 响应式设计
   - ✅ 自动刷新、导出 PDF
   - ✅ 图表搜索、单独下载
   - ✅ 智能数据洞察卡片（NEW v2.0 — 使用 --insights 启用）
+
+默认按 `workflow_specs/dashboard_workflow.md` 规划仪表盘，并使用 `workflow_specs/visual_templates/light.md` 的视觉规范。需要深色风格时使用 `workflow_specs/visual_templates/dark.md`。最终 Dashboard 由 Agent 按规范直接生成，不使用固定 Python dashboard 生成器。
 
 ⚠️ **重要**: 仪表盘 HTML 必须为**自包含单文件**（无外部 CSS/JS 引用，无硬编码端口号）。详见 Scenario 15 的 "Dashboard Single File 铁律"。
 
@@ -474,7 +476,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 /r <表名>  # 别名
 /报告 <表名>  # 中文别名
 
-一键生成专业数据分析报告，支持 Markdown/HTML/JSON 格式。
+一键生成企业级专家分析报告，支持 Markdown/HTML/JSON 格式。报告由 Agent 按 `workflow_specs/report_workflow.md` 组织，不由固定 Python 报告生成器渲染。Agent 需要自动判断行业场景，按行业常用专家分析模式设计分析路径，使用 SQL/Python 工具获取证据，再写出异常、对比、归因、分析结论与行动建议；不是简单图表说明。
 
 选项:
   --title, -t <标题>           报告标题
@@ -484,13 +486,21 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   --quick                       快速报告模式
 
 报告模板:
-  - general: 通用数据分析报告（含摘要/概览/指标/维度/趋势/异常/建议）
-  - sales:   销售分析报告（含销售概况/产品/渠道/区域/趋势）
-  - quick:   快速分析摘要（核心发现/数据画像/关键洞察/行动建议）
+  - general: 企业级通用分析报告（含摘要/结论/专家框架/概览/指标/维度/趋势/异常/归因/建议）
+  - sales:   销售分析报告（含销售结论/结构/产品/渠道/区域/趋势/归因）
+  - quick:   快速分析摘要（核心发现/分析结论/数据画像/关键洞察/行动建议）
+
+专家分析能力:
+  - 自动判断行业：流量/增长、销售/电商、财务、客户/会员、运营履约、通用经营
+  - 按行业专家模式检查：例如流量看规模、效率、留存、漏斗、渠道归因；销售看收入、结构、趋势、利润质量
+  - 自动做异常扫描、最近周期对比、维度贡献度归因
+  - 报告必须结论先行，明确“发生了什么、为什么、下一步做什么”
+  - Python 只能作为数据工具和计算工具，不能作为最终报告渲染器；最终报告由 Agent 按规范撰写
 
 示例:
   /report sales                                    # 生成通用报告(Markdown)
   /report sales --template sales --format html     # 销售报告(HTML)
+  /report traffic --format html                    # Agent 按工作流生成企业级 HTML 报告
   /report orders --quick --format markdown         # 快速摘要
   /r sales --title "Q1销售分析" --format html       # 指定标题
 ```
@@ -881,14 +891,15 @@ Step 7: validate_chart.py 硬校验（Single File + Dashboard + 渲染）
     │   │       3. 每个图表独立 init + setOption
     │   │       4. 所有 JS 内联到单个文件
     │   │
-    │   └── 子图表类型复杂？→ 用 /dashboard 命令 + SimpleDashboard API
+    │   └── 子图表类型复杂？→ 用 /dashboard 命令 + Agent Dashboard Workflow
     │
     └── 是 Dashboard？（3+ 图表 + 交互）
         └── 🟣 Dashboard 模式
-            1. 使用 SimpleDashboard API
-            2. 自然语言描述 → 自动解析图表类型
-            3. 自动布局 + 卡片式 UI
-            4. 参考 Scenario 15
+            1. 读取 workflow_specs/dashboard_workflow.md
+            2. 自然语言描述 → Agent 建立 KPI 树和布局层级
+            3. SQL/Python 只负责取数和计算证据
+            4. Agent 直接生成 standalone HTML + ECharts
+            5. 参考 Scenario 15
 ```
 
 ### 🟢 模板模式（优先使用）
@@ -1416,78 +1427,35 @@ Simply describe what you want in plain language:
 - 全国分布地图
 ```
 
-**Method 2: Simplified Python API**
+**Method 2: Agent Dashboard Workflow**
 
-```python
+1. 读取 `workflow_specs/dashboard_workflow.md`
+2. 明确目标用户、业务决策和刷新周期
+3. 根据行业建立 KPI 树，而不是先选图表
+4. 使用 DuckDB/SQL/Python 计算每个模块的数据
+5. Agent 直接撰写 standalone HTML：布局、CSS、ECharts option、洞察卡片和交互逻辑
+6. 运行 `python scripts/validate_chart.py <output.html>` 校验单文件完整性
 
-# Create dashboard with simplified API
-dashboard = SimpleDashboard(
-    title="销售数据分析",
-    db_path="workspace.duckdb"
-)
+**Dashboard Planning Patterns:**
 
-# Add charts with simple descriptions
-dashboard.add_chart("bar", "地区销售额", group_by="region")
-dashboard.add_chart("pie", "品类占比", group_by="category")  
-dashboard.add_chart("line", "月度趋势", time_column="month")
-dashboard.add_chart("map", "全国分布", geo_column="province")
+| Business Need | Recommended Module | Data Needed |
+|---------------|--------------------|-------------|
+| 指标总览 | KPI cards | 核心指标、上期值、变化率 |
+| 趋势判断 | Line / area chart | 日期列、指标列 |
+| 结构拆解 | Bar / treemap / pie | 维度列、指标列 |
+| 地域分布 | Map / bar fallback | 省市/地区列、指标列 |
+| 漏斗流失 | Funnel | 阶段列、人数/次数 |
+| 留存质量 | Cohort table / heatmap | 用户、日期、回访/留存字段 |
+| 归因分析 | Driver table + bars | 日期、指标、可拆解维度 |
+| 异常监控 | Alert cards + trend markers | 日期、指标、阈值或异常检测结果 |
 
-# Generate
-dashboard.generate("outputs/html/dashboard.html")
-```
+**Layout Rules:**
 
-**Method 3: Direct Text-to-Dashboard**
-
-```python
-
-create_dashboard_from_text(
-    """
-    创建销售分析仪表盘，包含：
-    - 各地区销售柱状图
-    - 产品类别饼图
-    - 月度趋势折线图  
-    - 全国分布地图
-    """,
-    db_path="workspace.duckdb",
-    output_path="outputs/html/dashboard.html"
-)
-```
-
-**Supported Chart Types in Simplified API:**
-
-| Chart Type | Keyword | Required Parameters |
-|-------------|---------|---------------------|
-| Bar Chart | `"bar"` | `group_by` |
-| Line Chart | `"line"` | `time_column` or `group_by` |
-| Pie Chart | `"pie"` | `group_by` |
-| Map Chart | `"map"` | `geo_column` (province/city) |
-| Scatter | `"scatter"` | `x_column`, `y_column` |
-| Radar | `"radar"` | `dimensions` |
-| Funnel | `"funnel"` | `group_by` |
-| Treemap | `"treemap"` | `group_by` |
-| Sunburst | `"sunburst"` | `hierarchy` |
-
-**Optional Parameters:**
-
-```python
-dashboard.add_chart(
-    chart_type="bar",
-    title="Top 10 产品",
-    group_by="product",
-    agg_column="sales",      # 聚合列（默认求和）
-    top_n=10,                # Top N
-    sort="desc",             # 排序方式
-    filter="region='华东'"   # 筛选条件
-)
-```
-
-**Auto-Layout Algorithm:**
-
-The system automatically:
-- Calculates optimal grid columns based on chart count
-- Assigns chart positions intelligently
-- Maps get 2x1 span, Pies can span vertically
-- Balances layout to avoid gaps
+- First row: KPI summary and current status
+- Second row: trend and comparison
+- Third row: structure/segment breakdown
+- Diagnostic area: anomaly, funnel, retention, attribution, drill-down tables
+- Filters: time, channel, region, product, user segment where available
 
 **Dashboard Features:**
 - ✅ **Professional Card-based Layout**: Modern UI with shadow and hover effects
@@ -1535,16 +1503,23 @@ The system automatically:
 - 所有 chart 实例存入 `charts` 数组，通过 chart ID 查找
 - DashboardController 的 `charts` 参数由 HTML 中的 IIFE 自动填充
 
-**实现方式：**
-1. 读取 `assets/echarts/echarts.min.js` → 内联为 `<script>/* echarts 代码 */</script>`
-2. 读取 `assets/dashboard/dashboard.css` → 内联为 `<style>/* 所有 CSS */</style>`
-3. 读取 `assets/dashboard/dashboard.js` → 内联为 `<script>/* DashboardController 代码 */</script>`
-4. 读取 `assets/dashboard/html2canvas.min.js` → 内联为 `<script>/* html2canvas 代码 */</script>`
-5. 读取 `assets/dashboard/jspdf.umd.min.js` → 内联为 `<script>/* jsPDF 代码 */</script>`
-6. 读取所需地图 JS 文件（`assets/echarts/china.js` 等）→ 内联到 `<script>` 标签
-7. 图表的 option + 数据 → 使用 IIFE 模式内联到 `<script>` 标签
-8. 初始化: `var dashboard = new DashboardController({ charts: charts, config: {...} });`
+**实现方式（Agent 工作流，不使用固定 Python 生成器）：**
+1. 先读取 `workflow_specs/dashboard_workflow.md`，明确用户角色、业务决策、KPI 树、布局层级
+2. 使用 DuckDB/SQL/Python 仅做数据查询、指标计算、异常/归因/洞察卡片证据准备
+3. Agent 自行设计 HTML 结构、CSS、ECharts option 和业务解释卡片
+4. 按 `workflow_specs/visual_templates/light.md` 或 `dark.md` 控制视觉方向，但允许 Agent 根据业务上下文调整
+5. 读取 `assets/echarts/echarts.min.js` → 内联为 `<script>/* echarts 代码 */</script>`
+6. 如需交互控件，可读取 `assets/dashboard/dashboard.css` 和 `assets/dashboard/dashboard.js` 作为参考或基础资产，但不得依赖一个固定 Python renderer
+7. 读取 `assets/dashboard/html2canvas.min.js`、`assets/dashboard/jspdf.umd.min.js` → 内联以支持 PDF 导出
+8. 读取所需地图 JS 文件（`assets/echarts/china.js` 等）→ 内联到 `<script>` 标签
 9. ⛔ **[MANDATORY]** 运行 `python scripts/validate_chart.py <output.html>` — 必须通过所有检查才能返回给用户
+
+**Dashboard 规范：**
+- 默认视觉方向：`workflow_specs/visual_templates/light.md`
+- 深色视觉方向：`workflow_specs/visual_templates/dark.md`
+- Dashboard 的布局、卡片、图表、洞察说明由 Agent 结合业务目标决定
+- 自定义样式不得使用外部 `@import`、远程图片、外部字体、外部 CSS/JS
+- 用户要求“更正式/更商务/公司风格”时，优先调整工作流规范和最终 HTML，不要新增固定 Python 生成逻辑
 
 **Example Use Cases:**
 
@@ -1733,54 +1708,66 @@ for ins in insights:
 
 **Action**:
 
-1. **Generate Report**:
-   ```bash
-   # Quick report (Markdown)
-   python scripts/report_engine.py <table_name> --quick --format markdown
+1. **Generate Report via Agent Workflow**:
+   - Read `workflow_specs/report_workflow.md`
+   - Infer the likely industry and choose the expert playbook
+   - Use SQL/Python only to collect evidence: profile, KPI totals, period comparison, anomaly scan, attribution, forecast when useful
+   - Agent writes the final Markdown/HTML/JSON report directly
+   - Do not call a fixed Python report renderer for the final artifact
 
-   # Full report with template
-   python scripts/report_engine.py <table_name> --template sales --format html
-
-   # Custom title and output
-   python scripts/report_engine.py <table_name> \
-       --title "销售数据分析报告" --template general --format html -o reports/sales_analysis.html
-   ```
-
-2. **Available Templates**:
-   - `general` — 8-section comprehensive report (summary, overview, metrics, dimensions, trends, anomalies, correlation, recommendations)
-   - `sales` — Sales-specific report (overview, product, channel, region, trend, recommendations)
-   - `quick` — 4-section brief (key findings, profile, insights, actions)
+2. **Report Structures**:
+   - `general` — summary, conclusions, expert framework, overview, metrics, dimensions, trends, diagnostics, anomalies, correlation, recommendations
+   - `sales` — sales conclusions, structure, product, channel, region, trend, attribution, recommendations
+   - `quick` — key findings, conclusions, profile, insights, actions
 
 3. **Output Formats**:
    - `markdown` — Clean markdown, ideal for embedding in AI responses
-   - `html` — Styled HTML with dark/light theme support, ready to share
-   - `json` — Structured JSON for programmatic consumption
+   - `html` — Agent-authored standalone HTML using workflow visual specs
+   - `json` — Structured JSON for programmatic consumption, when explicitly requested
 
-4. **Report Content**: Each report includes:
-   - Executive summary with key findings
+4. **Visual Specs**:
+   - Default: `workflow_specs/visual_templates/light.md`
+   - Dark: `workflow_specs/visual_templates/dark.md`
+   - These are design directions for the Agent, not renderer inputs
+   - Keep HTML self-contained: no external CSS, JS, fonts, images, or `@import`
+   - HTML report should visually read like an enterprise PDF: paper-like page, formal header, numbered sections, printable layout
+
+5. **Expert Analysis Layer**:
+   - Agent detects industry/domain from user brief, table name, column names, sample values, and business context
+   - Agent applies domain playbooks, e.g. traffic/growth checks scale, efficiency, retention, funnel, channel attribution
+   - Agent uses tools to scan anomalies, compare recent periods, and attribute metric change to dimensions
+   - Agent writes conclusion-first narrative: what happened, why it likely happened, what to do next
+   - Agent states data caveats when required fields are missing, instead of pretending a conclusion is fully supported
+
+6. **Report Content**: Each report includes:
+   - Executive summary with key conclusions
+   - Industry expert analysis framework
+   - Analysis conclusions and business interpretation
    - Data overview table with column profiles
    - KPI statistics (mean, median, min, max, std)
    - Dimension analysis (rankings + compositions)
    - Trend analysis with direction and strength
+   - Diagnostic analysis: anomaly + comparison + attribution
    - Anomaly detection results
    - Correlation analysis
    - Actionable recommendations based on findings
 
-**From Python API**:
+**Evidence Tools (not final renderers)**:
 ```python
-from scripts.report_engine import ReportEngine
+from scripts.insight_engine import InsightEngine
+from scripts.attribution_engine import AttributionEngine
 
-engine = ReportEngine("workspace.duckdb")
-path = engine.generate(
+insights = InsightEngine("workspace.duckdb").analyze("sales")
+drivers = AttributionEngine("workspace.duckdb").quick_explain(
     table="sales",
-    title="销售数据分析报告",
-    template="sales",
-    output_format="html",
+    metric="amount",
+    date_column="order_date",
+    period_before="2024-05",
+    period_after="2024-06",
 )
-print(f"Report: {path}")
 
-# Quick mode for fast summaries
-path = engine.quick_report("sales", output_format="markdown")
+# Agent uses these results as evidence, then writes the final report itself
+# according to workflow_specs/report_workflow.md.
 ```
 
 **Tips for Best Results**:

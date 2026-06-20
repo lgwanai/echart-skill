@@ -18,7 +18,7 @@
 
 - 🛡️ **绝对安全的数据隐私**：本地 DuckDB 执行，数据绝不出域。**v2.0 新增**：列级 PII 自动脱敏（手机/邮箱/身份证→`138****1234`）、只读执行拦截、审计日志。
 - 🧠 **AI 分析助手**：不再是图表工具——自动发现数据规律、生成分析报告、理解追问上下文、预测趋势、归因分析。
-- 📊 **27 种图表 + 356 官方案例**：内置完整 ECharts 知识库，覆盖 **27 种图表类型**（含 3D、地理、关系图、桑基图等）。
+- 📊 **27 种图表 + 354 官方案例**：内置完整 ECharts 知识库，覆盖 **27 种图表类型**（含 3D、地理、关系图、桑基图等），每个案例为自包含 .md 配方文件。
 - 🧩 **自包含单文件 HTML**：生成的图表为完全自包含的单一 HTML 文件，离线可用。
 - 🤖 **Dashboard 自然语言生成**：一句话描述即生成专业仪表盘，**v2.0 支持 `--insights` 洞察卡片**。
 - 🎨 **专业 Dashboard UI/UX**：9 大交互功能（主题切换、导出 PDF、自动刷新、图表搜索）。
@@ -169,74 +169,102 @@
 
 ## ECharts 图表生成工作流 ⛔ 硬性约束
 
+### 🎯 .md 驱动生成（零模板，纯配方文件）
+
+> ⛔ **每个 `.md` 是自包含图表配方——包含完整 JS 代码 + 数据替换点 + HTML 壳。Agent 只需 DuckDB 查数据 + 替换 data 数组。**
+
+```
+用户请求 "/chart bar 销售额"
+ ↓
+Step 1: DuckDB 查询真实数据 → 获取实际数据行
+ ↓
+Step 2: 查 references/examples/INDEX.md → 定位 {name}.md
+ ↓
+Step 3: 读 {name}.md → 提取 Complete Code（官方 JS，可直接运行）
+ ↓
+Step 4: 替换 data 数组为 DuckDB 真实数据
+ ↓
+Step 5: 包裹 HTML 壳（echarts inline + div#main + script）
+ ↓
+Step 6: 对照 docs/CHART_DEBUG_LOG.md 避坑
+ ↓
+Step 7: python scripts/validate_chart.py <output.html> 硬校验
+ ↓
+通过→返回用户 / 失败→修复→重试
+```
+
 ### 🎯 三级生成策略
 
 | 模式 | 触发条件 | 可靠度 | 说明 |
 |------|---------|--------|------|
-| 🟢 **模板模式** | 41 个模板覆盖了需求 | ★★★★★ | 只需生成 data JSON，零语法错误 |
-| 🔵 **组合模式** | 多图表拼装到单页 | ★★★★★ | 多个模板 + grid 布局组装 |
-| 🟡 **知识库兜底** | 模板覆盖不到的需求 | ★★★★ | 知识片段 + 356 案例代码参考 |
+| 🟢 **配方模式** | 354 个 .md 配方覆盖了需求 | ★★★★★ | 直接替换 data JSON，零语法错误 |
+| 🔵 **组合模式** | 多图表拼装到单页 | ★★★★★ | 多配方 + grid 布局组装 |
+| 🟡 **知识库兜底** | 配方覆盖不到的需求 | ★★★★ | 知识片段 + 案例代码参考 |
 
-### 🟢 模板模式（优先 — 27 种图表 × 41 个模板）
+### 🟢 配方模式（优先 — 27 种图表 × 354 个 .md 配方）
 
 ```
-用户请求 → Agent 查 references/examples/INDEX.md → 定位 md 参考 → DuckDB 查数据 → 替换 data → 生成 HTML
+用户请求 → Agent 查 references/examples/INDEX.md → 定位 .md 配方 → DuckDB 查数据 → 替换 data → 生成 HTML
 ```
 
-**Agent 只需生成 data JSON，不需要写任何 ECharts option 代码：**
-- 模板 = 完整 HTML + 预配置的 option 结构 + `{{ECHARTS_INLINE}}` 标记
-- 占位符 = `{{TITLE}}`, `{{DATA}}`, `{{CATEGORIES}}`, `{{VALUES}}` 等
-- data JSON 格式由模板头部注释定义
+**Agent 只需替换 data 数组，不需要写任何 ECharts option 代码：**
+- 每个 `.md` = 自包含图表配方（完整 JS + 数据替换点 + HTML 壳）
+- data 格式由 .md 文件中的 `## Data Format` 章节定义
+- 输出：单个自包含 HTML 文件，内联 ECharts 库（~1.1MB）
 
-**模板 JS 内联机制：**
+**内联机制：**
 
-| 标记 | 注入内容 | 覆盖 |
+| 资源 | 注入方式 | 说明 |
 |------|---------|------|
-| `<!-- {{ECHARTS_INLINE}} -->` | echarts.min.js (1.1MB) | 全部 41 个模板 |
-| `<!-- {{MAP_INLINE}} -->` | china.js / guangdong.js / world.js 等 | 5 个地图模板，自动检测 MAP_NAME |
-| `<!-- {{GL_INLINE}} -->` | echarts-gl.min.js (625KB) | 5 个 3D 模板 |
+| echarts.min.js (1.1MB) | Agent 内联到 `<script>` | 全部图表 |
+| 地图 JS (china.js 等) | Agent 内联到 `<script>` | 地图类型自动检测 |
+| echarts-gl.min.js (625KB) | Agent 内联到 `<script>` | 3D 图表 |
 
 ```bash
 # Agent 自动生成自包含 HTML（inline ECharts + div#main + script）：
-# Agent: DuckDB 查询 → md 参考结构 → 替换数据 → 生成 HTML
+# Agent: DuckDB 查询 → .md 配方结构 → 替换 data → 包裹 HTML 壳 → 校验
 # 输出：单个 .html 文件，双击浏览器即可打开，零外部依赖
 ```
 
 ### 🔵 组合模式
 
 ```
-多个独立图表 → 各自走模板模式 → grid 布局组装 → 单 HTML 输出
+多个独立图表 → 各自走配方模式 → grid 布局组装 → 单 HTML 输出
 ```
 
-### 🟡 知识库兜底（无模板时）
+### 🟡 知识库兜底（无 .md 配方时）
 
 ```
 Step 1: 查 references/knowledge/INDEX.md → 定位知识文件
 Step 2: 读知识片段（concepts/chart-types/api/patterns）→ 语法约束
-Step 3: 读 356 案例 main.js → 真值参考
+Step 3: 读 354 案例 .md → 参考代码
 Step 4: 知识 + 案例一起提交 → 生成完整 option
 ```
 
 ### 项目结构
 
 ```
-references/
-├── templates/              # 41 个 HTML 模板（优先使用）
-│   ├── INDEX.md            # 模板映射决策表
-│   ├── bar/  5 个模板      # basic, stack, horizontal, waterfall, race
-│   ├── line/  3 个模板     # basic, stack, xy
-│   ├── pie/  1 个模板      # basic (含 doughnut/rose 变体)
-│   ├── scatter/  3 个模板  # basic, bubble, geo
-│   ├── 3d/  5 个模板       # bar3d, scatter3d, surface, globe, lines3d
-│   └── ...  22 个更多模板  # 覆盖所有 27 种图表类型
-├── knowledge/              # 知识库（兜底使用）
-│   ├── INDEX.md            # 主索引
-│   ├── concepts/  8 个     # 核心概念
-│   ├── chart-types/  4 个  # 图表类型语法指南
-│   ├── api/  6 个          # API 参考
-│   ├── patterns/  10 个    # 最佳实践
-│   └── examples/INDEX.md   # 356 案例索引
-└── prompts/                # ⚠️ 已废弃
+echart-skill/
+├── references/
+│   ├── examples/            # 354 个 .md 自包含图表配方（优先使用）
+│   │   └── INDEX.md         # 配方映射决策表
+│   ├── templates/           # 41 个 HTML 模板（辅助参考）
+│   │   └── INDEX.md         # 模板映射表
+│   ├── knowledge/           # 知识库（兜底使用）
+│   │   ├── INDEX.md         # 主索引
+│   │   ├── concepts/  8 个  # 核心概念
+│   │   ├── chart-types/  4 个 # 图表类型语法指南
+│   │   ├── api/  6 个       # API 参考
+│   │   ├── patterns/  10 个 # 最佳实践
+│   │   └── examples/INDEX.md # 案例索引
+│   └── prompts/             # ⚠️ 已废弃
+├── workflow_specs/          # Agent 工作流规范
+│   ├── dashboard_workflow.md # Dashboard 规划流程
+│   ├── report_workflow.md    # 报告生成流程
+│   └── visual_templates/     # 视觉方向（light/dark）
+├── assets/                  # JS/CSS 资源和地图文件
+├── scripts/                 # Python 工具脚本
+└── outputs/                 # 输出目录（html/configs/reports）
 ```
 
 ---
@@ -412,9 +440,11 @@ references/
 
 #### 方法二：Agent 驱动（推荐）
 
+Agent 按 `workflow_specs/dashboard_workflow.md` 规划仪表盘，使用 `workflow_specs/visual_templates/light.md`（或 dark.md）控制视觉方向：
+
 ```
 用户: /dashboard 创建销售分析仪表盘，包含地区柱状图和品类饼图
-  → Agent 解析意图 → DuckDB 查询 → 配置 DashboardConfig → 生成 HTML
+  → Agent 解析意图 → DuckDB 查询 → 建立 KPI 树 → 设计布局 → 生成自包含 HTML
 ```
 
 #### 方法三：Python API
@@ -889,23 +919,29 @@ A: 支持主题切换（深色/浅色）、自动刷新、导出 PDF、图表搜
 
 ## 功能清单
 
-| 功能模块 | 脚本 | 说明 |
-|---------|------|------|
+| 功能模块 | 脚本 / 来源 | 说明 |
+|---------|------------|------|
 | 数据导入 | `scripts/data_importer.py` | 支持 CSV/Excel/URL 导入，流式处理大文件 |
 | 数据导出 | `scripts/data_exporter.py` | 导出为 CSV/Excel，支持 SQL 查询导出 |
-| 图表生成 | Agent 内联生成（参考 references/examples/） | DuckDB → md 参考 → 替换数据 → HTML |
-| 仪表盘生成 | Agent + SimpleDashboard API | 多图表网格布局，专业 UI/UX |
-| 甘特图生成 | Agent 直接生成 | 简化 API，支持任务数组输入 |
+| 图表生成 | Agent + `references/examples/*.md` | DuckDB → .md 配方 → 替换 data → 自包含 HTML |
+| 仪表盘生成 | Agent + `workflow_specs/dashboard_workflow.md` | 多图表网格布局，专业 UI/UX |
+| 报告生成 | Agent + `workflow_specs/report_workflow.md` | 企业级分析报告（Markdown/HTML） |
+| 洞察分析 | `scripts/insight_engine.py` | 自动发现 7 种洞察模式 |
+| 趋势预测 | `scripts/forecast_engine.py` | 4 种预测方法，零外部 ML 依赖 |
+| 归因分析 | `scripts/attribution_engine.py` | 指标变化贡献度分解 + 钻取建议 |
+| 会话管理 | `scripts/context_manager.py` | 追问解析、时间引用、意图检测 |
+| 语义建模 | `scripts/semantic_model.py` | 自然语言→SQL 映射，列自动分类 |
+| 隐私保护 | `scripts/privacy_guard.py` | 列级 PII 脱敏、只读拦截、审计日志 |
 | 数据合并 | `scripts/data_merger.py` | 合并多个表格，支持导出和入库 |
 | 数据清洗 | `scripts/data_cleaner.py` | 清洗、去重、标准化 |
-| 本地服务 | `scripts/server.py` | 本地 HTTP 服务，预览图表 |
-| 服务管理 | `scripts/server_cli.py` | /start, /stop, /status 命令支持 |
+| 本地服务 | `scripts/server.py` / `server_cli.py` | 本地 HTTP 服务，预览图表 |
 | 业务口径 | `scripts/metrics_manager.py` | 持久化业务规则和指标定义 |
 | 历史查看 | `scripts/history_viewer.py` | 查看导入历史、表结构、表关联关系 |
 | 外部数据库 | `scripts/db_cli.py` | MySQL/PostgreSQL/MongoDB 连接与查询 |
 | 数据轮询 | `scripts/polling_cli.py` | 定时刷新 HTTP API 或数据库数据 |
-| 图表生成 | Agent 驱动 | DuckDB → md 参考 → 数据替换 → HTML |
-| Dashboard UI | `assets/dashboard/` | 专业 CSS/JS 模板 |
+| 图表校验 | `scripts/validate_chart.py` | 硬校验：Single File / Dashboard / 渲染 |
+| Dashboard 资源 | `assets/dashboard/` | CSS/JS 模板（html2canvas、jsPDF 等） |
+| 工作流规范 | `workflow_specs/` | Dashboard/Report 规划流程 + 视觉模板 |
 
 ---
 
