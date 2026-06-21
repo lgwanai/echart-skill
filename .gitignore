@@ -4,6 +4,10 @@ tmp/
 outputs/
 backup/
 
+# 忽略临时文件与生成的 Dashboard HTML
+*.tmp
+*_Dashboard.html
+
 # 忽略开发设计文档与打包脚本
 idea.md
 package.sh
