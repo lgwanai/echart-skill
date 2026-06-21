@@ -259,18 +259,37 @@ echart-skill/
 │   │   └── examples/INDEX.md # 案例索引
 │   └── prompts/             # ⚠️ 已废弃
 ├── workflow_specs/          # Agent 工作流规范
-│   ├── dashboard_workflow.md # Dashboard 规划流程
-│   ├── report_workflow.md    # 报告生成流程
+│   ├── dashboard_workflow.md   # Dashboard 规划流程
+│   ├── report_workflow.md      # 报告生成流程
 │   ├── data_cleaning_workflow.md # Agent 引导式数据清洗流程
-│   ├── expert_library/       # 专家库：每类专家一个 .md
-│   │   ├── INDEX.md          # 专家动态匹配索引
-│   │   └── EXPERT_TEMPLATE.md # 用户自定义专家模板
-│   ├── html_templates/       # HTML 骨架模板
-│   │   ├── report_light.html # 默认企业 PDF 风格报告模板
+│   ├── dashboard_runtime_quality.md # Dashboard 运行时质量门（硬性约束）
+│   ├── dashboard_expert_library/ # Dashboard 专家库（5 个场景模板）
+│   │   ├── INDEX.md              # Dashboard 专家动态匹配索引
+│   │   ├── DASHBOARD_EXPERT_TEMPLATE.md # 用户自定义 Dashboard 专家模板
+│   │   ├── sales_ecommerce_dashboard.md
+│   │   ├── traffic_growth_dashboard.md
+│   │   └── general_business_dashboard.md
+│   ├── dashboard_modules/      # Dashboard 可复用分析模块
+│   │   └── city_sales_map.md   # 城市销售/销量地图模块
+│   ├── expert_library/         # Report 专家库（10 个领域专家）
+│   │   ├── INDEX.md            # 专家动态匹配索引
+│   │   ├── EXPERT_TEMPLATE.md   # 用户自定义专家模板
+│   │   ├── sales_ecommerce.md   # 销售/电商
+│   │   ├── traffic_growth.md    # 流量/增长
+│   │   ├── finance_management.md # 财务管理
+│   │   ├── marketing_campaign.md # 营销活动
+│   │   ├── operations_fulfillment.md # 运营履约
+│   │   ├── customer_membership.md   # 客户/会员
+│   │   ├── product_content.md       # 产品内容
+│   │   ├── risk_data_quality.md     # 风控/数据质量
+│   │   └── general_management.md    # 通用经营
+│   ├── html_templates/         # HTML 骨架模板
+│   │   ├── report_light.html   # 默认企业 PDF 风格报告模板
 │   │   └── dashboard_light.html # 默认企业 BI 仪表盘模板
-│   └── visual_templates/     # 视觉方向（light/dark）
+│   └── visual_templates/       # 视觉方向（light/dark）
 ├── assets/                  # JS/CSS 资源和地图文件
 ├── scripts/                 # Python 工具脚本
+├── tests/                   # 测试文件（40+ 测试文件）
 └── outputs/                 # 输出目录（html/configs/reports）
 ```
 
@@ -984,7 +1003,7 @@ A: 支持主题切换（深色/浅色）、自动刷新、导出 PDF、图表搜
 | 数据导入 | `scripts/data_importer.py` | 支持 CSV/Excel/URL 导入，流式处理大文件 |
 | 数据导出 | `scripts/data_exporter.py` | 导出为 CSV/Excel，支持 SQL 查询导出 |
 | 图表生成 | Agent + `references/examples/*.md` | DuckDB → .md 配方 → 替换 data → 自包含 HTML |
-| 仪表盘生成 | Agent + `workflow_specs/dashboard_workflow.md` + `expert_library/` | 专家模式驱动的 KPI 树、诊断模块、多图表企业级 Dashboard |
+| 仪表盘生成 | Agent + `workflow_specs/dashboard_workflow.md` + `dashboard_expert_library/` + `html_templates/` | 专家模式驱动的 KPI 树、诊断模块、多图表企业级 Dashboard |
 | 报告生成 | Agent + `workflow_specs/report_workflow.md` + `expert_library/` + `html_templates/` + `visual_templates/` | 金字塔结构企业级报告，结论先行、图表举证、异常/对比/归因完整 |
 | 洞察分析 | `scripts/insight_engine.py` | 自动发现 7 种洞察模式 |
 | 趋势预测 | `scripts/forecast_engine.py` | 4 种预测方法，零外部 ML 依赖 |
@@ -1001,7 +1020,7 @@ A: 支持主题切换（深色/浅色）、自动刷新、导出 PDF、图表搜
 | 数据轮询 | `scripts/polling_cli.py` | 定时刷新 HTTP API 或数据库数据 |
 | 图表校验 | `scripts/validate_chart.py` | 硬校验：Single File / Dashboard / 渲染 |
 | Dashboard 资源 | `assets/dashboard/` | CSS/JS 模板（html2canvas、jsPDF 等） |
-| 工作流规范 | `workflow_specs/` | Dashboard/Report 规划流程 + 专家库 + 视觉模板 |
+| 工作流规范 | `workflow_specs/` | Dashboard/Report 工作流 + 专家库（10 领域 + 5 Dashboard 场景）+ 可复用模块 + HTML 模板 + 视觉方向 |
 
 ---
 
