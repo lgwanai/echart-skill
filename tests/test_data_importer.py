@@ -11,6 +11,7 @@ from scripts.data_importer import (
     clean_column_names,
     find_header_row,
     calculate_md5,
+    calculate_sha256,
     check_duplicate_import,
     init_meta_table,
     unmerge_and_fill_excel,
@@ -104,6 +105,19 @@ class TestCalculateMD5:
         assert calculate_md5(str(file1)) != calculate_md5(str(file2))
 
 
+class TestCalculateSHA256:
+    """Test SHA-256 content fingerprint calculation."""
+
+    def test_sha256_consistency(self, tmp_path):
+        test_file = tmp_path / "test.csv"
+        test_file.write_text("test,content\n1,2\n")
+
+        hash_1 = calculate_sha256(str(test_file))
+        hash_2 = calculate_sha256(str(test_file))
+        assert hash_1 == hash_2
+        assert len(hash_1) == 64
+
+
 class TestImportToDuckDB:
     """Test file import functionality."""
 
@@ -153,6 +167,41 @@ class TestImportToDuckDB:
         # Second import (same file)
         tables2 = import_to_duckdb(str(csv_file), temp_db)
         assert len(tables2) == 1  # Returns existing table
+
+    def test_duplicate_detection_uses_content_not_filename(self, temp_db, tmp_path):
+        """Same content under a different file name should reuse existing import."""
+        csv_file_1 = tmp_path / "orders_june.csv"
+        csv_file_2 = tmp_path / "renamed_orders.csv"
+        content = "name,age\nAlice,25\nBob,30\n"
+        csv_file_1.write_text(content)
+        csv_file_2.write_text(content)
+
+        tables1 = import_to_duckdb(str(csv_file_1), temp_db)
+        tables2 = import_to_duckdb(str(csv_file_2), temp_db)
+
+        assert tables2 == tables1
+
+        conn = duckdb.connect(temp_db)
+        try:
+            data_tables = conn.execute("""
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema = 'main'
+                  AND table_name <> '_data_skill_meta'
+                ORDER BY table_name
+            """).fetchall()
+            meta_rows = conn.execute("""
+                SELECT COUNT(*), COUNT(sha256_hash)
+                FROM _data_skill_meta
+            """).fetchone()
+        finally:
+            conn.close()
+
+        table_names = {row[0] for row in data_tables}
+        assert "orders_june" in table_names
+        assert "renamed_orders" not in table_names
+        assert "orders_june_v1" not in table_names
+        assert meta_rows == (1, 1)
 
     def test_nonexistent_file(self, temp_db):
         """Nonexistent file should raise error."""
@@ -272,7 +321,7 @@ class TestRecordImport:
         record_import(conn, "test.csv", "test_table", "abc123")
 
         cursor = conn.cursor()
-        cursor.execute("SELECT file_name, table_name, md5_hash FROM _data_skill_meta")
+        cursor.execute("SELECT file_name, table_name, md5_hash, sha256_hash FROM _data_skill_meta")
         result = cursor.fetchone()
         conn.close()
 
@@ -280,6 +329,7 @@ class TestRecordImport:
         assert result[0] == "test.csv"
         assert result[1] == "test_table"
         assert result[2] == "abc123"
+        assert result[3] is None
 
 
 class TestUnsupportedFormat:

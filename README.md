@@ -261,6 +261,13 @@ echart-skill/
 ├── workflow_specs/          # Agent 工作流规范
 │   ├── dashboard_workflow.md # Dashboard 规划流程
 │   ├── report_workflow.md    # 报告生成流程
+│   ├── data_cleaning_workflow.md # Agent 引导式数据清洗流程
+│   ├── expert_library/       # 专家库：每类专家一个 .md
+│   │   ├── INDEX.md          # 专家动态匹配索引
+│   │   └── EXPERT_TEMPLATE.md # 用户自定义专家模板
+│   ├── html_templates/       # HTML 骨架模板
+│   │   ├── report_light.html # 默认企业 PDF 风格报告模板
+│   │   └── dashboard_light.html # 默认企业 BI 仪表盘模板
 │   └── visual_templates/     # 视觉方向（light/dark）
 ├── assets/                  # JS/CSS 资源和地图文件
 ├── scripts/                 # Python 工具脚本
@@ -271,9 +278,9 @@ echart-skill/
 
 ## 核心功能与使用案例
 
-### 案例一：数据导入与自动清洗
+### 案例一：数据导入与基础标准化
 
-**场景**：上传销售数据 Excel，自动识别并导入
+**场景**：上传销售数据 Excel，自动识别并导入。导入阶段只做表头、合并单元格、表名等基础标准化；业务清洗请使用 `/clean`。
 
 **操作**：
 
@@ -307,7 +314,30 @@ echart-skill/
 
 ---
 
-### 案例二：SQL 查询与数据分析
+### 案例二：Agent 引导式数据清洗
+
+**场景**：导入后按业务规则清洗数据，例如统一日期和金额格式、按多列唯一键去重、校验字段逻辑和跨表一致性。
+
+```bash
+/clean orders --unique-key order_id,line_id --duplicate-keep latest --duplicate-order-by updated_at
+/clean orders --config outputs/configs/orders_cleaning.json --output-table orders_cleaned
+/clean orders --dry-run
+```
+
+Agent 会按 `workflow_specs/data_cleaning_workflow.md` 先询问必要规则，不会强行设定。例如：
+
+- 唯一键是哪几列，重复时保留最新、首条、末条还是聚合？
+- 日期字段是否统一为 DATE？
+- 金额字段是否统一为两位小数，负数是否允许？
+- 缺失值是删除、填补、保留还是标记？
+- 是否需要规则校验，如 `start_date <= end_date`？
+- 是否需要跨表验证，如注册日期早于首次购买日期？
+
+支持的清洗能力包括：类型转换、缺失值处理、重复处理、异常值处理、归一化/标准化、文本一致性、规则引擎、跨表验证、派生特征和脱敏。
+
+---
+
+### 案例三：SQL 查询与数据分析
 
 **场景**：分析各地区销售情况
 
@@ -338,7 +368,7 @@ echart-skill/
 
 ---
 
-### 案例三：单图表生成
+### 案例四：单图表生成
 
 **场景**：生成各类统计图表
 
@@ -416,7 +446,7 @@ echart-skill/
 
 ---
 
-### 案例四：专业 Dashboard 生成（自然语言）
+### 案例五：专业 Dashboard 生成（自然语言）
 
 **场景**：用自然语言快速生成多图表仪表盘
 
@@ -440,33 +470,36 @@ echart-skill/
 
 #### 方法二：Agent 驱动（推荐）
 
-Agent 按 `workflow_specs/dashboard_workflow.md` 规划仪表盘，使用 `workflow_specs/visual_templates/light.md`（或 dark.md）控制视觉方向：
+Agent 按 `workflow_specs/dashboard_workflow.md` 规划仪表盘，并必须读取 `workflow_specs/dashboard_runtime_quality.md` 作为运行时质量门；随后完整读取、使用 `workflow_specs/html_templates/dashboard_light.html` 作为企业 BI 页面骨架，再结合 `workflow_specs/visual_templates/light.md`（或 dark.md）控制视觉方向：
 
 ```
 用户: /dashboard 创建销售分析仪表盘，包含地区柱状图和品类饼图
   → Agent 解析意图 → DuckDB 查询 → 建立 KPI 树 → 设计布局 → 生成自包含 HTML
 ```
 
-#### 方法三：Python API
+生成的 HTML 必须能看出模板落地：统一背景、企业级 header、工具栏、KPI 网格、洞察卡、图表面板、诊断区域、语义色、打印/PDF 和响应式规则。不能输出浏览器默认样式或临时 demo 风格页面。
 
-```python
-from scripts.dashboard_schema import DashboardConfig, ChartConfig
+主题切换必须切换整页 `data-theme` 和 CSS token，不能只切换图表主题；页面背景、header、toolbar、KPI 卡片、图表面板、诊断区、按钮和 toast 都要跟随变化。如果元数据、字段名或样例值包含城市信息，并且存在销售额/交易额/GMV/金额/销量/数量类指标，Dashboard 必须读取 `workflow_specs/dashboard_modules/city_sales_map.md`，补充城市地图 + 销售/销量模块；地图坐标或本地地图覆盖不足时，需提示数据缺口并用城市排行柱图兜底。
 
-# 编程方式配置仪表盘
-config = DashboardConfig(
-    title="销售数据分析",
-    charts=[
-        ChartConfig(type="bar", title="地区销售额", group_by="region"),
-        ChartConfig(type="pie", title="品类占比", group_by="category"),
-    ]
-)
+Dashboard 标题必须来自用户请求、表名、文件名或真实字段，不能凭空生成数据里不存在的行业/品类标题。业务 Dashboard 在数据支持时至少包含 6 个分析模块，例如 KPI、趋势、排行/贡献、结构、交叉分析、异常/归因、地理模块（触发时）和数据口径说明；图表过少且没有字段不足说明时，需要重做。
+
+#### 方法三：专家库动态匹配
+
+Dashboard 不通过固定 Python 生成器生成。Agent 会读取 `workflow_specs/dashboard_expert_library/INDEX.md`，根据表名、字段、样例值和用户目标选择 Dashboard 专用专家，再完整读取对应专家 `.md` 文件，按专家模式建立 KPI 树、诊断模块、交互筛选和图表组合。
+
+用户可复制 `workflow_specs/dashboard_expert_library/DASHBOARD_EXPERT_TEMPLATE.md` 创建自己的 Dashboard 专家文件，并在 `workflow_specs/dashboard_expert_library/INDEX.md` 登记触发词和适用场景。
+
+例如：
+
 ```
-    """
-# 自然语言示例 — Agent 自动解析生成仪表盘
 /dashboard 创建电商数据仪表盘，包含：各渠道销售柱状图、产品类别饼图、日销售趋势折线图、全国订单分布地图
+  → 读取专家库索引
+  → 选择 sales_ecommerce + customer_membership/marketing_campaign 支撑专家
+  → 计算 GMV、订单、客单价、转化、渠道、复购等指标
+  → 生成含洞察卡片、异常提醒、对比归因和交互筛选的企业级 HTML
 ```
 
-#### 支持的图表类型
+#### 常用图表模块
 
 | 图表类型 | 关键词 | 必需参数 | 示例 |
 |---------|--------|---------|------|
@@ -474,25 +507,27 @@ config = DashboardConfig(
 | 折线图 | `"line"` | `time_column` | 月度趋势折线图 |
 | 饼图 | `"pie"` | `group_by` | 产品类别饼图 |
 | 地图 | `"map"` | `geo_column` | 全国分布地图 |
+| 城市销售/销量地图 | `"geo" / "effectScatter"` | 城市列 + 销售额/交易额/GMV/金额/销量/数量列 | 城市销售或销量分布 |
 | 散点图 | `"scatter"` | `x_column`, `y_column` | 价格销量散点图 |
 | 雷达图 | `"radar"` | `dimensions` | 产品评分雷达图 |
 | 漏斗图 | `"funnel"` | `group_by` | 销售漏斗图 |
 | 树图 | `"treemap"` | `group_by` | 类别层级树图 |
 | 旭日图 | `"sunburst"` | `hierarchy` | 产品结构旭日图 |
 
-#### 可选参数
+图表选择由专家文件里的 `Dashboard Modules`、`Core Metrics`、`Required Data Checks` 决定。Python 只允许用于 DuckDB 查询、指标计算、异常检测、归因和 HTML 校验，不作为 Dashboard 最终渲染器。
 
-```python
-dashboard.add_chart(
-    chart_type="bar",
-    title="Top 10 产品",
-    group_by="product",
-    agg_column="sales",      # 聚合列（默认求和）
-    top_n=10,                # Top N
-    sort="desc",             # 排序方式
-    filter="region='华东'"   # 筛选条件
-)
-```
+#### Dashboard 运行时质量门
+
+生成或修复 dashboard 时必须执行 `workflow_specs/dashboard_runtime_quality.md`：
+
+- 禁止任何运行时外链：`<script src>`、`script.src = https...`、`fetch(https...)`、注入 CDN 脚本都不允许。
+- 禁止非法全局声明：使用 `window.dashboardCharts = []`，不能写 `var window.dashboardCharts = []`。
+- 地图必须使用本地内联地图文件，例如 `assets/echarts/china.js`；不得引用未定义的 `chinaGeoJSON`，不得远程 fetch GeoJSON。
+- 城市地图必须保证城市字段值和坐标 key 对齐，例如数据是 `北京市`，坐标表也必须有 `北京市`。
+- PDF 导出必须内联 `html2canvas` 和 `jsPDF`，并捕获导出异常，失败时提示并回退 `window.print()`。
+- PDF 导出必须通过 `window.jspdf.jsPDF || window.jsPDF` 解析构造器，不允许裸 `new jsPDF(...)`；调用 `html2canvas` 时必须设置 `ignoreElements`，避免 toast/临时节点进入 PDF。
+- Dashboard CSS 不使用 `color-mix()`、`oklch()`、`lab()` 等 html2canvas 可能无法解析的颜色函数，改用 hex/rgb/rgba token。
+- 返回前必须跑 `python scripts/validate_chart.py <output.html>`；能使用浏览器自动化时，用 `file://` 打开验证无 SyntaxError、无 console error、图表 canvas 和地图 canvas 正常、PDF 下载和单图下载可执行。
 
 #### 智能布局算法
 
@@ -540,7 +575,32 @@ Grid Layout (columns: 3, row_height: 400px)
 
 ---
 
-### 案例五：数据导出与报告生成
+### 案例六：企业级 Report 生成
+
+**场景**：生成正式企业分析报告，而不是图表堆叠或表格汇总。
+
+```bash
+/report sales --format html --title "6月销售经营分析报告"
+```
+
+Report 由 Agent 按 `workflow_specs/report_workflow.md` 生成，必须遵守金字塔原理：
+
+1. 先说结论：3-5 条可行动的业务结论
+2. 再说发现：一般会有多个关键发现分支，按业务重要性排序
+3. 每个发现分支内部也遵守金字塔：局部结论 -> 观察发现 -> 图表举证 -> 解释归因 -> 局部建议
+4. 图表举证：每个关键发现优先用趋势图、柱图、瀑布图、漏斗图、热力图等直观表达
+5. 交叉诊断：按专家库执行多维交叉，例如时间 x 渠道、品类 x 区域、客户 x 产品、活动 x 留存
+6. 深度归因：说明异常、对比、贡献来源、下钻路径和不确定性
+7. 行动建议：给出优先级、预期影响和需要补充的数据
+8. 附录放数据：汇总所有分支用到的数据表、SQL、字段口径、样本数据、数据限制，并用 `A1/A2/A3` 编号
+
+HTML 报告必须先读取并使用 `workflow_specs/html_templates/report_light.html` 作为页面骨架，再结合 `workflow_specs/visual_templates/light.md`（默认）或 `dark.md` 调整视觉方向，呈现为企业 PDF 风格：封面、一页纸结论、编号章节、图表证据、打印友好样式。每个图表必须读取 `references/examples/INDEX.md` 与对应图表配方 `.md` 后生成；表格不能替代主要举证图表；前文关键结论必须引用附录数据表，例如 `[Data A1]`。
+
+每个分析模块必须展示口语化“统计口径说明”，说明数据范围、时间粒度、指标口径、分组维度、筛选条件和当前数据不能证明的内容，主文不展示 SQL。报告只能基于事实字段和用户给定定义下结论；没有目标、预算、漏斗、留存、ROI、SLA 等字段或定义时，不得创造目标达成率、预算偏差、漏斗转化、留存表现等概念。涉及季节性或外部因素时，证据不足时应表述为“补充节假日、活动投放、价格、库存、天气、渠道策略等数据后，可以进一步判断这是季节性波动还是外部因素导致”。
+
+---
+
+### 案例七：数据导出
 
 **场景**：导出查询结果或整表数据
 
@@ -557,7 +617,7 @@ Grid Layout (columns: 3, row_height: 400px)
 
 ---
 
-### 案例六：外部数据库连接
+### 案例八：外部数据库连接
 
 **场景**：连接 MySQL 生产数据库查询数据
 
@@ -588,7 +648,7 @@ password=${MYSQL_PASSWORD}
 
 ---
 
-### 案例七：数据轮询刷新
+### 案例九：数据轮询刷新
 
 **场景**：定时从 API 自动刷新数据
 
@@ -642,7 +702,7 @@ http_config.auth.token=${API_TOKEN}
 | `/history` | `/h`, `/历史` | 导入历史 | `/history --limit 20` |
 | `/metrics` | `/m`, `/口径` | 指标管理 | `/metrics add 月活用户` |
 | `/help` | `/?`, `/帮助` | 显示帮助 | `/help` |
-| `/clean` | `/清理` | 清理旧数据 | `/clean --days 30` |
+| `/clean` | `/清洗`, `/清理` | 数据内容清洗或清理旧数据 | `/clean orders --config rules.json` |
 | `/poll` | `/轮询` | 轮询管理 | `/poll status` |
 | `/start` | `/server`, `/启动服务` | 启动本地服务 | `/start` |
 | `/stop` | `/停止服务` | 停止本地服务 | `/stop` |
@@ -907,7 +967,7 @@ A: 本技能目前默认使用本地 DuckDB 以追求开箱即用和零配置。
 A: 使用 `/import url` 命令，指定 URL 和格式即可导入。支持 Basic Auth 和 Bearer Token 认证。导入后可使用 `refresh` 命令刷新数据。
 
 **Q: 如何创建多图表仪表盘？**
-A: 创建一个 `.txt` 配置文件（内容可使用 JSON 结构表达复杂图表位置和配置），然后使用 `/dashboard` 命令生成即可。详见案例四示例。
+A: 创建一个 `.txt` 配置文件（内容可使用 JSON 结构表达复杂图表位置和配置），然后使用 `/dashboard` 命令生成即可。详见案例五示例。
 
 **Q: 地图如何选择正确的层级？**
 A: 省份数据用 `china.js`，城市数据用对应的省份 JS（如 `guangdong.js`），区县街道数据使用百度地图 API。系统会自动处理地图文件加载。
@@ -924,8 +984,8 @@ A: 支持主题切换（深色/浅色）、自动刷新、导出 PDF、图表搜
 | 数据导入 | `scripts/data_importer.py` | 支持 CSV/Excel/URL 导入，流式处理大文件 |
 | 数据导出 | `scripts/data_exporter.py` | 导出为 CSV/Excel，支持 SQL 查询导出 |
 | 图表生成 | Agent + `references/examples/*.md` | DuckDB → .md 配方 → 替换 data → 自包含 HTML |
-| 仪表盘生成 | Agent + `workflow_specs/dashboard_workflow.md` | 多图表网格布局，专业 UI/UX |
-| 报告生成 | Agent + `workflow_specs/report_workflow.md` | 企业级分析报告（Markdown/HTML） |
+| 仪表盘生成 | Agent + `workflow_specs/dashboard_workflow.md` + `expert_library/` | 专家模式驱动的 KPI 树、诊断模块、多图表企业级 Dashboard |
+| 报告生成 | Agent + `workflow_specs/report_workflow.md` + `expert_library/` + `html_templates/` + `visual_templates/` | 金字塔结构企业级报告，结论先行、图表举证、异常/对比/归因完整 |
 | 洞察分析 | `scripts/insight_engine.py` | 自动发现 7 种洞察模式 |
 | 趋势预测 | `scripts/forecast_engine.py` | 4 种预测方法，零外部 ML 依赖 |
 | 归因分析 | `scripts/attribution_engine.py` | 指标变化贡献度分解 + 钻取建议 |
@@ -933,7 +993,7 @@ A: 支持主题切换（深色/浅色）、自动刷新、导出 PDF、图表搜
 | 语义建模 | `scripts/semantic_model.py` | 自然语言→SQL 映射，列自动分类 |
 | 隐私保护 | `scripts/privacy_guard.py` | 列级 PII 脱敏、只读拦截、审计日志 |
 | 数据合并 | `scripts/data_merger.py` | 合并多个表格，支持导出和入库 |
-| 数据清洗 | `scripts/data_cleaner.py` | 清洗、去重、标准化 |
+| 数据清洗 | Agent + `workflow_specs/data_cleaning_workflow.md` + `scripts/data_cleaner.py` | 类型转换、缺失/重复/异常处理、多列唯一键排重、规则引擎、跨表验证、脱敏 |
 | 本地服务 | `scripts/server.py` / `server_cli.py` | 本地 HTTP 服务，预览图表 |
 | 业务口径 | `scripts/metrics_manager.py` | 持久化业务规则和指标定义 |
 | 历史查看 | `scripts/history_viewer.py` | 查看导入历史、表结构、表关联关系 |
@@ -941,7 +1001,7 @@ A: 支持主题切换（深色/浅色）、自动刷新、导出 PDF、图表搜
 | 数据轮询 | `scripts/polling_cli.py` | 定时刷新 HTTP API 或数据库数据 |
 | 图表校验 | `scripts/validate_chart.py` | 硬校验：Single File / Dashboard / 渲染 |
 | Dashboard 资源 | `assets/dashboard/` | CSS/JS 模板（html2canvas、jsPDF 等） |
-| 工作流规范 | `workflow_specs/` | Dashboard/Report 规划流程 + 视觉模板 |
+| 工作流规范 | `workflow_specs/` | Dashboard/Report 规划流程 + 专家库 + 视觉模板 |
 
 ---
 

@@ -35,7 +35,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | `/history` | `/h`, `/历史` | 查看导入历史 | `/history --limit 20` |
 | `/metrics` | `/m`, `/口径`, `/指标` | 指标管理 | `/metrics add 月活用户` |
 | `/help` | `/?`, `/帮助` | 显示帮助 | `/help` |
-| `/clean` | `/清理` | 清理旧数据 | `/clean --days 30` |
+| `/clean` | `/清洗`, `/清理` | 数据内容清洗或清理旧数据 | `/clean orders --config rules.json` |
 | `/poll` | `/轮询` | 轮询管理 | `/poll status` |
 | `/dashboard` | `/db`, `/仪表盘` | 生成仪表盘 | `/dashboard config.txt` |
 | `/start` | `/server`, `/启动服务` | 启动本地服务 | `/start` |
@@ -171,7 +171,12 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   - ✅ 图表搜索、单独下载
   - ✅ 智能数据洞察卡片（NEW v2.0 — 使用 --insights 启用）
 
-默认按 `workflow_specs/dashboard_workflow.md` 规划仪表盘，并使用 `workflow_specs/visual_templates/light.md` 的视觉规范。需要深色风格时使用 `workflow_specs/visual_templates/dark.md`。最终 Dashboard 由 Agent 按规范直接生成，不使用固定 Python dashboard 生成器。
+默认按 `workflow_specs/dashboard_workflow.md` 规划仪表盘，并必须读取 `workflow_specs/dashboard_expert_library/INDEX.md` 选择 Dashboard 专用专家，再读取、使用 `workflow_specs/html_templates/dashboard_light.html` 作为企业 BI 页面骨架，结合 `workflow_specs/visual_templates/light.md` 落实视觉方向。需要深色风格时使用 `workflow_specs/visual_templates/dark.md` 调整模板 token。最终 Dashboard 由 Agent 按规范直接生成，不使用固定 Python dashboard 生成器。
+
+Dashboard HTML 必须能看出模板落地：统一背景、卡片层级、字体尺度、图表面板、KPI 网格、语义色和响应式规则。不能生成未设计的默认 HTML。
+主题切换必须是页面级切换：切换 `data-theme` 后，页面背景、header、toolbar、KPI 卡片、图表面板、诊断区、按钮和 toast 都要一起变更，不能只切换 ECharts 图表主题。
+如果元数据、字段名或样例值包含城市信息，并且存在交易额/销售额/GMV/金额/销量/数量类字段，Dashboard 必须读取 `workflow_specs/dashboard_modules/city_sales_map.md`，增加城市地图 + 销售/销量模块；地图坐标或本地地图覆盖不足时，需要明确说明数据缺口并用城市排行柱图兜底。
+Dashboard 标题必须能追溯到用户请求、表名、文件名或真实字段；不能凭空出现“白酒分析”等数据和用户都没有提供的行业/品类。业务 Dashboard 在数据支持时至少包含 KPI、趋势、排行/贡献、结构、交叉分析、异常/归因、地理模块（触发时）和数据口径说明；如果少于 6 个分析模块，必须说明字段不足，否则需要重做。
 
 ⚠️ **重要**: 仪表盘 HTML 必须为**自包含单文件**（无外部 CSS/JS 引用，无硬编码端口号）。详见 Scenario 15 的 "Dashboard Single File 铁律"。
 
@@ -322,15 +327,20 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 /帮助  # 中文别名
 ```
 
-#### `/clean` - 清理旧数据
+#### `/clean` - 数据清洗 / 清理旧数据
 ```
-/clean [--days <天数>] [--db <数据库路径>]
-/清理 [--days <天数>]  # 中文别名
+/clean <表名> [--config <规则文件>] [--output-table <表名>] [--unique-key <列1,列2>]
+/清洗 <表名> [选项]  # 中文别名
+/清理 [--days <天数>]  # 兼容旧行为：清理旧数据
 
 示例:
-  /clean --days 30    # 清理30天未访问的表
-  /clean --days 7
+  /clean orders --unique-key order_id,line_id --duplicate-keep latest --duplicate-order-by updated_at
+  /clean orders --config outputs/configs/orders_cleaning.json --output-table orders_cleaned
+  /clean orders --dry-run
+  /清理 --days 7
 ```
+
+数据内容清洗必须读取 `workflow_specs/data_cleaning_workflow.md`。Agent 需要先诊断字段、样例值、缺失率、重复候选和业务口径，再询问用户不明确的清洗规则，不能强行设定。支持日期/金额/数值/布尔/文本类型转换、多列唯一键排重、缺失值处理、异常值处理、归一化/标准化、规则引擎、跨表验证、派生特征和脱敏。
 
 #### `/poll` - 轮询管理
 ```
@@ -476,7 +486,15 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 /r <表名>  # 别名
 /报告 <表名>  # 中文别名
 
-一键生成企业级专家分析报告，支持 Markdown/HTML/JSON 格式。报告由 Agent 按 `workflow_specs/report_workflow.md` 组织，不由固定 Python 报告生成器渲染。Agent 需要自动判断行业场景，按行业常用专家分析模式设计分析路径，使用 SQL/Python 工具获取证据，再写出异常、对比、归因、分析结论与行动建议；不是简单图表说明。
+一键生成企业级专家分析报告，支持 Markdown/HTML/JSON 格式。报告由 Agent 按 `workflow_specs/report_workflow.md` 组织，不由固定 Python 报告生成器渲染。Agent 必须先读取 `workflow_specs/expert_library/INDEX.md`，再动态选择并完整读取匹配专家 `.md` 文件，按专家模式设计分析路径，使用 SQL/Python 工具获取证据，再写出异常、对比、归因、分析结论与行动建议；不是简单图表说明。
+
+报告表达必须遵守金字塔原理：结论 -> 发现 -> 图表举证 -> 解释归因 -> 行动建议 -> 附录数据。每个发现分支内部也必须遵守局部金字塔：先说该发现的结论，再讲观察，再用图表举证，再解释归因，最后给局部行动建议。前文关键结论和发现结论必须引用附录数据表编号，例如 `[Data A1]`。HTML 报告必须先读取并使用 `workflow_specs/html_templates/report_light.html` 作为企业 PDF 风格页面骨架，再结合 `workflow_specs/visual_templates/light.md` 或 `dark.md` 调整视觉方向，不能生成浏览器默认样式或简陋表格页。报告较长时必须分段生成各发现分支，最后统一组装。
+
+每个报告图表都必须读取 `references/examples/INDEX.md` 并选择对应的 `references/examples/<chart-name>.md` 作为上下文，按配方生成 ECharts option，再嵌入统一 HTML 报告；不得脱离图表配方随手写图表。
+
+每个分析模块都必须补充“统计口径说明”，用口语化业务表达说明数据范围、时间粒度、指标口径、分组维度、筛选条件和当前数据不能证明的内容；主文不展示 SQL。所有结论必须尊重事实数据，不得创造数据中不存在、用户也没有提供定义的概念，例如没有目标或预算字段时不能写目标达成率、预算偏差；没有漏斗/留存字段时不能强行写漏斗转化或留存结论。
+
+涉及季节性波动或外部因素时，不得仅凭内部数据直接断言原因。推荐表达为：补充节假日、活动投放、价格、库存、天气、渠道策略等数据后，可以进一步判断这是季节性波动还是外部因素导致。
 
 选项:
   --title, -t <标题>           报告标题
@@ -491,10 +509,19 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   - quick:   快速分析摘要（核心发现/分析结论/数据画像/关键洞察/行动建议）
 
 专家分析能力:
-  - 自动判断行业：流量/增长、销售/电商、财务、客户/会员、运营履约、通用经营
-  - 按行业专家模式检查：例如流量看规模、效率、留存、漏斗、渠道归因；销售看收入、结构、趋势、利润质量
-  - 自动做异常扫描、最近周期对比、维度贡献度归因
+  - 自动判断行业：流量/增长、销售/电商、财务、客户/会员、运营履约、营销活动、产品内容、风控/数据质量、通用经营
+  - 动态拉取专家：读取 `workflow_specs/expert_library/INDEX.md`，选择主专家和支撑专家，再读取对应专家文件
+  - 用户自定义专家：复制 `workflow_specs/expert_library/EXPERT_TEMPLATE.md` 新建专家文件，并在 `INDEX.md` 登记
+  - 按专家模式检查：例如流量看规模、效率、留存、漏斗、渠道归因；销售看收入、结构、趋势、利润质量
+  - 必须执行专家诊断闭环：基线定义、异常扫描、交叉分析、深度归因、专家结论
+  - 自动做异常扫描、最近周期对比、多维交叉、贡献度归因和下钻解释
   - 报告必须结论先行，明确“发生了什么、为什么、下一步做什么”
+  - 每个关键发现分支必须内部遵守金字塔结构：局部结论、发现、图表举证、解释归因、局部建议
+  - 每个分析模块必须展示口语化统计口径说明，不在主文展示 SQL
+  - 不创造事实数据之外的业务概念；没有用户定义或字段支撑时，不写目标达成率、预算偏差、ROI、SLA、留存、漏斗等结论
+  - 季节性或外部因素只能在证据充分时下结论；证据不足时写明需要补充哪些外部数据进一步判断
+  - 关键发现必须优先用图表举证：趋势用折线，贡献用柱图/瀑布，漏斗用漏斗图，留存用热力图，关系用散点图
+  - 明细表、字段画像、SQL、样本数据只能放在附录或作为小型补充表；主文必须引用附录数据表编号
   - Python 只能作为数据工具和计算工具，不能作为最终报告渲染器；最终报告由 Agent 按规范撰写
 
 示例:
@@ -630,6 +657,7 @@ start 选项:
 |------|-----------|---------------|
 | 数据导入 | 上传、导入、import、load、打开文件、读取 | Scenario 1 |
 | SQL 查询 | 查询、筛选、统计、分组、排序、select、group by | Scenario 2 |
+| 数据清洗 | 清洗、去重、缺失值、异常值、标准化、日期格式、金额格式、唯一键、跨表校验 | /clean |
 | 图表生成 | 图表、可视化、画图、chart、plot、展示、可视化 | Scenario 4 |
 | 数据导出 | 导出、下载、export、保存、输出 | Scenario 6 |
 | 表结构 | 表结构、字段、列、describe、schema | Scenario 10 |
@@ -861,6 +889,12 @@ Step 7: validate_chart.py 硬校验（Single File + Dashboard + 渲染）
 - ❌ 不用 `{{PLACEHOLDER}}`（占位符系统已废弃）
 - ✅ 每个 `.md` = 完整的独立图表配方
 - ✅ Agent 只需：DuckDB + `.md` 代码 + 数据替换 → HTML
+
+**组合图双坐标硬规则**：
+- 折线图 + 柱状图组合时，先判断指标单位和量级。只要单位不同（如金额 vs 转化率、订单数 vs 留存率）或两组最大值相差约 5 倍以上，必须使用双 y 轴。
+- 柱状系列默认使用左轴 `yAxisIndex: 0`，折线系列默认使用右轴 `yAxisIndex: 1`；不要把不同量级的柱线系列放在同一个 `value` 轴上，否则小量级折线会贴地。
+- 两个 y 轴必须写清楚 `name` 和 `axisLabel.formatter`，让用户能看懂统计口径和单位。无单位时使用真实字段名，不要虚构 KPI 或目标口径。
+- 该规则适用于普通 `/chart`、Dashboard 子图表、Report 图表举证和所有基于 `references/examples/*.md` 的图表生成。
 
 ### 🗺️ 生成模式决策树（MUST FOLLOW — 先判断模式，再执行）
 
@@ -1430,8 +1464,9 @@ Simply describe what you want in plain language:
 **Method 2: Agent Dashboard Workflow**
 
 1. 读取 `workflow_specs/dashboard_workflow.md`
-2. 明确目标用户、业务决策和刷新周期
-3. 根据行业建立 KPI 树，而不是先选图表
+1.1. 读取 `workflow_specs/dashboard_runtime_quality.md`，把 Single File、地图、PDF 导出和浏览器 smoke test 作为硬性质量门
+2. 读取 `workflow_specs/dashboard_expert_library/INDEX.md`，按用户目标、表名、字段、样例值匹配 Dashboard 主专家和支撑专家
+3. 完整读取被选中的专家 `.md` 文件，明确目标用户、业务决策、刷新周期和 KPI 树，而不是先选图表
 4. 使用 DuckDB/SQL/Python 计算每个模块的数据
 5. Agent 直接撰写 standalone HTML：布局、CSS、ECharts option、洞察卡片和交互逻辑
 6. 运行 `python scripts/validate_chart.py <output.html>` 校验单文件完整性
@@ -1444,6 +1479,7 @@ Simply describe what you want in plain language:
 | 趋势判断 | Line / area chart | 日期列、指标列 |
 | 结构拆解 | Bar / treemap / pie | 维度列、指标列 |
 | 地域分布 | Map / bar fallback | 省市/地区列、指标列 |
+| 城市销售/销量地图 | Geo + effectScatter / map fallback | 城市列、交易额/销售额/GMV/金额/销量/数量列 |
 | 漏斗流失 | Funnel | 阶段列、人数/次数 |
 | 留存质量 | Cohort table / heatmap | 用户、日期、回访/留存字段 |
 | 归因分析 | Driver table + bars | 日期、指标、可拆解维度 |
@@ -1452,6 +1488,8 @@ Simply describe what you want in plain language:
 **Layout Rules:**
 
 - First row: KPI summary and current status
+- Business dashboards need at least 6 analytical modules when data supports them; 2-3 chart dashboards are incomplete unless visible data-gap notes explain why.
+- Dashboard titles must be evidence-based. Do not invent product, brand, or industry labels that are not in the prompt or data.
 - Second row: trend and comparison
 - Third row: structure/segment breakdown
 - Diagnostic area: anomaly, funnel, retention, attribution, drill-down tables
@@ -1497,6 +1535,8 @@ Simply describe what you want in plain language:
 - 在 `<script>` 标签中内联 jsPDF 库（约 200KB minified）
 - `exportDashboard()` 函数检查 `typeof html2canvas !== 'undefined'` 时必须找到内联的库
 - 如果内联库不可用，回退到浏览器的 `window.print()` 作为最低兜底
+- `exportDashboard()` 必须捕获 html2canvas/jsPDF 异常，失败时用 toast 提示并回退 `window.print()`
+- Dashboard CSS 禁止使用 `color-mix()`、`oklch()`、`oklab()`、`lab()`、`lch()` 等 html2canvas 可能无法解析的颜色函数；使用 hex/rgb/rgba token
 
 **Chart Download 实现要求：**
 - `downloadChart()` 使用 ECharts 内置的 `chart.getDataURL()` API（无需外部库）
@@ -1504,20 +1544,35 @@ Simply describe what you want in plain language:
 - DashboardController 的 `charts` 参数由 HTML 中的 IIFE 自动填充
 
 **实现方式（Agent 工作流，不使用固定 Python 生成器）：**
-1. 先读取 `workflow_specs/dashboard_workflow.md`，明确用户角色、业务决策、KPI 树、布局层级
-2. 使用 DuckDB/SQL/Python 仅做数据查询、指标计算、异常/归因/洞察卡片证据准备
-3. Agent 自行设计 HTML 结构、CSS、ECharts option 和业务解释卡片
-4. 按 `workflow_specs/visual_templates/light.md` 或 `dark.md` 控制视觉方向，但允许 Agent 根据业务上下文调整
-5. 读取 `assets/echarts/echarts.min.js` → 内联为 `<script>/* echarts 代码 */</script>`
-6. 如需交互控件，可读取 `assets/dashboard/dashboard.css` 和 `assets/dashboard/dashboard.js` 作为参考或基础资产，但不得依赖一个固定 Python renderer
-7. 读取 `assets/dashboard/html2canvas.min.js`、`assets/dashboard/jspdf.umd.min.js` → 内联以支持 PDF 导出
-8. 读取所需地图 JS 文件（`assets/echarts/china.js` 等）→ 内联到 `<script>` 标签
-9. ⛔ **[MANDATORY]** 运行 `python scripts/validate_chart.py <output.html>` — 必须通过所有检查才能返回给用户
+1. 先读取 `workflow_specs/dashboard_workflow.md`
+1.1. 再读取 `workflow_specs/dashboard_runtime_quality.md`，执行运行时质量门
+2. 读取 `workflow_specs/dashboard_expert_library/INDEX.md`，选择 Dashboard 主专家和支撑专家，并完整读取对应专家 `.md`
+3. 按专家文件建立用户角色、业务决策、KPI 树、布局层级、诊断模块和必要的数据检查
+4. 使用 DuckDB/SQL/Python 仅做数据查询、指标计算、异常/归因/洞察卡片证据准备
+5. Agent 自行设计 HTML 结构、CSS、ECharts option 和业务解释卡片
+6. 完整读取 `workflow_specs/html_templates/dashboard_light.html`，再读取 `workflow_specs/visual_templates/light.md` 或 `dark.md`，并把模板落实到 CSS tokens、布局、工具栏、图表面板、KPI 卡片、诊断区域和响应式规则
+7. 读取 `assets/echarts/echarts.min.js` → 内联为 `<script>/* echarts 代码 */</script>`
+8. 如需交互控件，可读取 `assets/dashboard/dashboard.css` 和 `assets/dashboard/dashboard.js` 作为参考或基础资产，但不得依赖一个固定 Python renderer
+9. 读取 `assets/dashboard/html2canvas.min.js`、`assets/dashboard/jspdf.umd.min.js` → 内联以支持 PDF 导出
+10. 读取所需地图 JS 文件（`assets/echarts/china.js` 等）→ 内联到 `<script>` 标签
+10.1. 地图 JS 内联后由该文件完成 `echarts.registerMap(...)`；不得额外引用未定义的 `chinaGeoJSON`，也不得从 `geo.datav.aliyun.com` 或 CDN fetch 地图数据
+11. 主题切换必须切换整页 `data-theme` 和 CSS token，不允许只重绘图表
+12. 元数据、字段名或样例值有城市信息 + 交易额/销售额/GMV/金额/销量/数量字段时，必须读取 `workflow_specs/dashboard_modules/city_sales_map.md` 并补城市地图 + 销售/销量模块；无法可靠绘制地图时，显示数据缺口并用排行柱图兜底
+13. 标题、模块深度和城市地图触发规则都必须自检；标题无依据、图表过少、城市地图缺失都属于生成失败
+14. ⛔ **[MANDATORY]** 运行 `python scripts/validate_chart.py <output.html>` — 必须通过所有检查才能返回给用户
+15. 浏览器自动化不可作为必需前提；必须依赖 `python scripts/validate_chart.py <output.html>` 完成无浏览器静态质量门，拦截外链、自引用 file URL、iframe/object/embed、业务脚本 location 跳转、JS 语法错误、PDF 不兼容 CSS、地图注册和导出/下载缺失
+16. 如果环境恰好支持浏览器自动化，可额外用 `file://` 打开 HTML 做 smoke test；这只是增强验证，不是 skill 成功的必要条件
 
 **Dashboard 规范：**
+- 默认 HTML 骨架：`workflow_specs/html_templates/dashboard_light.html`
+- 运行时质量门：`workflow_specs/dashboard_runtime_quality.md`
 - 默认视觉方向：`workflow_specs/visual_templates/light.md`
 - 深色视觉方向：`workflow_specs/visual_templates/dark.md`
+- Dashboard 专家库索引：`workflow_specs/dashboard_expert_library/INDEX.md`
+- 每一种专家对应一个独立 `.md` 文件；新增专家时新增文件并登记到 INDEX
+- 自定义 Dashboard 专家模板：`workflow_specs/dashboard_expert_library/DASHBOARD_EXPERT_TEMPLATE.md`
 - Dashboard 的布局、卡片、图表、洞察说明由 Agent 结合业务目标决定
+- 生成结果必须符合所选视觉模板；如果像默认 HTML 或临时 demo，必须重做
 - 自定义样式不得使用外部 `@import`、远程图片、外部字体、外部 CSS/JS
 - 用户要求“更正式/更商务/公司风格”时，优先调整工作流规范和最终 HTML，不要新增固定 Python 生成逻辑
 
@@ -1710,8 +1765,10 @@ for ins in insights:
 
 1. **Generate Report via Agent Workflow**:
    - Read `workflow_specs/report_workflow.md`
-   - Infer the likely industry and choose the expert playbook
-   - Use SQL/Python only to collect evidence: profile, KPI totals, period comparison, anomaly scan, attribution, forecast when useful
+   - Read `workflow_specs/expert_library/INDEX.md`
+   - Infer the likely industry/domain from the request and data, then choose one primary expert and optional supporting experts
+   - Read every selected expert Markdown file completely before planning the analysis
+   - Use SQL/Python only to collect evidence: profile, KPI totals, baseline comparison, anomaly scan, cross-analysis, attribution drill-down, forecast when useful
    - Agent writes the final Markdown/HTML/JSON report directly
    - Do not call a fixed Python report renderer for the final artifact
 
@@ -1722,35 +1779,50 @@ for ins in insights:
 
 3. **Output Formats**:
    - `markdown` — Clean markdown, ideal for embedding in AI responses
-   - `html` — Agent-authored standalone HTML using workflow visual specs
+   - `html` — Agent-authored standalone HTML using `workflow_specs/html_templates/report_light.html`
    - `json` — Structured JSON for programmatic consumption, when explicitly requested
 
 4. **Visual Specs**:
-   - Default: `workflow_specs/visual_templates/light.md`
-   - Dark: `workflow_specs/visual_templates/dark.md`
-   - These are design directions for the Agent, not renderer inputs
+   - HTML shell: `workflow_specs/html_templates/report_light.html`
+   - Default visual direction: `workflow_specs/visual_templates/light.md`
+   - Dark visual direction: `workflow_specs/visual_templates/dark.md`
+   - The HTML shell and selected visual spec must be read completely before HTML/CSS is written
+   - The generated HTML/CSS must visibly implement the shell: background, paper canvas, typography, spacing, borders, chart panels, semantic colors, print styles
    - Keep HTML self-contained: no external CSS, JS, fonts, images, or `@import`
    - HTML report should visually read like an enterprise PDF: paper-like page, formal header, numbered sections, printable layout
 
-5. **Expert Analysis Layer**:
+5. **Chart Context**:
+   - Read `references/examples/INDEX.md` before choosing chart types
+   - Read every selected `references/examples/<chart-name>.md` recipe completely
+   - Generate each report chart from its recipe, data query, and appendix data ID
+   - For long reports, write each finding branch and chart independently, then assemble into one report
+
+6. **Pyramid Report Logic**:
+   - Start with a one-page conclusion summary, not a data overview
+   - Each conclusion must have supporting findings with numbers and comparison periods
+   - Each major finding must include a primary chart as evidence
+   - Each finding branch must also follow pyramid logic: local conclusion, observations, chart evidence, attribution explanation, local action
+   - Every top conclusion and finding conclusion must cite appendix data table IDs, e.g. `[Data A1]`
+   - Raw tables, field profiles, SQL, and samples belong in appendix
+   - Forbidden: listing metrics/table outputs first, then adding a weak conclusion at the end
+
+6. **Expert Analysis Layer**:
    - Agent detects industry/domain from user brief, table name, column names, sample values, and business context
-   - Agent applies domain playbooks, e.g. traffic/growth checks scale, efficiency, retention, funnel, channel attribution
-   - Agent uses tools to scan anomalies, compare recent periods, and attribute metric change to dimensions
+   - Agent dynamically selects expert files from `workflow_specs/expert_library/INDEX.md`
+   - Agent must execute selected experts' `Cross Analysis Matrix`, `Anomaly Patterns`, and `Deep Attribution Paths`
+   - Agent applies selected expert files, e.g. traffic/growth checks scale, efficiency, retention, funnel, channel attribution, cohort quality, and segment reversal
+   - Agent uses tools to scan anomalies, compare recent periods, cross dimensions, and attribute metric change to drivers
    - Agent writes conclusion-first narrative: what happened, why it likely happened, what to do next
    - Agent states data caveats when required fields are missing, instead of pretending a conclusion is fully supported
 
-6. **Report Content**: Each report includes:
-   - Executive summary with key conclusions
-   - Industry expert analysis framework
-   - Analysis conclusions and business interpretation
-   - Data overview table with column profiles
-   - KPI statistics (mean, median, min, max, std)
-   - Dimension analysis (rankings + compositions)
-   - Trend analysis with direction and strength
-   - Diagnostic analysis: anomaly + comparison + attribution
-   - Anomaly detection results
-   - Correlation analysis
-   - Actionable recommendations based on findings
+7. **Report Content**: Each report includes:
+   - Cover: title, scope, period, assumptions, selected experts
+   - One-page conclusions: 3-5 actionable conclusions with appendix data references
+   - Key finding branches: ordered by business importance; each branch includes local conclusion, observations, chart evidence, attribution, action, and data references
+   - Chart evidence: trend/contribution/funnel/retention/relationship/geographic charts where relevant; each chart cites its appendix data table
+   - Diagnostic analysis: anomaly + comparison + cross-analysis + deep attribution
+   - Actions: priority, expected effect, owner/data needed when possible
+   - Appendix: numbered data tables, SQL, field profiles, data limitations; table IDs must support citations from the main body
 
 **Evidence Tools (not final renderers)**:
 ```python

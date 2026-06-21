@@ -138,7 +138,7 @@ Step D: 填充 {{占位符}} → 输出最终 HTML
 ### 混合/自定义
 | 图表类型 | 关键词 | 模板文件 | Data 格式 |
 |---------|--------|---------|-----------|
-| 混合图 | 混合、组合、line+bar | `mix/line-bar.html` | `{categories: string[], barData: number[], lineData: number[]}` |
+| 混合图 | 混合、组合、line+bar、折柱混合 | `mix/line-bar.html` | `{categories: string[], barData: number[], lineData: number[], barName?: string, lineName?: string}`；单位或量级不同必须双 yAxis，柱状 `yAxisIndex: 0`，折线 `yAxisIndex: 1` |
 | 时间轴 | timeline、时间轴、切换 | `mix/timeline.html` | `{timeline: string[], categories: string[], series: [{name,type}], options: [{series:[{data}]}]}` |
 | 自定义图 | 自定义、custom、特殊 | `custom/error-bar.html` | `renderItem function + data with encode` |
 

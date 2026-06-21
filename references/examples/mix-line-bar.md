@@ -7,6 +7,15 @@
 
 Columns needed: check data arrays in reference code for required format
 
+## Agent Generation Rules
+
+- This recipe is for mixed bar + line charts. When the bar metric and line metric use different units or materially different ranges, use **dual yAxis**.
+- Treat the ranges as materially different when the larger max value is about 5x or more than the smaller max value, or when one metric is money/count/volume and the other is rate/percentage/temperature.
+- Bar series use the left axis: `yAxisIndex: 0`. Line series use the right axis: `yAxisIndex: 1`.
+- Do not place mixed bar + line series with different magnitudes on one `value` y-axis; the smaller line series will visually stick to the bottom and mislead the reader.
+- Axis names and `axisLabel.formatter` must reflect real metric names and units from the user data. Do not invent target achievement, KPI, or rate concepts unless the data contains them.
+- If both metrics have the same unit and comparable magnitude, a single y-axis is acceptable only when the chart remains readable; otherwise keep the dual-axis structure below.
+
 ## Data Arrays — Complete Replacement Guide
 
 **5 array(s)** to replace with real data:
@@ -112,6 +121,7 @@ option = {
     {
       name: 'Evaporation',
       type: 'bar',
+      yAxisIndex: 0,
       tooltip: {
         valueFormatter: function (value) {
           return value + ' ml';
@@ -124,6 +134,7 @@ option = {
     {
       name: 'Precipitation',
       type: 'bar',
+      yAxisIndex: 0,
       tooltip: {
         valueFormatter: function (value) {
           return value + ' ml';

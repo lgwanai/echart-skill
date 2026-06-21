@@ -336,6 +336,8 @@ Total: 354 examples
 - [timeline-finance](mix-timeline-finance.md)
 - [zoom-on-value](mix-zoom-on-value.md)
 
+Note: line + bar mixed charts must use dual yAxis when units or magnitudes differ. Use the bar series on `yAxisIndex: 0` and the line series on `yAxisIndex: 1`.
+
 ## multiple (2)
 - [x-axis](multiple-x-axis.md)
 - [y-axis](multiple-y-axis.md)
@@ -503,4 +505,3 @@ Total: 354 examples
 
 ## wind (1)
 - [barb](wind-barb.md)
-

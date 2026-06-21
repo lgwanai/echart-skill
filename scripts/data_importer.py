@@ -33,6 +33,14 @@ def calculate_md5(file_path):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
+def calculate_sha256(file_path):
+    """Calculate SHA-256 content fingerprint of a file."""
+    hash_sha256 = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            hash_sha256.update(chunk)
+    return hash_sha256.hexdigest()
+
 def init_meta_table(conn):
     """Initialize metadata table for tracking file imports and usage.
 
@@ -45,6 +53,7 @@ def init_meta_table(conn):
             file_name TEXT,
             table_name TEXT PRIMARY KEY,
             md5_hash TEXT,
+            sha256_hash TEXT,
             import_time DATETIME,
             last_used_time DATETIME,
             source_url TEXT,
@@ -66,6 +75,7 @@ def init_meta_table(conn):
     extra_columns = [
         ('file_name', 'TEXT'),
         ('md5_hash', 'TEXT'),
+        ('sha256_hash', 'TEXT'),
         ('import_time', 'DATETIME'),
         ('last_used_time', 'DATETIME'),
         ('source_url', 'TEXT'),
@@ -89,33 +99,39 @@ def init_meta_table(conn):
 
     conn.commit()
 
-def check_duplicate_import(conn, md5_hash):
-    """Check if the file has already been imported with the same MD5. Returns a list of table names."""
+def check_duplicate_import(conn, content_hash, legacy_md5_hash=None):
+    """Check if identical file content was already imported.
+
+    SHA-256 is the primary identity check. MD5 is retained as a legacy fallback so
+    older metadata rows can still be reused instead of creating duplicate tables.
+    """
+    legacy_md5_hash = legacy_md5_hash or content_hash
     results = conn.execute('''
         SELECT table_name FROM _data_skill_meta 
-        WHERE md5_hash = ?
-    ''', (md5_hash,)).fetchall()
+        WHERE sha256_hash = ? OR md5_hash = ?
+    ''', (content_hash, legacy_md5_hash)).fetchall()
     if results:
         tables = [r[0] for r in results]
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         for t in tables:
             conn.execute('''
                 UPDATE _data_skill_meta 
-                SET last_used_time = ? 
+                SET last_used_time = ?,
+                    sha256_hash = COALESCE(sha256_hash, ?)
                 WHERE table_name = ?
-            ''', (now, t))
+            ''', (now, content_hash, t))
         conn.commit()
         return tables
     return None
 
-def record_import(conn, file_name, table_name, md5_hash, file_path=None, row_count=None):
+def record_import(conn, file_name, table_name, md5_hash, file_path=None, row_count=None, sha256_hash=None):
     """Record import metadata."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     conn.execute('''
         INSERT OR REPLACE INTO _data_skill_meta
-        (file_name, table_name, md5_hash, import_time, last_used_time, file_path, row_count)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (file_name, table_name, md5_hash, now, now, file_path, row_count))
+        (file_name, table_name, md5_hash, sha256_hash, import_time, last_used_time, file_path, row_count)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (file_name, table_name, md5_hash, sha256_hash, now, now, file_path, row_count))
     conn.commit()
 
 
@@ -366,9 +382,10 @@ def import_to_duckdb(file_path, db_path, table_name=None):
         init_meta_table(conn)
 
         file_md5 = calculate_md5(file_path)
+        file_sha256 = calculate_sha256(file_path)
         file_name = os.path.basename(file_path)
 
-        existing_tables = check_duplicate_import(conn, file_md5)
+        existing_tables = check_duplicate_import(conn, file_sha256, file_md5)
         if existing_tables:
             print(f"File '{file_name}' with identical content already imported as tables: {', '.join(existing_tables)}. Skipping import.")
             return existing_tables
@@ -422,7 +439,7 @@ def import_to_duckdb(file_path, db_path, table_name=None):
 
             print(f"CSV import completed successfully.")
             csv_row_count = conn.execute(f"SELECT COUNT(*) FROM {quote_identifier(target_table)}").fetchone()[0]
-            record_import(conn, file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=csv_row_count)
+            record_import(conn, file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=csv_row_count, sha256_hash=file_sha256)
             imported_tables.append(target_table)
 
         elif ext in ['.xlsx', '.xls', '.et']:
@@ -459,7 +476,7 @@ def import_to_duckdb(file_path, db_path, table_name=None):
 
                     sheet_file_name = f"{file_name}::{sheet_name}" if len(sheet_names) > 1 else file_name
                     et_row_count = conn.execute(f"SELECT COUNT(*) FROM {quote_identifier(target_table)}").fetchone()[0]
-                    record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=et_row_count)
+                    record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=et_row_count, sha256_hash=file_sha256)
                     imported_tables.append(target_table)
             else:
                 print(f"Using streaming import for Excel file ({file_size / 1024 / 1024:.2f} MB)")
@@ -488,7 +505,7 @@ def import_to_duckdb(file_path, db_path, table_name=None):
                     print(f"Sheet '{sheet_name}' import completed. Loaded {total_rows} rows.")
 
                     sheet_file_name = f"{file_name}::{sheet_name}" if len(sheet_names) > 1 else file_name
-                    record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=total_rows)
+                    record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=total_rows, sha256_hash=file_sha256)
                     imported_tables.append(target_table)
 
         elif ext == '.numbers':
@@ -539,7 +556,7 @@ def import_to_duckdb(file_path, db_path, table_name=None):
 
                 sheet_file_name = f"{file_name}::{sheet_name}" if len(sheets) > 1 else file_name
                 numbers_row_count = conn.execute(f"SELECT COUNT(*) FROM {quote_identifier(target_table)}").fetchone()[0]
-                record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=numbers_row_count)
+                record_import(conn, sheet_file_name, target_table, file_md5, file_path=os.path.abspath(file_path), row_count=numbers_row_count, sha256_hash=file_sha256)
                 imported_tables.append(target_table)
 
         else:

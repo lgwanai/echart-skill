@@ -27,7 +27,13 @@ class DashboardController {
   applyTheme(theme) {
     this.theme = theme;
     document.documentElement.setAttribute('data-theme', theme);
+    document.body.setAttribute('data-theme', theme);
+    const root = document.querySelector('.dashboard-container');
+    if (root) {
+      root.setAttribute('data-theme', theme);
+    }
     localStorage.setItem('dashboard-theme', theme);
+    this.updateThemeControls(theme);
     
     const newCharts = [];
     this.charts.forEach(chart => {
@@ -44,6 +50,18 @@ class DashboardController {
     });
     this.charts = newCharts;
   }
+
+  /**
+   * Keep theme buttons and labels in sync with the page-level theme.
+   */
+  updateThemeControls(theme) {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      themeToggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+      themeToggle.setAttribute('title', theme === 'dark' ? '切换为浅色主题' : '切换为深色主题');
+      themeToggle.textContent = theme === 'dark' ? '浅色' : '深色';
+    }
+  }
   
   /**
    * Toggle theme
@@ -59,21 +77,21 @@ class DashboardController {
    */
   setupEventListeners() {
     const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
+    if (themeToggle && themeToggle.dataset.globalHandler !== 'true') {
       const handler = () => this.toggleTheme();
       themeToggle.addEventListener('click', handler);
       this._listeners.themeToggle = { el: themeToggle, handler: handler };
     }
     
     const refreshBtn = document.getElementById('refresh-dashboard');
-    if (refreshBtn) {
+    if (refreshBtn && refreshBtn.dataset.globalHandler !== 'true') {
       const handler = () => this.refreshAllCharts();
       refreshBtn.addEventListener('click', handler);
       this._listeners.refreshBtn = { el: refreshBtn, handler: handler };
     }
     
     const exportBtn = document.getElementById('export-dashboard');
-    if (exportBtn) {
+    if (exportBtn && exportBtn.dataset.globalHandler !== 'true') {
       const handler = () => this.exportDashboard();
       exportBtn.addEventListener('click', handler);
       this._listeners.exportBtn = { el: exportBtn, handler: handler };
@@ -141,8 +159,13 @@ class DashboardController {
     try {
       if (typeof html2canvas !== 'undefined' && (typeof jsPDF !== 'undefined' || (typeof jspdf !== 'undefined' && jspdf.jsPDF))) {
         const JsPDF = typeof jsPDF !== 'undefined' ? jsPDF : jspdf.jsPDF;
-        const element = document.querySelector('.dashboard-container');
-        const canvas = await html2canvas(element);
+        const element = document.querySelector('.dashboard-container') || document.body;
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          backgroundColor: this.theme === 'dark' ? '#0b1220' : '#f5f7fb',
+          useCORS: true,
+          ignoreElements: element => element.classList && element.classList.contains('toast-container')
+        });
         const imgData = canvas.toDataURL('image/png');
         
         const pdf = new JsPDF('l', 'mm', 'a4');
@@ -158,8 +181,9 @@ class DashboardController {
         window.print();
       }
     } catch (error) {
-      this.showToast('Failed to export dashboard', 'error');
-      console.error('Export error:', error);
+      console.warn('PDF canvas export failed, falling back to browser print.', error);
+      this.showToast('Canvas export is not supported by this browser; opening print export instead.', 'warning');
+      window.print();
     }
   }
   

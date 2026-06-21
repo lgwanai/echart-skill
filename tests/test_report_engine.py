@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import tempfile
+from pathlib import Path
 
 import pytest
 
@@ -34,6 +35,7 @@ def db_path():
         CREATE TABLE test_sales (
             order_date DATE,
             region VARCHAR,
+            city VARCHAR,
             product VARCHAR,
             amount DOUBLE,
             quantity INTEGER,
@@ -42,30 +44,30 @@ def db_path():
     """)
     conn.execute("""
         INSERT INTO test_sales VALUES
-        ('2024-01-01', '北京', '产品A', 1000.0, 10, '电子'),
-        ('2024-01-05', '上海', '产品B', 800.0, 5, '电子'),
-        ('2024-01-10', '北京', '产品A', 1200.0, 12, '电子'),
-        ('2024-02-01', '广东', '产品C', 500.0, 3, '家居'),
-        ('2024-02-15', '北京', '产品B', 900.0, 8, '电子'),
-        ('2024-02-20', '上海', '产品C', 600.0, 4, '家居'),
-        ('2024-03-01', '广东', '产品A', 1500.0, 15, '电子'),
-        ('2024-03-10', '北京', '产品C', 700.0, 6, '家居'),
-        ('2024-03-15', '上海', '产品B', 1100.0, 9, '电子'),
-        ('2024-03-20', '广东', '产品B', 950.0, 7, '电子'),
-        ('2024-04-01', '北京', '产品A', 1300.0, 11, '电子'),
-        ('2024-04-10', '上海', '产品A', 1400.0, 14, '电子'),
-        ('2024-04-15', '广东', '产品C', 400.0, 2, '家居'),
-        ('2024-04-20', '北京', '产品B', 850.0, 7, '电子'),
-        ('2024-05-01', '广东', '产品A', 1600.0, 16, '电子'),
-        ('2024-05-10', '上海', '产品C', 550.0, 5, '家居'),
-        ('2024-05-15', '北京', '产品B', 1000.0, 10, '电子'),
-        ('2024-05-20', '广东', '产品B', 900.0, 8, '电子'),
-        ('2024-06-01', '上海', '产品A', 1700.0, 18, '电子'),
-        ('2024-06-10', '北京', '产品C', 650.0, 4, '家居'),
-        ('2024-06-15', '广东', '产品A', 1800.0, 20, '电子'),
-        ('2024-06-20', '上海', '产品B', 1200.0, 12, '电子'),
-        ('2024-06-25', '北京', NULL, NULL, NULL, '电子'),
-        ('2024-06-30', '上海', NULL, 500.0, 3, NULL)
+        ('2024-01-01', '北京', '北京市', '产品A', 1000.0, 10, '电子'),
+        ('2024-01-05', '上海', '上海市', '产品B', 800.0, 5, '电子'),
+        ('2024-01-10', '北京', '北京市', '产品A', 1200.0, 12, '电子'),
+        ('2024-02-01', '广东', '广州市', '产品C', 500.0, 3, '家居'),
+        ('2024-02-15', '北京', '北京市', '产品B', 900.0, 8, '电子'),
+        ('2024-02-20', '上海', '上海市', '产品C', 600.0, 4, '家居'),
+        ('2024-03-01', '广东', '深圳市', '产品A', 1500.0, 15, '电子'),
+        ('2024-03-10', '北京', '北京市', '产品C', 700.0, 6, '家居'),
+        ('2024-03-15', '上海', '上海市', '产品B', 1100.0, 9, '电子'),
+        ('2024-03-20', '广东', '深圳市', '产品B', 950.0, 7, '电子'),
+        ('2024-04-01', '北京', '北京市', '产品A', 1300.0, 11, '电子'),
+        ('2024-04-10', '上海', '上海市', '产品A', 1400.0, 14, '电子'),
+        ('2024-04-15', '广东', '广州市', '产品C', 400.0, 2, '家居'),
+        ('2024-04-20', '北京', '北京市', '产品B', 850.0, 7, '电子'),
+        ('2024-05-01', '广东', '深圳市', '产品A', 1600.0, 16, '电子'),
+        ('2024-05-10', '上海', '上海市', '产品C', 550.0, 5, '家居'),
+        ('2024-05-15', '北京', '北京市', '产品B', 1000.0, 10, '电子'),
+        ('2024-05-20', '广东', '深圳市', '产品B', 900.0, 8, '电子'),
+        ('2024-06-01', '上海', '上海市', '产品A', 1700.0, 18, '电子'),
+        ('2024-06-10', '北京', '北京市', '产品C', 650.0, 4, '家居'),
+        ('2024-06-15', '广东', '深圳市', '产品A', 1800.0, 20, '电子'),
+        ('2024-06-20', '上海', '上海市', '产品B', 1200.0, 12, '电子'),
+        ('2024-06-25', '北京', '北京市', NULL, NULL, NULL, '电子'),
+        ('2024-06-30', '上海', '上海市', NULL, 500.0, 3, NULL)
     """)
     conn.close()
 
@@ -213,6 +215,25 @@ class TestReportGenerateHTML:
         assert "<html" in content
         assert "<style>" in content or "css" in content.lower()
         assert "test_sales" in content
+        assert 'class="paper"' in content
+        assert "echarts.init" in content
+        assert "setOption" in content
+        assert "report_chart_" in content
+        assert "window.reportChartSpecs" in content
+        assert 'data-recipe="line-simple.md"' in content
+        assert "initReportChart" in content
+        assert "references/examples/line-simple.md" in content
+        assert "report_chart_city_map" in content
+        assert "effectScatter" in content
+        assert "城市amount地图" in content
+        assert "exportReportPDF" in content
+        assert "html2canvas" in content
+        assert "jsPDF" in content
+        assert "pdf.save" in content
+        assert "window.print" in content
+        assert "统计口径说明" in content
+        assert "补充节假日、活动投放、价格调整、库存、天气、渠道策略等外部数据" in content
+        assert "目标达成率" not in content
 
     def test_generate_html_quick(self, engine):
         path = engine.quick_report("test_sales", output_format="html")
@@ -225,6 +246,30 @@ class TestReportGenerateHTML:
         path = engine.generate("test_sales", template="general", output_format="html")
         content = open(path).read()
         assert "prefers-color-scheme" in content
+
+    def test_enterprise_html_templates_exist(self):
+        root = Path(__file__).resolve().parents[1]
+        report_template = root / "workflow_specs" / "html_templates" / "report_light.html"
+        dashboard_template = root / "workflow_specs" / "html_templates" / "dashboard_light.html"
+
+        report_html = report_template.read_text(encoding="utf-8")
+        dashboard_html = dashboard_template.read_text(encoding="utf-8")
+
+        assert "Enterprise Analysis Report" in report_html
+        assert "chart-panel" in report_html
+        assert "{{REPORT_BODY}}" in report_html
+        assert "{{PDF_EXPORT_JS}}" in report_html
+        assert "html2canvas" in report_html
+        assert "pdf.save" in report_html
+        assert "Enterprise Dashboard" in dashboard_html
+        assert "dashboard-container" in dashboard_html
+        assert "dashboard-grid" in dashboard_html
+        assert 'html[data-theme="dark"]' in dashboard_html
+        assert "dashboardExportPDF" in dashboard_html
+        assert 'data-global-handler="true"' in dashboard_html
+        assert "refreshAllCharts" in dashboard_html
+        assert "exportDashboard" in dashboard_html
+        assert "{{CHART_CARDS}}" in dashboard_html
 
 
 # ---------------------------------------------------------------------------

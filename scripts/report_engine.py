@@ -23,8 +23,10 @@ Usage:
 import json
 import os
 import sys
+import html
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 import duckdb
@@ -59,6 +61,18 @@ class Report:
     generated_at: str = field(default_factory=lambda: datetime.now().isoformat())
     sections: list[ReportSection] = field(default_factory=list)
     metadata: dict = field(default_factory=dict)
+
+
+@dataclass
+class ReportChart:
+    """A single report chart generated from a Markdown chart recipe."""
+    id: str
+    title: str
+    recipe_name: str
+    recipe_context: str
+    note: str
+    option: dict
+    appendix_id: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -186,6 +200,12 @@ class ReportEngine:
         report = Report(
             title=title,
             subtitle=f"基于 {profile.row_count} 条数据的自动分析",
+            metadata={
+                "table_name": table,
+                "row_count": profile.row_count,
+                "column_count": profile.column_count,
+                "template": template,
+            },
         )
 
         # Step 3: Fill sections
@@ -306,7 +326,7 @@ class ReportEngine:
             if i.severity in (Severity.CRITICAL, Severity.HIGH)
         ][:3]
 
-        summary_points = []
+        summary_points = [self._stat_scope_note(profile, "summary")]
         # Key facts from profile
         summary_points.append(
             f"本报告基于 **{profile.table_name}** 表的 {profile.row_count:,} 条记录，"
@@ -340,7 +360,7 @@ class ReportEngine:
         """Build the data overview section."""
         section = ReportSection(heading=heading, level=2)
 
-        lines = []
+        lines = [self._stat_scope_note(profile, "overview"), ""]
         lines.append(f"| 属性 | 值 |")
         lines.append(f"|------|-----|")
         lines.append(f"| 表名 | {profile.table_name} |")
@@ -384,7 +404,8 @@ class ReportEngine:
         section = ReportSection(heading=heading, level=2)
 
         metric_cols = profile.metric_columns[:5]
-        lines = ["| 指标 | 均值 | 中位数 | 最小值 | 最大值 | 标准差 |"]
+        lines = [self._stat_scope_note(profile, "metrics"), ""]
+        lines.append("| 指标 | 均值 | 中位数 | 最小值 | 最大值 | 标准差 |")
         lines.append("|------|------|--------|--------|--------|--------|")
 
         for mc in metric_cols:
@@ -427,7 +448,7 @@ class ReportEngine:
                 dim_groups[dim] = []
             dim_groups[dim].append(ins)
 
-        lines = []
+        lines = [self._stat_scope_note(profile, "dimension"), ""]
         for dim, dim_insights in dim_groups.items():
             lines.append(f"### {dim}\n")
             for ins in dim_insights[:3]:
@@ -453,7 +474,7 @@ class ReportEngine:
         changes = [i for i in insights if i.type == InsightType.CHANGE]
         seasonality = [i for i in insights if i.type == InsightType.SEASONALITY]
 
-        lines = []
+        lines = [self._stat_scope_note(profile, "trend"), ""]
 
         if trends:
             lines.append("### 整体趋势\n")
@@ -469,6 +490,13 @@ class ReportEngine:
             lines.append("\n### 季节性规律\n")
             for ins in seasonality:
                 lines.append(f"- **{ins.title}**：{ins.description}")
+
+        if profile.date_columns:
+            lines.append(
+                "\n### 波动原因边界\n"
+                "当前只能基于已导入的时间、指标和维度字段观察波动。"
+                "如需判断这是季节性波动还是外部因素导致，建议补充节假日、活动投放、价格调整、库存、天气、渠道策略等外部数据后再做交叉验证。"
+            )
 
         section.content = "\n".join(lines)
         section.insights = trends + changes + seasonality
@@ -488,10 +516,15 @@ class ReportEngine:
         anomalies = [i for i in insights if i.type == InsightType.ANOMALY]
 
         if not anomalies:
-            section.content = "✅ 未检测到显著异常数据点。"
+            section.content = (
+                f"{self._stat_scope_note(profile, 'anomaly')}\n\n"
+                "未检测到显著异常数据点。该结论只基于当前数据表内的数值分布和时间变化，"
+                "不等同于排除节假日、促销、投放、库存、天气等外部因素影响。"
+            )
             return section
 
-        lines = [f"检测到 **{len(anomalies)}** 个异常数据点：\n"]
+        lines = [self._stat_scope_note(profile, "anomaly"), ""]
+        lines.append(f"检测到 **{len(anomalies)}** 个异常数据点：\n")
         lines.append("| 时间 | 指标 | 异常描述 | 严重程度 |")
         lines.append("|------|------|----------|----------|")
 
@@ -506,6 +539,11 @@ class ReportEngine:
             metric = ins.evidence.get("metric", "N/A")
             sev = sev_labels.get(ins.severity, "低")
             lines.append(f"| {period} | {metric} | {ins.description[:60]}... | {sev} |")
+
+        lines.append(
+            "\n异常只能说明当前数据中存在明显偏离，不能直接证明原因。"
+            "建议补充节假日、营销活动、价格、库存、履约、渠道变更等数据，进一步判断是季节性波动还是外部事件导致。"
+        )
 
         section.content = "\n".join(lines)
         section.insights = anomalies
@@ -525,10 +563,11 @@ class ReportEngine:
         correlations = [i for i in insights if i.type == InsightType.CORRELATION]
 
         if not correlations:
-            section.content = "未检测到显著相关性。"
+            section.content = f"{self._stat_scope_note(profile, 'correlation')}\n\n未检测到显著相关性。"
             return section
 
-        lines = ["| 指标 A | 指标 B | 相关系数 | 方向 | 强度 |"]
+        lines = [self._stat_scope_note(profile, "correlation"), ""]
+        lines.append("| 指标 A | 指标 B | 相关系数 | 方向 | 强度 |")
         lines.append("|--------|--------|----------|------|------|")
 
         for ins in correlations:
@@ -554,6 +593,7 @@ class ReportEngine:
         """Generate actionable recommendations based on insights."""
         section = ReportSection(heading=heading, level=2)
 
+        scope_note = self._stat_scope_note(profile, "recommendations")
         recommendations = []
 
         # Check for high-severity anomalies → recommend investigation
@@ -564,7 +604,7 @@ class ReportEngine:
                 c for ins in anomalies for c in ins.related_columns
             ))
             recommendations.append(
-                f"🔍 **深入调查异常数据**：建议对 {cols} 的 {len(anomalies)} 处异常值进行根因分析。"
+                f"**深入调查异常数据**：建议对 {cols} 的 {len(anomalies)} 处异常值进行根因分析，并补充节假日、活动、价格、库存、渠道等外部数据，判断异常更接近季节性波动还是外部因素影响。"
             )
 
         # Check for negative trends → recommend action
@@ -574,7 +614,7 @@ class ReportEngine:
         ]
         if negative_trends:
             recommendations.append(
-                f"📉 **关注下降趋势**：部分指标呈下降趋势，建议分析下降原因并制定应对方案。"
+                f"**关注下降趋势**：部分指标呈下降趋势。当前数据可以确认趋势方向，但不能单独证明原因；建议补充外部环境、投放、价格、库存或运营动作数据后再判断原因。"
             )
 
         # Check concentration → recommend diversification
@@ -584,14 +624,14 @@ class ReportEngine:
         ]
         if high_conc:
             recommendations.append(
-                f"📊 **优化集中度风险**：部分维度过于集中，建议考虑多元化策略以分散风险。"
+                f"**优化集中度风险**：部分维度过于集中，建议结合业务资源、供给能力和渠道策略确认是否需要分散风险。"
             )
 
         # Check data quality
         high_null = [c for c in profile.columns if c.null_pct >= 20]
         if high_null:
             recommendations.append(
-                f"🧹 **提升数据质量**：{len(high_null)} 个字段缺失率超过 20%，建议完善数据采集流程。"
+                f"**提升数据质量**：{len(high_null)} 个字段缺失率超过 20%，建议完善数据采集流程，避免后续归因误判。"
             )
 
         # Positive findings
@@ -601,7 +641,7 @@ class ReportEngine:
         ]
         if positive_trends:
             recommendations.append(
-                f"✅ **巩固增长趋势**：部分指标呈现良好增长态势，建议总结经验并推广。"
+                f"**巩固增长趋势**：部分指标呈现增长态势。建议结合渠道、活动、供给和外部环境数据确认增长来源，再决定是否复制相关动作。"
             )
 
         if not recommendations:
@@ -609,7 +649,9 @@ class ReportEngine:
                 "基于当前数据，暂无特别需要关注的问题。建议持续监控关键指标变化。"
             )
 
-        section.content = "\n\n".join(f"{i+1}. {r}" for i, r in enumerate(recommendations))
+        section.content = scope_note + "\n\n" + "\n\n".join(
+            f"{i+1}. {r}" for i, r in enumerate(recommendations)
+        )
 
         return section
 
@@ -638,6 +680,37 @@ class ReportEngine:
         section.insights = matching
 
         return section
+
+    def _stat_scope_note(self, profile: TableProfile, module: str) -> str:
+        """Return a plain-language statistical scope note for a report module."""
+        date_part = (
+            f"时间上按 `{profile.date_columns[0]}` 观察"
+            if profile.date_columns else "当前数据没有明确日期字段，所以不做时间周期判断"
+        )
+        metric_part = (
+            f"数值上优先看 {', '.join(profile.metric_columns[:3])}"
+            if profile.metric_columns else "当前数据没有明确数值指标，所以只做结构和数据质量观察"
+        )
+        category_part = (
+            f"分组上优先按 {', '.join(profile.category_columns[:3])} 拆分"
+            if profile.category_columns else "当前数据没有明确分类字段，所以不做维度拆分"
+        )
+        labels = {
+            "summary": "本模块",
+            "overview": "数据概览",
+            "metrics": "关键指标",
+            "dimension": "维度分析",
+            "trend": "趋势分析",
+            "anomaly": "异常分析",
+            "correlation": "相关性分析",
+            "recommendations": "行动建议",
+        }
+        label = labels.get(module, "本模块")
+        return (
+            f"**统计口径说明**：{label}基于当前导入表 `{profile.table_name}` 的 {profile.row_count:,} 条记录；"
+            f"{date_part}；{metric_part}；{category_part}。"
+            "没有在数据中出现、且用户没有明确提供的业务目标或 KPI，不纳入本报告判断。"
+        )
 
     # ------------------------------------------------------------------
     # Output Formats
@@ -688,133 +761,428 @@ class ReportEngine:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))
 
+    def _read_report_template(self) -> str:
+        template_path = Path(__file__).resolve().parents[1] / "workflow_specs" / "html_templates" / "report_light.html"
+        return template_path.read_text(encoding="utf-8")
+
+    def _read_chart_recipe_context(self, recipe_name: str) -> str:
+        """Read the ECharts md recipe used as generation context."""
+        path = Path(__file__).resolve().parents[1] / "references" / "examples" / recipe_name
+        try:
+            return path.read_text(encoding="utf-8")
+        except OSError:
+            return ""
+
+    def _load_echarts_js(self) -> str:
+        path = Path(__file__).resolve().parents[1] / "assets" / "echarts" / "echarts.min.js"
+        return path.read_text(encoding="utf-8")
+
+    def _load_china_map_js(self) -> str:
+        path = Path(__file__).resolve().parents[1] / "assets" / "echarts" / "china.js"
+        try:
+            return path.read_text(encoding="utf-8")
+        except OSError:
+            return ""
+
+    def _load_pdf_export_js(self) -> str:
+        """Load local PDF export dependencies for standalone report HTML."""
+        root = Path(__file__).resolve().parents[1] / "assets" / "dashboard"
+        chunks = []
+        for filename in ("html2canvas.min.js", "jspdf.umd.min.js"):
+            path = root / filename
+            try:
+                chunks.append(path.read_text(encoding="utf-8"))
+            except OSError:
+                logger.warning("PDF 导出依赖缺失", path=str(path))
+        return "\n".join(chunks)
+
+    def _html_sections(self, report: Report) -> str:
+        parts = []
+        for idx, section in enumerate(report.sections, start=1):
+            parts.append(f'<section id="section-{idx}">')
+            parts.append(f"<h2>{idx}. {html.escape(section.heading)}</h2>")
+            if section.content:
+                parts.append(f'<div class="section-body">{self._md_to_html(section.content)}</div>')
+            for ins in section.insights[:4]:
+                severity = html.escape(ins.severity.value)
+                parts.append(
+                    '<div class="finding">'
+                    f'<div class="finding-title">{html.escape(ins.title)}'
+                    f'<span class="badge">{severity}</span></div>'
+                    f'<p>{html.escape(ins.description)}</p>'
+                    '</div>'
+                )
+            parts.append("</section>")
+        return "\n".join(parts)
+
+    def _html_toc(self, report: Report) -> str:
+        items = "\n".join(
+            f'<li><a href="#section-{idx}">{html.escape(section.heading)}</a></li>'
+            for idx, section in enumerate(report.sections, start=1)
+        )
+        if report.metadata.get("has_charts"):
+            chart_idx = len(report.sections) + 1
+            items += f'\n<li><a href="#section-charts">图表举证</a></li>'
+        return f'<nav class="toc"><h2>目录</h2><ol>{items}</ol></nav>'
+
+    def _profile_for_table(self, table_name: str) -> TableProfile | None:
+        try:
+            return self.insight_engine.profile_table(table_name)
+        except Exception:
+            return None
+
+    def _make_report_chart(
+        self,
+        chart_id: str,
+        title: str,
+        recipe_name: str,
+        option: dict,
+        appendix_id: str,
+        note_prefix: str = "",
+    ) -> ReportChart:
+        """Create one chart spec from a selected Markdown recipe."""
+        recipe_context = self._read_chart_recipe_context(recipe_name)
+        if not recipe_context:
+            raise ValueError(f"图表配方不存在或无法读取: references/examples/{recipe_name}")
+        note = f"{note_prefix}基于 references/examples/{recipe_name} 配方上下文生成"
+        return ReportChart(
+            id=chart_id,
+            title=title,
+            recipe_name=recipe_name,
+            recipe_context=recipe_context,
+            note=note,
+            option=option,
+            appendix_id=appendix_id,
+        )
+
+    def _build_report_charts(self, table_name: str) -> tuple[str, str]:
+        """Build ECharts panels one by one from Markdown recipe contexts."""
+        profile = self._profile_for_table(table_name)
+        if not profile:
+            return "", ""
+
+        chart_defs: list[ReportChart] = []
+        date_col = profile.date_columns[0] if profile.date_columns else None
+        metric_col = profile.metric_columns[0] if profile.metric_columns else None
+        transaction_metric_col = self._select_transaction_metric(profile.metric_columns) or metric_col
+        category_col = profile.category_columns[0] if profile.category_columns else None
+        city_col = self._select_city_column(profile)
+
+        with self.insight_engine.repo.connection() as conn:
+            if date_col and metric_col:
+                rows = conn.execute(
+                    f'''
+                    SELECT CAST({self._safe_identifier(date_col)} AS VARCHAR) AS label,
+                           SUM({self._safe_identifier(metric_col)}) AS value
+                    FROM {self._safe_identifier(table_name)}
+                    WHERE {self._safe_identifier(date_col)} IS NOT NULL
+                    GROUP BY 1
+                    ORDER BY 1
+                    LIMIT 30
+                    '''
+                ).fetchall()
+                if rows:
+                    chart_defs.append(self._make_report_chart(
+                        "report_chart_trend",
+                        f"{metric_col} 趋势",
+                        "line-simple.md",
+                        self._line_option(f"{metric_col} 趋势", rows),
+                        "Data A1",
+                    ))
+
+            if category_col and metric_col:
+                rows = conn.execute(
+                    f'''
+                    SELECT CAST({self._safe_identifier(category_col)} AS VARCHAR) AS label,
+                           SUM({self._safe_identifier(metric_col)}) AS value
+                    FROM {self._safe_identifier(table_name)}
+                    WHERE {self._safe_identifier(category_col)} IS NOT NULL
+                    GROUP BY 1
+                    ORDER BY 2 DESC
+                    LIMIT 12
+                    '''
+                ).fetchall()
+                if rows:
+                    chart_defs.append(self._make_report_chart(
+                        "report_chart_bar",
+                        f"{category_col} 贡献排行",
+                        "bar-simple.md",
+                        self._bar_option(f"{category_col} 贡献排行", rows),
+                        "Data A2",
+                    ))
+                    chart_defs.append(self._make_report_chart(
+                        "report_chart_pie",
+                        f"{category_col} 结构占比",
+                        "pie-simple.md",
+                        self._pie_option(f"{category_col} 结构占比", rows[:8]),
+                        "Data A2",
+                    ))
+
+            if city_col and transaction_metric_col:
+                rows = conn.execute(
+                    f'''
+                    SELECT CAST({self._safe_identifier(city_col)} AS VARCHAR) AS label,
+                           SUM({self._safe_identifier(transaction_metric_col)}) AS value
+                    FROM {self._safe_identifier(table_name)}
+                    WHERE {self._safe_identifier(city_col)} IS NOT NULL
+                    GROUP BY 1
+                    ORDER BY 2 DESC
+                    LIMIT 40
+                    '''
+                ).fetchall()
+                mapped_rows = [
+                    (self._normalize_city_name(label), value)
+                    for label, value in rows
+                    if self._city_coord(self._normalize_city_name(label))
+                ]
+                if mapped_rows:
+                    chart_defs.append(self._make_report_chart(
+                        "report_chart_city_map",
+                        f"城市{transaction_metric_col}地图",
+                        "geo-map-scatter.md",
+                        self._city_transaction_map_option(
+                            f"城市{transaction_metric_col}分布",
+                            mapped_rows,
+                            transaction_metric_col,
+                        ),
+                        "Data A3",
+                        note_prefix="检测到城市字段，",
+                    ))
+
+        panels = []
+        chart_specs = []
+        for chart in chart_defs:
+            panels.append(
+                f'<div class="chart-panel" data-recipe="{html.escape(chart.recipe_name)}" data-appendix="{html.escape(chart.appendix_id)}">'
+                '<div class="chart-head">'
+                f'<div class="chart-title">{html.escape(chart.title)}</div>'
+                f'<div class="chart-note">{html.escape(chart.note)}；引用 {html.escape(chart.appendix_id)}</div>'
+                '</div>'
+                f'<div class="chart" id="{chart.id}" role="img" aria-label="{html.escape(chart.title)}"></div>'
+                '</div>'
+            )
+            chart_specs.append({
+                "id": chart.id,
+                "title": chart.title,
+                "recipe": f"references/examples/{chart.recipe_name}",
+                "appendixId": chart.appendix_id,
+                "option": chart.option,
+            })
+
+        boot = [
+            "window.reportCharts = [];",
+            f"window.reportChartSpecs = {json.dumps(chart_specs, ensure_ascii=False)};",
+            """
+function initReportChart(spec) {
+  const el = document.getElementById(spec.id);
+  if (!el) return;
+  try {
+    const chart = echarts.init(el);
+    chart.setOption(spec.option, true);
+    window.reportCharts.push(chart);
+    window.requestAnimationFrame(function() { chart.resize(); });
+  } catch (error) {
+    console.error("Report chart render failed:", spec.id, spec.recipe, error);
+    el.innerHTML = '<div class="chart-error">图表渲染失败：' + spec.title + '</div>';
+  }
+}
+window.reportChartSpecs.forEach(initReportChart);
+window.addEventListener("resize", function() {
+  window.reportCharts.forEach(function(chart) {
+    try { chart.resize(); } catch (error) {}
+  });
+});
+""",
+        ]
+        return "\n".join(panels), "\n".join(boot)
+
+    def _select_city_column(self, profile: TableProfile) -> str | None:
+        candidates = profile.geo_columns + profile.category_columns
+        city_keywords = ("city", "城市", "市")
+        for col in candidates:
+            lowered = col.lower()
+            if any(keyword in lowered for keyword in city_keywords):
+                return col
+        return None
+
+    def _select_transaction_metric(self, metric_columns: list[str]) -> str | None:
+        keywords = ("交易额", "成交额", "销售额", "金额", "gmv", "amount", "sales", "revenue")
+        for col in metric_columns:
+            lowered = col.lower()
+            if any(keyword in lowered for keyword in keywords):
+                return col
+        return None
+
+    def _normalize_city_name(self, value: str) -> str:
+        city = str(value).strip()
+        aliases = {
+            "北京": "北京市",
+            "上海": "上海市",
+            "天津": "天津市",
+            "重庆": "重庆市",
+            "广州": "广州市",
+            "深圳": "深圳市",
+            "杭州": "杭州市",
+            "南京": "南京市",
+            "苏州": "苏州市",
+            "成都": "成都市",
+            "武汉": "武汉市",
+            "西安": "西安市",
+            "郑州": "郑州市",
+            "长沙": "长沙市",
+            "青岛": "青岛市",
+            "宁波": "宁波市",
+            "厦门": "厦门市",
+            "福州": "福州市",
+            "东莞": "东莞市",
+            "佛山": "佛山市",
+        }
+        if city in aliases:
+            return aliases[city]
+        return city
+
+    def _city_coord(self, city: str) -> list[float] | None:
+        coords = {
+            "北京市": [116.4074, 39.9042],
+            "上海市": [121.4737, 31.2304],
+            "天津市": [117.2000, 39.1333],
+            "重庆市": [106.5516, 29.5630],
+            "广州市": [113.2644, 23.1291],
+            "深圳市": [114.0579, 22.5431],
+            "杭州市": [120.1551, 30.2741],
+            "南京市": [118.7969, 32.0603],
+            "苏州市": [120.5853, 31.2989],
+            "成都市": [104.0665, 30.5728],
+            "武汉市": [114.3055, 30.5928],
+            "西安市": [108.9398, 34.3416],
+            "郑州市": [113.6254, 34.7466],
+            "长沙市": [112.9388, 28.2282],
+            "青岛市": [120.3826, 36.0671],
+            "宁波市": [121.5503, 29.8739],
+            "厦门市": [118.0894, 24.4798],
+            "福州市": [119.2965, 26.0745],
+            "东莞市": [113.7518, 23.0207],
+            "佛山市": [113.1214, 23.0215],
+        }
+        return coords.get(city)
+
+    def _safe_identifier(self, identifier: str) -> str:
+        return '"' + identifier.replace('"', '""') + '"'
+
+    def _line_option(self, title: str, rows) -> dict:
+        labels = [str(r[0]) for r in rows]
+        values = [float(r[1] or 0) for r in rows]
+        return {
+            "title": {"text": title, "left": "center", "textStyle": {"fontSize": 13}},
+            "tooltip": {"trigger": "axis"},
+            "grid": {"left": 48, "right": 28, "top": 56, "bottom": 46},
+            "xAxis": {"type": "category", "data": labels, "axisLabel": {"color": "#667085"}},
+            "yAxis": {"type": "value", "axisLabel": {"color": "#667085"}, "splitLine": {"lineStyle": {"color": "#d8dee9"}}},
+            "series": [{"data": values, "type": "line", "smooth": True, "areaStyle": {"opacity": 0.12}, "itemStyle": {"color": "#1f5eff"}}],
+        }
+
+    def _bar_option(self, title: str, rows) -> dict:
+        labels = [str(r[0]) for r in rows]
+        values = [float(r[1] or 0) for r in rows]
+        return {
+            "title": {"text": title, "left": "center", "textStyle": {"fontSize": 13}},
+            "tooltip": {"trigger": "axis"},
+            "grid": {"left": 56, "right": 28, "top": 56, "bottom": 72},
+            "xAxis": {"type": "category", "data": labels, "axisLabel": {"color": "#667085", "rotate": 30}},
+            "yAxis": {"type": "value", "axisLabel": {"color": "#667085"}, "splitLine": {"lineStyle": {"color": "#d8dee9"}}},
+            "series": [{"data": values, "type": "bar", "itemStyle": {"color": "#1f5eff"}}],
+        }
+
+    def _pie_option(self, title: str, rows) -> dict:
+        data = [{"name": str(r[0]), "value": float(r[1] or 0)} for r in rows]
+        return {
+            "title": {"text": title, "left": "center", "textStyle": {"fontSize": 13}},
+            "tooltip": {"trigger": "item"},
+            "legend": {"bottom": 4, "textStyle": {"color": "#667085"}},
+            "series": [{"name": title, "type": "pie", "radius": ["38%", "66%"], "center": ["50%", "46%"], "data": data}],
+        }
+
+    def _city_transaction_map_option(self, title: str, rows, metric_name: str) -> dict:
+        values = [float(r[1] or 0) for r in rows]
+        max_value = max(values) if values else 0
+        data = [
+            {
+                "name": city,
+                "value": self._city_coord(city) + [float(value or 0)],
+            }
+            for city, value in rows
+        ]
+        return {
+            "title": {"text": title, "left": "center", "textStyle": {"fontSize": 13}},
+            "tooltip": {
+                "trigger": "item",
+                "formatter": "{b}<br/>" + metric_name + ": {@[2]}",
+            },
+            "geo": {
+                "map": "china",
+                "roam": False,
+                "label": {"show": False},
+                "itemStyle": {"areaColor": "#eef3fb", "borderColor": "#b8c2d1"},
+                "emphasis": {"itemStyle": {"areaColor": "#dbeafe"}},
+            },
+            "visualMap": {
+                "min": 0,
+                "max": max_value,
+                "left": 18,
+                "bottom": 18,
+                "calculable": True,
+                "inRange": {"color": ["#c7d2fe", "#2563eb"]},
+                "textStyle": {"color": "#667085"},
+            },
+            "series": [
+                {
+                    "name": metric_name,
+                    "type": "effectScatter",
+                    "coordinateSystem": "geo",
+                    "data": data,
+                    "symbolSize": 14,
+                    "encode": {"value": 2},
+                    "rippleEffect": {"brushType": "stroke"},
+                    "itemStyle": {"color": "#1d4ed8"},
+                }
+            ],
+        }
+
     def _write_html(
         self,
         report: Report,
         output_path: str,
         include_charts: bool,
     ):
-        """Write report as styled HTML."""
-        # First write as markdown, then convert basic
+        """Write report as template-based PDF-like HTML with real charts."""
         md_path = output_path.replace(".html", ".md")
         self._write_markdown(report, md_path, include_charts)
 
-        # Simple HTML wrapper with styling
-        # This produces a clean, readable HTML report
-        html_parts = [
-            "<!DOCTYPE html>",
-            '<html lang="zh-CN">',
-            "<head>",
-            '<meta charset="UTF-8">',
-            '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
-            f"<title>{report.title}</title>",
-            "<style>",
-            """
-            :root {
-                --bg: #ffffff; --text: #1a1a2e; --muted: #6b7280;
-                --accent: #3b82f6; --border: #e5e7eb; --card: #f9fafb;
-                --critical: #ef4444; --high: #f59e0b; --medium: #3b82f6; --low: #9ca3af;
-            }
-            @media (prefers-color-scheme: dark) {
-                :root {
-                    --bg: #0f172a; --text: #e2e8f0; --muted: #94a3b8;
-                    --accent: #60a5fa; --border: #1e293b; --card: #1e293b;
-                }
-            }
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: var(--bg); color: var(--text);
-                line-height: 1.7; max-width: 900px; margin: 0 auto; padding: 2rem;
-            }
-            h1 { font-size: 2rem; margin-bottom: 0.5rem; }
-            h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem;
-                 padding-bottom: 0.5rem; border-bottom: 2px solid var(--accent); }
-            h3 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-            p { margin-bottom: 1rem; }
-            .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 0.5rem; }
-            .timestamp { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
-            table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
-            th, td { padding: 0.5rem 1rem; text-align: left; border: 1px solid var(--border); }
-            th { background: var(--card); font-weight: 600; }
-            tr:nth-child(even) { background: var(--card); }
-            blockquote {
-                border-left: 4px solid var(--accent);
-                margin: 1rem 0; padding: 0.75rem 1rem;
-                background: var(--card); border-radius: 0 8px 8px 0;
-            }
-            blockquote p { margin-bottom: 0.25rem; }
-            .severity-critical { border-left-color: var(--critical); }
-            .severity-high { border-left-color: var(--high); }
-            .severity-medium { border-left-color: var(--medium); }
-            hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
-            .footer { color: var(--muted); font-size: 0.85rem; text-align: center; }
-            .badge {
-                display: inline-block; padding: 0.15rem 0.5rem;
-                border-radius: 12px; font-size: 0.75rem; font-weight: 600;
-                margin-right: 0.25rem;
-            }
-            .badge-critical { background: #fef2f2; color: #dc2626; }
-            .badge-high { background: #fffbeb; color: #d97706; }
-            .badge-medium { background: #eff6ff; color: #2563eb; }
-            .badge-low { background: #f3f4f6; color: #6b7280; }
-            ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
-            li { margin-bottom: 0.25rem; }
-            @media (max-width: 768px) {
-                body { padding: 1rem; }
-                table { font-size: 0.85rem; }
-                th, td { padding: 0.35rem 0.5rem; }
-            }
-            </style>""",
-            "</head>",
-            "<body>",
-            f"<h1>{report.title}</h1>",
-        ]
+        table_name = report.metadata.get("table_name", "")
+        row_count = report.metadata.get("row_count", "")
+        chart_panels, chart_bootstrap = self._build_report_charts(table_name) if include_charts and table_name else ("", "")
+        report.metadata["has_charts"] = bool(chart_panels)
+        body = self._html_sections(report)
+        if chart_panels:
+            body += "\n<section id=\"section-charts\"><h2>图表举证</h2>" + chart_panels + "</section>"
 
-        if report.subtitle:
-            html_parts.append(f'<p class="subtitle">{report.subtitle}</p>')
-        html_parts.append(
-            f'<p class="timestamp">📅 生成时间: {report.generated_at[:19]}</p>'
+        template = self._read_report_template()
+        rendered = (
+            template
+            .replace("{{REPORT_TITLE}}", html.escape(report.title))
+            .replace("{{REPORT_SUBTITLE}}", html.escape(report.subtitle or "企业级数据分析报告"))
+            .replace("{{GENERATED_AT}}", html.escape(report.generated_at[:19]))
+            .replace("{{TABLE_NAME}}", html.escape(str(table_name or "-")))
+            .replace("{{ROW_COUNT}}", html.escape(str(row_count or "-")))
+            .replace("{{TABLE_OF_CONTENTS}}", self._html_toc(report))
+            .replace("{{REPORT_BODY}}", body)
+            .replace("{{ECHARTS_JS}}", self._load_echarts_js() + "\n" + self._load_china_map_js())
+            .replace("{{PDF_EXPORT_JS}}", self._load_pdf_export_js())
+            .replace("{{CHART_BOOTSTRAP}}", chart_bootstrap)
         )
-
-        # Build sections
-        for section in report.sections:
-            h_tag = f"h{section.level}"
-            html_parts.append(f"<{h_tag}>{section.heading}</{h_tag}>")
-
-            if section.content:
-                # Simple markdown-to-html for common patterns
-                content = section.content
-                # Convert tables
-                content = self._md_to_html(content)
-                html_parts.append(content)
-
-            # Insight blocks
-            for ins in section.insights:
-                sev_class = f"severity-{ins.severity.value}"
-                badge_class = f"badge-{ins.severity.value}"
-                html_parts.append(
-                    f'<blockquote class="{sev_class}">'
-                    f'<strong>{ins.title}</strong>'
-                    f'<span class="badge {badge_class}">{ins.severity.value}</span>'
-                    f"<p>{ins.description}</p>"
-                )
-                if include_charts and ins.suggested_chart:
-                    html_parts.append(
-                        f'<p style="font-size:0.85rem;color:var(--muted)">'
-                        f'📈 推荐图表: {ins.suggested_chart}</p>'
-                    )
-                html_parts.append("</blockquote>")
-
-        html_parts.append("<hr>")
-        html_parts.append(
-            f'<p class="footer">📊 报告由 <strong>Agent BI</strong> 自动生成 | '
-            f'{report.generated_at[:19]}</p>'
-        )
-        html_parts.append("</body></html>")
 
         with open(output_path, "w", encoding="utf-8") as f:
-            f.write("\n".join(html_parts))
+            f.write(rendered)
 
     def _write_json(
         self,
