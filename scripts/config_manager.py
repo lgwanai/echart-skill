@@ -49,10 +49,21 @@ class OutputConfig:
 
 
 @dataclass
+class PrivacyConfig:
+    """Privacy and audit configuration."""
+    enabled: bool = True
+    mask_pii: bool = False
+    audit_enabled: bool = True
+    read_only: bool = False
+    audit_log_path: str = "logs/audit.log"
+
+
+@dataclass
 class AppConfig:
     """Top-level application configuration."""
     server: ServerConfig = field(default_factory=ServerConfig)
     output: OutputConfig = field(default_factory=OutputConfig)
+    privacy: PrivacyConfig = field(default_factory=PrivacyConfig)
     baidu_ak: str = ""
 
 
@@ -77,6 +88,13 @@ def _default_config() -> dict:
         },
         "output": {
             "dir": DEFAULT_OUTPUT_DIR,
+        },
+        "privacy": {
+            "enabled": True,
+            "mask_pii": False,
+            "audit_enabled": True,
+            "read_only": False,
+            "audit_log_path": "logs/audit.log",
         },
         "baidu_ak": "",
     }
@@ -152,10 +170,19 @@ def get_config(reload: bool = False) -> AppConfig:
     output_cfg = OutputConfig(
         dir=raw.get("output", {}).get("dir", DEFAULT_OUTPUT_DIR),
     )
+    privacy_raw = raw.get("privacy", {})
+    privacy_cfg = PrivacyConfig(
+        enabled=privacy_raw.get("enabled", True),
+        mask_pii=privacy_raw.get("mask_pii", False),
+        audit_enabled=privacy_raw.get("audit_enabled", True),
+        read_only=privacy_raw.get("read_only", False),
+        audit_log_path=privacy_raw.get("audit_log_path", "logs/audit.log"),
+    )
 
     _config_cache = AppConfig(
         server=server_cfg,
         output=output_cfg,
+        privacy=privacy_cfg,
         baidu_ak=raw.get("baidu_ak", ""),
     )
     return _config_cache
@@ -171,4 +198,7 @@ if __name__ == "__main__":  # pragma: no cover
     print(f"Server enabled : {cfg.server.enabled}")
     print(f"Server ports   : {cfg.server.port_range}")
     print(f"Output dir     : {cfg.output.dir}")
+    print(f"Privacy enabled: {cfg.privacy.enabled}")
+    print(f"PII masking    : {cfg.privacy.mask_pii}")
+    print(f"Audit enabled  : {cfg.privacy.audit_enabled}")
     print(f"Baidu AK       : {'***' if cfg.baidu_ak else '(not set)'}")

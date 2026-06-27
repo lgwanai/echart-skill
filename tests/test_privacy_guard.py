@@ -360,8 +360,17 @@ class TestGuardPipeline:
 # ---------------------------------------------------------------------------
 
 class TestIntegration:
-    def test_execute_query_with_sensitive_data(self):
+    def test_execute_query_default_does_not_mask_sensitive_data(self, tmp_path, monkeypatch):
         import duckdb
+        import scripts.config_manager as cm
+
+        config_file = tmp_path / "echart_config.txt"
+        config_file.write_text(
+            f"privacy.mask_pii=false\nprivacy.audit_log_path={tmp_path / 'audit.log'}\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(cm, "_CONFIG_PATH", config_file)
+        monkeypatch.setattr(cm, "_config_cache", None)
 
         tmp = os.path.join(tempfile.gettempdir(), "test_privacy_i.duckdb")
         if os.path.exists(tmp):
@@ -375,15 +384,50 @@ class TestIntegration:
         try:
             from database import get_repository
             import database
-            database._repo = None  # Reset singleton
+            database._cleanup_repo()
             repo = get_repository(tmp)
             rows = repo.execute_query("SELECT name, phone, email, salary FROM users")
             assert len(rows) == 2
-            # Should be masked
-            assert rows[0]["phone"] != "13800001111"
+            assert rows[0]["phone"] == "13800001111"
+            assert rows[0]["email"] == "alice@test.com"
+            assert rows[0]["salary"] == 50000
+            assert rows[0]["name"] == "Alice"
+            assert (tmp_path / "audit.log").exists()
+        finally:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+
+    def test_execute_query_masks_when_config_enabled(self, tmp_path, monkeypatch):
+        import duckdb
+        import scripts.config_manager as cm
+
+        config_file = tmp_path / "echart_config.txt"
+        config_file.write_text(
+            f"privacy.mask_pii=true\nprivacy.audit_log_path={tmp_path / 'audit.log'}\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(cm, "_CONFIG_PATH", config_file)
+        monkeypatch.setattr(cm, "_config_cache", None)
+
+        tmp = os.path.join(tempfile.gettempdir(), "test_privacy_i_enabled.duckdb")
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+        conn = duckdb.connect(tmp)
+        conn.execute("CREATE TABLE users (name TEXT, phone TEXT, email TEXT, salary INTEGER)")
+        conn.execute("INSERT INTO users VALUES ('Alice','13800001111','alice@test.com',50000)")
+        conn.close()
+
+        try:
+            from database import get_repository
+            import database
+            database._cleanup_repo()
+            repo = get_repository(tmp)
+            rows = repo.execute_query("SELECT name, phone, email, salary FROM users")
+            assert rows[0]["phone"] == "138****1111"
             assert "***" in str(rows[0]["email"])
             assert rows[0]["salary"] == "[REDACTED]"
-            assert rows[0]["name"] == "Alice"  # Not sensitive
         finally:
             try:
                 os.unlink(tmp)
@@ -403,7 +447,7 @@ class TestIntegration:
         try:
             from database import get_repository
             import database
-            database._repo = None
+            database._cleanup_repo()
             repo = get_repository(tmp)
             rows = repo.execute_query_raw("SELECT phone FROM t")
             assert rows[0]["phone"] == "13800001111"  # Not masked

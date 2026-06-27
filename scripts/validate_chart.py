@@ -142,6 +142,10 @@ def _chart_bootstrap_before_echarts(parsed_html):
     return False
 
 
+def _has_inlined_echarts_library(parsed_html):
+    return any(_is_echarts_library_script(script) for _, script in parsed_html.scripts)
+
+
 def _custom_inline_scripts(parsed_html):
     scripts = []
     for attrs, script in parsed_html.scripts:
@@ -153,6 +157,31 @@ def _custom_inline_scripts(parsed_html):
             continue
         scripts.append(script)
     return scripts
+
+
+def _strip_js_comments(script: str) -> str:
+    """Remove JS single-line and multi-line comments, keeping line counts intact."""
+    # Remove /* ... */ blocks
+    result = re.sub(r"/\*.*?\*/", " ", script, flags=re.DOTALL)
+    # Remove // comments (but not URLs like https://)
+    result = re.sub(r"(?<!:)//[^\n]*", "", result)
+    return result
+
+
+def _detect_unbalanced_echarts_graphic_calls(scripts):
+    errors = []
+    pattern = re.compile(r"new\s+echarts\.graphic\.(LinearGradient|RadialGradient)\s*\(")
+    for script_index, script in enumerate(scripts, start=1):
+        clean = _strip_js_comments(script)
+        for match in pattern.finditer(clean):
+            call = match.group(1)
+            if not _extract_balanced(clean, match.end() - 1, "(", ")"):
+                errors.append(
+                    f"INVALID JS in custom script #{script_index}: "
+                    f"unclosed echarts.graphic.{call}(...) call — "
+                    f"close the constructor before closing the option object"
+                )
+    return errors
 
 
 def _run_node_syntax_check(scripts):
@@ -320,6 +349,12 @@ def validate(html_path):
             "embed ECharts/map/html2canvas/jsPDF/dashboard assets first, then define and run chart bootstrap"
         )
 
+    if "echarts.init" in content and not _has_inlined_echarts_library(parsed_html):
+        errors.append(
+            "MISSING: inlined ECharts library — generated chart/report/dashboard HTML must embed "
+            "assets/echarts/echarts.min.js before any echarts.init call"
+        )
+
     # 0f. Browser-free structural checks. Standalone chart/dashboard files should
     # not contain frames or file/http asset references. These are especially
     # fragile under file:// unique-origin rules.
@@ -338,6 +373,7 @@ def validate(html_path):
                 )
 
     custom_scripts = _custom_inline_scripts(parsed_html)
+    errors.extend(_detect_unbalanced_echarts_graphic_calls(custom_scripts))
     errors.extend(_run_node_syntax_check(custom_scripts))
 
     # ─────────────────────────────────────────────────────────────

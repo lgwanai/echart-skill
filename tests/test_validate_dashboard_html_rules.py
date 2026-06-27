@@ -3,6 +3,15 @@ from pathlib import Path
 from scripts.validate_chart import validate
 
 
+FAKE_ECHARTS_LIBRARY = (
+    "/* Apache Software Foundation */ var echarts = {"
+    "init:function(){return {setOption:function(){}};},"
+    "graphic:{LinearGradient:function(){},RadialGradient:function(){}}"
+    "};"
+    + ("/* echarts filler */" * 8000)
+)
+
+
 def _dashboard_html(body: str) -> str:
     return f"""
     <html>
@@ -17,6 +26,7 @@ def _dashboard_html(body: str) -> str:
         </style>
       </head>
       <body class="dashboard-container">
+        <script>{FAKE_ECHARTS_LIBRARY}</script>
         <script>
           window.html2canvas = function(){{}};
           window.jspdf = {{ jsPDF: function(){{}} }};
@@ -159,6 +169,61 @@ def test_validate_rejects_chart_bootstrap_before_echarts_library(tmp_path: Path)
       </body>
     </html>
     """)
+
+    assert validate(str(html)) == 1
+
+
+def test_validate_rejects_missing_inlined_echarts_library(tmp_path: Path):
+    html = tmp_path / "chart.html"
+    html.write_text("""
+    <html>
+      <body>
+        <div id="chart"></div>
+        <script>
+          var chart = echarts.init(document.getElementById('chart'));
+          chart.setOption({series:[{type:'bar',data:[1]}]});
+        </script>
+      </body>
+    </html>
+    """)
+
+    assert validate(str(html)) == 1
+
+
+def test_validate_rejects_echarts_cdn_script(tmp_path: Path):
+    html = tmp_path / "chart.html"
+    html.write_text("""
+    <html>
+      <body>
+        <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+        <div id="chart"></div>
+        <script>
+          var chart = echarts.init(document.getElementById('chart'));
+          chart.setOption({series:[{type:'bar',data:[1]}]});
+        </script>
+      </body>
+    </html>
+    """)
+
+    assert validate(str(html)) == 1
+
+
+def test_validate_rejects_unclosed_echarts_linear_gradient(tmp_path: Path):
+    html = tmp_path / "dashboard.html"
+    html.write_text(_dashboard_html("""
+      var option = {
+        series: [{
+          type: 'line',
+          data: [1, 2, 3],
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: 'rgba(56,239,125,0.3)' },
+              { offset: 1, color: 'rgba(56,239,125,0)' }
+            ] }
+          }
+        }]
+      };
+    """))
 
     assert validate(str(html)) == 1
 

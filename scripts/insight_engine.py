@@ -104,6 +104,9 @@ class Insight:
     related_columns: list[str] = field(default_factory=list)
     suggested_chart: Optional[str] = None  # e.g., "bar", "line", "heatmap"
     suggested_chart_config: dict = field(default_factory=dict)
+    confidence: float = 0.0
+    limitations: list[str] = field(default_factory=list)
+    evidence_refs: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         result = asdict(self)
@@ -251,6 +254,9 @@ class InsightEngine:
             changes = self._discover_changes(table, date_column, metric_columns[0])
             all_insights.extend(changes)
 
+        # Step 9: Confidence and limitation annotation
+        all_insights = [self._annotate_insight_confidence(insight) for insight in all_insights]
+
         # Sort by severity priority
         severity_order = {
             Severity.CRITICAL: 0,
@@ -263,6 +269,42 @@ class InsightEngine:
 
         logger.info("分析完成", table=table, insight_count=len(all_insights))
         return all_insights
+
+    def _annotate_insight_confidence(self, insight: Insight) -> Insight:
+        """Populate confidence and limitations when not set by detectors."""
+        if insight.confidence <= 0:
+            base_by_type = {
+                InsightType.SUMMARY: 0.95,
+                InsightType.RANKING: 0.88,
+                InsightType.COMPOSITION: 0.86,
+                InsightType.TREND: 0.78,
+                InsightType.CHANGE: 0.76,
+                InsightType.ANOMALY: 0.72,
+                InsightType.SEASONALITY: 0.65,
+                InsightType.CORRELATION: 0.62,
+                InsightType.OUTLIER: 0.68,
+                InsightType.GAP: 0.70,
+            }
+            confidence = base_by_type.get(insight.type, 0.70)
+            if not insight.evidence:
+                confidence -= 0.20
+            if insight.type in {InsightType.TREND, InsightType.ANOMALY, InsightType.SEASONALITY}:
+                period_count = insight.evidence.get("period_count") or len(insight.evidence.get("monthly_averages", {}))
+                if period_count and period_count < 6:
+                    confidence -= 0.10
+            insight.confidence = round(max(0.1, min(confidence, 0.99)), 2)
+
+        if not insight.limitations:
+            limitations = []
+            if insight.type == InsightType.CORRELATION:
+                limitations.append("相关性不等于因果，需要结合业务事件或外部变量验证。")
+            if insight.type in {InsightType.SEASONALITY, InsightType.TREND, InsightType.ANOMALY, InsightType.CHANGE}:
+                limitations.append("该判断基于当前表内时间序列，未纳入节假日、活动、价格、库存等外部因素。")
+            if not insight.evidence:
+                limitations.append("当前洞察缺少结构化证据，只能作为初步提示。")
+            insight.limitations = limitations
+
+        return insight
 
     def quick_scan(self, table: str) -> list[Insight]:
         """Fast scan — just profiling + ranking + anomalies.

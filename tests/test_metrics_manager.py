@@ -69,3 +69,55 @@ class TestMetricsManager:
         captured = capsys.readouterr()
         assert "成功追加统计口径" in captured.out
         assert metric_file.exists()
+
+    def test_project_metric_only_effective_under_recorded_project(self, tmp_path, monkeypatch):
+        """Project-level scope should be active only inside its project dir."""
+        import scripts.metrics_manager as mm
+
+        global_file = tmp_path / "global_metrics.md"
+        index_file = tmp_path / "project_index.json"
+        project_dir = tmp_path / "project"
+        other_dir = tmp_path / "other"
+        project_dir.mkdir()
+        other_dir.mkdir()
+
+        monkeypatch.setattr(mm, "GLOBAL_METRICS_PATH", global_file)
+        monkeypatch.setattr(mm, "PROJECT_INDEX_PATH", index_file)
+
+        mm.set_metric("全局GMV", "全局 GMV = SUM(amount)", level="global")
+        mm.set_metric("项目GMV", "项目 GMV = SUM(project_amount)", level="project", project_dir=str(project_dir))
+
+        active_inside = mm.render_effective_metrics(project_dir / "subdir")
+        assert "全局GMV" in active_inside
+        assert "项目GMV" in active_inside
+
+        active_outside = mm.render_effective_metrics(other_dir)
+        assert "全局GMV" in active_outside
+        assert "项目GMV" not in active_outside
+
+        index = index_file.read_text(encoding="utf-8")
+        assert str(project_dir.resolve()) in index
+
+    def test_metrics_cli_set_project(self, tmp_path, monkeypatch, capsys):
+        """CLI set --level project should record project directory."""
+        import scripts.metrics_manager as mm
+        from scripts.metrics_manager import main
+
+        index_file = tmp_path / "project_index.json"
+        project_dir = tmp_path / "project"
+        project_dir.mkdir()
+        monkeypatch.setattr(mm, "PROJECT_INDEX_PATH", index_file)
+        monkeypatch.setattr(sys, 'argv', [
+            'metrics_manager.py',
+            'set',
+            '--level', 'project',
+            '--name', '项目订单数',
+            '--desc', 'COUNT(DISTINCT order_id)',
+            '--project-dir', str(project_dir),
+        ])
+
+        main()
+
+        captured = capsys.readouterr()
+        assert "成功设置项目统计口径" in captured.out
+        assert (project_dir / ".echart-skill" / "metrics.md").exists()

@@ -13,11 +13,11 @@ idea.md
 package.sh
 RELEASE_NOTE.md
 
-# 忽略本地 DuckDB 数据库文件（避免上传敏感数据）
-*.db
-*.db-shm
-*.db-wal
+# 忽略本地 DuckDB 数据库文件
 *.duckdb
+
+# 离线依赖包体积较大，作为独立发布产物按需生成
+wheels/
 
 # 忽略本地敏感配置文件
 config.txt
@@ -40,4 +40,3 @@ logs/
 .pytest_cache/
 .ruff_cache/
 test/
-examples/all_356/*.html

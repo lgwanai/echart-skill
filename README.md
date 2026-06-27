@@ -1,31 +1,59 @@
-# Echart Skill v2.0.0 — Agent BI
+# Echart Skill v2.0.0 — Enterprise Agent BI
 
-专门为 AI Agent 设计的本地数据分析与处理技能包（Skill），已从"图表生成器"进化为**AI 分析助手**——自动发现规律、生成报告、理解业务语义、维护对话上下文、预测趋势、解释变化。
+**面向企业数据应用的本地优先 Agent BI 平替方案。**
 
-## 🆕 v2.0 Agent BI — 7 大智能引擎
+它不是一个单纯的 ECharts 图表生成器，而是一套围绕企业数据分析全流程构建的本地 BI 能力包：数据导入、清洗、统计口径、数据质量、专家分析、洞察发现、预测归因、企业报告、交互式 Dashboard、审计和血缘追踪。
 
-| 引擎 | 能力 | 指令 |
-|------|------|------|
-| **Insight Engine** | 自动发现 7 种洞察模式（趋势/异常/排名/构成/相关性/周期/变化） | `/analyze` `/insight` |
-| **Report Engine** | 一键生成专业分析报告（Markdown/HTML/JSON） | `/report` |
-| **Semantic Layer** | 业务语义建模，自然语言→SQL 映射 | 自动生效 |
-| **Context Manager** | 会话记忆，10+ 种追问解析（"上个月呢？""深挖一下"） | `/context` |
-| **Forecast Engine** | 4 种预测方法（移动平均/指数平滑/线性回归/集成），零外部依赖 | `/forecast` |
-| **Attribution Engine** | 指标变化根因分析，贡献度分解 + 自动钻取建议 | `/why` |
-| **Privacy Guard** | 列级 PII 脱敏、只读执行、审计日志 — 企业级数据安全 | 自动生效 |
+核心目标：让企业在不引入重型 BI 平台、不上传业务明细数据、不把数据交给大模型的前提下，用 AI Agent 完成专业、可复核、可交付的数据分析工作。
 
-## 项目亮点
+## 企业级定位
 
-- 🛡️ **绝对安全的数据隐私**：本地 DuckDB 执行，数据绝不出域。**v2.0 新增**：列级 PII 自动脱敏（手机/邮箱/身份证→`138****1234`）、只读执行拦截、审计日志。
-- 🧠 **AI 分析助手**：不再是图表工具——自动发现数据规律、生成分析报告、理解追问上下文、预测趋势、归因分析。
-- 📊 **27 种图表 + 354 官方案例**：内置完整 ECharts 知识库，覆盖 **27 种图表类型**（含 3D、地理、关系图、桑基图等），每个案例为自包含 .md 配方文件。
-- 🧩 **自包含单文件 HTML**：生成的图表为完全自包含的单一 HTML 文件，离线可用。
-- 🤖 **Dashboard 自然语言生成**：一句话描述即生成专业仪表盘，**v2.0 支持 `--insights` 洞察卡片**。
-- 🎨 **专业 Dashboard UI/UX**：9 大交互功能（主题切换、导出 PDF、自动刷新、图表搜索）。
-- 🗺️ **三层级地图架构**：省份→城市→区县，优先静态本地地图。
-- 💻 **20 个显性指令**：`/forecast` `/why` `/context` `/analyze` `/report` 等，兼顾精准指令与自然语言。
-- 🔗 **外部数据库**：MySQL、PostgreSQL、MongoDB、SQLite 查询与导入。
-- 🔒 **Privacy Guard**：敏感列自动检测与脱敏、只读模式、审计追踪（`logs/audit.log`）。
+| 企业诉求 | echart-skill 的做法 |
+|---|---|
+| **替代传统 BI 的分析应用层** | 用 Agent + DuckDB + ECharts + 专家工作流生成仪表盘、报告、图表、洞察和导出文件 |
+| **数据安全** | 数据分析在本地执行；业务明细数据默认不联网、不过大模型；大模型只负责规划、解释和生成代码/报告结构 |
+| **可审计** | 查询访问、用户指令、脱敏状态、query hash、产物血缘均可记录，支持按日期生成审计报告 |
+| **口径一致** | 支持全局/项目级统计口径；项目级口径只在记录的项目目录及子目录下生效 |
+| **专业分析** | 内置销售、电商、增长、财务、运营、会员、营销、风控、数据质量等专家分析模式 |
+| **强可视化** | 内置 ECharts 6 本地资源、27 类图表、354 个官方配方、地图/3D/关系图/桑基/漏斗/仪表盘等复杂图表 |
+| **高质量输出** | Dashboard 与 Report 使用企业级 HTML 骨架、质量门校验、图表证据、附录数据和统计口径说明 |
+
+## 安全与合规承诺
+
+| 能力 | 说明 |
+|---|---|
+| **0 联网分析链路** | CSV/Excel/DuckDB 查询、清洗、统计、洞察、报告生成均在本地完成；自包含 HTML 离线可打开 |
+| **0 明细过大模型** | 不把整表、明细行、原始文件内容塞进模型上下文；模型只接收 schema、聚合结果、样本级摘要或你显式提供的内容 |
+| **PII 脱敏可控** | 脱敏默认关闭；可通过 `/privacy mask on` 开启手机号、邮箱、身份证、银行卡、薪资、地址等字段脱敏 |
+| **审计报告** | `/audit-report --date YYYY-MM-DD` 输出当天用户指令、查询表、访问列、行数、脱敏状态、分类级别和 query hash |
+| **数据血缘** | `/lineage` 记录报告、Dashboard、图表、导出文件对应的来源表、字段、统计口径和 query hash |
+| **数据质量评分** | `/quality` 输出缺失率、重复行、常量列、疑似 ID 字段、质量分和分析限制 |
+
+> 说明：如果用户显式配置外部数据库、HTTP/API 数据源或第三方地图地理编码，相关连接会按用户配置发起。默认本地分析与输出链路不依赖联网资源。
+
+## 核心能力
+
+| 模块 | 企业级能力 | 指令 |
+|---|---|---|
+| **Data Import & Cleaning** | Excel/CSV 导入、合并单元格处理、表名标准化、引导式清洗、非破坏式中间表 | `/import` `/clean` |
+| **Semantic Scope** | 全局/项目级统计口径，保证不同报告和 Dashboard 使用同一指标定义 | `/scope` `/metrics` |
+| **Data Quality** | 数据完整性、重复、常量列、疑似 ID、质量评分和限制说明 | `/quality` |
+| **Insight Engine** | 自动发现趋势、异常、排名、构成、相关性、周期、变化，并输出置信度与限制 | `/analyze` `/insight` |
+| **Expert Report** | 专家库驱动的金字塔结构企业报告，结论先行、图表举证、归因解释、行动建议 | `/report` |
+| **Dashboard BI** | 自然语言生成企业级 Dashboard，支持 KPI、趋势、排行、结构、异常、地理、交互筛选 | `/dashboard` |
+| **Forecast & Attribution** | 趋势预测、指标变化归因、贡献度分解、自动钻取建议 | `/forecast` `/why` |
+| **Visualization Engine** | 27 类图表、354 个 ECharts 官方配方、本地地图、3D、关系图、桑基图、漏斗图等 | `/chart` `/chart-list` |
+| **Audit & Lineage** | 指令审计、查询审计、产物血缘、query hash、审计报告 | `/audit-report` `/lineage` |
+| **Context Manager** | 会话记忆和追问解析，支持“上个月呢”“和去年同期比”“深挖一下” | `/context` |
+
+## 为什么适合作为企业 BI 平替
+
+- **轻部署**：一个 Skill 包 + Python 依赖即可运行，不要求企业先部署完整 BI Server。
+- **低数据风险**：分析计算落在本地 DuckDB，输出为本地文件；敏感数据不需要进入云端 BI 或大模型。
+- **强分析深度**：不止展示指标，还能做质量检查、异常解释、变化归因、趋势预测和专家诊断。
+- **强交付能力**：输出可直接交付的企业 HTML 报告、交互 Dashboard、图表 HTML、CSV/Excel 导出。
+- **强治理能力**：统计口径、审计日志、数据血缘、质量报告让结果可追溯、可复核、可治理。
+- **强可视化能力**：不是简单 matplotlib 图，而是企业级 ECharts 交互可视化，支持复杂业务场景。
 
 ---
 
@@ -74,7 +102,7 @@
 
 2. **安装 Python 依赖**
 
-   > 💡 **网络不佳？** 如果发布包已包含 `wheels/` 目录，直接使用下方的离线安装命令，无需联网下载。
+   > 💡 默认发布包不再内置 `wheels/`，依赖从 PyPI 在线安装；离线 wheels 如需使用，应作为单独归档提供。
 
    **在线安装（默认）：**
    ```bash
@@ -85,7 +113,7 @@
    pip install -r requirements-core.txt
    ```
 
-   **离线安装（无需网络）：**
+   **离线安装（需单独提供 wheels/ 目录）：**
    ```bash
    # macOS / Linux
    bash scripts/install.sh --offline
@@ -220,6 +248,14 @@ Step 7: python scripts/validate_chart.py <output.html> 硬校验
 | 地图 JS (china.js 等) | Agent 内联到 `<script>` | 地图类型自动检测 |
 | echarts-gl.min.js (625KB) | Agent 内联到 `<script>` | 3D 图表 |
 
+**ECharts 稳定性铁律：**
+
+- 只要 HTML 中出现 `echarts.init`，就必须在它之前内联完整的 `assets/echarts/echarts.min.js`。
+- 禁止 `<script src="https://cdn.jsdelivr.net/.../echarts.min.js">`、`<script src="./echarts.min.js">`、运行时 `script.src = ...`。
+- 禁止用占位 stub 冒充 ECharts 库；校验器必须看到真实内联库。
+- `new echarts.graphic.LinearGradient(...)` / `RadialGradient(...)` 必须括号完整闭合，少一个 `)` 会导致整页图表脚本失败。
+- `python scripts/validate_chart.py <output.html>` 失败时，不能返回用户，必须修复后重跑。
+
 ```bash
 # Agent 自动生成自包含 HTML（inline ECharts + div#main + script）：
 # Agent: DuckDB 查询 → .md 配方结构 → 替换 data → 包裹 HTML 壳 → 校验
@@ -237,7 +273,7 @@ Step 7: python scripts/validate_chart.py <output.html> 硬校验
 ```
 Step 1: 查 references/knowledge/INDEX.md → 定位知识文件
 Step 2: 读知识片段（concepts/chart-types/api/patterns）→ 语法约束
-Step 3: 读 354 案例 .md → 参考代码
+Step 3: 读 354 案例 .md → 参考代码；冷门/归档资产从 DuckDB 资产库检索
 Step 4: 知识 + 案例一起提交 → 生成完整 option
 ```
 
@@ -246,18 +282,15 @@ Step 4: 知识 + 案例一起提交 → 生成完整 option
 ```
 echart-skill/
 ├── references/
-│   ├── examples/            # 354 个 .md 自包含图表配方（优先使用）
+│   ├── examples/            # 354 个 .md 自包含图表配方（唯一参考）
 │   │   └── INDEX.md         # 配方映射决策表
-│   ├── templates/           # 41 个 HTML 模板（辅助参考）
-│   │   └── INDEX.md         # 模板映射表
-│   ├── knowledge/           # 知识库（兜底使用）
+│   ├── knowledge/           # 知识库
 │   │   ├── INDEX.md         # 主索引
 │   │   ├── concepts/  8 个  # 核心概念
 │   │   ├── chart-types/  4 个 # 图表类型语法指南
 │   │   ├── api/  6 个       # API 参考
 │   │   ├── patterns/  10 个 # 最佳实践
 │   │   └── examples/INDEX.md # 案例索引
-│   └── prompts/             # ⚠️ 已废弃
 ├── workflow_specs/          # Agent 工作流规范
 │   ├── dashboard_workflow.md   # Dashboard 规划流程
 │   ├── report_workflow.md      # 报告生成流程
@@ -291,6 +324,21 @@ echart-skill/
 ├── scripts/                 # Python 工具脚本
 ├── tests/                   # 测试文件（40+ 测试文件）
 └── outputs/                 # 输出目录（html/configs/reports）
+```
+
+### 案例检索
+
+图表配方直接搜索 `references/examples/*.md` 文件，无需构建索引。
+
+```bash
+# 搜索图表配方
+python scripts/reference_assets.py search "bar race" --limit 5
+
+# 读取完整配方内容
+python scripts/reference_assets.py get references/examples/bar-race.md
+
+# 按图表类型列出
+python scripts/reference_assets.py list --chart-type line --limit 20
 ```
 
 ---
@@ -720,6 +768,11 @@ http_config.auth.token=${API_TOKEN}
 | `/tables` | `/t`, `/表` | 查看表结构 | `/tables sales` |
 | `/history` | `/h`, `/历史` | 导入历史 | `/history --limit 20` |
 | `/metrics` | `/m`, `/口径` | 指标管理 | `/metrics add 月活用户` |
+| `/scope` | `/统计口径`, `/口径设置` | 统计口径设置（全局/项目级） | `/scope set --level project --name GMV --desc "SUM(amount)"` |
+| `/privacy` | `/隐私` | 隐私配置，脱敏默认关闭，可开启 | `/privacy mask on` |
+| `/audit-report` | `/审计报告` | 按日期生成指令与查询审计报告 | `/audit-report --date 2026-06-27` |
+| `/quality` | `/数据质量` | 数据质量评分与问题报告 | `/quality orders --format markdown` |
+| `/lineage` | `/血缘` | 记录或查询产物数据血缘 | `/lineage list --table orders` |
 | `/help` | `/?`, `/帮助` | 显示帮助 | `/help` |
 | `/clean` | `/清洗`, `/清理` | 数据内容清洗或清理旧数据 | `/clean orders --config rules.json` |
 | `/poll` | `/轮询` | 轮询管理 | `/poll status` |
@@ -864,12 +917,10 @@ http_config.auth.token=${API_TOKEN}
 | 方式 | 适用场景 | 命令 | 是否需要网络 |
 |------|----------|------|:---:|
 | 在线安装 | 网络良好 | `pip install -r requirements.txt` | ✅ 是 |
-| 离线安装 | 网络差/无网络 | `bash scripts/install.sh --offline` | ❌ 否 |
-| 核心依赖 | 仅需基础功能 | `bash scripts/install.sh --offline --core-only` | ❌ 否 |
+| 离线安装 | 单独拿到了 wheels 归档 | `bash scripts/install.sh --offline` | ❌ 否 |
+| 核心依赖 | 仅需基础功能 | `bash scripts/install.sh --core-only` | ✅ 是 |
 
-> 💡 **离线包说明**：如果发布包 (`echart-skill_*.zip`) 内包含 `wheels/` 目录（约 323 MB），
-> 用户端运行 `install.sh` / `install.bat` 时会自动检测并使用本地 wheels，完全跳过 PyPI 下载。
-> 维护者生成离线包：`bash scripts/download_wheels.sh && bash package.sh --offline`。
+> 💡 **离线包说明**：默认 skill 包不再内置 `wheels/`。如确实需要离线安装，维护者可单独运行 `bash scripts/download_wheels.sh` 生成 wheels 归档，并随包外分发。
 
 ### 通用安装步骤
 
@@ -954,6 +1005,11 @@ setx BAIDU_AK "你的百度地图AK"
 server.enabled=false
 server.port_range=8100,8200
 output.dir=outputs/html
+privacy.enabled=true
+privacy.mask_pii=false
+privacy.audit_enabled=true
+privacy.read_only=false
+privacy.audit_log_path=logs/audit.log
 baidu_ak=
 ```
 
@@ -962,12 +1018,63 @@ baidu_ak=
 | `server.enabled` | `false` | 是否在生成图表后启动本地 HTTP 预览服务 |
 | `server.port_range` | `8100,8200` | 服务端口范围 |
 | `output.dir` | `outputs/html` | 图表 HTML 输出目录（相对于项目根目录） |
+| `privacy.enabled` | `true` | 是否启用隐私与审计管线 |
+| `privacy.mask_pii` | `false` | 是否开启 PII 脱敏；默认关闭 |
+| `privacy.audit_enabled` | `true` | 是否写入查询/指令审计日志 |
+| `privacy.read_only` | `false` | 兼容旧配置的可选 SQL 变更保护开关；默认不启用权限或写入管理 |
+| `privacy.audit_log_path` | `logs/audit.log` | 审计日志路径 |
 | `baidu_ak` | `""` | 百度地图 AK（也可通过环境变量 `BAIDU_AK` 设置） |
 
 > 💡 **提示**：
 > - 服务关闭时，生成图表后直接显示文件绝对路径（`file:///...`）。
 > - 所有图表 HTML 为**自包含单文件**，可在任意浏览器中离线打开。
 > - `baidu_ak` 优先级：环境变量 `BAIDU_AK` > `echart_config.txt`。
+
+### 统计口径与审计
+
+统计口径分两级：
+
+- 全局口径：`python scripts/metrics_manager.py set --level global --name "GMV" --desc "SUM(pay_amount)"`，写入 `references/metrics.md`，所有项目生效。
+- 项目口径：`python scripts/metrics_manager.py set --level project --name "GMV" --desc "SUM(pay_amount)" --project-dir "$PWD"`，写入当前项目 `.echart-skill/metrics.md`，并登记项目目录。只有执行目录位于该项目目录或子目录时才生效。
+- 查询当前生效口径：`python scripts/metrics_manager.py effective --cwd "$PWD"`。
+
+脱敏默认关闭：设置 `privacy.mask_pii=true` 后，默认查询入口会按敏感列规则脱敏；`execute_query_raw()` 仅用于明确需要原始数据的内部计算。
+
+审计报告：
+
+```bash
+python scripts/audit_report.py log-command "/report sales --format html" --cwd "$PWD" --status started
+python scripts/audit_report.py report --date 2026-06-27 --days 1 --print
+```
+
+报告会输出当天记录到的用户指令、查询表、访问列、行数、脱敏状态、分类级别、变更操作标记和 query hash。
+
+### 数据质量与血缘
+
+数据质量评分：
+
+```bash
+python scripts/data_quality.py orders --db workspace.duckdb --format markdown --print
+```
+
+报告包含质量分、等级、缺失率、重复行、常量列、疑似 ID 字段和改进建议。生成企业报告或 Dashboard 前建议先跑质量评分；当等级为 C/D 或存在 high/critical 问题时，报告结论应标注为“初步判断”并说明数据限制。
+
+数据血缘记录：
+
+```bash
+python scripts/lineage_manager.py record \
+  --artifact outputs/reports/orders.html \
+  --type report \
+  --tables orders \
+  --columns amount,region \
+  --query "SELECT region, SUM(amount) FROM orders GROUP BY region" \
+  --metrics GMV \
+  --generated-by "/report orders"
+
+python scripts/lineage_manager.py list --table orders
+```
+
+血缘记录写入 `outputs/lineage/lineage.jsonl`，记录产物路径、来源表、字段、query hash、统计口径和生成指令。默认不保存 SQL 明文，避免泄露敏感查询细节。
 
 ---
 
@@ -1010,7 +1117,7 @@ A: 支持主题切换（深色/浅色）、自动刷新、导出 PDF、图表搜
 | 归因分析 | `scripts/attribution_engine.py` | 指标变化贡献度分解 + 钻取建议 |
 | 会话管理 | `scripts/context_manager.py` | 追问解析、时间引用、意图检测 |
 | 语义建模 | `scripts/semantic_model.py` | 自然语言→SQL 映射，列自动分类 |
-| 隐私保护 | `scripts/privacy_guard.py` | 列级 PII 脱敏、只读拦截、审计日志 |
+| 隐私保护 | `scripts/privacy_guard.py` | 列级 PII 识别与脱敏、查询审计日志、敏感级别记录 |
 | 数据合并 | `scripts/data_merger.py` | 合并多个表格，支持导出和入库 |
 | 数据清洗 | Agent + `workflow_specs/data_cleaning_workflow.md` + `scripts/data_cleaner.py` | 类型转换、缺失/重复/异常处理、多列唯一键排重、规则引擎、跨表验证、脱敏 |
 | 本地服务 | `scripts/server.py` / `server_cli.py` | 本地 HTTP 服务，预览图表 |

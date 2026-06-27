@@ -202,8 +202,10 @@ Every chart embedded in a report must be generated from an explicit chart recipe
 3. Query or calculate the exact evidence table that powers the chart.
 4. Generate a standalone ECharts option from that recipe and data.
 5. Generate charts one by one. Do not assemble the report until each chart has a stable chart ID, selected recipe name, option, and appendix data reference.
-6. Embed the validated chart specs into the report template as a `reportChartSpecs` list; initialize each chart independently so one failed chart cannot break all other charts.
-7. Cite the appendix data table ID used by the chart.
-8. Validate the generated HTML with `python scripts/validate_chart.py <output.html>` when possible.
+6. Embed the full local `assets/echarts/echarts.min.js` library before any report chart bootstrap code. CDN scripts, local `<script src>`, runtime loaders, and placeholder ECharts stubs are invalid.
+7. Embed the validated chart specs into the report template as a `reportChartSpecs` list; initialize each chart independently so one failed chart cannot break all other charts.
+8. Keep ECharts JavaScript syntactically closed. In particular, `new echarts.graphic.LinearGradient(...)` and `new echarts.graphic.RadialGradient(...)` must close the constructor with `)` before closing the surrounding option object.
+9. Cite the appendix data table ID used by the chart.
+10. Validate the generated HTML with `python scripts/validate_chart.py <output.html>` when possible. If it fails for external ECharts CDN, missing inlined ECharts library, or unclosed graphic constructor, repair and rerun before returning.
 
 Do not create charts by freehand memory when a recipe exists. If a required recipe is missing, state the gap and choose the closest supported recipe from the index.

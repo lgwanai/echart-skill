@@ -1,79 +1,35 @@
-"""Tests for API key configuration."""
+"""Tests for API key configuration and app config."""
 
-import pytest
 import os
-import tempfile
-import warnings
 import sys
 
-# Add project root to path for imports
+import pytest
+
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
-sys.path.insert(0, os.path.join(project_root, 'scripts'))
+sys.path.insert(0, os.path.join(project_root, "scripts"))
 
 
-def test_api_key_from_env(monkeypatch):
-    """API key should be read from environment variable."""
-    # Set environment variable
-    monkeypatch.setenv('BAIDU_AK', 'test_api_key_123')
-
-    # Re-import to pick up new env
-    import importlib
-    import scripts.chart_generator as cg
-    importlib.reload(cg)
-
-    ak = cg.get_baidu_ak()
-    assert ak == 'test_api_key_123'
+def test_baidu_ak_from_config_file(monkeypatch, tmp_path):
+    """Baidu AK should be read from config file."""
+    import scripts.config_manager as cm
+    config_file = tmp_path / "echart_config.txt"
+    config_file.write_text("baidu_ak=env_key_123\n", encoding="utf-8")
+    monkeypatch.setattr(cm, "_CONFIG_PATH", config_file)
+    monkeypatch.setattr(cm, "_config_cache", None)
+    cfg = cm.get_config(reload=True)
+    assert cfg.baidu_ak == "env_key_123"
 
 
-def test_api_key_fallback_to_config(monkeypatch, tmp_path):
-    """Fallback to config.txt should show deprecation warning."""
-    # Ensure no env var
-    monkeypatch.delenv('BAIDU_AK', raising=False)
-
-    # Create config.txt
-    config_file = tmp_path / "config.txt"
-    config_file.write_text("BAIDU_AK=config_key_456\n", encoding='utf-8')
-
-    import importlib
-    import scripts.chart_generator as cg
-
-    # Create a mock function that reads from our temp config
-    base_dir = str(tmp_path)
-
-    def mock_get_baidu_ak():
-        """Mock version that uses temp directory."""
-        # Primary: environment variable (already cleared)
-        ak = os.environ.get('BAIDU_AK')
-        if ak:
-            return ak
-
-        # Fallback: config.txt (DEPRECATED)
-        config_path = os.path.join(base_dir, 'config.txt')
-
-        if os.path.exists(config_path):
-            with open(config_path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    if line.startswith('BAIDU_AK='):
-                        ak = line.strip().split('=', 1)[1]
-                        if ak:
-                            warnings.warn(
-                                "从 config.txt 读取 BAIDU_AK 已弃用，请设置环境变量 BAIDU_AK",
-                                DeprecationWarning,
-                                stacklevel=2
-                            )
-                            return ak
-
-        return None
-
-    # Test the mock function captures warning
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        ak = mock_get_baidu_ak()
-        assert ak == 'config_key_456'
-        assert len(w) == 1
-        assert issubclass(w[0].category, DeprecationWarning)
-        assert "已弃用" in str(w[0].message)
+def test_baidu_ak_missing(monkeypatch, tmp_path):
+    """Missing BAIDU_AK should result in empty string."""
+    import scripts.config_manager as cm
+    config_file = tmp_path / "echart_config.txt"
+    config_file.write_text("", encoding="utf-8")
+    monkeypatch.setattr(cm, "_CONFIG_PATH", config_file)
+    monkeypatch.setattr(cm, "_config_cache", None)
+    cfg = cm.get_config(reload=True)
+    assert cfg.baidu_ak == ""
 
 
 def test_app_config_txt_roundtrip(monkeypatch, tmp_path):
@@ -88,11 +44,17 @@ def test_app_config_txt_roundtrip(monkeypatch, tmp_path):
     assert config_file.exists()
     assert cfg.server.enabled is False
     assert cfg.server.port_range == [8100, 8200]
+    assert cfg.privacy.mask_pii is False
+    assert cfg.privacy.audit_enabled is True
+    assert cfg.privacy.read_only is False
 
     config_file.write_text(
         "server.enabled=true\n"
         "server.port_range=8201,8210\n"
         "output.dir=custom/html\n"
+        "privacy.mask_pii=true\n"
+        "privacy.audit_enabled=false\n"
+        "privacy.audit_log_path=tmp/audit.log\n"
         "baidu_ak=abc123\n",
         encoding="utf-8",
     )
@@ -101,29 +63,7 @@ def test_app_config_txt_roundtrip(monkeypatch, tmp_path):
     assert cfg.server.enabled is True
     assert cfg.server.port_range == [8201, 8210]
     assert cfg.output.dir == "custom/html"
+    assert cfg.privacy.mask_pii is True
+    assert cfg.privacy.audit_enabled is False
+    assert cfg.privacy.audit_log_path == "tmp/audit.log"
     assert cfg.baidu_ak == "abc123"
-
-
-def test_api_key_missing(monkeypatch):
-    """Missing API key should return None."""
-    # Ensure no env var and no config
-    monkeypatch.delenv('BAIDU_AK', raising=False)
-
-    import importlib
-    import scripts.chart_generator as cg
-    importlib.reload(cg)
-
-    # Create a temp directory without config.txt for testing
-    import tempfile
-    with tempfile.TemporaryDirectory() as tmpdir:
-        # Override base_dir temporarily in the function
-        original_file = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            'config.txt'
-        )
-
-        # If config.txt exists in project, this test may not return None
-        # So we just verify it doesn't crash
-        result = cg.get_baidu_ak()
-        # Result could be None, empty string, or a value from existing config
-        assert result is None or isinstance(result, str)

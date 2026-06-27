@@ -17,6 +17,12 @@ incompatibility. Treat this as a blocking quality gate, not optional advice.
 5. The final HTML must pass `python scripts/validate_chart.py <output.html>`.
 6. Browser automation is optional only; the required quality gate must work
    without opening a browser.
+7. A file that contains `echarts.init` but does not contain an inlined
+   `assets/echarts/echarts.min.js` library is invalid even if it has no
+   `<script src>` tag.
+8. ECharts graphic constructors such as
+   `new echarts.graphic.LinearGradient(...)` must be syntactically closed
+   before the surrounding option object is closed.
 
 ## Library Embedding Order
 
@@ -32,6 +38,19 @@ Embed scripts in this order:
 
 Do not place chart bootstrap code before ECharts or map registration.
 
+The generated HTML must embed the actual local ECharts library, not a CDN and
+not a placeholder. This is a hard rule for charts, reports, and dashboards:
+
+```html
+<!-- Wrong: file:// output becomes network-dependent and unstable. -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+<!-- Right: read assets/echarts/echarts.min.js and inline the full content. -->
+<script>
+/* full local ECharts library content */
+</script>
+```
+
 Chart option strings must be valid JavaScript. If an ECharts label needs a line
 break, write an escaped newline:
 
@@ -45,6 +64,27 @@ Do not split a quoted string over two physical lines:
 // Wrong: this creates a SyntaxError and prevents initCharts from being defined.
 label: { formatter: "{b}
 {d}%" }
+```
+
+Gradient constructors must also be balanced. The following pattern is invalid
+and blocks every chart initialized after it:
+
+```js
+// Wrong: missing ")" before closing the option object.
+areaStyle: {
+  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+    { offset: 0, color: "rgba(56,239,125,0.3)" },
+    { offset: 1, color: "rgba(56,239,125,0)" }
+  ] }
+}
+
+// Right.
+areaStyle: {
+  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+    { offset: 0, color: "rgba(56,239,125,0.3)" },
+    { offset: 1, color: "rgba(56,239,125,0)" }
+  ])
+}
 ```
 
 ## Forbidden Patterns
@@ -63,6 +103,10 @@ These patterns are blocking failures:
 - `location.href = ...`
 - `document.createElement("iframe")`
 - chart bootstrap scripts before the inlined ECharts library
+- `echarts.init` without the full local `assets/echarts/echarts.min.js`
+  content inlined earlier in the file
+- unclosed `new echarts.graphic.LinearGradient(...)` or
+  `new echarts.graphic.RadialGradient(...)`
 - raw line breaks inside JavaScript string literals, especially ECharts
   formatter strings
 - any `file://` value in generated business script, tag `src`, tag `href`, or
@@ -171,6 +215,9 @@ The validator must check:
 - runtime navigation or self-load patterns in custom scripts
 - unresolved template placeholders
 - ECharts initialization and `setOption`
+- actual inlined ECharts library before chart initialization
+- balanced `echarts.graphic.LinearGradient(...)` and
+  `echarts.graphic.RadialGradient(...)` constructor calls
 - chart type and non-empty data
 - dashboard controller, CSS markers, PDF export dependencies, and
   `downloadChart`
@@ -211,3 +258,6 @@ python scripts/validate_chart.py <output.html>
 ```
 
 For dashboard outputs, also run a real browser smoke test where possible.
+If validation reports an external ECharts CDN, missing inlined ECharts library,
+or an unclosed ECharts graphic constructor, repair those first because they
+usually prevent all charts from rendering.

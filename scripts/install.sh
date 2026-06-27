@@ -2,13 +2,13 @@
 # =============================================================================
 # echart-skill Installer (macOS / Linux)
 # =============================================================================
-# Installs echart-skill Python dependencies.  Tries offline (local wheels)
-# first so that installation works on slow / no-network machines.
+# Installs echart-skill Python dependencies. Online PyPI installation is the
+# default; local wheels are only for separately distributed offline archives.
 #
 # Usage:
 #   bash scripts/install.sh              # full install (core + optional)
 #   bash scripts/install.sh --core-only  # core dependencies only
-#   bash scripts/install.sh --offline    # force offline mode (must have wheels/)
+#   bash scripts/install.sh --offline    # force separately supplied wheels/
 # =============================================================================
 
 set -euo pipefail
@@ -89,8 +89,7 @@ if $OFFLINE_MODE; then
     ok "Offline mode — installing from pre-downloaded wheels"
 else
     info "Online mode — installing from PyPI"
-    warn "If your network is slow, use: bash scripts/install.sh --offline"
-    warn "(requires pre-downloaded wheels in the 'wheels/' directory)"
+    warn "Offline wheels are not bundled in the skill package."
 fi
 
 REQ_FILE="$FULL_REQ"

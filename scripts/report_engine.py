@@ -766,8 +766,9 @@ class ReportEngine:
         return template_path.read_text(encoding="utf-8")
 
     def _read_chart_recipe_context(self, recipe_name: str) -> str:
-        """Read the ECharts md recipe used as generation context."""
-        path = Path(__file__).resolve().parents[1] / "references" / "examples" / recipe_name
+        """Read the ECharts md recipe from disk."""
+        root = Path(__file__).resolve().parents[1]
+        path = root / "references" / "examples" / recipe_name
         try:
             return path.read_text(encoding="utf-8")
         except OSError:

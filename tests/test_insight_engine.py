@@ -321,6 +321,20 @@ class TestInsightDataClass:
         assert d["severity"] == "medium"
         assert d["title"] == "测试洞察"
         assert d["evidence"] == {"key": "value"}
+        assert "confidence" in d
+        assert "limitations" in d
+        assert "evidence_refs" in d
+
+    def test_analyze_populates_confidence(self, engine_with_data):
+        insights = engine_with_data.analyze("test_sales", date_column="order_date")
+        assert insights
+        assert all(0.0 < ins.confidence <= 1.0 for ins in insights)
+        trend_like = [
+            ins for ins in insights
+            if ins.type in {InsightType.TREND, InsightType.ANOMALY, InsightType.CHANGE, InsightType.SEASONALITY}
+        ]
+        if trend_like:
+            assert any(ins.limitations for ins in trend_like)
 
     def test_column_profile_defaults(self):
         """Test ColumnProfile default values."""

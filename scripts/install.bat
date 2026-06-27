@@ -2,13 +2,13 @@
 REM =============================================================================
 REM echart-skill Installer (Windows)
 REM =============================================================================
-REM Installs echart-skill Python dependencies.  Tries offline (local wheels)
-REM first so that installation works on slow / no-network machines.
+REM Installs echart-skill Python dependencies. Online PyPI installation is the
+REM default; local wheels are only for separately distributed offline archives.
 REM
 REM Usage:
 REM   scripts\install.bat                 full install (core + optional)
 REM   scripts\install.bat --core-only     core dependencies only
-REM   scripts\install.bat --offline       force offline mode (must have wheels\)
+REM   scripts\install.bat --offline       force separately supplied wheels\
 REM =============================================================================
 
 setlocal enabledelayedexpansion
@@ -125,7 +125,7 @@ if !OFFLINE_MODE!==1 (
     echo [ OK ] Offline mode - installing from pre-downloaded wheels
 ) else (
     echo [INFO] Online mode - installing from PyPI
-    echo [WARN] If network is slow, use: scripts\install.bat --offline
+    echo [WARN] Offline wheels are not bundled in the skill package.
 )
 
 set "REQ_FILE=%FULL_REQ%"

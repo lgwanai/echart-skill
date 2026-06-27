@@ -22,6 +22,16 @@ from typing import Iterator, Optional
 import duckdb
 
 
+def _infer_table_name(query: str) -> str:
+    """Best-effort table label for audit and column classification."""
+    import re
+
+    match = re.search(r"\bfrom\s+([\"`]?[a-zA-Z_][\w]*[\"`]?)", query, re.IGNORECASE)
+    if match:
+        return match.group(1).strip('"`')
+    return "query_result"
+
+
 class DatabaseRepository:
     """Thread-safe DuckDB repository with connection pooling.
 
@@ -115,11 +125,11 @@ class DatabaseRepository:
         finally:
             self._pool.put(conn)
 
-    def execute_query(self, query: str, params: tuple = ()) -> list[dict]:
-        """Execute a parameterized SELECT query and return results.
+    def execute_query_raw(self, query: str, params: tuple = ()) -> list[dict]:
+        """Execute a parameterized query and return unmasked raw results.
 
         Args:
-            query: SQL query string (SELECT statements).
+            query: SQL query string.
             params: Query parameters (default: empty tuple).
 
         Returns:
@@ -136,9 +146,35 @@ class DatabaseRepository:
                 conn.execute(query, params)
             else:
                 conn.execute(query)
+            if conn.description is None:
+                return []
             columns = [desc[0] for desc in conn.description]
             rows = conn.fetchall()
             return [dict(zip(columns, row)) for row in rows]
+
+    def execute_query(self, query: str, params: tuple = ()) -> list[dict]:
+        """Execute a query through the default privacy and audit pipeline.
+
+        PII masking is controlled by ``echart_config.txt`` and is off by
+        default. Audit logging is on by default so query access remains
+        traceable even when masking is disabled.
+        """
+        from scripts.config_manager import get_config
+        from scripts.privacy_guard import PrivacyGuard
+
+        cfg = get_config()
+        guard = PrivacyGuard(
+            enabled=cfg.privacy.enabled,
+            read_only=cfg.privacy.read_only,
+            audit_enabled=cfg.privacy.audit_enabled,
+            mask_pii=cfg.privacy.mask_pii,
+            audit_log_path=cfg.privacy.audit_log_path,
+        )
+
+        guard.enforce_read_only(query)
+        rows = self.execute_query_raw(query, params)
+        columns = list(rows[0].keys()) if rows else []
+        return guard.guard_query(query, _infer_table_name(query), columns, rows)
 
     def execute_many(self, query: str, params_list: list[tuple]) -> int:
         """Execute many INSERT/UPDATE operations efficiently.
