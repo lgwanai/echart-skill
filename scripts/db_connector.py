@@ -787,32 +787,87 @@ def create_connector(config: ConnectionProfile) -> DatabaseConnector:
 def execute_query(
     profile_name: str,
     query: str,
-    config_path: Optional[str] = None
+    config_path: Optional[str] = None,
+    audit: bool = True,
 ) -> List[Dict[str, Any]]:
     """Execute a query against a named connection profile.
-    
+
     Convenience function that loads config, creates connector,
     executes query, and closes connection.
-    
+
+    When ``audit=True`` (default), results are passed through the
+    PrivacyGuard pipeline (PII classification + masking) and logged
+    to the audit trail — the same as DuckDB queries.
+
     Args:
         profile_name: Name of connection profile in config
         query: SQL query string
         config_path: Optional path to config file
-        
+        audit: Enable privacy masking and audit logging (default True)
+
     Returns:
         List of dictionaries representing query results
     """
-    from scripts.db_config import load_config
-    
-    config = load_config(config_path)
+    from scripts.db_config import load_effective_config, load_config
+
+    config = load_config(config_path) if config_path else load_effective_config()
     profile = config.connections.get(profile_name)
-    
+
     if profile is None:
         raise KeyError(f"Connection profile '{profile_name}' not found")
-    
+
     connector = create_connector(profile)
     try:
         results = connector.execute_query(query)
+
+        # Apply privacy + audit pipeline (same as DuckDB queries)
+        if audit and results:
+            from scripts.config_manager import get_config
+            from scripts.privacy_guard import PrivacyGuard
+            from scripts.audit_report import log_external_query
+
+            cfg = get_config()
+            guard = PrivacyGuard(
+                enabled=cfg.privacy.enabled,
+                read_only=cfg.privacy.read_only,
+                audit_enabled=cfg.privacy.audit_enabled,
+                mask_pii=cfg.privacy.mask_pii,
+                audit_log_path=cfg.privacy.audit_log_path,
+            )
+
+            columns = list(results[0].keys())
+            table = _infer_table_name(query)
+
+            # Classify + mask
+            classification = guard.classify_columns(table, columns)
+            masked_results = guard.mask_rows(results, classification)
+
+            # Determine if masking actually changed anything
+            was_masked = cfg.privacy.mask_pii and any(
+                classification.get(col, {}).get("classification", "public") != "public"
+                for col in columns
+            )
+            max_level = max(
+                (classification.get(col, {}).get("classification", "public") for col in columns),
+                key=lambda x: ({"public": 0, "internal": 1, "sensitive": 2, "restricted": 3}.get(x, 0)),
+                default="public",
+            )
+
+            # Audit log
+            log_external_query(
+                query=query,
+                connection_name=profile_name,
+                db_type=profile.type,
+                table=table,
+                columns=columns,
+                row_count=len(masked_results),
+                masked=was_masked,
+                classification=max_level,
+                log_path=cfg.privacy.audit_log_path,
+            )
+
+            return masked_results
+
         return results
     finally:
         connector.close()

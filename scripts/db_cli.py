@@ -115,34 +115,94 @@ def get_profile(config_path: Optional[str], profile_name: str) -> ConnectionProf
 
 
 def cmd_query(args: argparse.Namespace) -> None:
-    """Execute database query command."""
+    """Execute database query command (with audit + privacy pipeline)."""
     profile = get_profile(args.config, args.profile)
     connector = create_connector(profile)
-    
+
     try:
         if args.file:
             query_text = Path(args.file).read_text()
         else:
             query_text = args.query
-        
+
         if connector.config.type == "mongodb":
             if args.collection is None:
                 print("Error: --collection required for MongoDB queries")
                 sys.exit(1)
             results = connector.execute_query(query_text, collection=args.collection)
         else:
-            results = connector.execute_query(query_text)
-        
+            # Use audited path with privacy masking
+            results = _execute_with_audit(
+                connector=connector,
+                query=query_text,
+                profile_name=args.profile,
+            )
+
         if args.output == "json":
             print(format_json_output(results))
         else:
             print(format_table_output(results))
-            
+
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)
     finally:
         connector.close()
+
+
+def _execute_with_audit(
+    connector: "SQLConnector",
+    query: str,
+    profile_name: str,
+) -> List[Dict[str, Any]]:
+    """Execute query with privacy masking + audit logging, same as DuckDB pipeline."""
+    from scripts.config_manager import get_config
+    from scripts.privacy_guard import PrivacyGuard
+    from scripts.audit_report import log_external_query
+
+    results = connector.execute_query(query)
+    if not results:
+        return results
+
+    cfg = get_config()
+    guard = PrivacyGuard(
+        enabled=cfg.privacy.enabled,
+        read_only=cfg.privacy.read_only,
+        audit_enabled=cfg.privacy.audit_enabled,
+        mask_pii=cfg.privacy.mask_pii,
+        audit_log_path=cfg.privacy.audit_log_path,
+    )
+
+    columns = list(results[0].keys())
+    guard.enforce_read_only(query)
+
+    classification = guard.classify_columns(profile_name, columns)
+    masked = guard.mask_rows(results, classification)
+
+    was_masked = cfg.privacy.mask_pii and any(
+        classification.get(col, {}).get("classification", "public") != "public"
+        for col in columns
+    )
+    level_order = {"public": 0, "internal": 1, "sensitive": 2, "restricted": 3}
+    max_level = max(
+        (classification.get(col, {}).get("classification", "public") for col in columns),
+        key=lambda x: level_order.get(x, 0),
+        default="public",
+    )
+
+    log_external_query(
+        query=query,
+        connection_name=profile_name,
+        db_type=connector.config.type,
+        table=profile_name,
+        columns=columns,
+        row_count=len(masked),
+        masked=was_masked,
+        classification=max_level,
+        log_path=cfg.privacy.audit_log_path,
+    )
+
+    return masked
 
 
 def cmd_list_tables(args: argparse.Namespace) -> None:

@@ -3,8 +3,8 @@
   "table": "orders",
   "description": "E2E测试订单模型",
   "synonyms": [],
-  "created_at": "2026-06-27T22:28:40.427338",
-  "updated_at": "2026-06-27T22:28:40.427404",
+  "created_at": "2026-06-29T02:09:00.507967",
+  "updated_at": "2026-06-29T02:09:00.508026",
   "columns": [
     {
       "name": "order_date",

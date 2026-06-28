@@ -77,6 +77,61 @@ def log_command(command: str, cwd: str | None = None, status: str = "started", n
     return path
 
 
+def log_external_query(
+    query: str,
+    connection_name: str,
+    db_type: str,
+    table: str = "",
+    columns: list[str] | None = None,
+    row_count: int = 0,
+    masked: bool = False,
+    classification: str = "internal",
+    log_path: str = "",
+) -> Path:
+    """Log an external database query to the audit trail.
+
+    Uses the same JSON-lines audit format as DuckDB queries, adding
+    connection metadata for traceability across external sources.
+
+    Args:
+        query: The SQL or MongoDB query string.
+        connection_name: Name of the connection profile used.
+        db_type: Database type (mysql, postgresql, mongodb).
+        table: Target table name (inferred if empty).
+        columns: Column names accessed.
+        row_count: Number of rows returned.
+        masked: Whether PII masking was applied.
+        classification: Max classification level.
+        log_path: Optional audit log path override.
+
+    Returns:
+        Path to the audit log file.
+    """
+    import hashlib
+
+    path = _audit_log_path(log_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    query_hash = hashlib.sha256(query.encode()).hexdigest()[:16]
+    entry = {
+        "ts": datetime.now().isoformat(timespec="seconds"),
+        "typ": "external_query",
+        "tbl": table,
+        "conn": connection_name,
+        "db": db_type,
+        "cols": columns or [],
+        "q": query_hash,
+        "n": row_count,
+        "mask": masked,
+        "lv": classification,
+        "mut": False,
+        "blk": "",
+    }
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    return path
+
+
 def filter_entries(entries: list[dict[str, Any]], start: date, days: int = 1) -> list[dict[str, Any]]:
     end = start + timedelta(days=days)
     result = []
@@ -92,17 +147,20 @@ def render_report(entries: list[dict[str, Any]], report_date: date, days: int = 
     end_date = report_date + timedelta(days=days - 1)
     title_date = str(report_date) if days == 1 else f"{report_date} 至 {end_date}"
     command_entries = [e for e in entries if e.get("typ") == "command"]
-    query_entries = [e for e in entries if e.get("typ") != "command"]
+    internal_entries = [e for e in entries if e.get("typ") not in ("command", "external_query")]
+    external_entries = [e for e in entries if e.get("typ") == "external_query"]
+    query_entries = internal_entries + external_entries
 
     command_counter = Counter(e.get("cmd", "(unknown)").split()[0] for e in command_entries)
     table_counter = Counter(e.get("tbl", "(unknown)") for e in query_entries)
+    external_conn_counter = Counter(e.get("conn", "(unknown)") for e in external_entries)
 
     lines = [
         f"# echart-skill 审计报告",
         "",
         f"- 日期范围: {title_date}",
         f"- 指令记录数: {len(command_entries)}",
-        f"- 查询记录数: {len(query_entries)}",
+        f"- 查询记录数: {len(query_entries)}（本地: {len(internal_entries)}, 外部: {len(external_entries)}）",
         "",
         "## 指令概览",
         "",
@@ -136,17 +194,37 @@ def render_report(entries: list[dict[str, Any]], report_date: date, days: int = 
     else:
         lines.append("无。")
 
+    if external_entries:
+        lines.extend(["", "## 外部数据库连接概览", ""])
+        lines.append("| 连接名 | 类型 | 查询次数 |")
+        lines.append("|---|---:|")
+        for conn, count in external_conn_counter.most_common():
+            lines.append(f"| `{conn}` | {external_entries[0].get('db', '') if external_entries else ''} | {count} |")
+
     lines.extend(["", "## 查询明细", ""])
     if query_entries:
-        lines.append("| 时间 | 表/结果 | 列 | 行数 | 脱敏 | 最高级别 | 变更操作 | 拦截 | Query Hash |")
-        lines.append("|---|---|---|---:|---|---|---|---|---|")
+        has_external = any(e.get("typ") == "external_query" for e in query_entries)
+        if has_external:
+            lines.append("| 时间 | 来源 | 表/结果 | 列 | 行数 | 脱敏 | 级别 | Query Hash |")
+            lines.append("|---|---|---|---:|---|---|---|---|")
+        else:
+            lines.append("| 时间 | 表/结果 | 列 | 行数 | 脱敏 | 最高级别 | 变更操作 | 拦截 | Query Hash |")
+            lines.append("|---|---|---|---:|---|---|---|---|---|")
         for entry in query_entries:
             cols = ", ".join(entry.get("cols", [])) if isinstance(entry.get("cols"), list) else ""
-            lines.append(
-                f"| {entry.get('ts', '')} | `{entry.get('tbl', '')}` | {cols} | "
-                f"{entry.get('n', 0)} | {entry.get('mask', '')} | {entry.get('lv', '')} | "
-                f"{entry.get('mut', '')} | {entry.get('blk', '')} | `{entry.get('q', '')}` |"
-            )
+            if entry.get("typ") == "external_query":
+                source = f"🔗 `{entry.get('conn', '')}` ({entry.get('db', '')})"
+                lines.append(
+                    f"| {entry.get('ts', '')} | {source} | `{entry.get('tbl', '')}` | {cols} | "
+                    f"{entry.get('n', 0)} | {entry.get('mask', '')} | {entry.get('lv', '')} | "
+                    f"`{entry.get('q', '')}` |"
+                )
+            else:
+                lines.append(
+                    f"| {entry.get('ts', '')} | `{entry.get('tbl', '')}` | {cols} | "
+                    f"{entry.get('n', 0)} | {entry.get('mask', '')} | {entry.get('lv', '')} | "
+                    f"{entry.get('mut', '')} | {entry.get('blk', '')} | `{entry.get('q', '')}` |"
+                )
     else:
         lines.append("无。")
 

@@ -3,8 +3,8 @@
   "table": "orders",
   "description": "订单模型V2",
   "synonyms": [],
-  "created_at": "2026-06-27T22:28:40.457524",
-  "updated_at": "2026-06-27T22:28:40.457564",
+  "created_at": "2026-06-29T02:09:00.538523",
+  "updated_at": "2026-06-29T02:09:00.538557",
   "columns": [
     {
       "name": "order_date",

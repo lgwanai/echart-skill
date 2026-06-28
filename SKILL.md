@@ -1739,6 +1739,9 @@ python scripts/db_cli.py import mongo_logs '{}' --collection users --table-name 
 - ✅ **连接测试**: `/dbconn test` 验证连接可用性
 - ✅ **流式导入**: 大数据量（>10K 行）自动流式处理
 - ✅ **元数据追踪**: 导入记录存储在 `_data_skill_meta` 表
+- 🆕 **审计追溯**: 外部查询自动记录到审计日志（与 DuckDB 同一 Pipeline）
+- 🆕 **隐私脱敏**: 外部查询结果自动经过 PrivacyGuard PII 检测与脱敏
+- 🆕 **Query Hash**: 每条外部查询生成 SHA256 hash，可追溯但不可逆
 - ✅ 支持 MySQL、PostgreSQL（SQLAlchemy）、MongoDB（PyMongo）
 
 **Notes:**

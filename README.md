@@ -727,6 +727,8 @@ python scripts/db_cli.py import analytics "SELECT * FROM customers" --table-name
 
 项目级连接同名覆盖全局连接，密码使用 `${ENV_VAR}` 占位符。
 
+**🆕 外部查询审计与隐私**：所有外部数据库查询自动经过 PrivacyGuard PII 检测/脱敏 + 审计日志记录（Query Hash、连接名、库类型、列、行数、脱敏状态）——与本地 DuckDB 查询使用同一审计 Pipeline。可通过 `/audit-report` 统一查看。
+
 ---
 
 ### 案例九：数据轮询刷新
