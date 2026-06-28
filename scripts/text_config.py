@@ -82,6 +82,41 @@ def _set_nested(root: dict[str, Any], key_path: list[str], value: Any) -> None:
     parent[key_path[-1]] = value
 
 
+def _has_commas_outside_parens(value: str) -> bool:
+    """Return True if value contains commas not enclosed in parentheses."""
+    depth = 0
+    for ch in value:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        elif ch == "," and depth == 0:
+            return True
+    return False
+
+
+def _split_outside_parens(value: str, sep: str = ",") -> list[str]:
+    """Split string by separator, ignoring separators inside parentheses."""
+    result: list[str] = []
+    depth = 0
+    current: list[str] = []
+    for ch in value:
+        if ch == "(":
+            depth += 1
+            current.append(ch)
+        elif ch == ")":
+            depth -= 1
+            current.append(ch)
+        elif ch == sep and depth == 0:
+            result.append("".join(current))
+            current = []
+        else:
+            current.append(ch)
+    if current:
+        result.append("".join(current))
+    return result
+
+
 def _parse_value(value: str) -> Any:
     if value == "":
         return ""
@@ -99,8 +134,11 @@ def _parse_value(value: str) -> Any:
     ):
         return value[1:-1]
 
-    if "," in value:
-        return [_parse_value(item.strip()) for item in value.split(",")]
+    # Only treat as list if commas exist outside parentheses (e.g. "1,2,3"
+    # but NOT "DECIMAL(10,2)" or "GEOMETRY(POINT,4326)")
+    if _has_commas_outside_parens(value):
+        parts = _split_outside_parens(value, ",")
+        return [_parse_value(item.strip()) for item in parts]
 
     try:
         return int(value)

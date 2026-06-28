@@ -42,6 +42,8 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | `/help` | `/?`, `/帮助` | 显示帮助 | `/help` |
 | `/clean` | `/清洗`, `/清理` | 数据内容清洗或清理旧数据 | `/clean orders --config rules.json` |
 | `/poll` | `/轮询` | 轮询管理 | `/poll status` |
+| `/dbconn` | `/dbc`, `/连接` | 数据库连接管理（全局/项目级） | `/dbconn add --name pg --type postgresql` |
+| `/schema` | `/sc`, `/表结构` | 表结构定义管理（全局/项目级） | `/schema add --name orders --columns "id:INT:ID:pk"` |
 | `/dashboard` | `/db`, `/仪表盘` | 生成仪表盘 | `/dashboard config.txt` |
 | `/start` | `/server`, `/启动服务` | 启动本地服务 | `/start` |
 | `/stop` | `/停止服务` | 停止本地服务 | `/stop` |
@@ -79,6 +81,7 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 │                ├── 预测关键词 ──→ Scenario 19 (趋势预测)          │
 │                ├── 归因关键词 ──→ Scenario 20 (归因分析)          │
 │                ├── 会话关键词 ──→ /context 子命令                  │
+│                ├── 数据库/连接关键词 ──→ Scenario 13 (数据库连接+分析) │
 │                └── 其他 ──→ 自然语言理解                          │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -731,7 +734,133 @@ start 选项:
   /ctx list                                                     # 别名
 ```
 
-### 模糊匹配关键词
+#### `/dbconn` - 数据库连接管理
+```
+/dbconn <子命令> [参数]
+/dbc <子命令>  # 别名
+/连接 <子命令>  # 中文别名
+
+独立管理外部数据库连接（MySQL、PostgreSQL、MongoDB），支持全局和项目级配置。
+
+子命令:
+  add        添加数据库连接
+  list       列出数据库连接
+  show       查看连接详情
+  remove     删除数据库连接
+  test       测试数据库连接
+
+全局 vs 项目级:
+  --level global    全局连接（存储在 Skill 根目录 references/db_connections.txt）
+                    对所有项目生效
+  --level project   项目级连接（存储在当前目录 .echart-skill/db_connections.txt）
+                    仅对当前项目目录及其子目录生效
+  默认使用 --level global
+
+生效规则:
+  - 项目级连接会覆盖同名的全局连接（优先级：项目 > 全局）
+  - 项目级连接只在配置时所在项目目录及子目录生效
+  - 使用 /dbconn list 查看当前目录下生效的所有连接
+
+密码安全:
+  - 密码字段支持 ${ENV_VAR} 占位符，切勿硬编码密码
+  - 示例: --password '${PG_PASSWORD}'
+  - 连接详情展示时密码自动脱敏为 ***
+
+示例:
+  # 添加全局 PostgreSQL 连接
+  /dbconn add --name analytics --type postgresql --host localhost --database analytics --username reader --password '${PG_PASSWORD}'
+
+  # 添加项目级 MySQL 连接
+  /dbconn add --name prod --type mysql --host db.internal --database production --username admin --password '${MYSQL_PASS}' --level project
+
+  # 添加 MongoDB 连接（使用连接字符串）
+  /dbconn add --name mongo_logs --type mongodb --connection-string '${MONGO_URI}'
+
+  # 列出当前生效的所有连接
+  /dbconn list
+
+  # 列出全局连接
+  /dbconn list --level global
+
+  # 列出项目连接
+  /dbconn list --level project
+
+  # 查看连接详情
+  /dbconn show analytics
+
+  # 测试连接是否可用
+  /dbconn test analytics
+
+  # 删除连接
+  /dbconn remove old_db --level global
+```
+
+**数据库类型支持:**
+
+| 类型 | 默认端口 | 驱动 | 说明 |
+|------|---------|------|------|
+| `postgresql` | 5432 | psycopg2 + SQLAlchemy | PostgreSQL 数据库 |
+| `mysql` | 3306 | pymysql + SQLAlchemy | MySQL 数据库 |
+| `mongodb` | 27017 | pymongo | MongoDB 数据库 |
+
+**连接配置后使用:**
+
+连接添加后，可通过以下方式使用：
+```bash
+# 查询远程数据库（使用有效配置中的连接）
+python scripts/db_cli.py query analytics "SELECT * FROM orders LIMIT 10"
+
+# 查看远程表结构
+python scripts/db_cli.py list-tables analytics
+
+# 导入远程数据到本地 DuckDB
+python scripts/db_cli.py import analytics "SELECT * FROM orders" --table-name orders_import
+```
+
+**执行方式:**
+```bash
+# 添加连接
+python scripts/db_manager.py add --name <name> --type <type> --host <host> --database <db> [--level global|project]
+
+# 列出连接
+python scripts/db_manager.py list [--level global|project|effective]
+
+# 查看详情
+python scripts/db_manager.py show <name>
+
+# 删除连接
+python scripts/db_manager.py remove <name> [--level global|project]
+
+# 测试连接
+python scripts/db_manager.py test <name>
+
+# 查看生效配置
+python scripts/db_manager.py effective
+```
+
+
+
+#### `/schema` - 表结构定义管理
+```
+/schema <子命令> [参数]
+/sc <子命令>  # 别名
+/表结构 <子命令>  # 中文别名
+
+管理表结构定义（列名、类型、描述），支持全局和项目级配置。
+表结构定义作为 Agent 生成 SQL 的核心上下文，大幅提升 SQL 准确度。
+
+列定义简写: "列名:类型:描述:flags"（flags: pk/required/nullable），多列逗号分隔
+
+示例:
+  /schema add --name orders --desc "订单表" \
+    --columns "order_id:INT:订单ID:pk,amount:DECIMAL(18,2):金额:required,channel:VARCHAR:渠道"
+
+  /schema list                           # 列出生效的表结构
+  /schema show orders                    # 查看表结构详情
+  /schema remove old_table --level global # 删除
+```
+
+执行: `python scripts/schema_manager.py add/list/show/remove/effective`
 
 当用户输入不是显性指令时，通过关键词推断意图：
 
@@ -752,6 +881,8 @@ start 选项:
 | 追问/继续 | 呢？、比呢？、刚才、上次、继续、深挖、为什么、换 | Scenario 18 |
 | 趋势预测 | 预测、预估、趋势、forecast、预测未来、走向、接下来 | Scenario 19 |
 | 归因分析 | 为什么、原因、驱动因素、归因、贡献、变化分析、why、explain | Scenario 20 |
+| 数据库连接 | 连接、数据库连接、dbconn、配置连接、添加连接、测试连接、外部数据库、postgresql、mysql 连接 | /dbconn 子命令 |
+| 表结构定义 | 表结构、schema、列定义、字段定义、建表、表定义 | /schema 子命令 |
 | 会话管理 | 会话、上下文、context、session、对话历史、追问 | /context 子命令 |
 
 ---
@@ -784,30 +915,122 @@ DuckDB 支持的 SQL 函数按以下类别组织（详见 `references/SQL_FUNCTI
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    SQL 生成智能流程                              │
+│                    SQL 生成智能流程 (v2.0)                       │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
+│  Step 0: 🆕 表结构上下文加载（Agent 大模型能力）                   │
+│  ├─ 根据用户需求推断涉及的表的语义名                                │
+│  ├─ 加载生效的表结构定义:                                         │
+│  │   python scripts/schema_manager.py effective                 │
+│  ├─ 如无预定义 schema → 用 DESCRIBE/采样数据自动推断               │
+│  └─ 将表名、列名、类型、描述作为 Agent 上下文                       │
+│                                                                 │
 │  Step 1: 需求分析                                                │
-│  ├─ 分析用户的查询意图（聚合？过滤？日期计算？字符串处理？）          │
-│  └─ 识别涉及的列及其数据类型                                       │
+│  ├─ 结合表结构上下文分析用户查询意图                               │
+│  ├─ 匹配需求中的指标/维度到实际列名（Agent 语义匹配）               │
+│  └─ 如 "销售额" → 匹配 schema 中的 amount/sales/gmv 列           │
 │                                                                 │
 │  Step 2: 类别推断                                                │
-│  ├─ 根据需求推断需要的函数类别（可多选）                            │
-│  └─ 示例：求平均值 + 按月分组 → 聚合函数 + 日期函数                 │
+│  ├─ 根据需求 + 列类型推断需要的函数类别                            │
+│  └─ 示例：amount(DECIMAL) + 按月 → 聚合函数 + 日期函数             │
 │                                                                 │
-│  Step 3: 函数上下文提取                                          │
-│  ├─ 读取 SQL_FUNCTIONS_REFERENCE.md 对应类别的函数说明            │
-│  └─ 将函数语法和示例作为上下文                                     │
+│  Step 3: 🆕 函数上下文提取（推断 + 精准摘取）                      │
+│  ├─ 根据需求+列类型推断需要的函数类别（Agent 大模型推断）             │
+│  ├─ 示例: DECIMAL列按月求和 → 聚合函数 + 日期函数                    │
+│  ├─ 👇 精准提取对应函数文档（不读全文件）                            │
+│  ├─ grep -n "^## <类别>$" references/SQL_FUNCTIONS_REFERENCE.md    │
+│  ├─ Read references/SQL_FUNCTIONS_REFERENCE.md<起始行> limit=80    │
+│  └─ 函数语法 + 参数说明 + 示例作为上下文                              │
 │                                                                 │
-│  Step 4: SQL 生成                                                │
-│  ├─ 仅使用文档中明确支持的函数                                     │
+│  📋 需求→类别推断表:                                              │
+│  | 需求关键词 | 推断类别 | 提取命令 |                              │
+│  |-----------|---------|---------|                              │
+│  | 求和/计数/均值/最值 | 聚合函数 | grep "## 聚合函数" |             │
+│  | 标准差/方差/分位数/相关性 | 统计聚合函数 | grep "## 统计聚合函数" | │
+│  | 取整/绝对值/平方根/幂 | 数值函数 | grep "## 数值函数" |           │
+│  | 字符串拼接/截取/正则/大小写 | 文本/字符串函数 | grep "## 文本" |  │
+│  | 按月/按周/按年分组,日期差 | 日期函数 | grep "## 日期函数" |       │
+│  | 排名/行号/移动平均/前后值 | 窗口函数 | grep "## 窗口函数" |       │
+│  | NULL处理/条件分支 | 条件函数 | grep "## 工具函数" |              │
+│  | 去重计数/近似统计 | 近似聚合函数 | grep "## 近似聚合函数" |       │
+│                                                                 │
+│                                                                 │
+│  Step 4: SQL 生成（Agent 大模型核心能力）                         │
+│  ├─ 上下文包含: 表结构 + 列类型 + 函数参考 + DuckDB 方言规则        │
+│  ├─ 仅使用 schema 中存在的列名（避免幻觉列名）                     │
+│  ├─ 列类型匹配正确的函数（如 DECIMAL → SUM/AVG，VARCHAR → COUNT）  │
 │  └─ 对于不确定的函数，先查阅文档再使用                              │
 │                                                                 │
 │  Step 5: 执行验证                                                │
 │  ├─ 执行 SQL，检查是否有错误                                      │
-│  └─ 如有错误，进入 reAct 修复流程                                 │
+│  ├─ 如有错误 → Agent 用 schema 上下文修复（列名错？类型错？）       │
+│  └─ 3 次失败 → 用 DESCRIBE 验证实际表结构 vs schema 定义          │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
+```
+
+**🆕 表结构上下文对 SQL 准确度的提升:**
+
+| 无 Schema | 有 Schema |
+|-----------|----------|
+| Agent 猜测列名 → 可能用 `sales_amount` 但实际是 `amount` | Schema 明确列名 → Agent 直接用 `amount` |
+| Agent 猜测类型 → VARCHAR 当数字用 `SUM` | Schema 指定 `DECIMAL(18,2)` → Agent 知道可用 `SUM` |
+| 自然语言 "销售额" → Agent 不确定用哪列 | Schema 描述匹配 → 明确用 `amount`（描述:"订单金额"） |
+| 多表 JOIN 时列名冲突 | Schema 区分 `orders.amount` vs `refunds.amount` |
+| reAct 修复 3 轮才找到正确列名 | 第一轮就用对，减少重试 |
+
+**Agent 自动推断 → Schema → Function 完整链路:**
+
+```
+用户: "分析各渠道订单金额和转化率"
+    │
+    ▼
+Step 0: Agent 推断所需表
+    ├── 关键词 "订单" → 可能表: orders, order_items
+    ├── 关键词 "渠道" → 需要 channel/source 列
+    ├── 关键词 "金额" → 需要 amount/gmv/price 列
+    └── 关键词 "转化率" → 需要 status/conversion 列
+    │
+    ▼
+Step 0: 加载 Schema 上下文
+    └─ python scripts/schema_manager.py effective
+    └─ orders: order_id(INT pk), amount(DECIMAL(18,2)), channel(VARCHAR), 
+               status(VARCHAR), created_at(TIMESTAMP)
+    │
+    ▼
+Step 2: Agent 推断所需 DuckDB 函数类别
+    ├── SUM(amount) → 聚合函数
+    ├── GROUP BY channel → 聚合函数
+    ├── COUNT(*) / COUNT(CASE WHEN...) → 聚合函数 + 条件函数
+    ├── 按月分组 → 日期函数 (date_trunc)
+    └── 转化率计算→ 数值函数 (ROUND)
+    │
+    ▼
+Step 3: 精准提取函数文档（只摘需要的内容）
+    ├─ grep -n "^## 聚合函数" references/SQL_FUNCTIONS_REFERENCE.md → L33
+    ├─ Read references/SQL_FUNCTIONS_REFERENCE.md33 limit=50
+    │   → 获得: SUM, COUNT, COUNTIF, AVG, string_agg 语法+示例
+    ├─ grep -n "^## 日期函数" references/SQL_FUNCTIONS_REFERENCE.md → L337
+    ├─ Read references/SQL_FUNCTIONS_REFERENCE.md337 limit=45
+    │   → 获得: DATE_TRUNC, DATE_DIFF, STRFTIME 语法+示例
+    └─ grep -n "^## 条件函数\|^## 工具函数" ... → 获取 CASE/COALESCE
+    │
+    ▼
+Step 4: Agent 上下文现在包含:
+    ├── 表结构: orders(order_id, amount, channel, status, created_at)
+    ├── 函数参考: SUM/COUNT/DATE_TRUNC 的 DuckDB 语法
+    └── DuckDB 方言规则: string_agg 非 GROUP_CONCAT, date_trunc 非 DATE_FORMAT
+    │
+    ▼
+精准 SQL (一次正确):
+    SELECT 
+        channel,
+        SUM(amount) as total_amount,
+        COUNT(*) as order_count,
+        ROUND(COUNTIF(status = 'completed') * 100.0 / COUNT(*), 2) as conversion_pct
+    FROM orders
+    GROUP BY channel
+    ORDER BY total_amount DESC
 ```
 
 ### 常见 MySQL → DuckDB 函数映射
@@ -1386,81 +1609,115 @@ done
 
 **Action:**
 
-**1. Configure Connections (db_connections.txt):**
-```ini
-[connections.mysql_prod]
-type=mysql
-host=localhost
-port=3306
-database=production
-username=admin
-password=${MYSQL_PASSWORD}
+**1. Configure Connections via /dbconn (Recommended):**
 
-[connections.postgres_analytics]
+```bash
+# 添加全局 PostgreSQL 连接
+/dbconn add --name analytics --type postgresql --host localhost --database analytics --username reader --password '${PG_PASSWORD}'
+
+# 添加项目级 MySQL 连接（仅当前目录生效）
+/dbconn add --name prod --type mysql --host db.internal --database production --level project --username admin --password '${MYSQL_PASS}'
+
+# 添加 MongoDB 连接
+/dbconn add --name mongo_logs --type mongodb --connection-string '${MONGO_URI}'
+```
+
+**2. 或手动编辑配置文件:**
+
+支持三级配置（优先级从高到低）：
+
+| 级别 | 配置文件路径 | 生效范围 |
+|------|-------------|---------|
+| **项目级** | `<当前项目>/.echart-skill/db_connections.txt` | 仅该项目目录及子目录 |
+| **传统** | `<当前目录>/db_connections.txt` | 当前目录及父目录 |
+| **全局** | `<echart-skill>/references/db_connections.txt` | 所有项目 |
+
+配置格式：
+```ini
+[connections.analytics]
 type=postgresql
-host=analytics-db.internal
+host=localhost
+port=5432
 database=analytics
 username=reader
 password=${PG_PASSWORD}
-
-[connections.mongo_docs]
-type=mongodb
-connection_string=${MONGODB_URI}
 ```
 
-**2. Set Environment Variables for Secrets:**
+**3. Set Environment Variables for Secrets:**
 ```bash
-export MYSQL_PASSWORD=your_password
 export PG_PASSWORD=your_password
-export MONGODB_URI="mongodb://user:pass@localhost:27017/docs"
+export MYSQL_PASS=your_password
+export MONGO_URI="mongodb://user:pass@localhost:27017/docs"
 ```
 
-**3. Query Database:**
+**4. 管理连接:**
 ```bash
-# Execute SQL query
-python scripts/db_cli.py query mysql_prod "SELECT * FROM orders WHERE date > '2024-01-01'"
+# 查看所有连接
+/dbconn list
+
+# 查看全局连接
+/dbconn list --level global
+
+# 查看项目连接
+/dbconn list --level project
+
+# 查看连接详情（密码自动脱敏）
+/dbconn show analytics
+
+# 测试连接
+/dbconn test analytics
+
+# 删除连接
+/dbconn remove old_db  # 默认全局
+/dbconn remove local_db --level project
+```
+
+**5. Query Database:**
+```bash
+# Execute SQL query (使用有效配置)
+python scripts/db_cli.py query analytics "SELECT * FROM orders WHERE date > '2024-01-01'"
 
 # Query from file
-python scripts/db_cli.py query postgres_analytics --file queries/monthly_sales.sql --output json
+python scripts/db_cli.py query analytics --file queries/monthly_sales.sql --output json
 
 # MongoDB query (requires --collection)
-python scripts/db_cli.py query mongo_docs '{"status": "active"}' --collection users
+python scripts/db_cli.py query mongo_logs '{"status": "active"}' --collection users
 ```
 
-**4. Discover Schema:**
+**6. Discover Schema:**
 ```bash
 # List tables
-python scripts/db_cli.py list-tables mysql_prod
+python scripts/db_cli.py list-tables analytics
 
 # List PostgreSQL tables in specific schema
-python scripts/db_cli.py list-tables postgres_analytics --schema public
+python scripts/db_cli.py list-tables analytics --schema public
 
 # Describe table structure
-python scripts/db_cli.py describe-table mysql_prod users
+python scripts/db_cli.py describe-table analytics users
 
 # MongoDB: list databases
-python scripts/db_cli.py list-tables mongo_docs --show-databases
+python scripts/db_cli.py list-tables mongo_logs --show-databases
 
 # MongoDB: list collections
-python scripts/db_cli.py list-tables mongo_docs --database docs
+python scripts/db_cli.py list-tables mongo_logs --database docs
 
 # MongoDB: infer collection schema
-python scripts/db_cli.py describe-table mongo_docs users
+python scripts/db_cli.py describe-table mongo_logs users
 ```
 
-**5. Import to DuckDB:**
+**7. Import to DuckDB:**
 ```bash
 # Import SQL query results to DuckDB
-python scripts/db_cli.py import mysql_prod "SELECT * FROM customers" --table-name customers_import
+python scripts/db_cli.py import analytics "SELECT * FROM customers" --table-name customers_import
 
 # Import with custom DuckDB path
-python scripts/db_cli.py import postgres_analytics "SELECT * FROM sales" --duckdb analytics.duckdb
+python scripts/db_cli.py import analytics "SELECT * FROM sales" --duckdb analytics.duckdb
 
 # Import MongoDB collection
-python scripts/db_cli.py import mongo_docs '{}' --collection users --table-name mongo_users
+python scripts/db_cli.py import mongo_logs '{}' --collection users --table-name mongo_users
 ```
 
-**6. After Import, Use with Charts:**
+**8. After Import, Use with Charts:**
 ```json
 {
     "db_path": "workspace.duckdb",
@@ -1475,17 +1732,97 @@ python scripts/db_cli.py import mongo_docs '{}' --collection users --table-name 
 ```
 
 **Key Features:**
-- Connection config auto-discovered in current and parent directories
-- Use `${ENV_VAR}` placeholders for passwords (never hardcode secrets)
-- Query results automatically import to DuckDB with `import` command
-- Large results (>10K rows) are streamed
-- Metadata tracked in `_data_skill_meta` table
-- Support for MySQL, PostgreSQL (via SQLAlchemy), and MongoDB (via PyMongo)
+- ✅ **三级配置**: 全局（所有项目共享）/ 项目级（当前目录生效）/ 传统（向后兼容）
+- ✅ **连接管理**: `/dbconn` 独立指令管理连接生命周期
+- ✅ **密码安全**: 使用 `${ENV_VAR}` 占位符，展示时自动脱敏
+- ✅ **自动发现**: 查询时自动合并全局 + 项目级配置
+- ✅ **连接测试**: `/dbconn test` 验证连接可用性
+- ✅ **流式导入**: 大数据量（>10K 行）自动流式处理
+- ✅ **元数据追踪**: 导入记录存储在 `_data_skill_meta` 表
+- ✅ 支持 MySQL、PostgreSQL（SQLAlchemy）、MongoDB（PyMongo）
 
 **Notes:**
+- 项目级连接同名覆盖全局连接
 - Default connection timeout: 30 seconds (override with `--timeout`)
 - MongoDB documents are flattened for tabular storage (nested fields become `parent_child`)
 - Arrays in MongoDB are expanded to indexed fields (`skills_0`, `skills_1`)
+
+---
+
+### 🔍 数据库连接自动识别与数据分析流程
+
+> ⚠️ **核心原则**: 外部数据库**直接查询**，不导入 DuckDB。DuckDB 导入仅在用户需要反复分析、跨表 join、或离线使用时才做。
+
+**自动识别决策树：**
+
+```
+用户提出数据分析需求
+    │
+    ├── 用户是否指定了连接名？（如 "分析 analytics 库的 orders 表"）
+    │   └── ✅ 是 → 直接使用指定连接名
+    │
+    ├── 当前是否有已配置的数据库连接？
+    │   ├── 检查有效连接：python scripts/db_manager.py list
+    │   │
+    │   ├── 有 1 个连接 → 自动使用该连接
+    │   │
+    │   ├── 有多个连接 → 按以下优先级匹配：
+    │   │   1. 连接名与用户提到的关键词匹配（如 "analytics"、"prod"）
+    │   │   2. 数据库名与用户提到的表/数据源匹配
+    │   │   3. 连接类型匹配（如用户提到 PostgreSQL → 匹配 postgresql 连接）
+    │   │   4. 无法匹配 → 列出可用连接，询问用户
+    │   │
+    │   └── 无连接 → 提示用户配置：
+    │       "未找到数据库连接。你可以：
+    │        1. 使用 /dbconn add 添加连接
+    │        2. 直接上传 CSV/Excel 文件进行分析"
+    │
+    └── 连接确定后 → 直接查询分析流程
+```
+
+**🟢 直接查询分析流程（默认，推荐）：**
+
+```
+Step 1: 确定目标连接
+    └─ python scripts/db_manager.py list
+    └─ 匹配/选择连接名
+
+Step 2: 探索远程数据库结构
+    └─ python scripts/db_cli.py list-tables <连接名>
+    └─ python scripts/db_cli.py describe-table <连接名> <表名>
+
+Step 3: 直接在远程数据库执行查询 → 拿数据
+    └─ python scripts/db_cli.py query <连接名> "SELECT ..." --output json
+    └─ Agent 拿到 JSON 数据后直接用于图表/分析/报告
+
+Step 4: 数据 → 图表 / 分析 / 报告
+    └─ 图表: 数据替换 ECharts option → 生成 HTML
+    └─ 分析: /analyze 直接基于查询结果
+    └─ 报告: /report 直接基于查询结果
+```
+
+**🟡 DuckDB 导入流程（仅在以下场景使用）：**
+
+> 只在以下情况才导入 DuckDB：
+> - 用户明确说"导入到本地"
+> - 需要对多张远程表做 JOIN 或跨库查询
+> - 数据量大且需要反复分析（避免重复查询远程库）
+> - 需要离线使用
+
+```
+python scripts/db_cli.py import <连接名> "SELECT * FROM <表名>" --table-name <本地表名>
+# 之后在 DuckDB 中分析：/query SELECT ... FROM <本地表名>
+```
+
+**自动识别示例：**
+
+| 用户输入 | Agent 行为 |
+|---------|-----------|
+| "分析 sales 数据" | 1. 检查有效连接 → 发现 `analytics` 连接<br>2. `list-tables analytics` → 有 `sales` 表<br>3. `query analytics "SELECT * FROM sales LIMIT 5"` 看结构<br>4. **直接查询** `analytics` 拿数据 → `/chart` `/report` |
+| "查看 PostgreSQL 里的订单趋势" | 1. 匹配 `type=postgresql` 的连接<br>2. 描述表结构，找订单表<br>3. **直接查** `SELECT date, SUM(amount) FROM orders GROUP BY date`<br>4. 数据 → 折线图 |
+| "各渠道销售额占比" | 1. 自动发现连接<br>2. **直接查** `SELECT channel, SUM(amount) FROM orders GROUP BY channel`<br>3. 数据 → 饼图 |
+| "把 orders 表导入本地分析" | 1. 用户明确说"导入" → 触发 DuckDB 导入<br>2. `import analytics "SELECT * FROM orders" --table-name orders`<br>3. 后续在 DuckDB 中 join/分析 |
+| "帮我看看数据库里有什么" | 1. 列出所有有效连接<br>2. 逐个 `list-tables` 展示结构<br>3. 询问用户想分析哪个表 |
 
 ### Scenario 15: Dashboard Generation (Simplified Natural Language)
 **Trigger**: User needs to create multi-chart dashboards with natural language.

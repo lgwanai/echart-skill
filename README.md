@@ -1,4 +1,4 @@
-# Echart Skill v2.0.0 — Enterprise Agent BI
+# Echart Skill v2.1.0 — Enterprise Agent BI
 
 **面向企业数据应用的本地优先 Agent BI 平替方案。**
 
@@ -686,32 +686,46 @@ HTML 报告必须先读取并使用 `workflow_specs/html_templates/report_light.
 
 ### 案例八：外部数据库连接
 
-**场景**：连接 MySQL 生产数据库查询数据
+**场景**：连接 PostgreSQL/MySQL/MongoDB 数据库，直接查询分析
 
-**1. 创建连接配置**（`db_connections.txt`）：
-
-```ini
-[connections.mysql_prod]
-type=mysql
-host=localhost
-port=3306
-database=production
-username=reader
-password=${MYSQL_PASSWORD}
-```
-
-**2. 查询外部数据库**：
+**1. 使用 /dbconn 管理连接（推荐）：**
 
 ```bash
-# 查看表列表
-/db list-tables mysql_prod
+# 添加全局 PostgreSQL 连接
+/dbconn add --name analytics --type postgresql --host localhost --database analytics --username reader --password '${PG_PASSWORD}'
 
-# 查询数据
-/db query mysql_prod "SELECT * FROM orders WHERE created_at > '2024-01-01'"
+# 添加项目级 MySQL 连接（仅当前目录生效）
+/dbconn add --name prod --type mysql --host db.internal --database production --level project
 
-# 导入到 DuckDB
-/db import mysql_prod "SELECT * FROM customers" --table customers_import
+# 列出当前生效的连接
+/dbconn list
+
+# 测试连接
+/dbconn test analytics
 ```
+
+**2. 直接查询外部数据库：**
+
+```bash
+# 查看远程库表结构
+python scripts/db_cli.py list-tables analytics
+
+# 直接查询（无需先导入 DuckDB）
+python scripts/db_cli.py query analytics "SELECT channel, SUM(amount) FROM orders GROUP BY channel"
+
+# 需要跨表 JOIN 或离线分析时才导入 DuckDB
+python scripts/db_cli.py import analytics "SELECT * FROM customers" --table-name customers_import
+```
+
+**3. 三级配置体系：**
+
+| 级别 | 配置文件路径 | 生效范围 |
+|------|-------------|---------|
+| **项目级** | `<当前项目>/.echart-skill/db_connections.txt` | 仅该项目目录及子目录 |
+| **传统** | `<当前目录>/db_connections.txt` | 当前目录及父目录 |
+| **全局** | `<echart-skill>/references/db_connections.txt` | 所有项目 |
+
+项目级连接同名覆盖全局连接，密码使用 `${ENV_VAR}` 占位符。
 
 ---
 
@@ -763,6 +777,8 @@ http_config.auth.token=${API_TOKEN}
 | `/query` | `/q`, `/sql`, `/查询` | SQL 查询 | `/query SELECT * FROM sales LIMIT 10` |
 | `/chart` | `/c`, `/图表` | 图表生成 | `/chart bar 销售额按类别` |
 | `/chart-list` | `/cl`, `/图表列表` | 查看支持的图表类型 | `/chart-list 3d` |
+| `/dbconn` | `/dbc`, `/连接` | 数据库连接管理（全局/项目级，支持 PostgreSQL/MySQL/MongoDB） | `/dbconn add --name pg --type postgresql` |
+| `/schema` | `/sc`, `/表结构` | 表结构定义管理（全局/项目级，Agent SQL 上下文增强） | `/schema add --name orders --columns "id:INT:ID:pk"` |
 | `/dashboard` | `/db`, `/仪表盘` | 生成仪表盘 | `/dashboard config.txt` |
 | `/export` | `/e`, `/导出` | 数据导出 | `/export result.csv --table sales` |
 | `/tables` | `/t`, `/表` | 查看表结构 | `/tables sales` |
@@ -1087,7 +1103,7 @@ A: 本技能为了应对"脏数据"，会在底层调用 `openpyxl` 来遍历并
 A: 本技能内置了"后悔药"机制。你可以直接对 Agent 说："刚才那一步算错了，撤销"，Agent 会由于没有覆盖原表，直接回退到上一个表版本。
 
 **Q: 支持连接外部的 MySQL 或 PostgreSQL 吗？**
-A: 本技能目前默认使用本地 DuckDB 以追求开箱即用和零配置。DuckDB 采用列式存储，对分析型查询性能卓越。如果需要连接外部数据库，你可以让 Agent 修改生成的连接字符串，架构上是完全支持的。
+A: ✅ 完全支持。使用 `/dbconn` 指令管理 PostgreSQL/MySQL/MongoDB 连接（支持全局/项目级配置），直接查询外部数据库无需先导入 DuckDB。详见案例八。
 
 **Q: 如何从 API 接口导入数据？**
 A: 使用 `/import url` 命令，指定 URL 和格式即可导入。支持 Basic Auth 和 Bearer Token 认证。导入后可使用 `refresh` 命令刷新数据。
@@ -1121,7 +1137,9 @@ A: 支持主题切换（深色/浅色）、自动刷新、导出 PDF、图表搜
 | 数据合并 | `scripts/data_merger.py` | 合并多个表格，支持导出和入库 |
 | 数据清洗 | Agent + `workflow_specs/data_cleaning_workflow.md` + `scripts/data_cleaner.py` | 类型转换、缺失/重复/异常处理、多列唯一键排重、规则引擎、跨表验证、脱敏 |
 | 本地服务 | `scripts/server.py` / `server_cli.py` | 本地 HTTP 服务，预览图表 |
-| 业务口径 | `scripts/metrics_manager.py` | 持久化业务规则和指标定义 |
+| 业务口径 | `scripts/metrics_manager.py` | 持久化业务规则和指标定义，全局/项目级 |
+| 数据库连接 | `scripts/db_manager.py` + `db_cli.py` | PostgreSQL/MySQL/MongoDB 连接管理，三级配置体系，直接查询 |
+| 表结构定义 | `scripts/schema_manager.py` | 表结构定义管理（全局/项目级），Agent SQL 生成上下文增强 |
 | 历史查看 | `scripts/history_viewer.py` | 查看导入历史、表结构、表关联关系 |
 | 外部数据库 | `scripts/db_cli.py` | MySQL/PostgreSQL/MongoDB 连接与查询 |
 | 数据轮询 | `scripts/polling_cli.py` | 定时刷新 HTTP API 或数据库数据 |
