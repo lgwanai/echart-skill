@@ -143,6 +143,10 @@
    # 创建符号链接（推荐）
    ln -s ~/skills/echart-skill ~/.claude/skills/echart-skill
 
+   # 安装 Claude Code 可见的 /echart-* slash commands
+   cd ~/skills/echart-skill
+   python scripts/install_claude_commands.py
+
    # 或直接复制
    cp -r ~/skills/echart-skill ~/.claude/skills/
    ```
@@ -153,6 +157,8 @@
    New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills"
    Copy-Item -Recurse "$env:USERPROFILE\skills\echart-skill" "$env:USERPROFILE\.claude\skills\"
    ```
+
+   安装后，Claude Code 的 `/` 菜单会显示 `/echart-import`、`/echart-query`、`/echart-chart`、`/echart-dashboard`、`/echart-report`、`/echart-quality`、`/echart-lineage` 等命令。使用 `/echart-help` 可查看完整命令索引。
 
    在项目根目录创建 `CLAUDE.md`：
 
@@ -964,6 +970,10 @@ http_config.auth.token=${API_TOKEN}
 ```bash
 # 方法1：创建符号链接（推荐，方便更新）
 ln -s /path/to/echart-skill ~/.claude/skills/echart-skill
+
+# 安装 /echart-* slash commands，让 Claude Code 的 / 菜单可见全部指令
+cd /path/to/echart-skill
+python scripts/install_claude_commands.py
 
 # 方法2：直接复制
 cp -r /path/to/echart-skill ~/.claude/skills/
