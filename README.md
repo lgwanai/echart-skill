@@ -5,6 +5,12 @@
 </p>
 
 <p align="center">
+  <a href="README_EN.md">🇬🇧 English</a>
+  &nbsp;|&nbsp;
+  <b>🇨🇳 中文</b>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/version-2.1.0-blue" alt="Version">
   <img src="https://img.shields.io/badge/python-3.10+-green" alt="Python">
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
