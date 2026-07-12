@@ -98,6 +98,48 @@ def test_validate_rejects_custom_script_syntax_error(tmp_path: Path):
     assert validate(str(html)) == 1
 
 
+def _chart_html(library_close_tag: str) -> str:
+    """Single-chart HTML where the inlined library uses the given closing tag."""
+    return f"""<!DOCTYPE html>
+    <html><head><meta charset="utf-8"></head>
+    <body>
+      <div class="header"><h1>标题</h1></div>
+      <div id="chart" style="height:300px"></div>
+      <script>{FAKE_ECHARTS_LIBRARY}{library_close_tag}
+      <script>
+        var chart = echarts.init(document.getElementById('chart'));
+        chart.setOption({{series:[{{type:'bar',data:[1,2,3]}}]}});
+      </script>
+    </body></html>
+    """
+
+
+def test_validate_rejects_escaped_script_close_tag_blank_page(tmp_path: Path):
+    # The classic blank-page bug: inlined library closed with an escaped
+    # <\/script> tag the browser never recognizes → whole page renders blank.
+    html = tmp_path / "chart.html"
+    html.write_text(_chart_html("<\\/script>"))
+
+    assert validate(str(html)) == 1
+
+
+def test_validate_accepts_literal_script_close_tag(tmp_path: Path):
+    # Same page with a correct literal </script> must pass.
+    html = tmp_path / "chart.html"
+    html.write_text(_chart_html("</script>"))
+
+    assert validate(str(html)) == 0
+
+
+def test_validate_rejects_unbalanced_script_tags(tmp_path: Path):
+    # Missing closing </script> for the library block (unterminated) → blank page.
+    html = tmp_path / "chart.html"
+    html.write_text(_chart_html(""))
+
+    assert validate(str(html)) == 1
+
+
+
 def test_validate_rejects_html2canvas_export_without_ignore_elements(tmp_path: Path):
     html = tmp_path / "dashboard.html"
     html.write_text(_dashboard_html("""

@@ -63,6 +63,10 @@ Every selected expert must run this loop before writing conclusions:
 | Marketing Campaign Analyst | `marketing_campaign.md` | Campaigns, ads, spend, impressions, CTR, CAC, ROAS, creative/channel performance |
 | Product & Content Analyst | `product_content.md` | Features, pages, content, engagement, activation, usage paths, product retention |
 | Risk & Data Quality Analyst | `risk_data_quality.md` | Missing values, anomalies, fraud, outliers, compliance, audit, suspicious records |
+| HR & Performance Analyst | `hr_performance.md` | Headcount, attrition, performance appraisal, KPI/OKR scores, compensation, recruitment funnel, training |
+| Supply Chain & Procurement Analyst | `supply_chain_procurement.md` | Procurement, spend, supplier performance, on-time delivery, inventory turnover, price/quote comparison |
+| Manufacturing & Quality Analyst | `manufacturing_quality.md` | Production output, yield/defect rate, OEE, downtime, scrap/rework, quality defect attribution |
+| Project Management & Delivery Analyst | `project_delivery.md` | Projects, milestones, schedule/cost variance, effort/utilization, task completion, delivery risk |
 
 ## Trigger Terms
 
@@ -107,12 +111,43 @@ Every selected expert must run this loop before writing conclusions:
 `risk`, `fraud`, `audit`, `outlier`, `missing`, `null`, `duplicate`, `异常`,
 `风险`, `欺诈`, `审计`, `缺失`, `重复`, `脏数据`
 
+### HR & Performance
+
+`headcount`, `employee`, `staff`, `attrition`, `turnover`, `resignation`, `performance`,
+`appraisal`, `rating`, `kpi`, `okr`, `compensation`, `salary`, `payroll`, `recruit`,
+`hire`, `offer`, `training`, `人力`, `员工`, `编制`, `人效`, `离职`, `绩效`, `考核`,
+`评分`, `目标达成`, `薪酬`, `招聘`, `入职`, `培训`
+
+### Supply Chain & Procurement
+
+`procurement`, `purchase`, `purchasing`, `supplier`, `vendor`, `spend`, `sourcing`,
+`quote`, `price`, `lead time`, `on-time`, `otif`, `inventory`, `turnover`, `stock`,
+`采购`, `供应商`, `寻源`, `询价`, `比价`, `到货`, `准时`, `交付率`, `库存`, `周转`
+
+### Manufacturing & Quality
+
+`production`, `output`, `yield`, `defect`, `reject`, `scrap`, `rework`, `oee`,
+`downtime`, `machine`, `line`, `shift`, `process`, `quality`, `pareto`,
+`生产`, `产量`, `良率`, `不良`, `报废`, `返工`, `稼动率`, `设备`, `产线`, `班次`,
+`工序`, `质量`, `缺陷`, `停机`
+
+### Project Management & Delivery
+
+`project`, `milestone`, `schedule`, `deadline`, `variance`, `effort`, `utilization`,
+`task`, `completion`, `burndown`, `spi`, `cpi`, `blocked`, `overdue`, `delivery`,
+`项目`, `里程碑`, `进度`, `延期`, `工时`, `资源利用`, `任务`, `完成率`, `交付`,
+`风险项`, `阻塞`, `逾期`
+
 ## Multi-expert Examples
 
 - Traffic dashboard with ad spend: primary `traffic_growth.md`, support `marketing_campaign.md`
 - E-commerce sales report with refund/margin: primary `sales_ecommerce.md`, support `finance_management.md`
 - Member purchase analysis: primary `customer_membership.md`, support `sales_ecommerce.md`
 - Delivery delay report: primary `operations_fulfillment.md`, support `risk_data_quality.md`
+- HR performance review with pay data: primary `hr_performance.md`, support `finance_management.md`
+- Procurement cost report with supplier risk: primary `supply_chain_procurement.md`, support `risk_data_quality.md`
+- Production efficiency report with cost impact: primary `manufacturing_quality.md`, support `finance_management.md`
+- Project portfolio review with resource cost: primary `project_delivery.md`, support `finance_management.md`
 
 ## Custom Expert Contract
 

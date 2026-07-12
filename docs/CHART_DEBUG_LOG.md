@@ -295,4 +295,18 @@
 - **现象**：40_Geo_Lines 从空白→线条不可见→纯色线→最终修复
 - **根因**：(1) 多次偏离官方示例，自己创造配置；(2) 官方「模拟迁徙」示例有 3 层 series（粒子飞线+箭头线+涟漪散点）和 planePath 飞机图标
 - **修复**：模板完全按官方 `geo-lines` Migration 示例重写——`backgroundColor: '#404a59'`、3 层 series、planePath SVG、`convertData` 城市名→坐标转换、18 条路线
+
+---
+
+## #35 — 整页空白：内联库的 `</script>` 被写成 `<\/script>` ⚠️ 高频致命
+- **日期**：2026-07-01
+- **现象**：多图表单文件（如 `lottery_region_yoy.html`）浏览器打开**整页全白**，连静态 HTML 的标题/KPI 卡片都不显示
+- **根因**：内联 ECharts 库的 `<script>...库代码...</script>` 中，**结束标签被写成了 `<\/script>`（带反斜杠）**。浏览器只在遇到**字面** `</script>` 时才关闭 `<script>` 块；`<\/script>` 不被识别，于是从内联库的 `<script>` 开始一直吞到页面**最后一个**真实 `</script>` 为止 —— 整个 body HTML + 所有图表 bootstrap 全被当作脚本文本，什么都不渲染
+  - 为什么之前没被 `validate_chart.py` 拦住：Python `HTMLParser` 同样会跳过 `<\/script>`、扫描到下一个真实 `</script>`，结果只解析出「1 个超大脚本」，仍然满足「已内联 ECharts 库」的判断 → **误判为通过**
+  - 为什么会写错：模型知道「JS 字符串里出现 `</script>` 要转义成 `<\/script>`」这条规则，却错误地把它套用到了**真实的 HTML 结束标签**上
+- **修复**：
+  - **生成侧铁律**：内联任何库（ECharts / html2canvas / jsPDF / 地图 JS）的结束标签**必须是字面 `</script>`**。反斜杠转义 `<\/script>` 只允许出现在 JS 字符串字面量内部（如 `document.write('<\/script>')`），**绝不能作为真实标签的结束符**
+  - **校验侧兜底**：`validate_chart.py` 新增 `_check_script_tag_integrity()` 基于原始文本（绕开 HTMLParser）检测：① 出现 `<\/script>` 转义结束标签直接报错；② `<script>` 开/闭标签数量不平衡直接报错。任一命中 → 退出码 1
+- **自检口诀**：内联库之后，数一下 `<script>` 与 `</script>` 是否成对、结束标签有没有多余的反斜杠
+
 | effectScatter | `series.data` | — |

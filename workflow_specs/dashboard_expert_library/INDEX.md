@@ -46,6 +46,11 @@ Every selected dashboard expert must run this loop:
 | General Business Dashboard Expert | `general_business_dashboard.md` | Ambiguous business data, general operations, executive monitoring |
 | Sales & E-commerce Dashboard Expert | `sales_ecommerce_dashboard.md` | Sales tables, orders, GMV, products, categories, regions, stores, customers |
 | Traffic & Growth Dashboard Expert | `traffic_growth_dashboard.md` | Traffic, acquisition, conversion, funnel, retention, campaign growth |
+| Finance & Management Dashboard Expert | `finance_management_dashboard.md` | Revenue, cost, expense, profit, margin, budget variance, cost center, cash, receivables |
+| HR & Performance Dashboard Expert | `hr_performance_dashboard.md` | Headcount, attrition, performance appraisal, KPI/OKR scores, compensation, recruitment funnel, training |
+| Supply Chain & Procurement Dashboard Expert | `supply_chain_procurement_dashboard.md` | Spend, supplier performance, on-time delivery, inventory turnover, price/quote comparison, sourcing risk |
+| Manufacturing & Quality Dashboard Expert | `manufacturing_quality_dashboard.md` | Output vs plan, yield/defect rate, OEE, downtime, scrap/rework, defect attribution |
+| Project Management & Delivery Dashboard Expert | `project_delivery_dashboard.md` | Project status, milestones, schedule/cost variance, effort/utilization, task completion, delivery risk |
 
 ## Trigger Terms
 
@@ -65,6 +70,35 @@ Every selected dashboard expert must run this loop:
 
 `dashboard`, `经营`, `运营`, `监控`, `看板`, `分析面板`, `overview`, `summary`,
 or when no stronger expert matches.
+
+### Finance & Management Dashboard
+
+`profit`, `cost`, `expense`, `budget`, `margin`, `cash`, `receivable`, `payable`,
+`cost center`, `利润`, `成本`, `费用`, `预算`, `毛利`, `现金`, `应收`, `应付`, `成本中心`
+
+### HR & Performance Dashboard
+
+`headcount`, `employee`, `attrition`, `turnover`, `performance`, `appraisal`, `kpi`,
+`okr`, `compensation`, `salary`, `recruit`, `hire`, `training`, `人力`, `员工`, `编制`,
+`人效`, `离职`, `绩效`, `考核`, `薪酬`, `招聘`, `入职`, `培训`
+
+### Supply Chain & Procurement Dashboard
+
+`procurement`, `purchase`, `supplier`, `vendor`, `spend`, `sourcing`, `quote`,
+`lead time`, `on-time`, `otif`, `inventory`, `turnover`, `采购`, `供应商`, `寻源`,
+`询价`, `比价`, `到货`, `准时`, `库存`, `周转`
+
+### Manufacturing & Quality Dashboard
+
+`production`, `output`, `yield`, `defect`, `scrap`, `rework`, `oee`, `downtime`,
+`machine`, `line`, `shift`, `quality`, `pareto`, `生产`, `产量`, `良率`, `不良`,
+`报废`, `返工`, `稼动率`, `设备`, `产线`, `班次`, `工序`, `质量`, `缺陷`, `停机`
+
+### Project Management & Delivery Dashboard
+
+`project`, `milestone`, `schedule`, `variance`, `effort`, `utilization`, `task`,
+`completion`, `spi`, `cpi`, `blocked`, `overdue`, `delivery`, `项目`, `里程碑`,
+`进度`, `延期`, `工时`, `资源利用`, `任务`, `完成率`, `交付`, `阻塞`, `逾期`
 
 ## Custom Dashboard Expert Contract
 

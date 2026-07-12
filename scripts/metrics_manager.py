@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -30,6 +31,15 @@ class MetricDefinition:
     file_path: str
     project_dir: str = ""
     created_at: str = ""
+
+
+@dataclass
+class MetricValidationIssue:
+    severity: str
+    metric_name: str
+    source_path: str
+    message: str
+    recommendation: str
 
 
 def _resolve_path(file_path: str | os.PathLike[str]) -> Path:
@@ -191,6 +201,101 @@ def render_effective_metrics(cwd: str | os.PathLike[str] | None = None) -> str:
     return "\n".join(parts)
 
 
+def _parse_metric_blocks(path: Path) -> list[dict]:
+    """Parse metric definition blocks from a metrics Markdown file."""
+    if not path.exists():
+        return []
+    text = path.read_text(encoding="utf-8")
+    matches = list(re.finditer(r"^##\s+(.+?)\s*$", text, flags=re.MULTILINE))
+    blocks = []
+    for index, match in enumerate(matches):
+        start = match.end()
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        blocks.append({
+            "name": match.group(1).strip(),
+            "body": text[start:end].strip(),
+            "path": str(path),
+        })
+    return blocks
+
+
+def validate_metric_scopes(cwd: str | os.PathLike[str] | None = None) -> list[MetricValidationIssue]:
+    """Validate effective metric definitions for enterprise governance."""
+    blocks = []
+    for _level, path, _project_dir in read_effective_metrics(cwd):
+        blocks.extend(_parse_metric_blocks(path))
+
+    issues: list[MetricValidationIssue] = []
+    seen: dict[str, list[dict]] = {}
+    for block in blocks:
+        key = block["name"].strip().lower()
+        seen.setdefault(key, []).append(block)
+        body = block["body"]
+        metric_name = block["name"]
+        source_path = block["path"]
+        if not body:
+            issues.append(MetricValidationIssue(
+                "high",
+                metric_name,
+                source_path,
+                "口径定义为空。",
+                "补充计算公式、过滤条件、时间范围和适用场景。",
+            ))
+            continue
+        if not re.search(r"\b(sum|count|avg|min|max|distinct|where|group by|=)\b|[+\-*/]", body, re.IGNORECASE):
+            issues.append(MetricValidationIssue(
+                "medium",
+                metric_name,
+                source_path,
+                "口径缺少可执行或可复核的计算表达。",
+                "用 SQL 片段或清晰公式描述指标如何计算。",
+            ))
+        if not any(token in body for token in ("时间", "日期", "周期", "按天", "按月", "date", "time")):
+            issues.append(MetricValidationIssue(
+                "low",
+                metric_name,
+                source_path,
+                "口径缺少时间范围或统计周期说明。",
+                "说明指标按自然日、业务日、月、季度或指定日期字段统计。",
+            ))
+        if not any(token in body for token in ("来源", "表", "字段", "source", "table", "column")):
+            issues.append(MetricValidationIssue(
+                "low",
+                metric_name,
+                source_path,
+                "口径缺少来源表或来源字段说明。",
+                "补充来源表、字段、过滤条件和排除规则。",
+            ))
+
+    for duplicated in seen.values():
+        if len(duplicated) > 1:
+            for block in duplicated:
+                issues.append(MetricValidationIssue(
+                    "high",
+                    block["name"],
+                    block["path"],
+                    "存在同名统计口径定义，可能导致 SQL/报告口径不稳定。",
+                    "保留一个权威定义，或明确全局口径与项目口径的覆盖关系。",
+                ))
+    return issues
+
+
+def render_metric_validation(issues: list[MetricValidationIssue]) -> str:
+    lines = ["# 统计口径校验报告", ""]
+    if not issues:
+        lines.append("当前生效统计口径未发现明显治理问题。")
+        return "\n".join(lines) + "\n"
+    lines.append("| 严重级别 | 指标 | 来源 | 问题 | 建议 |")
+    lines.append("|---|---|---|---|---|")
+    for issue in issues:
+        lines.append(
+            f"| {issue.severity} | {issue.metric_name} | `{issue.source_path}` | "
+            f"{issue.message} | {issue.recommendation} |"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
 def list_metric_files(level: str = "effective", cwd: str | None = None) -> list[tuple[str, Path, str]]:
     if level == "global":
         return [("global", GLOBAL_METRICS_PATH, "")] if GLOBAL_METRICS_PATH.exists() else []
@@ -235,6 +340,10 @@ def main():
     effective_parser = subparsers.add_parser("effective", help="输出当前生效口径内容")
     effective_parser.add_argument("--cwd", help="用于判断项目口径是否生效的当前目录")
 
+    validate_parser = subparsers.add_parser("validate", help="校验当前生效统计口径")
+    validate_parser.add_argument("--cwd", help="用于判断项目口径是否生效的当前目录")
+    validate_parser.add_argument("--json", action="store_true", help="输出 JSON")
+
     # Backward-compatible flat options.
     parser.add_argument("--name", "-n", help="口径名称")
     parser.add_argument("--desc", "-d", help="口径描述和定义")
@@ -248,6 +357,12 @@ def main():
         _print_metric_files(args.level, args.cwd)
     elif args.command in {"show", "effective"}:
         print(render_effective_metrics(args.cwd))
+    elif args.command == "validate":
+        issues = validate_metric_scopes(args.cwd)
+        if args.json:
+            print(json.dumps([issue.__dict__ for issue in issues], ensure_ascii=False, indent=2))
+        else:
+            print(render_metric_validation(issues))
     elif args.name and args.desc:
         add_metric(args.name, args.desc, args.file)
     else:

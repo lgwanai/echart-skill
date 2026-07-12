@@ -71,6 +71,49 @@ def _extract_balanced(text, start_index, opener, closer):
     return ""
 
 
+def _check_script_tag_integrity(content):
+    """Detect the #1 blank-page bug: a <script> block that never properly closes.
+
+    Browsers only terminate a <script> on a *literal* ``</script>``. If the
+    inlined ECharts library (or any inline block) is closed with an escaped
+    ``<\\/script>`` — the JS-string escape wrongly applied to the real HTML
+    closing tag — the browser ignores it and swallows the entire rest of the
+    document (page body + every chart bootstrap) as script text. The page
+    renders completely blank, yet Python's HTMLParser silently scans past the
+    escaped tag to the next real ``</script>``, so the structural checks below
+    still see a "valid" inlined library. This raw-text check is the only place
+    that catches it.
+    """
+    errors = []
+
+    # Escaped closing tag used as a real terminator. Legitimate uses (a
+    # </script> literal emitted from inside a JS string) are essentially never
+    # present in generated data-chart pages, so flag it directly.
+    if re.search(r"<\\/script\s*>", content, re.IGNORECASE):
+        errors.append(
+            "BLANK PAGE: found escaped `<\\/script>` closing tag — the browser "
+            "does NOT recognize it, so the <script> block never closes and the "
+            "whole page renders blank. Write the inline library's closing tag as "
+            "a literal `</script>` (backslash-escaping only belongs inside JS "
+            "string literals, never on the real tag)."
+        )
+
+    # Opening/closing <script> tag balance. A mismatch means at least one inline
+    # block is unterminated and will swallow the markup that follows it.
+    open_tags = len(re.findall(r"<script\b", content, re.IGNORECASE))
+    close_tags = len(re.findall(r"</script\s*>", content, re.IGNORECASE))
+    if open_tags != close_tags:
+        errors.append(
+            f"BLANK PAGE: unbalanced <script> tags ({open_tags} open vs "
+            f"{close_tags} close) — an inline block is not properly terminated "
+            f"and will consume the rest of the document as script text. Every "
+            f"`<script>` (including the inlined ECharts library) needs a matching "
+            f"literal `</script>`."
+        )
+
+    return errors
+
+
 def _extract_report_chart_specs(content):
     marker = "window.reportChartSpecs"
     marker_index = content.find(marker)
@@ -285,7 +328,13 @@ def validate(html_path):
     parsed_html = _parse_html(content)
 
     # ─────────────────────────────────────────────────────────────
-    # 0. Single File Compliance (MUST RUN FIRST — catches most 404s)
+    # 0. Script-tag integrity (MUST RUN FIRST — catches blank pages that
+    #    HTMLParser-based checks below cannot see)
+    # ─────────────────────────────────────────────────────────────
+    errors.extend(_check_script_tag_integrity(content))
+
+    # ─────────────────────────────────────────────────────────────
+    # 0. Single File Compliance (catches most 404s)
     # ─────────────────────────────────────────────────────────────
     # 0a. External script src (not data: URI)
     external_scripts = re.findall(

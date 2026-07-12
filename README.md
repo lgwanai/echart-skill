@@ -246,7 +246,7 @@ Echart Skill 将数据质量作为分析流程的**前置环节**，而非事后
 | **列级脱敏** | 手机号 → `138****1234`，邮箱 → `u***@domain.com`，身份证 → `3201**********1234` |
 | **审计日志** | JSON-lines 格式，记录时间戳、表名、列、行数、脱敏状态、分类级别、query hash |
 | **4 级数据分类** | `public < internal < sensitive < restricted` |
-| **只读保护** | 可配置阻断 DROP/DELETE/UPDATE/INSERT/ALTER/TRUNCATE |
+| **非破坏式处理** | 默认生成新表、新文件和审计记录，避免覆盖原始数据 |
 
 外部数据库查询同样经过 PrivacyGuard 检测与审计管线，使用 `/audit-report` 统一查看。
 
@@ -263,6 +263,7 @@ Echart Skill 将数据质量作为分析流程的**前置环节**，而非事后
 | `/export` | 导出查询结果或整表为 CSV/Excel |
 | `/tables` | 查看表结构、行数、列信息 |
 | `/query` | 执行 SQL（DuckDB 语法），支持 JOIN、GROUP BY、子查询 |
+| `/catalog` | 生成本地数据资产目录，含字段角色、质量分、缺失率、唯一率 |
 
 ### 可视化
 
@@ -281,6 +282,11 @@ Echart Skill 将数据质量作为分析流程的**前置环节**，而非事后
 | `/report` | 一键生成金字塔结构企业报告 |
 | `/forecast` | 时间序列趋势预测（4 种方法） |
 | `/why` | 指标变化归因分析，贡献度分解 |
+| `/compare` | 指定基准组和对比组，执行指标变化分析 |
+| `/segment` | 维度分群分析，输出规模、指标值和占比 |
+| `/funnel` | 漏斗转化分析，输出首步/上步转化率和流失 |
+| `/cohort` | 留存/队列分析，生成用户留存矩阵 |
+| `/whatif` | What-if 假设推演，模拟指标上升/下降场景 |
 
 ### 治理与安全
 
@@ -290,6 +296,12 @@ Echart Skill 将数据质量作为分析流程的**前置环节**，而非事后
 | `/metrics` | 查看当前生效的指标定义 |
 | `/schema` | 全局/项目级表结构定义管理 |
 | `/quality` | 数据质量评分与问题报告 |
+| `/evidence` | 为报告、图表、Dashboard 生成证据包 |
+| `/review-report` | 审阅报告的证据、口径、结构、行动建议和专业表达 |
+| `/review-dashboard` | 审阅 Dashboard 离线性、图表渲染和业务完整性 |
+| `/contract` | 数据契约校验，发现字段缺失、类型漂移、必填空值 |
+| `/brief` | 从报告或分析产物生成高管摘要 |
+| `/pack` | 生成带 manifest 和 SHA256 的本地 BI 交付包 |
 | `/privacy` | PII 脱敏开关控制 |
 | `/audit-report` | 按日期生成审计报告 |
 | `/lineage` | 记录和查询产物数据血缘 |

@@ -38,7 +38,14 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | `/privacy` | `/隐私` | 隐私配置，脱敏默认关闭，可开启 | `/privacy mask on` |
 | `/audit-report` | `/审计报告` | 按日期生成指令与查询审计报告 | `/audit-report --date 2026-06-27` |
 | `/quality` | `/数据质量` | 数据质量评分与问题报告 | `/quality orders --format markdown` |
+| `/catalog` | `/数据目录`, `/资产目录` | 生成本地数据资产目录 | `/catalog --db workspace.duckdb` |
 | `/lineage` | `/血缘` | 记录或查询产物数据血缘 | `/lineage list --table orders` |
+| `/evidence` | `/证据包` | 生成报告/图表/Dashboard 证据包 | `/evidence outputs/reports/sales.md` |
+| `/review-report` | `/报告审阅` | 审阅报告证据和专业性 | `/review-report outputs/reports/sales.md` |
+| `/review-dashboard` | `/看板审阅` | 审阅 Dashboard 离线性和业务完整性 | `/review-dashboard outputs/dashboards/sales.html` |
+| `/contract` | `/数据契约` | 校验表结构与必填字段契约 | `/contract orders --columns order_id:VARCHAR:required` |
+| `/brief` | `/高管摘要` | 从报告生成高管摘要 | `/brief outputs/reports/sales.md` |
+| `/pack` | `/交付包` | 生成本地 BI 交付包 | `/pack report.md evidence.md --output delivery.zip` |
 | `/help` | `/?`, `/帮助` | 显示帮助 | `/help` |
 | `/clean` | `/清洗`, `/清理` | 数据内容清洗或清理旧数据 | `/clean orders --config rules.json` |
 | `/poll` | `/轮询` | 轮询管理 | `/poll status` |
@@ -52,6 +59,11 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 | `/analyze` | `/a`, `/分析` | 自动分析数据表，发现规律与异常 | `/analyze sales` |
 | `/insight` | `/洞察` | 对指定维度生成深度洞察 | `/insight sales --dim region` |
 | `/report` | `/r`, `/报告` | 一键生成专业分析报告 | `/report sales --template sales` |
+| `/compare` | `/对比` | 指标对比分析 | `/compare sales amount month 2024-01 2024-02` |
+| `/segment` | `/分群` | 维度分群分析 | `/segment sales region amount --agg sum` |
+| `/funnel` | `/漏斗` | 漏斗转化分析 | `/funnel events user_id step --steps visit,signup,pay` |
+| `/cohort` | `/留存`, `/队列` | 留存/队列分析 | `/cohort activity user_id signup_date active_date` |
+| `/whatif` | `/假设推演` | What-if 假设推演 | `/whatif sales amount --scenarios conservative:-5,growth:10` |
 | `/forecast` | `/f`, `/预测` | 时间序列预测 | `/forecast orders 订单日期 金额 --periods 6` |
 | `/why` | `/w`, `/归因`, `/为什么` | 数据变化归因分析 | `/why orders 金额 订单日期 2024-01 2024-06` |
 | `/context` | `/ctx`, `/会话` | 会话管理（开始/追问/历史/列表） | `/context start sales` |
@@ -333,6 +345,7 @@ Dashboard 标题必须能追溯到用户请求、表名、文件名或真实字�
 /scope set --level <global|project> --name <口径名> --desc <定义>
 /scope list [--level global|project|effective]
 /scope show
+/scope validate
 /统计口径 set --level project --name GMV --desc "GMV = SUM(pay_amount)"
 /口径设置 show
 
@@ -345,6 +358,9 @@ Dashboard 标题必须能追溯到用户请求、表名、文件名或真实字�
 
   # 读取当前目录下生效口径：全局 + 当前目录命中的项目口径
   python scripts/metrics_manager.py effective --cwd "$PWD"
+
+  # 校验当前生效口径是否存在重复、空定义、缺少公式/来源/周期等问题
+  python scripts/metrics_manager.py validate --cwd "$PWD"
 ```
 
 项目级口径必须记录设置时的项目目录；只有后续执行目录位于该项目目录或其子目录下时才生效。生成 SQL、报告、Dashboard、归因和预测前，必须读取 `python scripts/metrics_manager.py effective --cwd "$PWD"` 的结果作为统计口径上下文。
@@ -384,6 +400,17 @@ Dashboard 标题必须能追溯到用户请求、表名、文件名或真实字�
 
 生成报告、Dashboard、归因分析前，应优先执行数据质量评分。报告需要把质量分、等级、关键问题和限制写入口径说明；如果质量等级为 C/D 或存在 critical/high 问题，强结论必须降级为“初步判断”并说明数据缺口。
 
+#### `/catalog` - 数据资产目录
+```
+/catalog [--db workspace.duckdb] [--format markdown|json] [--output <path>]
+/数据目录
+
+执行方式:
+  python scripts/catalog_manager.py --db workspace.duckdb --format markdown --print
+```
+
+数据资产目录会扫描本地 DuckDB 中的表、字段类型、字段角色、缺失率、唯一率和质量评分。生成 SQL、报告、Dashboard 前，优先用目录确认真实表字段，避免幻觉列名和错误指标。
+
 #### `/lineage` - 数据血缘
 ```
 /lineage record --artifact <产物路径> --type report --tables orders --columns amount,region --query "<SQL>"
@@ -404,6 +431,127 @@ Dashboard 标题必须能追溯到用户请求、表名、文件名或真实字�
 ```
 
 所有图表、Dashboard、Report 和数据导出在产物生成成功后都应记录血缘。血缘记录只保存 query hash，不保存 SQL 明文，避免泄露敏感查询细节；报告附录可引用血缘记录说明来源表、字段、统计口径和产物路径。
+
+#### `/evidence` - 证据包
+```
+/evidence <产物路径> [--lineage-path <path>] [--audit-log <path>] [--format markdown|json]
+/证据包 outputs/reports/sales.md
+
+执行方式:
+  python scripts/evidence_pack.py outputs/reports/sales.md --print
+```
+
+证据包汇总产物 SHA256、血缘记录、匹配到的审计查询记录和当前生效统计口径。用于企业内部复核、交付归档和关键结论追溯。
+
+#### `/review-report` - 报告质量审阅
+```
+/review-report <报告路径> [--format markdown|json] [--output <path>]
+/报告审阅 outputs/reports/sales.md
+
+执行方式:
+  python scripts/report_reviewer.py outputs/reports/sales.md --print
+```
+
+报告发布前应审阅证据充分性、结构完整性、图表/附录证据、行动建议、口径限制和表达专业性。评分较低时，先补证据和限制说明，再交付给业务方。
+
+#### `/compare` - 指标对比分析
+```
+/compare <表名> <指标字段> <分组字段> <基准值> <对比值> [--agg sum|avg|count]
+/对比 sales amount month 2024-01 2024-02
+
+执行方式:
+  python scripts/compare_analysis.py sales amount month 2024-01 2024-02 --agg sum
+```
+
+对比分析在本地 DuckDB 中计算基准组、对比组、变化量和变化率，适合报告中的环比、组间差异、活动前后变化和异常解释。
+
+#### `/segment` - 分群分析
+```
+/segment <表名> <分群字段> <指标字段> [--agg sum|avg|count] [--limit 20]
+/分群 sales region amount --agg sum
+
+执行方式:
+  python scripts/segment_analysis.py sales region amount --agg sum
+```
+
+分群分析用于识别重点地区、渠道、客户层级、产品类别等结构差异。输出每个分群的行数、指标值和占比，报告中应结合业务含义解释头部集中度和长尾风险。
+
+#### `/funnel` - 漏斗转化分析
+```
+/funnel <表名> <用户字段> <步骤字段> --steps <步骤1,步骤2,步骤3>
+/漏斗 events user_id step --steps visit,signup,pay
+
+执行方式:
+  python scripts/funnel_analysis.py events user_id step --steps visit,signup,pay
+```
+
+漏斗分析按指定步骤顺序计算去重用户数、相对首步转化率、相对上步转化率和流失人数。步骤顺序必须来自业务流程或用户明确指定，不得自行编造。
+
+#### `/cohort` - 留存/队列分析
+```
+/cohort <表名> <用户字段> <队列日期字段> <活跃日期字段> [--unit day|week|month]
+/留存 activity user_id signup_date active_date --unit month
+
+执行方式:
+  python scripts/cohort_analysis.py activity user_id signup_date active_date --unit month
+```
+
+留存/队列分析按天、周或月生成留存矩阵，适用于增长、复购、活跃质量和客户生命周期分析。报告中必须说明队列字段、活跃字段和周期单位。
+
+#### `/whatif` - What-if 假设推演
+```
+/whatif <表名> <指标字段> --scenarios <场景名:变化率,场景名:变化率> [--agg sum|avg|count]
+/假设推演 sales amount --scenarios conservative:-5,base:0,growth:10
+
+执行方式:
+  python scripts/whatif_analysis.py sales amount --scenarios conservative:-5,base:0,growth:10
+```
+
+假设推演基于当前本地指标基准值计算不同增长/下降场景下的推演值和变化量。它只做明确的线性场景计算，不替代因果预测；报告中必须说明这是场景模拟，不是确定性预测。
+
+#### `/review-dashboard` - Dashboard 质量审阅
+```
+/review-dashboard <Dashboard HTML 路径> [--format markdown|json] [--output <path>]
+/看板审阅 outputs/dashboards/sales.html
+
+执行方式:
+  python scripts/dashboard_reviewer.py outputs/dashboards/sales.html --print
+```
+
+Dashboard 发布前应审阅外部网络资源、ECharts 初始化、图表容器、标题、KPI 总览、洞察/风险提示和文件完整性。出现外部 `http/https` 资源时视为企业离线交付风险，必须修复。
+
+#### `/contract` - 数据契约校验
+```
+/contract <表名> --columns <字段:类型:required,字段:类型>
+/数据契约 orders --columns order_id:VARCHAR:required,amount:DECIMAL
+
+执行方式:
+  python scripts/data_contract.py orders --columns order_id:VARCHAR:required,amount:DECIMAL
+```
+
+数据契约校验用于发现上游字段缺失、类型漂移和必填字段空值。导入关键业务表、生成正式报告或上线 Dashboard 前，应先执行契约校验并把失败项写入数据限制。
+
+#### `/brief` - 高管摘要
+```
+/brief <报告或分析产物路径> [--format markdown|json] [--output <path>]
+/高管摘要 outputs/reports/sales.md
+
+执行方式:
+  python scripts/executive_brief.py outputs/reports/sales.md --format markdown
+```
+
+高管摘要从现有报告中提取关键数字、主要结论、行动建议和口径限制。它是交付层摘要工具，不能替代原始报告中的证据和附录。
+
+#### `/pack` - 本地 BI 交付包
+```
+/pack <文件1> <文件2> ... [--output delivery.zip]
+/交付包 outputs/reports/sales.md outputs/evidence/sales.md --output sales_delivery.zip
+
+执行方式:
+  python scripts/delivery_pack.py outputs/reports/sales.md outputs/evidence/sales.md --output sales_delivery.zip
+```
+
+交付包会复制指定报告、Dashboard、图表、证据包等文件，并生成 `manifest.json`、`README.md` 和 SHA256 校验值，便于企业内部归档、复核和离线交付。
 
 #### `/help` - 显示帮助
 ```
@@ -594,7 +742,7 @@ Dashboard 标题必须能追溯到用户请求、表名、文件名或真实字�
   - quick:   快速分析摘要（核心发现/分析结论/数据画像/关键洞察/行动建议）
 
 专家分析能力:
-  - 自动判断行业：流量/增长、销售/电商、财务、客户/会员、运营履约、营销活动、产品内容、风控/数据质量、通用经营
+  - 自动判断行业：流量/增长、销售/电商、财务/经营、客户/会员、运营履约、营销活动、产品内容、风控/数据质量、人力资源/绩效考核、供应链/采购、生产制造/质量、项目管理/交付、通用经营
   - 动态拉取专家：读取 `workflow_specs/expert_library/INDEX.md`，选择主专家和支撑专家，再读取对应专家文件
   - 用户自定义专家：复制 `workflow_specs/expert_library/EXPERT_TEMPLATE.md` 新建专家文件，并在 `INDEX.md` 登记
   - 按专家模式检查：例如流量看规模、效率、留存、漏斗、渠道归因；销售看收入、结构、趋势、利润质量
@@ -874,6 +1022,13 @@ python scripts/db_manager.py effective
 | 表结构 | 表结构、字段、列、describe、schema | Scenario 10 |
 | 导入历史 | 历史、导入记录、history | Scenario 10 |
 | 指标管理 | 指标、口径、定义、metric | Scenario 8 |
+| 数据资产目录 | 数据目录、资产目录、catalog、字段盘点、数据盘点 | /catalog |
+| 证据包 | 证据包、evidence、复核、可追溯、审计证据 | /evidence |
+| 报告审阅 | 审阅报告、检查报告、报告质量、专业性、review-report | /review-report |
+| Dashboard 审阅 | 审阅看板、检查看板、Dashboard 质量、离线性、review-dashboard | /review-dashboard |
+| 数据契约 | 数据契约、字段契约、结构漂移、contract、必填字段 | /contract |
+| 高管摘要 | 高管摘要、执行摘要、brief、老板版、管理层摘要 | /brief |
+| 交付打包 | 交付包、打包、归档、publish、pack、交付物 | /pack |
 | 服务管理 | 服务、服务器、启动、停止、server、start、stop | 直接执行 /start 或 /stop |
 | Skill 更新 | 更新、拉取、update、pull、升级 | 执行 /echart-update |
 | 自动分析 | 分析、洞察、发现、规律、趋势、异常、相关性、report、analyze | Scenario 16 |
@@ -881,6 +1036,11 @@ python scripts/db_manager.py effective
 | 追问/继续 | 呢？、比呢？、刚才、上次、继续、深挖、为什么、换 | Scenario 18 |
 | 趋势预测 | 预测、预估、趋势、forecast、预测未来、走向、接下来 | Scenario 19 |
 | 归因分析 | 为什么、原因、驱动因素、归因、贡献、变化分析、why、explain | Scenario 20 |
+| 对比分析 | 对比、比较、环比、组间差异、compare、baseline | /compare |
+| 分群分析 | 分群、客群、分层、结构分析、segment | /segment |
+| 漏斗分析 | 漏斗、转化、流失、步骤转化、funnel | /funnel |
+| 留存分析 | 留存、复购、队列、cohort、retention | /cohort |
+| 假设推演 | 假设、如果、模拟、what-if、whatif、场景推演 | /whatif |
 | 数据库连接 | 连接、数据库连接、dbconn、配置连接、添加连接、测试连接、外部数据库、postgresql、mysql 连接 | /dbconn 子命令 |
 | 表结构定义 | 表结构、schema、列定义、字段定义、建表、表定义 | /schema 子命令 |
 | 会话管理 | 会话、上下文、context、session、对话历史、追问 | /context 子命令 |
@@ -1182,7 +1342,7 @@ Step 4: 替换 data 数组为 DuckDB 真实数据
  ↓
 Step 5: 包裹 HTML 壳（echarts inline + div#main + script）
  ↓
-Step 6: 对照 docs/CHART_DEBUG_LOG.md 避坑（34 条）
+Step 6: 对照 docs/CHART_DEBUG_LOG.md 避坑（35 条，含 #35 整页空白 `<\/script>` 陷阱）
  ↓
 Step 7: validate_chart.py 硬校验（Single File + Dashboard + 渲染）
    └─ python scripts/validate_chart.py <output.html>
@@ -1367,13 +1527,17 @@ python scripts/reference_assets.py list --chart-type line --limit 20
 │  ✅ 必须: <style>/* 所有 CSS 样式内联 */</style>                 │
 │  ✅ 必须: 地图数据由 generator 自动内联注入                       │
 │  ✅ 必须: 输出为单个 .html 文件，双击浏览器即可打开              │
+│  ⚠️ 结束标签必须是字面 </script>，绝不能写成 <\/script>          │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+> 🔴 **整页空白第一杀手（见 CHART_DEBUG_LOG #35）**：内联 ECharts/html2canvas/jsPDF/地图 JS 时，结束标签**必须**是字面 `</script>`。**绝不能**写成带反斜杠的 `<\/script>` —— 浏览器不识别转义标签，会从内联库一直吞到页面最后一个真实 `</script>`，导致连标题、KPI 卡片在内的整页全白。反斜杠转义 `<\/script>` 只允许出现在 JS **字符串字面量**内部，永远不能作为真实标签的结束符。生成后自检：`<script>` 与 `</script>` 必须成对，结束标签不得有多余反斜杠。
+
 **实现方式**：
 - 生成 ECharts option 时，**不写任何 `<script src=...>` 或 `<link href=...>`**
 - 只要 HTML 中出现 `echarts.init`，就必须在它之前内联完整的 `assets/echarts/echarts.min.js`；CDN、相对路径、本地文件路径、占位 stub 都不合格
+- 内联库的 `<script>` 块结束标签写字面 `</script>`（不是 `<\/script>`）；开/闭标签数量必须平衡，否则整页空白（`validate_chart.py` 会硬拦截）
 - `new echarts.graphic.LinearGradient(...)` / `RadialGradient(...)` 必须先闭合构造函数 `)`，再闭合 option 对象；少一个括号会让整页图表初始化脚本失败
 - 地图数据（china.js, world.js 等）由 generator 自动处理内联，不在 option 中引用
 - 百度地图 SDK 是唯一例外（必须远程加载），仅在用户配置了 `BAIDU_AK` 且使用 bmap 模式时才允许

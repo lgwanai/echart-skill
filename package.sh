@@ -4,8 +4,8 @@
 # =============================================================================
 set -euo pipefail
 
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-PACKAGE_NAME="echart-skill_${TIMESTAMP}.zip"
+DATE=$(date +"%Y%m%d")
+PACKAGE_NAME="echart-skill_${DATE}.zip"
 DIST_DIR="dist"
 mkdir -p "$DIST_DIR"
 
