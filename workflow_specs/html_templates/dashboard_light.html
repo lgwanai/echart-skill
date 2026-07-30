@@ -252,6 +252,13 @@
       gap: 6px;
       flex: 0 0 auto;
     }
+    .chart-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
     .icon-btn {
       width: 28px;
       height: 28px;
@@ -271,6 +278,53 @@
       width: 100%;
       height: 100%;
       min-height: 240px;
+    }
+    .chart-data-table,
+    .data-table-panel {
+      display: none;
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+      padding: 12px 14px 14px;
+    }
+    .chart-data-table.is-open,
+    .data-table-panel.is-open {
+      display: block;
+    }
+    .chart-data-title {
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .table-scroll {
+      max-height: 360px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .chart-data-table table,
+    .data-table-panel table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .chart-data-table th,
+    .chart-data-table td,
+    .data-table-panel th,
+    .data-table-panel td {
+      padding: 7px 9px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .chart-data-table th,
+    .data-table-panel th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--surface-soft);
+      color: var(--ink-soft);
+      font-weight: 760;
     }
 
     .diagnostic-panel {
@@ -443,6 +497,15 @@
         document.body.setAttribute("data-theme", next);
         const root = document.querySelector(".dashboard-container");
         if (root) root.setAttribute("data-theme", next);
+      };
+
+      window.toggleChartData = function toggleChartData(targetId) {
+        const panel = document.getElementById(targetId);
+        if (!panel) return;
+        const nextOpen = panel.hidden || !panel.classList.contains("is-open");
+        panel.hidden = !nextOpen;
+        panel.classList.toggle("is-open", nextOpen);
+        panel.setAttribute("aria-hidden", String(!nextOpen));
       };
     })();
   </script>

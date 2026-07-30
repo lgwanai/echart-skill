@@ -1,15 +1,15 @@
 ---
-description: "执行维度分群分析"
-argument-hint: "<table> <dimension> <metric> [--agg sum|avg|count]"
+description: "可选快捷聚合查询"
+argument-hint: "entity-search|period-compare|segment|trend|topn ..."
 ---
 
-# /echart-segment
+# /echart-analysis-query
 
-映射到 echart-skill 原始指令 `/segment`。
+映射到 echart-skill 原始指令 `/analysis-query`。
 
 ## 任务
 
-按业务维度聚合指标，输出分群规模、指标值和占比，用于结构分析和重点客群识别。
+可选使用 scripts/analysis_runner.py 执行简单实体搜索、区间对比、分维度聚合、趋势和 TopN 查询。复杂业务问题不要强行堆参数；应读取 schema 与当前生效统计口径，生成 SQL 后交给 scripts/sql_runner.py 执行。
 
 ## 执行规则
 
@@ -32,4 +32,6 @@ argument-hint: "<table> <dimension> <metric> [--agg sum|avg|count]"
 
 ## 示例
 
-- `/echart-segment sales region amount --agg sum`
+- `python scripts/metrics_manager.py effective`
+- `python scripts/sql_runner.py --profile analytics --file queries/hotel_business_scope_analysis.sql --output json`
+- `python scripts/analysis_runner.py period-compare --profile analytics --table orders --date-column order_date --metric amount --dimension city --baseline-start 2025-01-01 --baseline-end 2025-06-30 --current-start 2026-01-01 --current-end 2026-06-30 --output json`

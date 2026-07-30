@@ -23,6 +23,27 @@ incompatibility. Treat this as a blocking quality gate, not optional advice.
 8. ECharts graphic constructors such as
    `new echarts.graphic.LinearGradient(...)` must be syntactically closed
    before the surrounding option object is closed.
+9. Dashboard HTML must be a designed BI layout, not a raw Page output or a
+   vertical stack of chart containers.
+10. Dashboard data must be embedded from Python `json.dumps(...,
+    ensure_ascii=False, default=str)`, not hand-written as a large nested
+    JavaScript object literal.
+11. Desktop dashboard layout must use the available viewport. A narrow
+    left-column layout with large blank space on the right is invalid.
+12. Long detail tables must be scrollable, summarized, or paginated; they must
+    not stretch the page into an unreadable single-column report.
+13. Dense forecast/trend/monthly/annual/GMV cards must declare their span.
+    They must not accidentally occupy half-width rows while the other half of
+    the row is blank.
+14. KPI cards and chart-card headers must have stable text wrapping rules.
+    `white-space: nowrap` on card text is invalid unless the text is inside a
+    deliberately clipped control such as a compact button.
+15. Wide/full span class names must map to real CSS. A class such as
+    `.chart-card--wide` is invalid unless it defines `grid-column: span 2` or
+    `grid-column: 1 / -1`, or the card has an equivalent inline style.
+16. Do not create pseudo full-width rows such as `<div class="row full">`
+    inside a two-column grid. The wide/full span rule must be attached to the
+    actual chart card, not to an intermediate row wrapper.
 
 ## Library Embedding Order
 
@@ -92,6 +113,8 @@ areaStyle: {
 These patterns are blocking failures:
 
 - `<script src="https://...">`
+- `<script src="https://cdn.example.com/echarts.min.js">`
+- `<script src="https://cdn.jsdelivr.net/...">`
 - `<link href="https://...">`
 - `script.src = "https://..."`
 - `fetch("https://...")` for map JSON or chart data
@@ -109,6 +132,23 @@ These patterns are blocking failures:
   `new echarts.graphic.RadialGradient(...)`
 - raw line breaks inside JavaScript string literals, especially ECharts
   formatter strings
+- raw `Page`, `Page.SimplePageLayout`, or `.chart-container` stacks used
+  as the final Dashboard layout
+- fixed/narrow dashboard shells such as `max-width: 720px` for desktop
+- 3+ chart cards arranged as `flex-direction: column` without responsive grid
+- dense forecast/trend/monthly/annual/GMV chart cards without
+  `chart-card--wide`, `span-2`, `full-width`, or `grid-column: span 2`
+- `chart-card--wide`, `span-2`, `full-width`, or similar class names used
+  without an effective `grid-column` rule
+- `.row` / `.full` pseudo full-width wrappers, especially
+  `<div class="row full"><div class="card">...</div></div>` on a two-column grid
+- chart cards or chart surfaces with tiny fixed dimensions
+- long tables with 18+ rows and no local `max-height`/`overflow:auto` wrapper
+- KPI cards or chart headers with `white-space: nowrap`
+- KPI cards or chart headers without `min-width: 0` plus
+  `overflow-wrap: anywhere` / `word-break: break-word`
+- large hand-written `const DATA = {...}`, `const chartData = {...}`, or
+  equivalent nested JS object literals
 - any `file://` value in generated business script, tag `src`, tag `href`, or
   tag `data`
 - `var window.dashboardCharts = []`
@@ -125,6 +165,65 @@ Use plain assignments for globals:
 window.dashboardCharts = [];
 window.dashboard = new DashboardController({ charts: window.dashboardCharts });
 ```
+
+## Dashboard Layout And Data Embedding
+
+Enterprise dashboards must contain an explicit information architecture:
+
+- `dashboard-header` for title, period, source, and actions
+- KPI cards such as `kpi-card` for first-screen decision signals
+- `dashboard-grid` for responsive chart placement
+- `chart-card` wrappers with headings, notes, and stable dimensions
+- diagnostic or insight areas when the data supports them
+
+Layout density requirements:
+
+- Use a full-width constrained shell such as `width: min(100%, 1440px)` or
+  `max-width: 1440px; margin: 0 auto`.
+- Use responsive grid columns, e.g.
+  `grid-template-columns: repeat(auto-fit, minmax(420px, 1fr))`.
+- Do not render 3+ chart cards as one narrow vertical strip on desktop.
+- Keep chart surfaces stable and readable, normally 320-420px high.
+- Put long tables inside a `.table-scroll` or `.table-wrapper` with
+  `max-height` and `overflow:auto`.
+- Use a clear span taxonomy:
+  - `chart-card--wide`, `span-2`, or `full-width` for dense forecast, trend,
+    monthly, annual, confidence-interval, or GMV charts.
+  - normal `chart-card` for compact comparison, composition, and diagnostic
+    modules.
+  - every span class must have real CSS, for example
+    `.chart-card--wide { grid-column: span 2; }`.
+- Use one dashboard grid parent. Do not wrap each chart in separate `.row`
+  grids, and do not put `.full` on a row wrapper. Put the span class on the
+  chart card itself:
+  - wrong: `<div class="row full"><div class="card">...</div></div>`
+  - right: `<section class="chart-card chart-card--wide">...</section>`
+- Add text wrapping to card components:
+  - `.kpi-card { min-width: 0; overflow-wrap: anywhere; }`
+  - `.chart-card-header { min-width: 0; overflow-wrap: anywhere; }`
+  - avoid `white-space: nowrap` for KPI labels, KPI values, chart titles, and
+    card headers.
+
+Do not use raw `Page` / `Page.SimplePageLayout` style output as the final output.
+The final dashboard must be authored from the `.md` workflow, dashboard HTML
+template, CSS Grid rules, and ECharts options.
+
+All data injected into HTML must be serialized before writing the HTML file:
+
+```python
+import json
+
+json_payload = json.dumps(data, ensure_ascii=False, default=str)
+html = f"""
+<script>
+window.dashboardData = JSON.parse({json.dumps(json_payload, ensure_ascii=False)});
+</script>
+"""
+```
+
+Do not hand-write large nested JavaScript objects. A single missing brace,
+quote, or non-serializable date can make the entire script block fail and stop
+all `echarts.init()` calls.
 
 ## Map Rules
 
@@ -221,6 +320,14 @@ The validator must check:
 - chart type and non-empty data
 - dashboard controller, CSS markers, PDF export dependencies, and
   `downloadChart`
+- enterprise Dashboard layout markers: header, grid, KPI cards, and chart cards
+- viewport usage and layout density: no narrow fixed shell, no single-column
+  chart stack for multi-card dashboards, no tiny chart surfaces
+- long tables without scroll/max-height wrappers
+- dense chart cards without explicit wide/full span classes
+- KPI/card-header text wrapping rules and forbidden `white-space: nowrap`
+- raw Page/SimplePageLayout-style chart stacks
+- large hand-written DATA/chartData object literals
 - PDF-incompatible CSS color functions
 - map registration when `geo`, `map`, or `effectScatter` is used
 

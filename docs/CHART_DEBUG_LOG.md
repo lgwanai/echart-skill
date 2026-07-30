@@ -309,4 +309,90 @@
   - **校验侧兜底**：`validate_chart.py` 新增 `_check_script_tag_integrity()` 基于原始文本（绕开 HTMLParser）检测：① 出现 `<\/script>` 转义结束标签直接报错；② `<script>` 开/闭标签数量不平衡直接报错。任一命中 → 退出码 1
 - **自检口诀**：内联库之后，数一下 `<script>` 与 `</script>` 是否成对、结束标签有没有多余的反斜杠
 
+---
+
+## #36 — Dashboard 裸图堆叠 + 手写 DATA 对象导致布局乱/整页不显示
+- **日期**：2026-07-22
+- **现象**：
+  - `crowneplaza_dashboard.html` 样式乱：页面只是多个图表纵向堆叠，没有企业 Dashboard 的 header、KPI 卡片、CSS Grid、图表卡片层级、信息密度和视觉层次。
+  - `wangjing_hotel_analysis.html` 完全无法显示：内嵌 `DATA` 对象是手写大型 JS 字面量，嵌套层级多，某处花括号或引号不匹配，导致整个 `<script>` 块语法错误，后续 `echarts.init()` 全部没有执行。
+- **根因**：
+  1. 用裸 `Page.SimplePageLayout` 式堆叠页面生成 Dashboard。这类页面只能快速堆图，不适合企业 BI Dashboard 交付。
+  2. 直接手写 1000+ 字符甚至 4000+ 字符的 JS 对象字面量。模型生成嵌套对象时非常容易漏引号、漏括号、混用单引号和日期对象，浏览器只报脚本错误，页面静默空白。
+  3. 依赖 `cdn.jsdelivr.net` 等 CDN，破坏单文件离线交付和 0 联网承诺。
+- **修复**：
+  - **生成侧铁律**：
+    1. Dashboard 禁止使用裸 `Page` / `Page.SimplePageLayout` 式堆叠输出；必须按 `.md` 工作流和 HTML 模板手写企业级 HTML/CSS Grid 外壳，包含 `dashboard-header`、`dashboard-grid`、`kpi-card`、`chart-card` 等结构。
+    2. 数据必须先由 Python `json.dumps(data, ensure_ascii=False, default=str)` 序列化，再嵌入 HTML；推荐 `window.dashboardData = JSON.parse(<json.dumps(json_string)>);`，禁止手写大型 `const DATA = {...}`。
+    3. 交付 HTML 禁止任何 CDN；ECharts、地图、html2canvas、jsPDF 都从本地 `assets/` 读取并内联。
+  - **校验侧兜底**：`validate_chart.py` 新增：
+    1. Dashboard 布局质量门：看起来是 Dashboard 的 HTML 必须有 header/grid/KPI/card 结构。
+    2. 裸 Page/SimplePageLayout 特征检测：检测到裸图堆叠直接失败。
+    3. 大型手写 DATA/chartData 对象检测：检测到未 JSON 序列化的大型对象直接失败。
+- **自检口诀**：Dashboard 不是图表列表；数据不手写，全部 JSON 序列化；交付不走 CDN，全部本地内联。
+
+---
+
+## #37 — Dashboard 窄列排版：左侧长条、右侧大面积空白、图表和长表不可读
+- **日期**：2026-07-22
+- **现象**：Dashboard 在桌面宽屏打开时只占左侧一条窄列，右侧大片空白；多个图表纵向堆叠，信息密度低；折线图 legend 和标签拥挤；明细表无限向下延伸，页面像长报表而不是企业 Dashboard。
+- **根因**：
+  1. 主容器或图表卡片使用了窄固定宽度（常见 600-900px），没有使用宽屏约束布局。
+  2. 多图区域没有真正的 CSS Grid，3+ 图表仍按单列 flex column 堆叠。
+  3. 长表没有 `max-height` + `overflow:auto` 的滚动容器，也没有分页/汇总。
+  4. 图表卡片缺少稳定尺寸约束，导致坐标轴、legend、数据标签挤压。
+- **修复**：
+  - **生成侧铁律**：
+    1. Dashboard 主容器使用 `width: min(100%, 1440px)` 或 `max-width: 1440px; margin: 0 auto`，不能固定成窄列。
+    2. 图表区使用响应式 CSS Grid，例如 `grid-template-columns: repeat(auto-fit, minmax(420px, 1fr))`。
+    3. 3 个以上图表卡片不得用 `flex-direction: column` 在桌面单列堆叠。
+    4. 图表绘图区高度通常保持 320-420px，避免 legend/坐标轴挤压。
+    5. 超过 18 行的表格必须放入 `.table-scroll` / `.table-wrapper`，设置 `max-height` 和 `overflow:auto`，或分页/摘要化。
+  - **校验侧兜底**：`validate_chart.py` 新增 Dashboard 视觉版式质量门，拦截窄固定主容器、单列图表堆叠、小尺寸图表区域和长表无滚动。
+- **自检口诀**：宽屏要用满、图表要成网格、表格要滚动；Dashboard 不是左侧长报表。
+
+---
+
+## #38 — 卡片换行混乱：密集图表半宽、KPI/标题缺少换行策略
+- **日期**：2026-07-28
+- **现象**：Dashboard 首屏 KPI 卡片还能横排，但下面图表卡片换行逻辑混乱：前两张预测大图以半宽卡片单独占一行，右侧留白；后续卡片又突然两列；KPI/卡片标题在宽度变化时缺少稳定换行规则，长标题和指标名容易撑乱卡片。
+- **根因**：
+  1. Dashboard 没有“卡片跨度 taxonomy”，所有图表都用同一种 `.chart-card`，导致预测/趋势/年度/月度/GMV 等密集图表被误放进半宽网格。
+  2. CSS Grid 只定义列，没有定义哪些卡片应该 `span 2` 或 `full-width`。
+  3. KPI 卡片和 chart header 没有 `min-width: 0` 与 `overflow-wrap`，或者使用了 `white-space: nowrap`，导致换行和溢出由浏览器随机处理。
+- **修复**：
+  - **生成侧铁律**：
+    1. 建立明确跨度规则：普通卡片 `.chart-card`，密集卡片 `.chart-card--wide` / `.span-2` / `.full-width`。
+    2. 预测、趋势、月度、年度、置信区间、GMV 等图表必须显式跨列，例如 `grid-column: span 2` 或 `grid-column: 1 / -1`；跨度类名必须有真实 CSS，不能只写类名。
+    3. KPI 和卡片标题必须设置 `min-width: 0; overflow-wrap: anywhere;`，必要时对子元素也设置。
+    4. KPI 标签、数值、图表标题、卡片标题禁止 `white-space: nowrap`，除非是有 `text-overflow: ellipsis` 的小控件。
+  - **校验侧兜底**：`validate_chart.py` 新增：
+    1. 密集图表卡片无 `span-2/full-width/grid-column` 直接失败。
+    2. 跨度类名没有对应 `grid-column` 规则直接失败。
+    3. `.kpi-card` / `.chart-card-header` 缺少 `min-width:0` + `overflow-wrap` 直接失败。
+    4. KPI/卡片标题出现 `white-space: nowrap` 直接失败。
+- **自检口诀**：大图要跨列，短图才半宽；卡片可压缩，文字能换行。
+
+---
+
+## #39 — Dashboard 空卡片：CDN ECharts + JS 字符串拼坏 + `.row full` 伪全宽
+- **日期**：2026-07-28
+- **现象**：`rujia_analysis.html` 页面只显示 header 和空白卡片，所有图表区域没有任何数据；首张“月度趋势”大图位于左半列，右侧大片空白，后续卡片网格节奏混乱。
+- **根因**：
+  1. HTML 使用 `<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js">`，违反企业离线交付和 `file://` 稳定性要求。网络慢、断网或被拦截时 `echarts` 不存在，所有图表无法初始化。
+  2. KPI HTML 使用字符串拼接，其中一段引号写成 `+'</div></div>"+`，导致业务 `<script>` 出现 `SyntaxError`，后续 `echarts.init()` 全部不执行。
+  3. 布局使用 `.row{grid-template-columns:1fr 1fr}` + `<div class="row full"><div class="card">...</div></div>`。`.full` 加在 row 容器上不会让内部单个 card 跨两列，形成“看似全宽、实际半宽”的伪全宽。
+  4. 页面没有使用企业 Dashboard 标准类：`dashboard-header`、`dashboard-grid`、`chart-card`、`kpi-card`，导致既难维护，也绕不开布局质量门。
+- **修复**：
+  - **生成侧铁律**：
+    1. Dashboard/Chart/Report 禁止任何 CDN；必须读取并内联本地 `assets/echarts/echarts.min.js`。
+    2. 数据和 KPI 文案先用 `json.dumps(..., ensure_ascii=False, default=str)` 序列化，再在 JS 中通过 DOM API 或模板函数渲染；禁止长字符串拼接业务 HTML。
+    3. Dashboard 只使用一个 `.dashboard-grid` 父网格；跨列类必须加在实际 `.chart-card` 上，例如 `<section class="chart-card chart-card--wide">...</section>`。
+    4. `python scripts/validate_chart.py <output.html>` 返回非 0 时绝不能交付给用户。
+  - **校验侧兜底**：`validate_chart.py` 新增：
+    1. 更稳健的 CSS selector 解析，支持 `.row{...}` 这种紧凑写法。
+    2. `.row full` 伪全宽检测：发现两列 row grid 包单个 card 或密集图表时直接失败。
+    3. 命令安装器为 `/echart-dashboard`、`/echart-chart`、`/echart-report` 注入 CDN、伪全宽、JSON 序列化和校验失败不得交付的硬规则。
+- **自检口诀**：依赖不走网，脚本不能红，跨列加卡片，校验不通过不交付。
+
 | effectScatter | `series.data` | — |

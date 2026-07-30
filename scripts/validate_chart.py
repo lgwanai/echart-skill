@@ -86,10 +86,7 @@ def _check_script_tag_integrity(content):
     """
     errors = []
 
-    # Escaped closing tag used as a real terminator. Legitimate uses (a
-    # </script> literal emitted from inside a JS string) are essentially never
-    # present in generated data-chart pages, so flag it directly.
-    if re.search(r"<\\/script\s*>", content, re.IGNORECASE):
+    if _has_escaped_script_close_outside_js_string(content):
         errors.append(
             "BLANK PAGE: found escaped `<\\/script>` closing tag — the browser "
             "does NOT recognize it, so the <script> block never closes and the "
@@ -98,10 +95,11 @@ def _check_script_tag_integrity(content):
             "string literals, never on the real tag)."
         )
 
-    # Opening/closing <script> tag balance. A mismatch means at least one inline
-    # block is unterminated and will swallow the markup that follows it.
-    open_tags = len(re.findall(r"<script\b", content, re.IGNORECASE))
-    close_tags = len(re.findall(r"</script\s*>", content, re.IGNORECASE))
+    # Opening/closing <script> tag balance for real HTML tags. Do not count
+    # escaped/script-like strings inside inlined libraries such as jsPDF.
+    parsed = _parse_html(content)
+    open_tags = sum(1 for tag, _attrs in parsed.tags if tag == "script")
+    close_tags = len(parsed.scripts)
     if open_tags != close_tags:
         errors.append(
             f"BLANK PAGE: unbalanced <script> tags ({open_tags} open vs "
@@ -112,6 +110,52 @@ def _check_script_tag_integrity(content):
         )
 
     return errors
+
+
+def _has_escaped_script_close_outside_js_string(content):
+    script_open = re.compile(r"<script\b[^>]*>", re.IGNORECASE)
+    literal_close = re.compile(r"</script\s*>", re.IGNORECASE)
+    escaped_close = re.compile(r"<\\/script\s*>", re.IGNORECASE)
+
+    pos = 0
+    while True:
+        open_match = script_open.search(content, pos)
+        if not open_match:
+            return False
+        close_match = literal_close.search(content, open_match.end())
+        script_end = close_match.start() if close_match else len(content)
+        script_body = content[open_match.end():script_end]
+        if _escaped_script_close_outside_string(script_body, escaped_close):
+            return True
+        if not close_match:
+            return False
+        pos = close_match.end()
+
+
+def _escaped_script_close_outside_string(script_body, escaped_close_pattern):
+    in_string = None
+    escape = False
+    index = 0
+    while index < len(script_body):
+        if escaped_close_pattern.match(script_body, index) and in_string is None:
+            return True
+        char = script_body[index]
+        if in_string:
+            if escape:
+                escape = False
+            elif char == "\\":
+                escape = True
+            elif in_string == "`" and char == "$" and index + 1 < len(script_body) and script_body[index + 1] == "{":
+                # Template expression parsing is intentionally conservative;
+                # keep treating it as string for this check because generated
+                # dashboard data should never need raw closing script tags.
+                pass
+            elif char == in_string:
+                in_string = None
+        elif char in ("'", '"', "`"):
+            in_string = char
+        index += 1
+    return False
 
 
 def _extract_report_chart_specs(content):
@@ -319,6 +363,518 @@ def _specs_have_data(specs):
     return False
 
 
+def _looks_like_dashboard(content, html_path):
+    basename = os.path.basename(html_path).lower()
+    lower = content.lower()
+    init_count = len(re.findall(r"echarts\.init\s*\(", content))
+    title_dashboard = bool(re.search(r"<title>[^<]*(dashboard|仪表盘|看板)", lower))
+    return (
+        "dashboard" in basename
+        or "仪表盘" in content
+        or "看板" in content
+        or title_dashboard
+        or init_count >= 2
+        or "dashboard-container" in content
+        or "dashboard-grid" in content
+        or "DashboardController" in content
+    )
+
+
+def _has_html_class(content, class_name):
+    return bool(re.search(
+        r"class\s*=\s*['\"][^'\"]*\b" + re.escape(class_name) + r"\b",
+        content,
+        re.IGNORECASE,
+    ))
+
+
+def _detect_raw_page_layout(content):
+    lower = content.lower()
+    explicit_raw_page = "simplepagelayout" in lower
+    page_layout_marker = bool(re.search(
+        r"(?:class\s*=\s*['\"][^'\"]*\bpage\b|\.page\s*\{)",
+        content,
+        re.IGNORECASE,
+    ))
+    flex_stack_marker = (
+        "display:flex;flex-direction:column" in lower
+        or "display: flex; flex-direction: column" in lower
+    )
+    chart_container_count = len(re.findall(r"class\s*=\s*['\"][^'\"]*chart-container", content, re.IGNORECASE))
+    return chart_container_count >= 2 and (explicit_raw_page or (page_layout_marker and flex_stack_marker))
+
+
+def _detect_large_handwritten_data_objects(scripts):
+    errors = []
+    assignment_pattern = re.compile(
+        r"\b(?:const|let|var)\s+(?:DATA|data|dashboardData|chartData)\s*=\s*\{",
+    )
+    for script_index, script in enumerate(scripts, start=1):
+        for match in assignment_pattern.finditer(script):
+            raw_object = _extract_balanced(script, match.end() - 1, "{", "}")
+            if not raw_object:
+                continue
+            # Large nested JS object literals are the common source of silent
+            # dashboard blank pages. JSON.parse/json.dumps output always has
+            # quoted keys, no single-quoted strings, and can be node-checked.
+            unquoted_keys = len(re.findall(r"(?<!['\"])\b[A-Za-z_$][\w$]*\s*:", raw_object))
+            single_quotes = raw_object.count("'")
+            if len(raw_object) > 1200 and (unquoted_keys > 5 or single_quotes > 10):
+                errors.append(
+                    f"INVALID DATA embedding in custom script #{script_index}: "
+                    f"large hand-written JS object assigned to DATA/chartData — "
+                    f"serialize data with Python `json.dumps(..., ensure_ascii=False, default=str)` "
+                    f"and embed it as `window.dashboardData = JSON.parse(<json string>)` "
+                    f"or a strict JSON literal with quoted keys. Do not hand-write nested JS objects."
+                )
+    return errors
+
+
+def _css_number_px(value):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _detect_narrow_fixed_layout(content):
+    errors = []
+    # Enterprise dashboards should use most desktop viewport width. A main
+    # shell fixed around 600-900px creates the common left-column / blank-right
+    # failure shown in browser screenshots.
+    narrow_shell_pattern = re.compile(
+        r"(?:\.|#)(?:dashboard-container|dashboard-shell|dashboard-main|main-content|content|container|wrapper)"
+        r"[^{}]*\{[^{}]*(?:max-)?width\s*:\s*(\d+(?:\.\d+)?)px",
+        re.IGNORECASE | re.DOTALL,
+    )
+    for match in narrow_shell_pattern.finditer(content):
+        width = _css_number_px(match.group(1))
+        if width is not None and width < 1100:
+            errors.append(
+                f"DASHBOARD LAYOUT: main dashboard shell is fixed/narrow ({width:g}px) — "
+                "desktop dashboards must use a responsive full-width container such as "
+                "`width: min(100%, 1440px)` or `max-width: 1440px; margin: 0 auto`, "
+                "not a narrow left column that leaves blank space."
+            )
+
+    narrow_inline_pattern = re.compile(
+        r"class\s*=\s*['\"][^'\"]*(?:dashboard-container|dashboard-shell|dashboard-main)[^'\"]*['\"][^>]*"
+        r"style\s*=\s*['\"][^'\"]*(?:max-)?width\s*:\s*(\d+(?:\.\d+)?)px",
+        re.IGNORECASE | re.DOTALL,
+    )
+    for match in narrow_inline_pattern.finditer(content):
+        width = _css_number_px(match.group(1))
+        if width is not None and width < 1100:
+            errors.append(
+                f"DASHBOARD LAYOUT: inline dashboard shell width is too narrow ({width:g}px) — "
+                "use responsive full-width layout constraints."
+            )
+    return errors
+
+
+def _detect_dashboard_grid_density_issues(content):
+    errors = []
+    lower = content.lower()
+    has_grid_class = _has_html_class(content, "dashboard-grid") or ".dashboard-grid" in content
+    has_grid_css = bool(re.search(
+        r"\.dashboard-grid[^{}]*\{[^{}]*display\s*:\s*grid",
+        content,
+        re.IGNORECASE | re.DOTALL,
+    ))
+    has_responsive_columns = bool(re.search(
+        r"grid-template-columns\s*:\s*(?:repeat\s*\([^;{}]*(?:minmax|auto-fit|auto-fill)|[^;{}]*(?:minmax|fr))",
+        content,
+        re.IGNORECASE | re.DOTALL,
+    ))
+    if has_grid_class and (not has_grid_css or not has_responsive_columns):
+        errors.append(
+            "DASHBOARD LAYOUT: dashboard-grid is not a real responsive CSS Grid — "
+            "use `display: grid` with `grid-template-columns: repeat(auto-fit, minmax(...))` "
+            "or explicit `fr` columns so desktop views do not collapse into one narrow column."
+        )
+
+    chart_card_count = len(_chart_card_opening_tags(content))
+    if chart_card_count >= 3 and not has_responsive_columns:
+        errors.append(
+            "DASHBOARD LAYOUT: 3+ chart cards without responsive multi-column grid — "
+            "desktop dashboards need 2-3 column card placement, not a single vertical strip."
+        )
+
+    if (
+        ("display:flex;flex-direction:column" in lower or "display: flex; flex-direction: column" in lower)
+        and chart_card_count >= 3
+        and not has_responsive_columns
+    ):
+        errors.append(
+            "DASHBOARD LAYOUT: chart cards are arranged as a vertical flex column — "
+            "replace with CSS Grid and responsive columns to avoid left-column whitespace."
+        )
+    return errors
+
+
+def _detect_chart_card_dimension_issues(content):
+    errors = []
+    # Fixed tiny cards/charts make legends and axes unreadable. Keep this check
+    # conservative: only block explicit small px dimensions on dashboard chart
+    # cards/containers.
+    for selector in ("chart-card", "chart-panel", "chart-container", "echart-card", "viz-card"):
+        for block in _css_blocks_for_exact_selector(content, selector):
+            match = re.search(r"(?:max-)?width\s*:\s*(\d+(?:\.\d+)?)px", block, re.IGNORECASE)
+            width = _css_number_px(match.group(1)) if match else None
+            if width is not None and width < 520:
+                errors.append(
+                    f"DASHBOARD LAYOUT: chart card/container width is too small ({width:g}px) — "
+                    "use grid tracks with minmax(360px, 1fr) or wider cards for readable axes and legends."
+                )
+
+    for selector in ("chart", "chart-card", "chart-panel", "chart-container", "echart-card", "viz-card"):
+        for block in _css_blocks_for_exact_selector(content, selector):
+            match = re.search(r"(?:height|min-height)\s*:\s*(\d+(?:\.\d+)?)px", block, re.IGNORECASE)
+            height = _css_number_px(match.group(1)) if match else None
+            if height is not None and height < 300:
+                errors.append(
+                    f"DASHBOARD LAYOUT: chart area height is too small ({height:g}px) — "
+                    "use stable chart heights of at least 320-420px for enterprise dashboards."
+                )
+    return errors
+
+
+def _detect_long_table_without_scroll(content):
+    table_blocks = re.findall(r"<table\b.*?</table>", content, flags=re.IGNORECASE | re.DOTALL)
+    errors = []
+    for table in table_blocks:
+        row_count = len(re.findall(r"<tr\b", table, flags=re.IGNORECASE))
+        table_index = content.find(table)
+        context_start = max(0, table_index - 500)
+        context_end = min(len(content), table_index + len(table) + 250)
+        table_context = content[context_start:context_end]
+        has_local_scroll_container = bool(re.search(
+            r"(table-scroll|table-wrapper|data-table-container|overflow-y\s*:\s*(?:auto|scroll)|overflow\s*:\s*(?:auto|scroll)|max-height\s*:)",
+            table_context,
+            re.IGNORECASE,
+        ))
+        if row_count > 18 and not has_local_scroll_container:
+            errors.append(
+                f"DASHBOARD LAYOUT: long table has {row_count} rows without a scroll/max-height wrapper — "
+                "large detail tables must live inside `.table-scroll`/`.table-wrapper` with "
+                "`max-height` and `overflow:auto`, or be paginated/summarized."
+            )
+            break
+    return errors
+
+
+def _css_blocks_for_selector(content, selector_name):
+    pattern = re.compile(
+        r"\." + re.escape(selector_name) + r"(?=[\s\*\.:,\{])[^{}]*\{([^{}]*)\}",
+        re.IGNORECASE | re.DOTALL,
+    )
+    return [match.group(1) for match in pattern.finditer(content)]
+
+
+def _css_blocks_for_exact_selector(content, selector_name):
+    pattern = re.compile(
+        r"(?:^|[}\n])\s*(?:\.|#)" + re.escape(selector_name) + r"\s*\{([^{}]*)\}",
+        re.IGNORECASE | re.DOTALL,
+    )
+    return [match.group(1) for match in pattern.finditer(content)]
+
+
+def _detect_card_text_wrap_issues(content):
+    errors = []
+    checks = [
+        ("kpi-card", "KPI cards"),
+        ("chart-card-header", "chart card headers"),
+    ]
+    for class_name, label in checks:
+        if class_name not in content:
+            continue
+        css_blocks = _css_blocks_for_selector(content, class_name)
+        combined = "\n".join(css_blocks).lower()
+        if re.search(r"white-space\s*:\s*nowrap", combined):
+            errors.append(
+                f"DASHBOARD LAYOUT: {label} use `white-space: nowrap` — "
+                "KPI/card text must wrap predictably instead of forcing cards to overflow."
+            )
+        has_min_width_zero = bool(re.search(r"min-width\s*:\s*0\b", combined))
+        has_wrap = bool(re.search(r"(overflow-wrap\s*:\s*(?:anywhere|break-word)|word-break\s*:\s*break-word)", combined))
+        if not has_min_width_zero or not has_wrap:
+            errors.append(
+                f"DASHBOARD LAYOUT: {label} lack stable wrapping CSS — "
+                "add `min-width: 0` plus `overflow-wrap: anywhere` or `word-break: break-word` "
+                "so Chinese titles, long metric names, and large values do not break card layout."
+            )
+    return errors
+
+
+def _strip_html_tags(text):
+    return re.sub(r"<[^>]+>", " ", text)
+
+
+def _detect_dense_cards_without_span(content):
+    errors = []
+    card_pattern = re.compile(
+        r"<(?P<tag>section|article|div)\b(?P<attrs>[^>]*class\s*=\s*['\"][^'\"]*['\"][^>]*)>"
+        r"(?P<body>.*?)</(?P=tag)>",
+        re.IGNORECASE | re.DOTALL,
+    )
+    dense_keywords = (
+        "预测",
+        "趋势",
+        "年度",
+        "月度",
+        "置信",
+        "区间",
+        "GMV",
+        "forecast",
+        "trend",
+        "monthly",
+        "year",
+    )
+    for match in card_pattern.finditer(content):
+        attrs = match.group("attrs")
+        if not _has_class_token(attrs, "chart-card"):
+            continue
+        body = match.group("body")
+        text = _strip_html_tags(body)
+        is_dense = any(keyword.lower() in text.lower() for keyword in dense_keywords)
+        if not is_dense:
+            continue
+        has_span = bool(
+            re.search(r"\b(chart-card--wide|card-wide|span-2|grid-span-2|full-width|is-wide)\b", attrs, re.IGNORECASE)
+            or re.search(r"grid-column\s*:\s*(?:span\s*2|1\s*/\s*-1)", attrs + body, re.IGNORECASE)
+        )
+        if not has_span:
+            title = " ".join(text.split())[:80]
+            errors.append(
+                f"DASHBOARD LAYOUT: dense chart card `{title}` has no explicit wide/full span — "
+                "forecast, trend, monthly, annual, confidence-interval, or GMV charts need "
+                "`chart-card--wide`/`span-2`/`full-width` or `grid-column: span 2` to avoid "
+                "half-width cards wrapping into broken rows."
+            )
+    return errors
+
+
+def _has_class_token(attrs, class_name):
+    match = re.search(r"class\s*=\s*['\"]([^'\"]*)['\"]", attrs, re.IGNORECASE | re.DOTALL)
+    if not match:
+        return False
+    return class_name in re.split(r"\s+", match.group(1).strip())
+
+
+def _chart_card_opening_tags(content):
+    tags = []
+    for match in re.finditer(
+        r"<(?:section|article|div)\b(?P<attrs>[^>]*class\s*=\s*['\"][^'\"]*['\"][^>]*)>",
+        content,
+        re.IGNORECASE | re.DOTALL,
+    ):
+        attrs = match.group("attrs")
+        if _has_class_token(attrs, "chart-card"):
+            tags.append(attrs)
+    return tags
+
+
+def _chart_card_has_effective_span(attrs):
+    return bool(
+        re.search(r"\b(chart-card--wide|card-wide|span-2|grid-span-2|full-width|is-wide)\b", attrs, re.IGNORECASE)
+        or re.search(r"grid-column\s*:\s*(?:span\s*2|1\s*/\s*-1)", attrs, re.IGNORECASE)
+    )
+
+
+def _detect_orphan_half_width_cards(content):
+    errors = []
+    if not re.search(
+        r"\.dashboard-grid[^{}]*\{[^{}]*grid-template-columns\s*:\s*(?:repeat\s*\(\s*2\s*,|[^;{}]*1fr[^;{}]*1fr)",
+        content,
+        re.IGNORECASE | re.DOTALL,
+    ):
+        return errors
+
+    card_attrs = _chart_card_opening_tags(content)
+    if len(card_attrs) < 5:
+        return errors
+
+    ordinary_count = sum(1 for attrs in card_attrs if not _chart_card_has_effective_span(attrs))
+    if ordinary_count >= 5 and ordinary_count % 2 == 1:
+        errors.append(
+            "DASHBOARD LAYOUT: odd number of ordinary half-width chart cards in a two-column dashboard grid — "
+            "this creates orphan rows and large blank space like a broken BI page. Make one analytical card "
+            "`chart-card--wide`/`full-width` with an effective `grid-column` rule, or add a paired companion card."
+        )
+    return errors
+
+
+def _detect_first_dashboard_card_not_wide(content):
+    errors = []
+    if not re.search(
+        r"\.dashboard-grid[^{}]*\{[^{}]*grid-template-columns\s*:\s*(?:repeat\s*\(\s*(?:2|3)\s*,|[^;{}]*1fr[^;{}]*1fr)",
+        content,
+        re.IGNORECASE | re.DOTALL,
+    ):
+        return errors
+
+    card_attrs = _chart_card_opening_tags(content)
+    if len(card_attrs) < 4:
+        return errors
+    if not _chart_card_has_effective_span(card_attrs[0]):
+        errors.append(
+            "DASHBOARD LAYOUT: first analytical chart card is ordinary half-width in a multi-column grid — "
+            "enterprise dashboards must make the first core trend/diagnostic chart wide/full so the first "
+            "row does not leave a blank right side or bury the main conclusion."
+        )
+    return errors
+
+
+def _detect_span_class_css_issues(content):
+    errors = []
+    span_classes = (
+        "chart-card--wide",
+        "card-wide",
+        "span-2",
+        "grid-span-2",
+        "full-width",
+        "is-wide",
+    )
+    for class_name in span_classes:
+        if class_name not in content:
+            continue
+        css_blocks = _css_blocks_for_selector(content, class_name)
+        has_class_grid_span = any(
+            re.search(r"grid-column\s*:\s*(?:span\s*2|1\s*/\s*-1)", block, re.IGNORECASE)
+            for block in css_blocks
+        )
+        has_inline_grid_span = bool(re.search(
+            r"class\s*=\s*['\"][^'\"]*\b" + re.escape(class_name) + r"\b[^'\"]*['\"][^>]*"
+            r"style\s*=\s*['\"][^'\"]*grid-column\s*:\s*(?:span\s*2|1\s*/\s*-1)",
+            content,
+            re.IGNORECASE | re.DOTALL,
+        ))
+        if not has_class_grid_span and not has_inline_grid_span:
+            errors.append(
+                f"DASHBOARD LAYOUT: `{class_name}` is used but has no effective `grid-column` rule — "
+                "wide/full span class names must map to `grid-column: span 2` or `grid-column: 1 / -1`; "
+                "otherwise dense dashboard cards still collapse into ordinary half-width placement."
+            )
+    return errors
+
+
+def _detect_misapplied_full_width_grid_issues(content):
+    errors = []
+    row_grid_blocks = _css_blocks_for_selector(content, "row")
+    row_grid_is_two_col = any(
+        re.search(r"display\s*:\s*grid", block, re.IGNORECASE)
+        and re.search(r"grid-template-columns\s*:\s*(?:1fr\s+1fr|repeat\s*\(\s*2\s*,)", block, re.IGNORECASE)
+        for block in row_grid_blocks
+    )
+    if not row_grid_is_two_col:
+        return errors
+
+    row_full_pattern = re.compile(
+        r"<(?P<tag>section|article|div|main)\b(?P<attrs>[^>]*class\s*=\s*['\"][^'\"]*\brow\b[^'\"]*\bfull\b[^'\"]*['\"][^>]*)>"
+        r"(?P<body>.*?)</(?P=tag)>",
+        re.IGNORECASE | re.DOTALL,
+    )
+    for match in row_full_pattern.finditer(content):
+        body = match.group("body")
+        card_like_children = len(re.findall(r"class\s*=\s*['\"][^'\"]*\b(?:card|chart-card)\b", body, re.IGNORECASE))
+        dense_text = _strip_html_tags(body)
+        has_dense_chart = any(
+            keyword.lower() in dense_text.lower()
+            for keyword in ("趋势", "月度", "年度", "GMV", "预测", "forecast", "trend", "monthly", "year")
+        )
+        if card_like_children <= 1 or has_dense_chart:
+            title = " ".join(dense_text.split())[:80]
+            errors.append(
+                f"DASHBOARD LAYOUT: pseudo full-width row `{title}` uses `class=\"row full\"` on a "
+                "two-column grid container — `grid-column` on the row itself does not make its single "
+                "child card span both columns. Use one `.dashboard-grid` parent and put "
+                "`chart-card--wide`/`full-width`/`grid-column: 1 / -1` on the actual chart card."
+            )
+            break
+    return errors
+
+
+def _count_chart_shells(content):
+    return len(_chart_card_opening_tags(content)) + len(re.findall(
+        r"<(?:section|article|div)\b[^>]*class\s*=\s*['\"][^'\"]*\bchart-panel\b",
+        content,
+        re.IGNORECASE | re.DOTALL,
+    ))
+
+
+def _detect_missing_chart_governance_and_data_access(content, is_dashboard):
+    errors = []
+    chart_shell_count = _count_chart_shells(content)
+    if chart_shell_count == 0:
+        if "echarts.init" in content:
+            errors.append(
+                "CHART GOVERNANCE: ECharts output has no chart-card/chart-panel shell — "
+                "every chart must live in an enterprise chart container with title, scope, source, and data access."
+            )
+        return errors
+
+    data_button_count = len(re.findall(
+        r"(?:data-action\s*=\s*['\"]view-data['\"]|data-role\s*=\s*['\"]view-data['\"]|查看数据)",
+        content,
+        re.IGNORECASE,
+    ))
+    data_table_count = len(re.findall(
+        r"class\s*=\s*['\"][^'\"]*\b(?:chart-data-table|data-table-panel|chart-data-modal)\b",
+        content,
+        re.IGNORECASE,
+    ))
+    hidden_table_count = len(re.findall(
+        r"(?:hidden|display\s*:\s*none|aria-hidden\s*=\s*['\"]true['\"]|class\s*=\s*['\"][^'\"]*\bis-hidden\b)",
+        content,
+        re.IGNORECASE,
+    ))
+
+    if data_button_count < chart_shell_count:
+        errors.append(
+            f"CHART GOVERNANCE: {chart_shell_count} chart cards/panels but only {data_button_count} visible data buttons — "
+            "each chart must include a `查看数据` button (`data-action=\"view-data\"` or `data-role=\"view-data\"`)."
+        )
+    if data_table_count < chart_shell_count:
+        errors.append(
+            f"CHART GOVERNANCE: {chart_shell_count} chart cards/panels but only {data_table_count} corresponding data table containers — "
+            "each chart must include its own default-hidden data table (`chart-data-table` / `data-table-panel` / modal)."
+        )
+    if hidden_table_count == 0:
+        errors.append(
+            "CHART GOVERNANCE: chart data tables are not default-hidden — "
+            "actual data should be hidden initially and shown only after the user clicks `查看数据`."
+        )
+    if not re.search(r"(toggleChartData|openChartData|showChartData|data-table-modal)", content, re.IGNORECASE):
+        errors.append(
+            "CHART GOVERNANCE: missing data-table interaction handler — "
+            "clicking `查看数据` must open/toggle the corresponding data table."
+        )
+    if not re.search(r"(统计口径|口径说明|chart-scope|data-scope)", content, re.IGNORECASE):
+        errors.append(
+            "CHART GOVERNANCE: missing chart-level statistical scope / 统计口径说明."
+        )
+    if not re.search(r"(数据来源|来源表|source table|chart-source|data-source|query hash)", content, re.IGNORECASE):
+        errors.append(
+            "CHART GOVERNANCE: missing chart-level data source / 数据来源 / query hash."
+        )
+    return errors
+
+
+def _detect_dashboard_visual_layout_issues(content):
+    errors = []
+    errors.extend(_detect_narrow_fixed_layout(content))
+    errors.extend(_detect_dashboard_grid_density_issues(content))
+    errors.extend(_detect_chart_card_dimension_issues(content))
+    errors.extend(_detect_long_table_without_scroll(content))
+    errors.extend(_detect_card_text_wrap_issues(content))
+    errors.extend(_detect_dense_cards_without_span(content))
+    errors.extend(_detect_orphan_half_width_cards(content))
+    errors.extend(_detect_first_dashboard_card_not_wide(content))
+    errors.extend(_detect_span_class_css_issues(content))
+    errors.extend(_detect_misapplied_full_width_grid_issues(content))
+    return errors
+
+
 def validate(html_path):
     with open(html_path) as f:
         content = f.read()
@@ -423,6 +979,7 @@ def validate(html_path):
 
     custom_scripts = _custom_inline_scripts(parsed_html)
     errors.extend(_detect_unbalanced_echarts_graphic_calls(custom_scripts))
+    errors.extend(_detect_large_handwritten_data_objects(custom_scripts))
     errors.extend(_run_node_syntax_check(custom_scripts))
 
     # ─────────────────────────────────────────────────────────────
@@ -491,13 +1048,41 @@ def validate(html_path):
         if "registerMap" not in content and "FeatureCollection" not in content:
             errors.append("MISSING: map GeoJSON not loaded (MAP_INLINE issue?)")
 
+    errors.extend(_detect_missing_chart_governance_and_data_access(content, is_dashboard=False))
+
     # ─────────────────────────────────────────────────────────────
     # 8. Dashboard-specific checks
     # ─────────────────────────────────────────────────────────────
-    is_dashboard = bool(
-        re.search(r'DashboardController|dashboard-container|dashboard-grid', content)
-    )
+    is_dashboard = _looks_like_dashboard(content, html_path)
     if is_dashboard:
+        if _detect_raw_page_layout(content):
+            errors.append(
+                "DASHBOARD: raw Page/SimplePageLayout-style chart stack detected — "
+                "do not use any naked page generator output for enterprise dashboards. "
+                "Author the dashboard from the .md workflow/template with CSS Grid, "
+                "header, KPI cards, chart cards, hierarchy, and inlined ECharts assets."
+            )
+
+        required_layout_classes = [
+            "dashboard-header",
+            "dashboard-grid",
+            "chart-card",
+            "kpi-card",
+        ]
+        missing_layout = [
+            class_name for class_name in required_layout_classes
+            if not _has_html_class(content, class_name)
+            and f".{class_name}" not in content
+        ]
+        if missing_layout:
+            errors.append(
+                f"DASHBOARD: missing enterprise layout structure {missing_layout} — "
+                f"dashboards must use a designed CSS Grid layout with header, KPI cards, "
+                f"and chart cards. Do not ship bare stacked charts."
+            )
+
+        errors.extend(_detect_dashboard_visual_layout_issues(content))
+
         # 8a. DashboardController must be defined (dashboard.js inlined)
         if "DashboardController" not in content or "class DashboardController" not in content:
             errors.append(

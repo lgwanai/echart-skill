@@ -6,7 +6,8 @@
 |---|---|---|---|
 | `/echart-help` | `/help` | 查看 echart-skill 全部命令索引 | `` |
 | `/echart-import` | `/import` | 导入 Excel/CSV 数据到本地 DuckDB | `<file> [--table <name>] [--db <path>]` |
-| `/echart-query` | `/query` | 执行本地 DuckDB SQL 查询 | `<SQL>` |
+| `/echart-query` | `/query` | 通过统一 SQL runner 执行 DuckDB/PostgreSQL/MySQL 查询 | `<SQL>` |
+| `/echart-analysis-query` | `/analysis-query` | 可选快捷聚合查询 | `entity-search|period-compare|segment|trend|topn ...` |
 | `/echart-chart` | `/chart` | 生成自包含 ECharts 图表 HTML | `<type> <description> [--table <name>] [--output <path>]` |
 | `/echart-chart-list` | `/chart-list` | 查看支持的图表类型 | `[category]` |
 | `/echart-export` | `/export` | 导出查询或表到 CSV/Excel | `<output> [--table <name>|--query <SQL>]` |
@@ -46,4 +47,4 @@
 | `/echart-why` | `/why` | 指标变化归因分析 | `<table> <metric> <date_column> <from> <to>` |
 | `/echart-context` | `/context` | 会话管理和追问解析 | `start|resolve|history|context|list ...` |
 
-核心原则：本地 DuckDB 计算、明细数据不过大模型、自包含 ECharts 输出、审计与血缘可追踪、专家模式生成企业报告和 Dashboard。
+核心原则：Agent 可以根据 schema 和当前生效统计口径生成 SQL，也可以写 SQL 文件，但必须通过 `scripts/sql_runner.py --sql` / `scripts/sql_runner.py --file` / `scripts/db_cli.py` / `scripts/db_manager.py` 执行，`scripts/analysis_runner.py` 只作为简单聚合快捷方式；不得用临时 heredoc Python 连接数据库，不得从 `conn = ...` 开始写查数脚本。执行前读取 `python scripts/metrics_manager.py effective`，业务集合口径（如商圈酒店集合）必须按口径展开为 SQL 条件，例如 `hotel_name IN (...)`，不能假设存在商圈字段，也不能自行用关键词 LIKE 猜集合。分析代码仅用于 SQL 难以表达的算法、建模或后处理，不能负责连接数据库、执行 SQL、审计或结果导出。连接信息通过 profile 或 runner 参数传入，密码通过环境变量传入。任何输出形态都必须满足企业 BI 交付标准：查询/导出有 `.meta.json` 元数据和血缘，报告/图表/Dashboard 有统计口径说明、数据血缘/来源、生成时间、证据引用、限制说明和专业版式；每个图表区域都有 `查看数据` 按钮和默认隐藏的对应数据表，并通过 `scripts/validate_output_quality.py`；HTML 还要通过 `scripts/validate_chart.py`。可用 `python scripts/validate_agent_output.py <log-or-text>` 扫描过程输出。本地 DuckDB 计算、明细数据不过大模型、自包含 ECharts 输出、审计与血缘可追踪、专家模式生成企业报告和 Dashboard。

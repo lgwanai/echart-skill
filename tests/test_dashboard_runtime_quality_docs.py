@@ -23,6 +23,18 @@ def test_dashboard_runtime_quality_gate_exists_and_covers_recent_failure_modes()
         "validate_chart.py",
         "chart bootstrap scripts before the inlined ECharts library",
         "raw line breaks inside JavaScript string literals",
+        "Page.SimplePageLayout",
+        "json.dumps",
+        "chart-card",
+        "kpi-card",
+        "width: min(100%, 1440px)",
+        "repeat(auto-fit, minmax(420px, 1fr))",
+        "table-scroll",
+        "overflow:auto",
+        "chart-card--wide",
+        "span-2",
+        "white-space: nowrap",
+        "overflow-wrap: anywhere",
     ]
 
     for term in required_terms:

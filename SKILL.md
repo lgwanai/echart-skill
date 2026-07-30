@@ -8,13 +8,92 @@ description: 专门处理日常办公场景下的高频、复杂数据分析与�
 This skill transforms the agent into a powerful local data analysis assistant, strictly adhering to a **Local Code Execution** paradigm.
 
 ## Core Architecture & Principles
-1. **Local Execution First**: NEVER read large datasets directly into the context window. Always generate Python scripts or SQL commands and execute them locally using `RunCommand`.
+1. **Local Execution First**: NEVER read large datasets directly into the context window. Database connections and SQL execution must go through the maintained CLI scripts (`scripts/sql_runner.py`, `scripts/db_cli.py`, `scripts/db_manager.py`) instead of ad-hoc heredoc Python.
 2. **DuckDB as the Engine**: All CSV/Excel files should be imported into a local DuckDB database (default: `workspace.duckdb`). Rely on SQL for robust data manipulation (filtering, joining, grouping). DuckDB's columnar storage delivers superior analytical performance.
 3. **Non-Destructive Operations (Undo Mechanism)**: Do not overwrite original tables. When modifying data, create a new table (e.g., `CREATE TABLE table_v2 AS SELECT ...`) or a View. This guarantees the user can always say "undo the last step".
 4. **Data Privacy**: Keep data local. Only send aggregated statistics or schema info into the context window.
 5. **Chart Output**: After generating ANY HTML chart/dashboard output, follow the server config:
 	   - **Default (`server.enabled=false`)**: Return the local file path only. The chart is a self-contained HTML file that works offline.
 	   - **If enabled (`server.enabled=true`)**: Start the server and return the access URL. Use `python scripts/server_cli.py start` to auto-start if not running. See Scenario 4 for detailed server check instructions.
+
+## SQL Execution Gate
+
+This gate applies to every data access path: explicit commands, natural-language
+analysis, schema discovery, metric calculation,同比/环比, reports, dashboards,
+charts, exports, and follow-up drilldowns.
+
+- ✅ Use maintained CLIs for every database connection and SQL query. The primary path is: read schema + read effective metric/scope Markdown + generate SQL + execute it through `scripts/sql_runner.py`.
+  - `python scripts/sql_runner.py --profile <name> --sql "<SELECT ...>" --output json`
+  - `python scripts/sql_runner.py --profile <name> --file queries/<task>.sql --output json`
+  - `python scripts/sql_runner.py --type postgresql --host <host> --database <db> --username <user> --password-env DB_PASSWORD --sql "<SELECT ...>" --output json`
+  - `python scripts/sql_runner.py --db workspace.duckdb --sql "<SELECT ...>" --output json`
+  - `python scripts/db_cli.py list-tables <profile>` / `describe-table`
+- ✅ Before generating SQL for reports, dashboards,同比/环比,商圈/品类/区域 competition, customer changes, or any business concept, load the effective scope definitions:
+  - `python scripts/metrics_manager.py effective`
+  - Project-level scope applies only when the current working directory is inside the recorded project directory.
+  - If a concept such as `金融街商圈` is maintained as a hotel set in the scope Markdown, resolve the listed hotel names from that definition and query `hotel_name IN (...)`. Do not invent a `business_district` field, and do not approximate the set with `LIKE '%金融街%' OR LIKE '%西单%'` unless the scope explicitly says to use keyword matching.
+- ✅ `scripts/analysis_runner.py` is only an optional shortcut for trivial standard aggregates. Do not force complex business questions into many runner flags when normal SQL is clearer and more auditable.
+- ✅ Complex SQL may be saved as a `.sql` file for review and audit. Execute SQL files only through `scripts/sql_runner.py --file`; never write Python just to open the file, create a connection, and execute it.
+- ✅ For one-off external DSNs, use `--dsn-env DB_URL`; never paste passwords or
+  connection strings into generated code or shell history.
+- ❌ Never use heredoc Python for SQL or database connections:
+  `python3 << 'PYEOF'`, `python << 'PY'`, `psycopg2.connect(...)`,
+  `psycopg.connect(...)`, `pymysql.connect(...)`, `duckdb.connect(...)`,
+  `create_engine(...)`, `.cursor()`, `cur.execute(...)`.
+- ❌ Never start analysis code with `conn = ...`; connection objects belong
+  inside fixed tools, not in Agent-authored query scripts.
+- ❌ Never hand-build SQL strings inside temporary Python loops for analysis.
+- ✅ If reviewing an Agent transcript or command log, run
+  `python scripts/validate_agent_output.py <log-or-text>`; any failure means the
+  answer must be rewritten as SQL executed by `scripts/sql_runner.py` or another maintained query tool, never as temporary connection code.
+
+Correct pattern for any database-backed analysis:
+
+```bash
+mkdir -p queries outputs/query_results
+python scripts/metrics_manager.py effective
+python scripts/schema_manager.py show hotel_order
+python scripts/sql_runner.py --profile china_mobile --sql "<SELECT ...>" --output json --out outputs/query_results/hotel_analysis.json
+```
+
+Correct pattern for hotel + business district + demand-side analysis:
+
+```bash
+python scripts/metrics_manager.py effective
+# Read the scope definition for 金融街商圈. If it defines a hotel set, generate SQL with:
+# WHERE hotel_name IN ('酒店A', '酒店B', ...)
+python scripts/sql_runner.py --profile china_mobile --sql "<SELECT ... WHERE hotel_name IN (...)>" --output json --out outputs/query_results/financial_street_competition.json
+```
+
+## Enterprise Output Quality Gate
+
+This gate applies to every generated artifact: query result, export, Markdown
+report, HTML report, chart, dashboard, evidence pack, and brief. Do not return
+bare numbers, bare charts, or visually improvised pages.
+
+- ✅ Every SQL-backed query/export written to disk must be generated by
+  `scripts/sql_runner.py --out <artifact>` or another maintained exporter that
+  creates a metadata sidecar. The sidecar must include artifact path/type,
+  generated time, row count, source tables, columns, query hash, effective
+  metric scope, and lineage confirmation.
+- ✅ Every Report/Dashboard/Chart HTML or Markdown artifact must visibly include:
+  statistical scope / 统计口径说明, data lineage or source table / 数据血缘,
+  generation/update time, evidence references or query hash, known limitations,
+  and a professional enterprise layout.
+- ✅ Every chart area must include a `查看数据` button and a corresponding
+  default-hidden data table for the exact data behind that chart. The button
+  must toggle/open the table; the table must not be visible by default. Each
+  chart card/panel also needs chart-level 统计口径 and 数据来源/query hash.
+- ✅ HTML outputs must use the relevant enterprise template/workflow and stable
+  layout primitives. Reports use `workflow_specs/html_templates/report_light.html`;
+  dashboards use `workflow_specs/html_templates/dashboard_light.html`; charts use
+  designed containers with readable title, subtitle, legend, units, source, and
+  scope notes.
+- ✅ Run `python scripts/validate_output_quality.py <artifact>` before returning
+  any generated file path. For HTML chart/report/dashboard outputs, also run
+  `python scripts/validate_chart.py <artifact>`.
+- ❌ Never return a file that lacks scope, lineage/source, timestamp, evidence,
+  and layout quality just because the chart renders or the SQL produced rows.
 
 ---
 
@@ -126,6 +205,18 @@ This skill transforms the agent into a powerful local data analysis assistant, s
   /sql DESCRIBE sales
 ```
 
+执行铁律:
+- 本地 DuckDB 查询必须走 `python scripts/sql_runner.py --db workspace.duckdb --sql "<SQL>"` 或 `python scripts/sql_runner.py --db workspace.duckdb --file queries/<task>.sql`。
+- 常规实体搜索、酒店/客户/供应商模糊匹配、同比/环比、趋势、分群、TopN、商圈/区域竞争分析：先读 schema 和当前生效统计口径，再生成 SQL，最后交给 `scripts/sql_runner.py` 执行。Agent 可以写 SQL，禁止写临时数据库连接代码。
+- `scripts/analysis_runner.py` 仅作为简单聚合快捷方式；复杂业务口径、酒店集合、商圈、竞品集合、客户集合必须按口径 md 展开到 SQL。
+- 外部 PostgreSQL/MySQL 查询必须先用 `/dbconn` 配置 profile，然后走 `python scripts/sql_runner.py --profile <name> --sql "<SQL>"` 或 `python scripts/sql_runner.py --profile <name> --file queries/<task>.sql`。
+- 一次性连接必须使用 `--type/--host/--database/--username/--password-env` 或 `--dsn-env DB_URL` 从参数/环境变量读取连接信息；不要把密码写进临时 Python 或 shell 历史。
+- 可以写 SQL 文件并执行 SQL；禁止的是 `python3 << 'PYEOF'` 里手写 `psycopg2.connect(...)`、拼接 SQL、循环打印结果，或者写 Python 只是为了执行 SQL。
+- 也禁止换成 `psycopg.connect(...)`、`pymysql.connect(...)`、`duckdb.connect(...)`、`create_engine(...)`、`.cursor()`、`cur.execute(...)` 绕过 runner。数据库连接和 SQL 执行只能在维护脚本内部发生。
+- 临时 Python 只允许用于 SQL 难以表达的算法实验，且不得负责数据库连接、SQL 执行、审计或结果导出。
+- 可用 `python scripts/validate_agent_output.py <log-or-text>` 检查 Agent 输出是否违反 SQL 执行门禁。
+- 使用 `--out` 写入查询结果时，`scripts/sql_runner.py` 会自动生成 `<artifact>.meta.json` 并记录血缘；返回给用户前必须运行 `python scripts/validate_output_quality.py <artifact>`。
+
 #### `/chart` - 图表生成
 ```
 /chart <图表类型> [描述] [--table <表名>] [--output <路径>]
@@ -194,6 +285,16 @@ This skill transforms the agent into a powerful local data analysis assistant, s
 默认按 `workflow_specs/dashboard_workflow.md` 规划仪表盘，并必须读取 `workflow_specs/dashboard_expert_library/INDEX.md` 选择 Dashboard 专用专家，再读取、使用 `workflow_specs/html_templates/dashboard_light.html` 作为企业 BI 页面骨架，结合 `workflow_specs/visual_templates/light.md` 落实视觉方向。需要深色风格时使用 `workflow_specs/visual_templates/dark.md` 调整模板 token。最终 Dashboard 由 Agent 按规范直接生成，不使用固定 Python dashboard 生成器。
 
 Dashboard HTML 必须能看出模板落地：统一背景、卡片层级、字体尺度、图表面板、KPI 网格、语义色和响应式规则。不能生成未设计的默认 HTML。
+⛔ 禁止使用任何 Python 图表页面生成器或裸 Page 堆叠方式生成 Dashboard：最终输出必须由 Agent 读取 `.md` 配方与 `workflow_specs/html_templates/dashboard_light.html` 后，直接撰写企业级 HTML/CSS Grid 外壳，并把 ECharts option 注入卡片容器。
+⛔ 禁止手写大型 JS 数据对象字面量：所有传入 Dashboard/Report/Chart 的数据，必须先在 Python 中用 `json.dumps(data, ensure_ascii=False, default=str)` 序列化。HTML 中推荐写法为 `window.dashboardData = JSON.parse(<json.dumps(json_string)>);` 或严格 JSON 字面量；不要手写 1000+ 字符的 `const DATA = { ... }` 嵌套对象，避免花括号、引号、日期类型导致整个 `<script>` 静默失败。
+⛔ 禁止窄列 Dashboard：桌面端主容器不能固定在 600-900px 宽度导致右侧大面积空白。使用 `width: min(100%, 1440px)` 或 `max-width: 1440px; margin: 0 auto`，图表区使用 `grid-template-columns: repeat(auto-fit, minmax(420px, 1fr))`。3 个以上图表卡片不得用单列 `flex-direction: column` 堆叠。
+⛔ 长表必须滚动或分页：超过 18 行的明细表必须放进 `.table-scroll` / `.table-wrapper`，设置 `max-height` 与 `overflow:auto`，不能让页面变成长条窄报表。
+⛔ 密集图表必须声明跨度：预测、趋势、月度、年度、置信区间、GMV 等信息密集图表必须使用 `chart-card--wide` / `span-2` / `full-width` 或 `grid-column: span 2`。跨度类名必须有真实 CSS，例如 `.chart-card--wide { grid-column: span 2; }` 或 `.full-width { grid-column: 1 / -1; }`；不能只写类名却没有布局效果。不能让大图以半宽卡片单独换行，造成右侧空白和节奏断裂。
+⛔ 多图 Dashboard 的第一张核心分析卡必须宽跨列：第一张图如果是普通半宽卡，会造成首屏右侧空白、主结论弱化和信息层级混乱。
+⛔ 两列 Dashboard 禁止出现奇数个普通半宽 `chart-card`：5/7 个半宽卡片会产生孤儿行和大面积空白。必须把首个核心趋势/对比图或最后一个明细/结论卡设置为 `chart-card--wide` / `full-width`，或者补齐成成对卡片。
+⛔ 禁止伪全宽网格：不得用 `<div class="row full"><div class="card">...</div></div>` 这类多层 row 包裹来假装全宽。Dashboard 只使用一个 `.dashboard-grid` 父网格，跨列规则必须加在实际 `.chart-card` 上，例如 `<section class="chart-card chart-card--wide">...</section>`。
+⛔ 卡片文字必须有换行策略：`.kpi-card`、`.chart-card-header` 及其内部文本必须包含 `min-width: 0` 和 `overflow-wrap: anywhere` 或 `word-break: break-word`。KPI 标签、数值、图表标题、卡片标题禁止 `white-space: nowrap`，除非是明确截断的按钮/标签。
+⛔ 每个 `.chart-card` 必须包含图表级 `统计口径`、`数据来源`、`查看数据` 按钮和默认隐藏的数据表（如 `.chart-data-table`）。用户点击后必须能查看该图对应的实际数据表；不得只给图表不提供可核验数据。
 主题切换必须是页面级切换：切换 `data-theme` 后，页面背景、header、toolbar、KPI 卡片、图表面板、诊断区、按钮和 toast 都要一起变更，不能只切换 ECharts 图表主题。
 如果元数据、字段名或样例值包含城市信息，并且存在交易额/销售额/GMV/金额/销量/数量类字段，Dashboard 必须读取 `workflow_specs/dashboard_modules/city_sales_map.md`，增加城市地图 + 销售/销量模块；地图坐标或本地地图覆盖不足时，需要明确说明数据缺口并用城市排行柱图兜底。
 Dashboard 标题必须能追溯到用户请求、表名、文件名或真实字段；不能凭空出现“白酒分析”等数据和用户都没有提供的行业/品类。业务 Dashboard 在数据支持时至少包含 KPI、趋势、排行/贡献、结构、交叉分析、异常/归因、地理模块（触发时）和数据口径说明；如果少于 6 个分析模块，必须说明字段不足，否则需要重做。
@@ -724,8 +825,10 @@ Dashboard 发布前应审阅外部网络资源、ECharts 初始化、图表容�
 报告表达必须遵守金字塔原理：结论 -> 发现 -> 图表举证 -> 解释归因 -> 行动建议 -> 附录数据。每个发现分支内部也必须遵守局部金字塔：先说该发现的结论，再讲观察，再用图表举证，再解释归因，最后给局部行动建议。前文关键结论和发现结论必须引用附录数据表编号，例如 `[Data A1]`。HTML 报告必须先读取并使用 `workflow_specs/html_templates/report_light.html` 作为企业 PDF 风格页面骨架，再结合 `workflow_specs/visual_templates/light.md` 或 `dark.md` 调整视觉方向，不能生成浏览器默认样式或简陋表格页。报告较长时必须分段生成各发现分支，最后统一组装。
 
 每个报告图表都必须搜索并读取 `references/examples/*.md` 中对应的图表配方作为上下文，按配方生成 ECharts option，再嵌入统一 HTML 报告；不得脱离图表配方随手写图表。
+每个报告图表面板必须包含 `查看数据` 按钮和默认隐藏的数据表，展示该图使用的汇总数据或明细样本；面板内必须写清图表级统计口径、数据来源表/文件、query hash 或附录数据编号。
 
 每个分析模块都必须补充“统计口径说明”，用口语化业务表达说明数据范围、时间粒度、指标口径、分组维度、筛选条件和当前数据不能证明的内容；主文不展示 SQL。所有结论必须尊重事实数据，不得创造数据中不存在、用户也没有提供定义的概念，例如没有目标或预算字段时不能写目标达成率、预算偏差；没有漏斗/留存字段时不能强行写漏斗转化或留存结论。
+报告必须包含“数据血缘/来源”和“统计口径说明”两个明确章节，列出来源表/文件、使用字段、query hash 或附录数据编号、当前生效口径、数据质量限制和生成时间。HTML/Markdown 报告返回前必须运行 `python scripts/validate_output_quality.py <report>`；HTML 报告还必须运行 `python scripts/validate_chart.py <report>`。
 
 涉及季节性波动或外部因素时，不得仅凭内部数据直接断言原因。推荐表达为：补充节假日、活动投放、价格、库存、天气、渠道策略等数据后，可以进一步判断这是季节性波动还是外部因素导致。
 
@@ -956,7 +1059,10 @@ start 选项:
 连接添加后，可通过以下方式使用：
 ```bash
 # 查询远程数据库（使用有效配置中的连接）
-python scripts/db_cli.py query analytics "SELECT * FROM orders LIMIT 10"
+python scripts/sql_runner.py --profile analytics --sql "SELECT * FROM orders LIMIT 10"
+
+# 复杂查询可保存为 SQL 文件，但必须交给固定 runner 执行
+python scripts/sql_runner.py --profile analytics --file queries/monthly_orders.sql --output csv --out outputs/monthly_orders.csv
 
 # 查看远程表结构
 python scripts/db_cli.py list-tables analytics
@@ -1295,8 +1401,9 @@ LIMIT 10;
    *Note: This script calculates the MD5 hash of the file. If an identical file was already imported, it skips the import and returns the existing table name. It also automatically handles merged cells, detects the real header row, chunks large CSVs, and sanitizes column names for DuckDB.*
 2. Once imported, run a quick check to understand the schema and data:
    ```bash
-   python -c "import duckdb; conn = duckdb.connect('workspace.duckdb'); print(conn.execute('DESCRIBE table_name').fetchdf())"
-   python -c "import duckdb; conn = duckdb.connect('workspace.duckdb'); print(conn.execute('SELECT * FROM table_name LIMIT 3').fetchdf())"
+   python scripts/db_cli.py tables --db workspace.duckdb
+   python scripts/sql_runner.py --db workspace.duckdb --output table --sql "DESCRIBE table_name"
+   python scripts/sql_runner.py --db workspace.duckdb --output table --sql "SELECT * FROM table_name LIMIT 3"
    ```
 3. Ask the user if they want to perform standard cleaning (e.g., handling missing values, deduplication). Execute these via SQL.
 
@@ -1304,7 +1411,7 @@ LIMIT 10;
 **Trigger**: User asks to filter, sort, aggregate, or add columns.
 **Action**:
 1. **SQL Generation with Function Validation**: Follow the intelligent SQL generation workflow (see `SQL Generation Protocol` section below).
-2. Execute it via `RunCommand`: `python -c "import duckdb; conn = duckdb.connect('workspace.duckdb'); print(conn.execute('SELECT ...').fetchdf())"`
+2. Execute it via the audited runner: run `python scripts/sql_runner.py --db workspace.duckdb --output json --sql "<SELECT ...>"` or `python scripts/sql_runner.py --db workspace.duckdb --file queries/<task>.sql --output json`. Routine BI comparisons, trends, segments and TopN queries may use `python scripts/analysis_runner.py ...` only when it is simpler than direct SQL.
 3. For structural changes, remember the Undo principle: `CREATE TABLE table_name_step2 AS SELECT ...`
 4. **Error Handling**: If SQL execution fails, use the reAct recovery process (see `SQL Error Recovery (reAct)` section below).
 
@@ -1839,12 +1946,12 @@ export MONGO_URI="mongodb://user:pass@localhost:27017/docs"
 **5. Query Database:**
 ```bash
 # Execute SQL query (使用有效配置)
-python scripts/db_cli.py query analytics "SELECT * FROM orders WHERE date > '2024-01-01'"
+python scripts/sql_runner.py --profile analytics --sql "SELECT * FROM orders WHERE date > '2024-01-01'"
 
-# Query from file
-python scripts/db_cli.py query analytics --file queries/monthly_sales.sql --output json
+# Complex SQL can be saved to a SQL file, then executed by the fixed runner
+python scripts/sql_runner.py --profile analytics --file queries/monthly_sales.sql --output json
 
-# MongoDB query (requires --collection)
+# MongoDB query uses db_cli because it is not SQL
 python scripts/db_cli.py query mongo_logs '{"status": "active"}' --collection users
 ```
 
@@ -1900,6 +2007,7 @@ python scripts/db_cli.py import mongo_logs '{}' --collection users --table-name 
 - ✅ **连接管理**: `/dbconn` 独立指令管理连接生命周期
 - ✅ **密码安全**: 使用 `${ENV_VAR}` 占位符，展示时自动脱敏
 - ✅ **自动发现**: 查询时自动合并全局 + 项目级配置
+- ✅ **统一 SQL Runner**: DuckDB/PostgreSQL/MySQL 查询统一使用 `scripts/sql_runner.py`，避免临时 Python 连接、拼接 SQL 和漏审计
 - ✅ **连接测试**: `/dbconn test` 验证连接可用性
 - ✅ **流式导入**: 大数据量（>10K 行）自动流式处理
 - ✅ **元数据追踪**: 导入记录存储在 `_data_skill_meta` 表
@@ -1959,7 +2067,7 @@ Step 2: 探索远程数据库结构
     └─ python scripts/db_cli.py describe-table <连接名> <表名>
 
 Step 3: 直接在远程数据库执行查询 → 拿数据
-    └─ python scripts/db_cli.py query <连接名> "SELECT ..." --output json
+    └─ python scripts/sql_runner.py --profile <连接名> --sql "<SELECT ...>" --output json
     └─ Agent 拿到 JSON 数据后直接用于图表/分析/报告
 
 Step 4: 数据 → 图表 / 分析 / 报告
@@ -1967,6 +2075,11 @@ Step 4: 数据 → 图表 / 分析 / 报告
     └─ 分析: /analyze 直接基于查询结果
     └─ 报告: /report 直接基于查询结果
 ```
+
+禁止在此流程中使用 `python3 << 'PYEOF'`、`psycopg2.connect(...)`、
+`psycopg.connect(...)`、`pymysql.connect(...)`、`duckdb.connect(...)`、
+`create_engine(...)`、`.cursor()`、`cur.execute(...)` 或手工字符串拼接 SQL。需要复杂逻辑时，
+由 Agent 生成 SQL 文本，并通过 `scripts/sql_runner.py --sql` 或 `scripts/sql_runner.py --file` 执行；需要复用中间结果时，使用 `scripts/db_cli.py import` 导入 DuckDB。
 
 **🟡 DuckDB 导入流程（仅在以下场景使用）：**
 
@@ -2013,7 +2126,7 @@ Simply describe what you want in plain language:
 2. 读取 `workflow_specs/dashboard_expert_library/INDEX.md`，按用户目标、表名、字段、样例值匹配 Dashboard 主专家和支撑专家
 3. 完整读取被选中的专家 `.md` 文件，明确目标用户、业务决策、刷新周期和 KPI 树，而不是先选图表
 4. 使用 DuckDB/SQL/Python 计算每个模块的数据
-5. Agent 直接撰写 standalone HTML：布局、CSS、ECharts option、洞察卡片和交互逻辑
+5. Agent 直接撰写 standalone HTML：布局、CSS、ECharts option、洞察卡片和交互逻辑；不得调用任何裸 Page/堆叠式图表页面生成器作为 Dashboard 输出
 6. 运行 `python scripts/validate_chart.py <output.html>` 校验单文件完整性
 
 **Dashboard Planning Patterns:**
@@ -2061,9 +2174,19 @@ Simply describe what you want in plain language:
 │                                                                         │
 │  ❌ 禁止: <link rel="stylesheet" href="http://127.0.0.1:8101/...">     │
 │  ❌ 禁止: <script src="http://127.0.0.1:8101/..."></script>            │
+│  ❌ 禁止: <script src="https://cdn.example.com/echarts.min.js"></script>     │
+│  ❌ 禁止: <script src="https://cdn.jsdelivr.net/..."></script>         │
 │  ❌ 禁止: 硬编码端口号（8101 或任何端口）                                 │
 │  ❌ 禁止: 任何外部 src/href 引用                                         │
 │  ❌ 禁止: 依赖本地文件系统中的 JS/CSS 文件                                │
+│  ❌ 禁止: 手写大型 const DATA = {...} JS 对象字面量                      │
+│  ❌ 禁止: 裸 Page/SimplePageLayout 式图表堆叠                    │
+│  ❌ 禁止: 窄固定宽度主容器 + 单列图表堆叠 + 右侧大面积空白                │
+│  ❌ 禁止: 长表无 max-height / overflow:auto 滚动容器                    │
+│  ❌ 禁止: 预测/趋势/GMV 等密集图表无 span-2/full-width 跨列规则          │
+│  ❌ 禁止: span-2/full-width/chart-card--wide 类名没有真实 grid-column    │
+│  ❌ 禁止: <div class="row full"><div class="card">...</div></div> 伪全宽 │
+│  ❌ 禁止: KPI/卡片标题 white-space: nowrap 或缺少 overflow-wrap         │
 │                                                                         │
 │  ✅ 必须: 将 echarts.min.js 完整内联到 <script> 标签中                   │
 │  ✅ 必须: 将 dashboard.css 完整内联到 <style> 标签中                     │
@@ -2094,7 +2217,8 @@ Simply describe what you want in plain language:
 2. 读取 `workflow_specs/dashboard_expert_library/INDEX.md`，选择 Dashboard 主专家和支撑专家，并完整读取对应专家 `.md`
 3. 按专家文件建立用户角色、业务决策、KPI 树、布局层级、诊断模块和必要的数据检查
 4. 使用 DuckDB/SQL/Python 仅做数据查询、指标计算、异常/归因/洞察卡片证据准备
-5. Agent 自行设计 HTML 结构、CSS、ECharts option 和业务解释卡片
+4.1. 所有数据对象先在 Python 中 `json.dumps(..., ensure_ascii=False, default=str)`；HTML 中只嵌入 JSON 序列化结果，不能手写大型 JS 对象
+5. Agent 自行设计 HTML 结构、CSS Grid、KPI 卡片、图表卡片、ECharts option 和业务解释卡片；严禁用裸 Page/SimplePageLayout 式图表堆叠输出
 6. 完整读取 `workflow_specs/html_templates/dashboard_light.html`，再读取 `workflow_specs/visual_templates/light.md` 或 `dark.md`，并把模板落实到 CSS tokens、布局、工具栏、图表面板、KPI 卡片、诊断区域和响应式规则
 7. 读取 `assets/echarts/echarts.min.js` → 内联为 `<script>/* echarts 代码 */</script>`
 8. 如需交互控件，可读取 `assets/dashboard/dashboard.css` 和 `assets/dashboard/dashboard.js` 作为参考或基础资产，但不得依赖一个固定 Python renderer
@@ -2104,9 +2228,11 @@ Simply describe what you want in plain language:
 11. 主题切换必须切换整页 `data-theme` 和 CSS token，不允许只重绘图表
 12. 元数据、字段名或样例值有城市信息 + 交易额/销售额/GMV/金额/销量/数量字段时，必须读取 `workflow_specs/dashboard_modules/city_sales_map.md` 并补城市地图 + 销售/销量模块；无法可靠绘制地图时，显示数据缺口并用排行柱图兜底
 13. 标题、模块深度和城市地图触发规则都必须自检；标题无依据、图表过少、城市地图缺失都属于生成失败
-14. ⛔ **[MANDATORY]** 运行 `python scripts/validate_chart.py <output.html>` — 必须通过所有检查才能返回给用户
-15. 浏览器自动化不可作为必需前提；必须依赖 `python scripts/validate_chart.py <output.html>` 完成无浏览器静态质量门，拦截外链、自引用 file URL、iframe/object/embed、业务脚本 location 跳转、JS 语法错误、PDF 不兼容 CSS、地图注册和导出/下载缺失
-16. 如果环境恰好支持浏览器自动化，可额外用 `file://` 打开 HTML 做 smoke test；这只是增强验证，不是 skill 成功的必要条件
+14. ⛔ **[MANDATORY]** 运行 `python scripts/validate_chart.py <output.html>` — 必须通过所有检查才能返回给用户；该校验会拦截裸 Page/堆叠式图表页面、缺少企业 Dashboard 布局、手写大型 DATA 对象、窄固定主容器、单列图表堆叠、伪全宽 row/full 网格、密集图表无跨列、跨度类无真实 CSS、卡片文字无换行策略、长表无滚动、外链 CDN 和 JS 语法错误
+15. ⛔ **[MANDATORY]** 每个 `.chart-card` 必须有 `查看数据` 按钮、默认隐藏的对应数据表、图表级统计口径和数据来源/query hash。查看数据按钮必须能打开/关闭对应表格。
+16. ⛔ **[MANDATORY]** 运行 `python scripts/validate_output_quality.py <output.html>` — 必须检查统计口径说明、数据血缘/来源、生成时间、证据引用、限制说明和企业版式完整性
+17. 浏览器自动化不可作为必需前提；必须依赖 `python scripts/validate_chart.py <output.html>` 和 `python scripts/validate_output_quality.py <output.html>` 完成无浏览器静态质量门，拦截外链、自引用 file URL、iframe/object/embed、业务脚本 location 跳转、JS 语法错误、PDF 不兼容 CSS、地图注册、导出/下载缺失、裸图表堆叠、大型 DATA 对象、卡片换行混乱、低密度坏版式、缺少口径、缺少血缘和缺少查看数据入口
+17. 如果环境恰好支持浏览器自动化，可额外用 `file://` 打开 HTML 做 smoke test；这只是增强验证，不是 skill 成功的必要条件
 
 **Dashboard 规范：**
 - 默认 HTML 骨架：`workflow_specs/html_templates/dashboard_light.html`

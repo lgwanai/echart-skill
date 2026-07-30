@@ -45,7 +45,9 @@ Echart Skill 深度融入企业数据管理体系，不只是查询工具：
 - **自定义统计口径**：通过 `/scope` 定义全局/项目级业务指标（如 GMV、客单价、转化率），保证不同报告和 Dashboard 使用同一口径。项目级口径仅在项目目录及子目录生效，互不干扰。
 - **自定义表结构数据描述**：通过 `/schema` 管理表结构定义（列名、类型、含义、主外键），Agent 生成 SQL 时自动引用精确的字段描述，避免猜测字段含义导致的查询错误。
 - **三级配置体系**：全局 → 项目级 → 运行时配置，数据库连接、表结构定义、统计口径均可按级别管理。
-- **外部数据库直连**：支持 MySQL / PostgreSQL / MongoDB 直连查询，无需预先导入 DuckDB；连接密码使用 `${ENV_VAR}` 环境变量占位符，杜绝硬编码。
+- **外部数据库直连**：支持 MySQL / PostgreSQL / MongoDB 直连查询，无需预先导入 DuckDB；连接密码使用 `${ENV_VAR}` 环境变量占位符，SQL 执行统一走 `scripts/sql_runner.py` / `scripts/db_cli.py`，杜绝硬编码和临时 Python 片段。
+- **企业级输出门禁**：任何查询、导出、报告、图表和 Dashboard 都必须具备统计口径、数据血缘/来源、生成时间、证据引用和专业版式；查询/导出自动生成 `.meta.json` 旁路元数据，HTML 产物通过静态质量门拦截坏布局。
+- **图表数据可核验**：每个图表区域必须提供“查看数据”按钮，默认隐藏对应数据表，点击后可查看该图实际使用的汇总数据或明细样本。
 - **数据轮询刷新**：支持 HTTP API / 外部数据库定时轮询，自动刷新本地分析表。
 - **非破坏式操作**：所有数据修改创建新表或视图，支持任意步骤回退（Undo）。
 
@@ -66,6 +68,8 @@ Echart Skill 深度融入企业数据管理体系，不只是查询工具：
 - **354 个 ECharts 官方配方**：Agent 无需手写 option 代码，直接替换数据数组即可生成
 - **多层地图**：省份（china.js）→ 城市（省份 JS）→ 区县街道（百度地图 API）
 - **交互式 Dashboard**：KPI 卡片、趋势图、异常提醒、主题切换、响应式布局、PDF/PNG 导出
+- **Dashboard 专家规划**：生成前读取 `workflow_specs/dashboard_expert_library/INDEX.md`，新增专家按 `workflow_specs/dashboard_expert_library/DASHBOARD_EXPERT_TEMPLATE.md` 扩展
+- **Dashboard 深度门槛**：业务 Dashboard 在数据支持时至少包含 6 个分析模块，标题必须可追溯到用户请求、文件、表名或真实字段
 - **企业级视觉**：统一 HTML 骨架、语义色、打印友好、暗色/亮色双主题
 
 ---
@@ -101,6 +105,7 @@ ln -s ~/skills/echart-skill ~/.claude/skills/echart-skill   # Claude Code
 ```bash
 /import sales_2024.xlsx                        # 导入数据
 /query SELECT region, SUM(amount) FROM sales_2024 GROUP BY region  # 查询
+python scripts/sql_runner.py --db workspace.duckdb "SELECT COUNT(*) FROM sales_2024"
 /chart bar 各区域销售额对比                      # 生成图表
 /dashboard 创建销售分析仪表盘                    # 一键仪表盘
 /report sales --format html                     # 生成企业报告
@@ -248,7 +253,7 @@ Echart Skill 将数据质量作为分析流程的**前置环节**，而非事后
 | **4 级数据分类** | `public < internal < sensitive < restricted` |
 | **非破坏式处理** | 默认生成新表、新文件和审计记录，避免覆盖原始数据 |
 
-外部数据库查询同样经过 PrivacyGuard 检测与审计管线，使用 `/audit-report` 统一查看。
+外部数据库查询同样经过 PrivacyGuard 检测与审计管线，使用 `/audit-report` 统一查看。企业环境下可以写 SQL 和 `.sql` 文件，但不要使用 `python3 <<EOF`、`psycopg2.connect`、`psycopg.connect`、`pymysql.connect`、`duckdb.connect`、`create_engine`、`cursor.execute` 这类临时连接/执行代码；先用 `/dbconn` 登记连接，再用 `python scripts/sql_runner.py --profile <name> --sql "<SELECT ...>"` 或 `python scripts/sql_runner.py --profile <name> --file queries/<task>.sql` 执行。
 
 ---
 
@@ -262,7 +267,7 @@ Echart Skill 将数据质量作为分析流程的**前置环节**，而非事后
 | `/clean` | Agent 引导式数据清洗（类型转换、去重、规则校验、跨表验证） |
 | `/export` | 导出查询结果或整表为 CSV/Excel |
 | `/tables` | 查看表结构、行数、列信息 |
-| `/query` | 执行 SQL（DuckDB 语法），支持 JOIN、GROUP BY、子查询 |
+| `/query` | 通过统一 SQL runner 执行查询，支持 DuckDB、已配置 PostgreSQL/MySQL profile、JOIN、GROUP BY、子查询 |
 | `/catalog` | 生成本地数据资产目录，含字段角色、质量分、缺失率、唯一率 |
 
 ### 可视化
@@ -369,6 +374,8 @@ echart-skill/
 └── outputs/                   # 输出目录
 ```
 
+Dashboard 生成必须执行 `workflow_specs/dashboard_runtime_quality.md` 中的硬性质量门，并通过 `python scripts/validate_chart.py <output.html>` 和 `python scripts/validate_output_quality.py <output.html>`。质量门会拦截外链资源、`chinaGeoJSON` 未定义、`color-mix()` 等 PDF 不兼容 CSS、裸 Page/堆叠式图表页面、手写大型 DATA 对象、JS 语法错误、缺少统计口径、缺少数据血缘、缺少“查看数据”入口和坏版式。
+
 ---
 
 ## FAQ
@@ -386,7 +393,7 @@ A: 使用 `/scope set --level global --name "指标名" --desc "计算规则"` �
 A: 使用 `/schema add` 为表的每个列提供中文描述、数据类型、合法值范围和主外键关系。Agent 会在生成 SQL 时精确引用，显著提升查询准确率。
 
 **Q: 支持连接公司已有的数据库吗？**
-A: 支持。`/dbconn` 管理 PostgreSQL/MySQL/MongoDB 连接，密码通过 `${ENV_VAR}` 环境变量传入，支持直接查询或导入 DuckDB 进行跨表分析。
+A: 支持。`/dbconn` 管理 PostgreSQL/MySQL/MongoDB 连接，密码通过 `${ENV_VAR}` 环境变量传入。SQL 查询使用 `scripts/sql_runner.py --profile <name>`，导入本地分析库使用 `scripts/db_cli.py import`，避免临时 Python 造成连接泄露、审计缺失和 SQL 拼接错误。
 
 **Q: 生成的报告和图表能否直接交付给客户？**
 A: 可以。Dashboard 和 Report 使用企业级 HTML 骨架，支持深色/亮色主题、PDF 导出、打印优化，图表为 ECharts 交互式可视化，可直接作为交付物。

@@ -333,6 +333,34 @@
       font-size: 12px;
       text-align: right;
     }
+    .chart-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+    .chart-actions {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .chart-data-table,
+    .data-table-panel {
+      display: none;
+      border-top: 1px solid var(--line);
+      background: #ffffff;
+      padding: 12px 14px 14px;
+    }
+    .chart-data-table.is-open,
+    .data-table-panel.is-open {
+      display: block;
+    }
+    .table-scroll {
+      max-height: 340px;
+      overflow: auto;
+    }
     .chart {
       width: 100%;
       height: 360px;
@@ -442,6 +470,14 @@
   <script>{{PDF_EXPORT_JS}}</script>
   <script>
   {{CHART_BOOTSTRAP}}
+  window.toggleChartData = function toggleChartData(targetId) {
+    const panel = document.getElementById(targetId);
+    if (!panel) return;
+    const nextOpen = panel.hidden || !panel.classList.contains("is-open");
+    panel.hidden = !nextOpen;
+    panel.classList.toggle("is-open", nextOpen);
+    panel.setAttribute("aria-hidden", String(!nextOpen));
+  };
   window.exportReportPDF = async function exportReportPDF() {
     const charts = Array.isArray(window.reportCharts) ? window.reportCharts : [];
     charts.forEach(function(chart) {
