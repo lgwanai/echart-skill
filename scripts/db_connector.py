@@ -48,6 +48,14 @@ DEFAULT_POOL_SIZE = 5
 DEFAULT_MAX_OVERFLOW = 10
 
 
+def _infer_query_table(query: str) -> str:
+    """Infer the first table name from a SQL query for audit metadata."""
+    match = re.search(r"\bfrom\s+([A-Za-z_][\w.]*|\"[^\"]+\"|`[^`]+`)", query, re.IGNORECASE)
+    if not match:
+        return ""
+    return match.group(1).strip("\"`")
+
+
 class DatabaseConnector(ABC):
     """Abstract base class for database connectors.
     
@@ -836,22 +844,15 @@ def execute_query(
             )
 
             columns = list(results[0].keys())
-            table = _infer_table_name(query)
+            table = _infer_query_table(query)
 
             # Classify + mask
             classification = guard.classify_columns(table, columns)
             masked_results = guard.mask_rows(results, classification)
 
             # Determine if masking actually changed anything
-            was_masked = cfg.privacy.mask_pii and any(
-                classification.get(col, {}).get("classification", "public") != "public"
-                for col in columns
-            )
-            max_level = max(
-                (classification.get(col, {}).get("classification", "public") for col in columns),
-                key=lambda x: ({"public": 0, "internal": 1, "sensitive": 2, "restricted": 3}.get(x, 0)),
-                default="public",
-            )
+            was_masked = cfg.privacy.mask_pii and classification.has_sensitive_data
+            max_level = classification.max_classification
 
             # Audit log
             log_external_query(

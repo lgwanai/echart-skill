@@ -179,16 +179,8 @@ def _execute_with_audit(
     classification = guard.classify_columns(profile_name, columns)
     masked = guard.mask_rows(results, classification)
 
-    was_masked = cfg.privacy.mask_pii and any(
-        classification.get(col, {}).get("classification", "public") != "public"
-        for col in columns
-    )
-    level_order = {"public": 0, "internal": 1, "sensitive": 2, "restricted": 3}
-    max_level = max(
-        (classification.get(col, {}).get("classification", "public") for col in columns),
-        key=lambda x: level_order.get(x, 0),
-        default="public",
-    )
+    was_masked = cfg.privacy.mask_pii and classification.has_sensitive_data
+    max_level = classification.max_classification
 
     log_external_query(
         query=query,
