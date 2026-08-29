@@ -124,6 +124,20 @@ def test_validate_rejects_custom_script_syntax_error(tmp_path: Path):
     assert validate(str(html)) == 1
 
 
+def test_validate_rejects_json_parse_object_literal_runtime_failure(tmp_path: Path):
+    html = tmp_path / "dashboard.html"
+    html.write_text(_dashboard_html("const DATA = JSON.parse({\"items\":[1,2,3]});"))
+
+    assert validate(str(html)) == 1
+
+
+def test_validate_accepts_json_parse_string_literal(tmp_path: Path):
+    html = tmp_path / "dashboard.html"
+    html.write_text(_dashboard_html("const DATA = JSON.parse('{\"items\":[1,2,3]}');"))
+
+    assert validate(str(html)) == 0
+
+
 def test_validate_rejects_raw_page_stack_as_dashboard(tmp_path: Path):
     html = tmp_path / "hotel_dashboard.html"
     html.write_text(f"""

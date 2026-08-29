@@ -28,6 +28,9 @@ incompatibility. Treat this as a blocking quality gate, not optional advice.
 10. Dashboard data must be embedded from Python `json.dumps(...,
     ensure_ascii=False, default=str)`, not hand-written as a large nested
     JavaScript object literal.
+    `JSON.parse(...)` must receive a JavaScript string literal. Passing an
+    object/array literal such as `JSON.parse({...})` is a blocking runtime
+    failure: it is valid syntax, but throws before any chart is initialized.
 11. Desktop dashboard layout must use the available viewport. A narrow
     left-column layout with large blank space on the right is invalid.
 12. Long detail tables must be scrollable, summarized, or paginated; they must
@@ -149,6 +152,8 @@ These patterns are blocking failures:
   `overflow-wrap: anywhere` / `word-break: break-word`
 - large hand-written `const DATA = {...}`, `const chartData = {...}`, or
   equivalent nested JS object literals
+- `JSON.parse({...})` or `JSON.parse([...])`; `JSON.parse` must receive the
+  quoted JSON payload produced by a second `json.dumps`
 - any `file://` value in generated business script, tag `src`, tag `href`, or
   tag `data`
 - `var window.dashboardCharts = []`
@@ -219,6 +224,13 @@ html = f"""
 window.dashboardData = JSON.parse({json.dumps(json_payload, ensure_ascii=False)});
 </script>
 """
+```
+
+Do not omit the outer `json.dumps`:
+
+```js
+// Wrong: valid JavaScript syntax, guaranteed runtime exception.
+window.dashboardData = JSON.parse({"items": [1, 2, 3]});
 ```
 
 Do not hand-write large nested JavaScript objects. A single missing brace,
@@ -328,6 +340,7 @@ The validator must check:
 - KPI/card-header text wrapping rules and forbidden `white-space: nowrap`
 - raw Page/SimplePageLayout-style chart stacks
 - large hand-written DATA/chartData object literals
+- object/array literals passed directly to `JSON.parse`
 - PDF-incompatible CSS color functions
 - map registration when `geo`, `map`, or `effectScatter` is used
 
@@ -338,14 +351,15 @@ location navigation, and iframe creation.
 
 ## Optional Browser Smoke Test
 
-When browser automation is available, it is useful but not required. Open the
-generated HTML with `file://` and check:
+When browser automation can open the generated URL, the smoke test is
+mandatory. Open the generated HTML and check:
 
 - no `pageerror`
 - no console error
 - `typeof window.echarts === "object"`
-- `window.dashboardCharts.length` equals the expected chart count
-- every chart card has a rendered canvas
+- `window.dashboardCharts.length` equals the expected chart/container count
+- every chart container has a rendered canvas; canvas count must equal chart
+  container count
 - city map card has a canvas when geography is triggered
 - `Array.from(document.scripts).filter(s => s.src)` is empty
 - HTML does not contain `var window.`, `chinaGeoJSON`, `color-mix(`, or runtime
@@ -364,7 +378,10 @@ Regenerate or repair the HTML first, then rerun:
 python scripts/validate_chart.py <output.html>
 ```
 
-For dashboard outputs, also run a real browser smoke test where possible.
+For dashboard outputs, also run a real browser smoke test whenever the browser
+surface can open the generated URL. If local URL policy blocks the page, report
+that limitation and rely on the blocking static gate; do not claim a browser
+smoke test passed.
 If validation reports an external ECharts CDN, missing inlined ECharts library,
 or an unclosed ECharts graphic constructor, repair those first because they
 usually prevent all charts from rendering.

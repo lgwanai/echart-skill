@@ -286,7 +286,7 @@ bare numbers, bare charts, or visually improvised pages.
 
 Dashboard HTML 必须能看出模板落地：统一背景、卡片层级、字体尺度、图表面板、KPI 网格、语义色和响应式规则。不能生成未设计的默认 HTML。
 ⛔ 禁止使用任何 Python 图表页面生成器或裸 Page 堆叠方式生成 Dashboard：最终输出必须由 Agent 读取 `.md` 配方与 `workflow_specs/html_templates/dashboard_light.html` 后，直接撰写企业级 HTML/CSS Grid 外壳，并把 ECharts option 注入卡片容器。
-⛔ 禁止手写大型 JS 数据对象字面量：所有传入 Dashboard/Report/Chart 的数据，必须先在 Python 中用 `json.dumps(data, ensure_ascii=False, default=str)` 序列化。HTML 中推荐写法为 `window.dashboardData = JSON.parse(<json.dumps(json_string)>);` 或严格 JSON 字面量；不要手写 1000+ 字符的 `const DATA = { ... }` 嵌套对象，避免花括号、引号、日期类型导致整个 `<script>` 静默失败。
+⛔ 禁止手写大型 JS 数据对象字面量：所有传入 Dashboard/Report/Chart 的数据，必须先在 Python 中用 `json.dumps(data, ensure_ascii=False, default=str)` 序列化。HTML 中推荐写法为 `json_payload = json.dumps(data, ensure_ascii=False, default=str)` 后注入 `window.dashboardData = JSON.parse({json.dumps(json_payload, ensure_ascii=False)});`。`JSON.parse(...)` 的参数必须是字符串，严禁 `JSON.parse({...})` / `JSON.parse([...])`；这种写法语法检查会通过，但运行时会在第一个 `echarts.init()` 前抛错并让所有图表空白。
 ⛔ 禁止窄列 Dashboard：桌面端主容器不能固定在 600-900px 宽度导致右侧大面积空白。使用 `width: min(100%, 1440px)` 或 `max-width: 1440px; margin: 0 auto`，图表区使用 `grid-template-columns: repeat(auto-fit, minmax(420px, 1fr))`。3 个以上图表卡片不得用单列 `flex-direction: column` 堆叠。
 ⛔ 长表必须滚动或分页：超过 18 行的明细表必须放进 `.table-scroll` / `.table-wrapper`，设置 `max-height` 与 `overflow:auto`，不能让页面变成长条窄报表。
 ⛔ 密集图表必须声明跨度：预测、趋势、月度、年度、置信区间、GMV 等信息密集图表必须使用 `chart-card--wide` / `span-2` / `full-width` 或 `grid-column: span 2`。跨度类名必须有真实 CSS，例如 `.chart-card--wide { grid-column: span 2; }` 或 `.full-width { grid-column: 1 / -1; }`；不能只写类名却没有布局效果。不能让大图以半宽卡片单独换行，造成右侧空白和节奏断裂。
@@ -2217,7 +2217,7 @@ Simply describe what you want in plain language:
 2. 读取 `workflow_specs/dashboard_expert_library/INDEX.md`，选择 Dashboard 主专家和支撑专家，并完整读取对应专家 `.md`
 3. 按专家文件建立用户角色、业务决策、KPI 树、布局层级、诊断模块和必要的数据检查
 4. 使用 DuckDB/SQL/Python 仅做数据查询、指标计算、异常/归因/洞察卡片证据准备
-4.1. 所有数据对象先在 Python 中 `json.dumps(..., ensure_ascii=False, default=str)`；HTML 中只嵌入 JSON 序列化结果，不能手写大型 JS 对象
+4.1. 所有数据对象先在 Python 中 `json.dumps(..., ensure_ascii=False, default=str)`；如果使用 `JSON.parse`，必须再用一次 `json.dumps(json_payload, ensure_ascii=False)` 生成 JS 字符串字面量，严禁 `JSON.parse({...})` / `JSON.parse([...])`
 5. Agent 自行设计 HTML 结构、CSS Grid、KPI 卡片、图表卡片、ECharts option 和业务解释卡片；严禁用裸 Page/SimplePageLayout 式图表堆叠输出
 6. 完整读取 `workflow_specs/html_templates/dashboard_light.html`，再读取 `workflow_specs/visual_templates/light.md` 或 `dark.md`，并把模板落实到 CSS tokens、布局、工具栏、图表面板、KPI 卡片、诊断区域和响应式规则
 7. 读取 `assets/echarts/echarts.min.js` → 内联为 `<script>/* echarts 代码 */</script>`
@@ -2231,8 +2231,8 @@ Simply describe what you want in plain language:
 14. ⛔ **[MANDATORY]** 运行 `python scripts/validate_chart.py <output.html>` — 必须通过所有检查才能返回给用户；该校验会拦截裸 Page/堆叠式图表页面、缺少企业 Dashboard 布局、手写大型 DATA 对象、窄固定主容器、单列图表堆叠、伪全宽 row/full 网格、密集图表无跨列、跨度类无真实 CSS、卡片文字无换行策略、长表无滚动、外链 CDN 和 JS 语法错误
 15. ⛔ **[MANDATORY]** 每个 `.chart-card` 必须有 `查看数据` 按钮、默认隐藏的对应数据表、图表级统计口径和数据来源/query hash。查看数据按钮必须能打开/关闭对应表格。
 16. ⛔ **[MANDATORY]** 运行 `python scripts/validate_output_quality.py <output.html>` — 必须检查统计口径说明、数据血缘/来源、生成时间、证据引用、限制说明和企业版式完整性
-17. 浏览器自动化不可作为必需前提；必须依赖 `python scripts/validate_chart.py <output.html>` 和 `python scripts/validate_output_quality.py <output.html>` 完成无浏览器静态质量门，拦截外链、自引用 file URL、iframe/object/embed、业务脚本 location 跳转、JS 语法错误、PDF 不兼容 CSS、地图注册、导出/下载缺失、裸图表堆叠、大型 DATA 对象、卡片换行混乱、低密度坏版式、缺少口径、缺少血缘和缺少查看数据入口
-17. 如果环境恰好支持浏览器自动化，可额外用 `file://` 打开 HTML 做 smoke test；这只是增强验证，不是 skill 成功的必要条件
+17. 必须依赖 `python scripts/validate_chart.py <output.html>` 和 `python scripts/validate_output_quality.py <output.html>` 完成无浏览器静态质量门，拦截外链、自引用 file URL、iframe/object/embed、业务脚本 location 跳转、JS 语法错误、`JSON.parse({...})` 运行时错误、PDF 不兼容 CSS、地图注册、导出/下载缺失、裸图表堆叠、大型 DATA 对象、卡片换行混乱、低密度坏版式、缺少口径、缺少血缘和缺少查看数据入口
+18. 环境支持浏览器自动化且浏览器允许打开生成 URL 时，smoke test 是强制质量门：确认无 console/page error、`window.dashboardCharts.length` 等于图表容器数、每个容器有 canvas，且 canvas 数等于图表容器数。若本地 URL 被浏览器安全策略阻止，必须明确记录未执行，不能声称浏览器验证通过
 
 **Dashboard 规范：**
 - 默认 HTML 骨架：`workflow_specs/html_templates/dashboard_light.html`

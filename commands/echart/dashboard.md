@@ -34,8 +34,10 @@ argument-hint: "<description|config> [--output <path>] [--insights]"
 15. 禁止 `.row` / `.full` 伪全宽网格；大图必须把 `chart-card--wide` / `full-width` / `grid-column: 1 / -1` 加在实际 chart card 上。
 16. 多图 Dashboard 的第一张核心分析卡必须 wide/full；两列 Dashboard 禁止出现 5/7 个普通半宽 `chart-card` 造成孤儿行和大面积空白，必须提升一个核心卡为 wide/full 或补齐配对。
 17. 数据必须用 Python `json.dumps(..., ensure_ascii=False, default=str)` 序列化后写入 HTML；禁止手写大型 JS 对象和字符串拼接 KPI HTML。
+    使用 `JSON.parse` 时必须把序列化结果再经一次 `json.dumps` 变成 JavaScript 字符串字面量；严禁 `JSON.parse({...})` / `JSON.parse([...])`，它们会在运行时阻断全部图表初始化。
 18. 每个图表卡片必须有 `查看数据` 按钮、默认隐藏数据表、统计口径和数据来源；按钮要能打开对应表格。
 19. `python scripts/validate_chart.py <output.html>` 或 `python scripts/validate_output_quality.py <output.html>` 返回非 0 时，必须修复后重跑，绝不能把文件路径返回给用户。
+20. 浏览器能力可用且允许打开生成 URL 时，必须执行 smoke test，确认无 console/page error，且图表容器数、`window.dashboardCharts.length`、实际 canvas 数三者一致；被安全策略阻止时必须如实记录未执行。
 
 ## 示例
 

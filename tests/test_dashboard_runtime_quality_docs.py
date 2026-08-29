@@ -25,6 +25,8 @@ def test_dashboard_runtime_quality_gate_exists_and_covers_recent_failure_modes()
         "raw line breaks inside JavaScript string literals",
         "Page.SimplePageLayout",
         "json.dumps",
+        "JSON.parse({...})",
+        "canvas count must equal chart",
         "chart-card",
         "kpi-card",
         "width: min(100%, 1440px)",

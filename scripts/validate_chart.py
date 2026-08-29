@@ -320,6 +320,84 @@ def _run_node_syntax_check(scripts):
     return errors
 
 
+def _mask_js_strings_and_comments(script):
+    """Preserve JS code positions while hiding strings and comments.
+
+    This is intentionally a small lexer, not a JavaScript parser.  It is used
+    only for runtime-contract checks that must not fire on examples embedded in
+    labels, comments, or template strings.
+    """
+    chars = list(script)
+    index = 0
+    state = "code"
+    quote = None
+    escape = False
+    while index < len(chars):
+        char = chars[index]
+        next_char = chars[index + 1] if index + 1 < len(chars) else ""
+        if state == "line_comment":
+            if char in "\r\n":
+                state = "code"
+            else:
+                chars[index] = " "
+        elif state == "block_comment":
+            chars[index] = " "
+            if char == "*" and next_char == "/":
+                chars[index + 1] = " "
+                index += 1
+                state = "code"
+        elif state == "string":
+            chars[index] = " "
+            if escape:
+                escape = False
+            elif char == "\\":
+                escape = True
+            elif char == quote:
+                state = "code"
+                quote = None
+        elif char == "/" and next_char == "/":
+            chars[index] = chars[index + 1] = " "
+            index += 1
+            state = "line_comment"
+        elif char == "/" and next_char == "*":
+            chars[index] = chars[index + 1] = " "
+            index += 1
+            state = "block_comment"
+        elif char in ("'", '"', "`"):
+            chars[index] = " "
+            state = "string"
+            quote = char
+        index += 1
+    return "".join(chars)
+
+
+def _detect_json_parse_non_string_literals(scripts):
+    """Catch valid JavaScript that always fails before chart bootstrap.
+
+    ``JSON.parse({...})`` is syntactically valid, but the object is coerced to
+    ``"[object Object]"`` and parsing throws.  A single occurrence before
+    ``echarts.init`` leaves every chart blank, which a syntax-only check misses.
+    """
+    errors = []
+    pattern = re.compile(r"\bJSON\s*\.\s*parse\s*\(")
+    for script_index, script in enumerate(scripts, start=1):
+        code = _mask_js_strings_and_comments(script)
+        for match in pattern.finditer(code):
+            argument_index = match.end()
+            while argument_index < len(code) and code[argument_index].isspace():
+                argument_index += 1
+            if argument_index < len(code) and code[argument_index] in "{[":
+                errors.append(
+                    f"RUNTIME JS failure in custom script #{script_index}: "
+                    "JSON.parse received an object/array literal instead of a JSON string. "
+                    "This throws before echarts.init and leaves every chart blank. "
+                    "Serialize twice when embedding: payload = json.dumps(data, "
+                    "ensure_ascii=False, default=str), then emit "
+                    "JSON.parse(json.dumps(payload, ensure_ascii=False))."
+                )
+    return errors
+
+
 def _unsafe_url(value):
     if value is None:
         return False
@@ -980,6 +1058,7 @@ def validate(html_path):
     custom_scripts = _custom_inline_scripts(parsed_html)
     errors.extend(_detect_unbalanced_echarts_graphic_calls(custom_scripts))
     errors.extend(_detect_large_handwritten_data_objects(custom_scripts))
+    errors.extend(_detect_json_parse_non_string_literals(custom_scripts))
     errors.extend(_run_node_syntax_check(custom_scripts))
 
     # ─────────────────────────────────────────────────────────────
