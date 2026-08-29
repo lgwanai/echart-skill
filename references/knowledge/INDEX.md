@@ -4,10 +4,16 @@
 
 ## 🎯 Generation Workflow (MUST FOLLOW)
 
-When generating ECharts code, follow this 4-step process:
+When generating ECharts code, follow this 5-step process:
+
+### Step 0: Message → Relation → View
+Read `../../workflow_specs/analysis_expression_quality.md`. Write an analysis-plan
+JSON that states the conclusion, analytical relationship, selected/rejected view,
+table mode, evidence, and next check. Run
+`python scripts/validate_analysis_plan.py <analysis-plan.json>` and stop if it fails.
 
 ### Step 1: Identify → Find in Index
-Identify chart type (bar/line/pie/scatter/candlestick/etc.) and required features (stack/race/waterfall/etc.)
+Use the validated relationship and view choice to identify chart type and required features.
 
 ### Step 2: Read Knowledge Snippets → Syntax Constraints
 Read the relevant chart-type, concept, and pattern files from this index. These contain:

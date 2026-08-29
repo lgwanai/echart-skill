@@ -5,7 +5,29 @@ Usage: python scripts/validate_chart.py <path/to/chart.html>
 Exit code 0 = valid, 1 = invalid (with error details)
 """
 import re, sys, os, json, subprocess, tempfile, shutil
+import html as html_lib
 from html.parser import HTMLParser
+from pathlib import Path
+
+try:
+    from scripts.validate_analysis_plan import validate_comparison
+    from scripts.artifact_manifest import (
+        MANIFEST_ID,
+        validate_comparison_binding,
+        validate_embedded_manifest,
+    )
+except ModuleNotFoundError:  # Direct execution: python scripts/validate_chart.py ...
+    from validate_analysis_plan import validate_comparison
+    from artifact_manifest import MANIFEST_ID, validate_comparison_binding, validate_embedded_manifest
+
+
+COMPARISON_CONTRACT_ID = "analysis-comparison-contract"
+TEMPORAL_COMPARISON_PATTERN = re.compile(
+    r"同比|环比|同期|较(?:上|去)(?:年|月|同期)|"
+    r"\b(?:yoy|qoq|mom|wow)\b|year[- ]over[- ]year|quarter[- ]over[- ]quarter|"
+    r"month[- ]over[- ]month|week[- ]over[- ]week",
+    re.IGNORECASE,
+)
 
 
 class _HTMLAssetParser(HTMLParser):
@@ -238,12 +260,100 @@ def _custom_inline_scripts(parsed_html):
     for attrs, script in parsed_html.scripts:
         if attrs.get("src"):
             continue
+        script_type = (attrs.get("type") or "").strip().lower()
+        if script_type and script_type not in {
+            "text/javascript", "application/javascript", "module"
+        }:
+            continue
         if not script.strip():
             continue
         if _is_probably_vendor_script(script):
             continue
         scripts.append(script)
     return scripts
+
+
+def _visible_html_text(content):
+    """Return user-visible text, excluding script/style payloads and markup."""
+    visible = re.sub(r"<script\b[^>]*>.*?</script\s*>", " ", content, flags=re.IGNORECASE | re.DOTALL)
+    visible = re.sub(r"<style\b[^>]*>.*?</style\s*>", " ", visible, flags=re.IGNORECASE | re.DOTALL)
+    visible = re.sub(r"<!--.*?-->", " ", visible, flags=re.DOTALL)
+    visible = re.sub(r"<[^>]+>", " ", visible)
+    return re.sub(r"\s+", " ", html_lib.unescape(visible)).strip()
+
+
+def _detect_period_comparison_contract_issues(content, parsed_html=None):
+    """Enforce an auditable period contract on every temporal comparison.
+
+    The contract lives inside the delivered HTML, so final validation does not
+    depend on an Agent remembering to include a sidecar analysis-plan file.
+    """
+    errors = []
+    parsed_html = parsed_html or _parse_html(content)
+    visible_text = _visible_html_text(content)
+    has_temporal_claim = bool(TEMPORAL_COMPARISON_PATTERN.search(visible_text))
+    contract_scripts = [
+        (attrs, script) for attrs, script in parsed_html.scripts
+        if (attrs.get("id") or "").strip() == COMPARISON_CONTRACT_ID
+    ]
+
+    if has_temporal_claim and not contract_scripts:
+        return [
+            "PERIOD ALIGNMENT: visible temporal comparison claim found, but the HTML has no "
+            f"machine-readable <script type=\"application/json\" id=\"{COMPARISON_CONTRACT_ID}\"> "
+            "contract. Embed the compared windows, completeness, latest complete period, "
+            "alignment and comparability before shipping."
+        ]
+    if not contract_scripts:
+        return []
+    if len(contract_scripts) > 1:
+        errors.append(
+            f"PERIOD ALIGNMENT: duplicate #{COMPARISON_CONTRACT_ID} contracts found; keep exactly one."
+        )
+
+    contract_attrs, contract_script = contract_scripts[0]
+    if (contract_attrs.get("type") or "").strip().lower() != "application/json":
+        errors.append(
+            f"PERIOD ALIGNMENT: #{COMPARISON_CONTRACT_ID} must use type=\"application/json\"."
+        )
+    raw_contract = contract_script.strip()
+    try:
+        contract = json.loads(raw_contract)
+    except json.JSONDecodeError as exc:
+        return errors + [
+            f"PERIOD ALIGNMENT: #{COMPARISON_CONTRACT_ID} is not valid JSON: {exc.msg}."
+        ]
+    if not isinstance(contract, dict):
+        return errors + [
+            f"PERIOD ALIGNMENT: #{COMPARISON_CONTRACT_ID} root must be a JSON object."
+        ]
+    if contract.get("version") != 1:
+        errors.append(
+            f"PERIOD ALIGNMENT: #{COMPARISON_CONTRACT_ID}.version must be 1."
+        )
+    comparisons = contract.get("comparisons")
+    if not isinstance(comparisons, list) or not comparisons:
+        return errors + [
+            f"PERIOD ALIGNMENT: #{COMPARISON_CONTRACT_ID}.comparisons must contain at least one comparison."
+        ]
+
+    for index, comparison in enumerate(comparisons):
+        prefix = f"#{COMPARISON_CONTRACT_ID}.comparisons[{index}]"
+        errors.extend(
+            f"PERIOD ALIGNMENT: {message}"
+            for message in validate_comparison(comparison, prefix=prefix)
+        )
+        if not isinstance(comparison, dict):
+            continue
+        for label_key in ("current_label", "baseline_label"):
+            label = comparison.get(label_key)
+            if not isinstance(label, str) or not label.strip():
+                errors.append(f"PERIOD ALIGNMENT: {prefix}.{label_key}: required visible period label")
+            elif label.strip() not in visible_text:
+                errors.append(
+                    f"PERIOD ALIGNMENT: {prefix}.{label_key}={label!r} is not shown in visible page text."
+                )
+    return errors
 
 
 def _strip_js_comments(script: str) -> str:
@@ -966,6 +1076,16 @@ def validate(html_path):
     #    HTMLParser-based checks below cannot see)
     # ─────────────────────────────────────────────────────────────
     errors.extend(_check_script_tag_integrity(content))
+    errors.extend(_detect_period_comparison_contract_issues(content, parsed_html))
+    if COMPARISON_CONTRACT_ID in content:
+        errors.extend(
+            f"ARTIFACT MANIFEST: {message}"
+            for message in validate_embedded_manifest(content, Path(html_path))
+        )
+        errors.extend(
+            f"ARTIFACT MANIFEST: {message}"
+            for message in validate_comparison_binding(content)
+        )
 
     # ─────────────────────────────────────────────────────────────
     # 0. Single File Compliance (catches most 404s)

@@ -1,0 +1,20 @@
+{
+  "domain": "operations",
+  "rows": [
+    {"period_date": "2026-01-01", "value": 100},
+    {"period_date": "2026-03-31", "value": 105},
+    {"period_date": "2026-04-01", "value": 108},
+    {"period_date": "2026-06-30", "value": 110},
+    {"period_date": "2026-07-01", "value": 999}
+  ],
+  "view_request": {"relation": "time", "roles": ["time", "metric"], "category_count": 6, "measure_count": 1},
+  "expected_view": "line",
+  "comparison": {
+    "id": "cmp_ops", "type": "qoq", "calendar": "calendar",
+    "current_start": "2026-04-01", "current_end": "2026-06-30",
+    "baseline_start": "2026-01-01", "baseline_end": "2026-03-31",
+    "current_period_status": "complete", "baseline_period_status": "complete",
+    "latest_complete_period_end": "2026-06-30", "alignment": "same_complete_periods", "comparable": true
+  },
+  "expected_error": "outside declared comparison windows"
+}

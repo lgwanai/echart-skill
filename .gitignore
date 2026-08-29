@@ -3,6 +3,7 @@ dist/
 tmp/
 outputs/
 backup/
+queries/
 
 # 忽略临时文件与生成的 Dashboard HTML
 *.tmp
@@ -22,6 +23,8 @@ wheels/
 # 忽略本地敏感配置文件
 config.txt
 echart_config.txt
+references/db_connections.txt
+references/project_*_index.json
 
 # 忽略打包生成的 skill 产物
 *.skill

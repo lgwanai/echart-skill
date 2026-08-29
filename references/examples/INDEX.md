@@ -58,7 +58,6 @@ Total: 354 examples
 - [noise-modified-from-marpi-demo](bar3d-noise-modified-from-marpi-demo.md)
 - [punch-card](bar3d-punch-card.md)
 - [simplex-noise](bar3d-simplex-noise.md)
-- [voxelize-image]()
 
 ## boxplot (3)
 - [light-velocity](boxplot-light-velocity.md)

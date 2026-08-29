@@ -373,11 +373,11 @@ class TestContextInsightIntegration:
 class TestSemanticInsightIntegration:
     """Test semantic model creation from real data profiles."""
 
-    def test_create_model_from_real_table(self, db_path):
+    def test_create_model_from_real_table(self, db_path, tmp_path):
         """Auto-create semantic model from profiled table."""
         from scripts.semantic_model import ModelManager
 
-        mgr = ModelManager()
+        mgr = ModelManager(models_dir=str(tmp_path / "models"))
         model = mgr.create_from_table("orders", db_path=db_path,
                                        model_name="orders_e2e",
                                        description="E2E测试订单模型")
@@ -410,11 +410,11 @@ class TestSemanticInsightIntegration:
         assert loaded.name == "orders_e2e"
         assert len(loaded.columns) == 8
 
-    def test_model_prompt_context_with_real_data(self, db_path):
+    def test_model_prompt_context_with_real_data(self, db_path, tmp_path):
         """Generated prompt context should accurately reflect the table."""
         from scripts.semantic_model import ModelManager
 
-        mgr = ModelManager()
+        mgr = ModelManager(models_dir=str(tmp_path / "models"))
         model = mgr.create_from_table("orders", db_path=db_path,
                                        model_name="orders_ctx")
         ctx_text = model.to_prompt_context()
@@ -428,11 +428,11 @@ class TestSemanticInsightIntegration:
         assert "metric" in ctx_text.lower() or "指标" in ctx_text
         assert "dimension" in ctx_text.lower() or "维度" in ctx_text
 
-    def test_multiple_models_prompt_context(self, db_path):
+    def test_multiple_models_prompt_context(self, db_path, tmp_path):
         """Combine multiple semantic models into one context."""
         from scripts.semantic_model import ModelManager
 
-        mgr = ModelManager()
+        mgr = ModelManager(models_dir=str(tmp_path / "models"))
         model1 = mgr.create_from_table("orders", db_path=db_path, model_name="orders_multi")
         mgr.save(model1, "orders_multi")
 

@@ -17,6 +17,11 @@ selection must be decided by the Agent according to the workflow specs.
 
 ## Hard Requirements
 
+- Read `analysis_expression_quality.md`, write an analysis-plan JSON, and pass
+  `scripts/validate_analysis_plan.py` before choosing chart recipes or rendering.
+- Use Message → Relation → View, distinguish audit source toggles from visible
+  companion tables, and complete What → Baseline → Why → So what → Next check
+  for every major finding.
 - Report HTML must read and visibly implement `html_templates/report_light.html`
   as the shell before returning output.
 - Dashboard HTML must read and visibly implement `html_templates/dashboard_light.html`
@@ -41,6 +46,7 @@ selection must be decided by the Agent according to the workflow specs.
 
 ## Files
 
+- `analysis_expression_quality.md` — chart/table selection and deep-analysis contract
 - `report_workflow.md` — enterprise report workflow and required reasoning steps
 - `dashboard_workflow.md` — dashboard planning and construction workflow
 - `dashboard_runtime_quality.md` — dashboard runtime quality gate for single-file,

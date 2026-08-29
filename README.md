@@ -374,7 +374,7 @@ echart-skill/
 └── outputs/                   # 输出目录
 ```
 
-Dashboard 生成必须执行 `workflow_specs/dashboard_runtime_quality.md` 中的硬性质量门，并通过 `python scripts/validate_chart.py <output.html>` 和 `python scripts/validate_output_quality.py <output.html>`。质量门会拦截外链资源、`chinaGeoJSON` 未定义、`color-mix()` 等 PDF 不兼容 CSS、裸 Page/堆叠式图表页面、手写大型 DATA 对象、`JSON.parse({...})` 这类语法正确但运行时必然失败的数据注入、JS 语法错误、缺少统计口径、缺少数据血缘、缺少“查看数据”入口和坏版式。浏览器能力可用且允许打开生成 URL 时，还必须确认图表容器数、图表实例数和实际 canvas 数一致。
+Dashboard 生成必须执行 `workflow_specs/dashboard_runtime_quality.md` 中的硬性质量门，并通过 `python scripts/validate_delivery.py <output.html>`。组合门禁会核对查询证据 manifest、静态结构、治理信息、无障碍/性能要求，并在真实 Chromium 中拦截 console/page error、外链请求、缺失图表实例和零尺寸 canvas/SVG；静态层仍会拦截未定义的 `chinaGeoJSON` 与 html2canvas 不兼容的 `color-mix()`。
 
 ---
 

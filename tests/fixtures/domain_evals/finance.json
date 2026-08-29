@@ -1,0 +1,19 @@
+{
+  "domain": "finance",
+  "rows": [
+    {"period_date": "2026-01-01", "value": 100},
+    {"period_date": "2026-03-31", "value": 120},
+    {"period_date": "2026-04-01", "value": 130},
+    {"period_date": "2026-05-10", "value": 140}
+  ],
+  "view_request": {"relation": "deviation", "roles": ["ordered_contributions"], "category_count": 6, "measure_count": 1},
+  "expected_view": "waterfall",
+  "comparison": {
+    "id": "cmp_finance", "type": "qoq", "calendar": "fiscal",
+    "current_start": "2026-04-01", "current_end": "2026-05-10",
+    "baseline_start": "2026-01-01", "baseline_end": "2026-03-31",
+    "current_period_status": "partial", "baseline_period_status": "complete",
+    "latest_complete_period_end": "2026-03-31", "alignment": "same_elapsed_days", "comparable": true
+  },
+  "expected_error": "partial and complete periods cannot be compared"
+}

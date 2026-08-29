@@ -27,7 +27,7 @@ def test_dashboard_workflow_prevents_invented_titles_and_shallow_dashboards():
     assert "white liquor" in workflow
     assert "Minimum depth for business dashboards" in workflow
     assert "at least 6 analytical modules" in workflow
-    assert "白酒分析" in skill
+    assert "Do not invent a product, brand, industry label" in skill
     assert "至少包含 6 个分析模块" in readme
 
 

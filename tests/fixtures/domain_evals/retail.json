@@ -1,0 +1,20 @@
+{
+  "domain": "retail",
+  "rows": [
+    {"period_date": "2025-07-06", "value": 100},
+    {"period_date": "2025-08-02", "value": 120},
+    {"period_date": "2026-07-05", "value": 130},
+    {"period_date": "2026-08-01", "value": 145}
+  ],
+  "view_request": {"relation": "composition", "roles": ["category", "series", "metric"], "category_count": 8, "measure_count": 2},
+  "expected_view": "stacked_bar",
+  "comparison": {
+    "id": "cmp_retail", "type": "yoy", "calendar": "retail_445",
+    "current_period_key": "FY2026-P07", "baseline_period_key": "FY2025-P07",
+    "current_start": "2026-07-05", "current_end": "2026-08-01",
+    "baseline_start": "2025-07-06", "baseline_end": "2025-08-02",
+    "current_period_status": "complete", "baseline_period_status": "complete",
+    "latest_complete_period_end": "2026-08-01", "alignment": "same_named_periods", "comparable": true
+  },
+  "expected_error": null
+}

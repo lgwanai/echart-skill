@@ -10,9 +10,11 @@ Use Python only to query data, calculate metrics, and validate standalone HTML.
 ## Required Steps
 
 1. **Define the dashboard job**
+   - Read `workflow_specs/analysis_expression_quality.md` completely.
    - Identify target user: executive, analyst, operator, growth, finance, sales, etc.
    - Identify operating cadence: real-time, daily, weekly, monthly, campaign review.
    - Identify the primary decision the dashboard should support.
+   - Query the maximum available business date, determine the latest complete period, and record it before calculating any YoY/MoM metric.
    - Define the dashboard title from the user request, table/file name, and actual fields. Do not invent a product, brand, or industry label that is not present in the data or prompt.
    - Title rule: if the user uploads a sales table and does not name a specific industry, use a neutral title such as `销售数据经营 Dashboard`, `销售表现分析 Dashboard`, or `<表名> Dashboard`. Never infer a narrow category such as white liquor, cosmetics, SaaS, or apparel unless the data contains that category or the user says it.
 
@@ -26,10 +28,12 @@ Use Python only to query data, calculate metrics, and validate standalone HTML.
    - Avoid chart collections without a business hierarchy.
 
 3. **Plan layout**
+   - Save the message/relation/view/table/finding decisions as an analysis-plan JSON and run `python scripts/validate_analysis_plan.py <plan.json>` before selecting recipes or writing HTML.
    - First row: KPI summary and key status.
    - Second row: trend and comparison.
    - Third row: structure/segment breakdown.
    - Diagnostic area: anomalies, funnel, retention, attribution, or drill-down tables where relevant.
+   - Treat the hidden `查看数据` table as an audit source toggle. Add a visible compact companion table when exact lookup, exception handling, more than 15 categories, or four-plus measures make it decision-relevant.
    - Include at least one cross-analysis module and one anomaly/attribution module when data supports them.
    - Put filters where users expect them: time, channel, region, product, user segment.
    - If metadata, schema, or sample values contain a city field and a sales/volume/transaction metric, read `workflow_specs/dashboard_modules/city_sales_map.md` completely and include its map module unless the user explicitly excludes geography.
@@ -38,6 +42,7 @@ Use Python only to query data, calculate metrics, and validate standalone HTML.
 
 4. **Query evidence**
    - Use DuckDB/SQL/Python to produce the exact data arrays needed by charts.
+   - Reuse one explicit comparison boundary across headline KPIs, charts, rankings, tables, price analysis, attribution, and narrative. If the latest complete month is July, every YoY query must compare January–July on both sides.
    - Keep query logic auditable; include key SQL in comments or appendix when appropriate.
    - For every chart, first read the selected chart recipe from `references/examples/*.md`, then generate the option from the recipe and evidence table. Dashboard charts are not written from memory.
 
@@ -109,6 +114,17 @@ If no dashboard expert strongly matches, select `general_business_dashboard.md` 
 
 Before returning:
 
+- Read `workflow_specs/artifact_evidence_contract.md`, bind every query result to
+  the final HTML with `scripts/artifact_manifest.py`, and run the combined
+  `scripts/validate_delivery.py` gate.
+- The analysis-plan JSON must pass `scripts/validate_analysis_plan.py`; every view title states a finding rather than only a topic.
+- Any YoY/MoM/period comparison must declare both windows, completeness status, and latest complete period. Partial-versus-complete or YTD-versus-full-year is a blocking failure; a caveat does not downgrade it to a warning.
+- If the visible HTML contains 同比/环比/同期/YoY/QoQ/MoM/WoW, embed the version-1
+  `analysis-comparison-contract` JSON described in
+  `analysis_expression_quality.md`. The visible current/baseline labels and the
+  embedded dates must agree; missing or misaligned contracts fail
+  `scripts/validate_chart.py`.
+- Every major finding must complete What, baseline, Why status, Why, So what, next check, evidence references, and limitations. Execute at least one next check when the needed fields exist, or show the data gap.
 - Read and apply `workflow_specs/dashboard_runtime_quality.md`.
 - Generated HTML must be standalone.
 - ECharts and map assets must be inlined when used.
@@ -123,6 +139,6 @@ Before returning:
 - If city geography and sales/volume metrics are present, the final HTML must include the city map module or the documented fallback. Missing the module is a blocking failure.
 - The dashboard must include at least one business interpretation card when data supports it; it cannot be only charts.
 - The dashboard should not stop at KPI totals; it must include cross-analysis, anomaly, or attribution diagnostics when the required fields exist.
-- Run `python scripts/validate_chart.py <output.html>` when an HTML dashboard is produced.
-- Browser automation is optional. The mandatory no-browser gate is `python scripts/validate_chart.py <output.html>`, which must catch forbidden URL assets, iframe/object/embed usage, runtime self-load/navigation patterns, custom JS syntax errors, PDF-incompatible CSS, missing controller/export/download pieces, and map registration issues.
+- Run `python scripts/validate_delivery.py <output.html>` when an HTML dashboard is produced.
+- The combined gate requires live Chromium rendering when available and also runs the browser-free static checks for forbidden URL assets, iframe/object/embed usage, runtime self-load/navigation patterns, custom JS syntax errors, PDF-incompatible CSS, missing controller/export/download pieces, and map registration issues. `--allow-static-only` is an explicitly degraded exception.
 - When browser automation is available, use it only as an extra smoke test through `file://`: no page errors, no console errors, expected chart canvas count, map canvas when triggered, empty external script list, working PDF export, and working chart download.

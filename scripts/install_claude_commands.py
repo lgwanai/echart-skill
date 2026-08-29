@@ -84,7 +84,7 @@ def _command_source(spec: CommandSpec) -> str:
         "9. [FAIL] 禁止在任何指令中使用 `python3 << 'PYEOF'` / `python << 'PY'` heredoc、"
         "`psycopg2.connect(...)`、`psycopg.connect(...)`、`pymysql.connect(...)`、`duckdb.connect(...)`、"
         "`create_engine(...)`、`.cursor()`、`cur.execute(...)` 或临时 Python 代码直接连接数据库/执行 SQL。\n"
-        "10. 执行前必须读取 schema 和当前生效统计口径：`python scripts/metrics_manager.py effective`。如果口径中维护了业务集合（如商圈酒店集合），SQL 必须使用该集合，例如 `hotel_name IN (...)`；不得把商圈误当作不存在的字段，也不得自行用关键词 LIKE 猜集合。\n"
+        "10. 执行前必须读取 schema 和当前生效统计口径：`python scripts/metrics_manager.py effective`。如果口径中维护了业务实体集合，SQL 必须使用受治理集合，例如 `entity_id IN (...)`；不得把业务概念误当作不存在的字段，也不得自行用关键词 LIKE 猜集合。\n"
         "11. PostgreSQL/MySQL 查询使用 `python scripts/sql_runner.py --profile <name> --sql \"<SELECT ...>\" --output json` 或 `python scripts/sql_runner.py --profile <name> --file queries/<task>.sql --output json`；"
         "未配置 profile 时，使用 `python scripts/sql_runner.py --type postgresql --host <host> --database <db> --username <user> --password-env DB_PASSWORD --sql \"<SELECT ...>\" --output json`。"
         "可以写 SQL 文件；不得把密码写入命令或临时代码。\n"
@@ -138,7 +138,7 @@ def _shared_source() -> str:
         "|---|---|---|---|\n"
         + rows
         + "\n\n"
-        "核心原则：Agent 可以根据 schema 和当前生效统计口径生成 SQL，也可以写 SQL 文件，但必须通过 `scripts/sql_runner.py --sql` / `scripts/sql_runner.py --file` / `scripts/db_cli.py` / `scripts/db_manager.py` 执行，`scripts/analysis_runner.py` 只作为简单聚合快捷方式；不得用临时 heredoc Python 连接数据库，不得从 `conn = ...` 开始写查数脚本。执行前读取 `python scripts/metrics_manager.py effective`，业务集合口径（如商圈酒店集合）必须按口径展开为 SQL 条件，例如 `hotel_name IN (...)`，不能假设存在商圈字段，也不能自行用关键词 LIKE 猜集合。分析代码仅用于 SQL 难以表达的算法、建模或后处理，不能负责连接数据库、执行 SQL、审计或结果导出。连接信息通过 profile 或 runner 参数传入，密码通过环境变量传入。任何输出形态都必须满足企业 BI 交付标准：查询/导出有 `.meta.json` 元数据和血缘，报告/图表/Dashboard 有统计口径说明、数据血缘/来源、生成时间、证据引用、限制说明和专业版式；每个图表区域都有 `查看数据` 按钮和默认隐藏的对应数据表，并通过 `scripts/validate_output_quality.py`；HTML 还要通过 `scripts/validate_chart.py`。可用 `python scripts/validate_agent_output.py <log-or-text>` 扫描过程输出。本地 DuckDB 计算、明细数据不过大模型、自包含 ECharts 输出、审计与血缘可追踪、专家模式生成企业报告和 Dashboard。\n"
+        "核心原则：Agent 可以根据 schema 和当前生效统计口径生成 SQL，也可以写 SQL 文件，但必须通过 `scripts/sql_runner.py --sql` / `scripts/sql_runner.py --file` / `scripts/db_cli.py` / `scripts/db_manager.py` 执行，`scripts/analysis_runner.py` 只作为简单聚合快捷方式；不得用临时 heredoc Python 连接数据库，不得从 `conn = ...` 开始写查数脚本。执行前读取 `python scripts/metrics_manager.py effective`，业务实体集合口径必须按治理定义展开为 SQL 条件，例如 `entity_id IN (...)`，不能假设不存在的字段，也不能自行用关键词 LIKE 猜集合。分析代码仅用于 SQL 难以表达的算法、建模或后处理，不能负责连接数据库、执行 SQL、审计或结果导出。连接信息通过 profile 或 runner 参数传入，密码通过环境变量传入。任何输出形态都必须满足企业 BI 交付标准：查询/导出有 `.meta.json` 元数据和血缘，报告/图表/Dashboard 有统计口径说明、数据血缘/来源、生成时间、证据引用、限制说明和专业版式；每个图表区域都有 `查看数据` 按钮和默认隐藏的对应数据表，并通过 `scripts/validate_output_quality.py`；HTML 还要通过 `scripts/validate_chart.py`。可用 `python scripts/validate_agent_output.py <log-or-text>` 扫描过程输出。本地 DuckDB 计算、明细数据不过大模型、自包含 ECharts 输出、审计与血缘可追踪、专家模式生成企业报告和 Dashboard。\n"
     )
 
 

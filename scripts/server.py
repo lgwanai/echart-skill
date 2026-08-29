@@ -130,7 +130,8 @@ class ServerLifecycle:
             return False
 
 def find_free_port(start_port=8100, max_port=8200):
-    for port in range(start_port, max_port + 1):
+    """Return a free port in the half-open interval [start_port, max_port)."""
+    for port in range(start_port, max_port):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 s.bind(('', port))

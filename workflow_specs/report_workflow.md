@@ -23,6 +23,9 @@ query results, and explicit conclusions.
    - Do not encode expert selection or expert rules as Python if/else logic.
 
 3. **Build an analysis plan before writing**
+   - Read `workflow_specs/analysis_expression_quality.md` completely.
+   - Save message/relation/view/table/finding decisions as an analysis-plan JSON and run `python scripts/validate_analysis_plan.py <plan.json>` before selecting recipes or writing the report.
+   - Query the maximum available business date and latest complete period. Every YoY/MoM branch must reuse the same aligned dates across headline metrics, charts, tables, attribution, and narrative.
    - Use the selected expert files as the analysis playbook.
    - Decide which views are supported by available data.
    - List unsupported views as data gaps instead of fabricating conclusions.
@@ -35,7 +38,7 @@ query results, and explicit conclusions.
    - Use DuckDB/SQL/Python for profiling, grouping, period comparison, anomaly scan, and attribution math.
    - Use existing engines such as `insight_engine.py`, `attribution_engine.py`, and `forecast_engine.py` only as evidence providers.
    - The Agent writes the interpretation, not the tool.
-   - Evidence for main findings should be converted into charts first. Tables are supporting detail, not the primary proof.
+   - Choose chart, chart + visible companion table, or table-first expression using `analysis_expression_quality.md`. The hidden `查看数据` table is only an audit source toggle, not the analytical companion table.
    - At minimum, collect evidence for baseline comparison, anomaly scan, cross-analysis, and driver attribution when data supports them.
    - Do not expose SQL in the main report body. Translate calculation logic into plain business wording.
 
@@ -151,7 +154,7 @@ When multiple experts apply, use a primary/supporting structure:
   - one anomaly scan
   - one cross-analysis
   - one attribution/drill-down path
-- Every key finding should have a primary chart. Use tables only for appendix or compact supporting detail.
+- Every key finding needs the strongest evidence view. Prefer a chart for patterns; use chart + compact visible table for precise decision lookup, and table-first when a chart adds noise.
 - Choose chart types by analytical purpose:
   - Trend/change: line or area chart.
   - Ranking/contribution: bar chart or waterfall.
@@ -162,6 +165,7 @@ When multiple experts apply, use a primary/supporting structure:
   - City transaction distribution: when a city field and transaction amount/sales amount/GMV field are both present, add a city transaction map. Use `geo + effectScatter` or a province/city map recipe; do not force city data into province totals unless province mapping exists.
   - Structure: treemap, stacked bar, or pie only when categories are few.
 - If evidence is weak, phrase as “初步判断” or “需要补充数据验证”.
+- Every major finding must complete What, baseline, Why status, Why, So what, next check, evidence references, and limitations. Execute at least one next check when fields exist; otherwise expose the data gap.
 - When discussing seasonality or external factors, do not assert causality from internal data alone. Prefer wording such as: `补充节假日、活动投放、价格、库存、天气、渠道策略等数据后，可以进一步判断这是季节性波动还是外部因素导致。`
 - Do not overfit one chart. Reports must include interpretation and action.
 - Do not hide data limitations.
@@ -195,6 +199,10 @@ Do not display SQL in the main body. SQL can only appear in the appendix when th
 
 ## Chart Generation Contract
 
+Before report assembly, read `workflow_specs/artifact_evidence_contract.md` and
+bind the evidence files, metric/scope fingerprints, comparisons, charts, and
+findings into the final HTML.
+
 Every chart embedded in a report must be generated from an explicit chart recipe context:
 
 1. Read `references/examples/INDEX.md` to select the chart type.
@@ -206,6 +214,9 @@ Every chart embedded in a report must be generated from an explicit chart recipe
 7. Embed the validated chart specs into the report template as a `reportChartSpecs` list; initialize each chart independently so one failed chart cannot break all other charts.
 8. Keep ECharts JavaScript syntactically closed. In particular, `new echarts.graphic.LinearGradient(...)` and `new echarts.graphic.RadialGradient(...)` must close the constructor with `)` before closing the surrounding option object.
 9. Cite the appendix data table ID used by the chart.
-10. Validate the generated HTML with `python scripts/validate_chart.py <output.html>` when possible. If it fails for external ECharts CDN, missing inlined ECharts library, or unclosed graphic constructor, repair and rerun before returning.
+10. When the report visibly says 同比/环比/同期/YoY/QoQ/MoM/WoW, embed the version-1
+    `analysis-comparison-contract` from `analysis_expression_quality.md`; its
+    current/baseline labels must also be visible in the report.
+11. Validate the generated HTML with `python scripts/validate_delivery.py <output.html>`. Evidence mismatch, browser/runtime failure, missing/malformed/misaligned period contract, external ECharts CDN, missing inlined ECharts library, or unclosed graphic constructor is blocking; repair and rerun before returning.
 
 Do not create charts by freehand memory when a recipe exists. If a required recipe is missing, state the gap and choose the closest supported recipe from the index.

@@ -107,6 +107,11 @@ class Insight:
     confidence: float = 0.0
     limitations: list[str] = field(default_factory=list)
     evidence_refs: list[str] = field(default_factory=list)
+    analysis_stage: str = "descriptive"
+    decision_question: str = ""
+    why_hypotheses: list[str] = field(default_factory=list)
+    next_checks: list[str] = field(default_factory=list)
+    companion_table: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         result = asdict(self)
@@ -254,8 +259,13 @@ class InsightEngine:
             changes = self._discover_changes(table, date_column, metric_columns[0])
             all_insights.extend(changes)
 
-        # Step 9: Confidence and limitation annotation
-        all_insights = [self._annotate_insight_confidence(insight) for insight in all_insights]
+        # Step 9: Confidence, decision meaning, and next-query annotation.
+        # Statistical detectors produce candidates; this layer makes the boundary
+        # between description and verified diagnosis explicit.
+        all_insights = [
+            self._annotate_insight_expression(self._annotate_insight_confidence(insight))
+            for insight in all_insights
+        ]
 
         # Sort by severity priority
         severity_order = {
@@ -304,6 +314,91 @@ class InsightEngine:
                 limitations.append("当前洞察缺少结构化证据，只能作为初步提示。")
             insight.limitations = limitations
 
+        return insight
+
+    def _annotate_insight_expression(self, insight: Insight) -> Insight:
+        """Add decision question, diagnostic hypotheses, and a compact table plan."""
+        dimension = insight.evidence.get("dimension")
+        metric = insight.evidence.get("metric")
+        columns = [column for column in (dimension, metric) if column]
+
+        guidance = {
+            InsightType.SUMMARY: {
+                "question": "这份数据是否足以支持业务判断，哪些字段或口径仍缺失？",
+                "hypotheses": ["当前结果只是数据画像，尚未形成业务原因判断。"],
+                "checks": ["核对时间范围、指标定义、缺失率、重复记录和可用分析维度。"],
+                "columns": ["字段", "类型", "缺失率", "唯一值数"],
+            },
+            InsightType.RANKING: {
+                "question": "领先或落后的对象是否稳定，并且是否真正驱动整体结果？",
+                "hypotheses": ["差异可能来自规模、样本量、结构或时间窗口，而非效率。"],
+                "checks": ["补充总量、占比、变化率和样本量，并按时间及第二维度检查排名稳定性。"],
+                "columns": columns + ["排名", "占比", "变化率", "样本量"],
+            },
+            InsightType.COMPOSITION: {
+                "question": "结构集中来自真实依赖，还是规模、分类口径或单期波动？",
+                "hypotheses": ["集中度可能由头部对象规模、分类合并或当期异常共同造成。"],
+                "checks": ["同时查询绝对值、占比、累计占比及上期占比，并拆分头部对象的次级维度。"],
+                "columns": columns + ["占比", "累计占比", "上期占比"],
+            },
+            InsightType.TREND: {
+                "question": "趋势由哪些分群驱动，最近一期是否完整且趋势是否稳定？",
+                "hypotheses": ["趋势可能来自规模变化、结构变化、季节性或不完整周期。"],
+                "checks": ["检查周期完整性和缺口，再按头部维度分解绝对变化与变化率。"],
+                "columns": columns + ["周期", "数值", "环比", "同比", "完整周期"],
+            },
+            InsightType.CHANGE: {
+                "question": "总变化由哪些对象、数量因素或率值因素贡献？",
+                "hypotheses": ["变化可能由数量、价格/率值或结构迁移驱动。"],
+                "checks": ["计算分维度贡献，并在字段支持时执行数量 × 价格/率值分解。"],
+                "columns": columns + ["本期", "基期", "变化额", "变化率", "贡献率"],
+            },
+            InsightType.ANOMALY: {
+                "question": "异常是真实业务事件还是数据质量问题，影响集中在哪里？",
+                "hypotheses": ["异常可能来自业务事件、录入错误、口径变化或样本量过小。"],
+                "checks": ["先核验原始记录、单位和口径，再按对象拆分异常贡献并检查相邻周期。"],
+                "columns": columns + ["周期/对象", "实际值", "基线", "偏差", "样本量"],
+            },
+            InsightType.OUTLIER: {
+                "question": "离群对象是否可行动，还是由错误、特殊口径或小样本造成？",
+                "hypotheses": ["离群值可能是录入错误、特殊对象或真实高风险事件。"],
+                "checks": ["回查原始记录，核对样本量，并与同类对象和历史区间比较。"],
+                "columns": columns + ["实际值", "同类基线", "偏差", "样本量"],
+            },
+            InsightType.CORRELATION: {
+                "question": "相关关系在不同分群和排除离群值后是否仍然成立？",
+                "hypotheses": ["相关可能由共同趋势、第三变量、分群结构或离群值造成。"],
+                "checks": ["报告样本量，检查离群点，并按关键维度分层计算相关性；不要据此声称因果。"],
+                "columns": columns + ["样本量", "相关系数", "分群", "离群标记"],
+            },
+            InsightType.SEASONALITY: {
+                "question": "周期模式是否跨多个可比周期重复，并能排除节假日或活动影响？",
+                "hypotheses": ["表观周期可能由节假日、促销、库存或不完整周期造成。"],
+                "checks": ["比较至少两个完整周期，并补充节假日、活动、价格和库存标记。"],
+                "columns": columns + ["周期位置", "本周期", "上周期", "事件标记"],
+            },
+            InsightType.GAP: {
+                "question": "差距来自规模、效率、结构还是统计口径？",
+                "hypotheses": ["差距可能由规模、效率、结构或口径差异造成。"],
+                "checks": ["统一口径后分解绝对差额、相对差率和各维度贡献。"],
+                "columns": columns + ["对象", "基线", "差额", "差率", "贡献率"],
+            },
+        }
+        selected = guidance.get(insight.type, guidance[InsightType.SUMMARY])
+        if not insight.decision_question:
+            insight.decision_question = selected["question"]
+        if not insight.why_hypotheses:
+            insight.why_hypotheses = list(selected["hypotheses"])
+        if not insight.next_checks:
+            insight.next_checks = list(selected["checks"])
+        if not insight.companion_table:
+            deduped_columns = list(dict.fromkeys(selected["columns"]))
+            insight.companion_table = {
+                "mode": "companion",
+                "columns": deduped_columns,
+                "reason": "图表用于识别模式，表格用于核对决策所需的精确值和样本基础。",
+            }
+        insight.suggested_chart_config.setdefault("message", insight.description)
         return insight
 
     def quick_scan(self, table: str) -> list[Insight]:
@@ -612,7 +707,7 @@ class InsightEngine:
     def _discover_composition(
         self, table: str, dimension: str, metric: str, top_n: int
     ) -> list[Insight]:
-        """Discover composition/distribution insights (for pie/treemap charts)."""
+        """Discover composition insights using comparison-first visual defaults."""
         insights = []
         safe_dim = f'"{dimension}"'
         safe_metric = f'"{metric}"'
@@ -665,9 +760,12 @@ class InsightEngine:
                         "top2_pct": top2_pct,
                     },
                     related_columns=[dimension, metric],
-                    suggested_chart="pie",
+                    suggested_chart="bar",
                     suggested_chart_config={
-                        "title": f"{dimension} - {metric} 占比",
+                        "title": desc,
+                        "orientation": "horizontal",
+                        "show_absolute_value": True,
+                        "show_percent": True,
                         "data": [{"name": str(r["dim_val"]), "value": r["metric_val"]} for r in dist[:10]],
                     },
                 ))

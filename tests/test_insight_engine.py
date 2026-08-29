@@ -173,6 +173,12 @@ class TestInsightDiscovery:
             assert ins.description
             assert ins.type in InsightType.__members__.values()
             assert ins.severity in Severity.__members__.values()
+            assert ins.analysis_stage == "descriptive"
+            assert ins.decision_question
+            assert ins.why_hypotheses
+            assert ins.next_checks
+            assert ins.companion_table["mode"] == "companion"
+            assert len(ins.companion_table["columns"]) >= 2
 
     def test_analyze_returns_summary(self, engine_with_data):
         """Test that summary insights are included."""
@@ -209,6 +215,9 @@ class TestInsightDiscovery:
         assert len(comp) > 0
         for ins in comp:
             assert ins.type == InsightType.COMPOSITION
+            assert ins.suggested_chart == "bar"
+            assert ins.suggested_chart_config["show_absolute_value"] is True
+            assert ins.suggested_chart_config["show_percent"] is True
 
     def test_discover_trends(self, engine_with_data):
         """Test trend discovery."""

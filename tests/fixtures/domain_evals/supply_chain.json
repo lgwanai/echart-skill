@@ -1,0 +1,19 @@
+{
+  "domain": "supply_chain",
+  "rows": [
+    {"period_date": "2025-01-01", "value": 60},
+    {"period_date": "2025-07-31", "value": 75},
+    {"period_date": "2026-01-01", "value": 55},
+    {"period_date": "2026-07-31", "value": 50}
+  ],
+  "view_request": {"relation": "ranking", "roles": ["category", "metric"], "category_count": 12, "measure_count": 2},
+  "expected_view": "bar",
+  "comparison": {
+    "id": "cmp_supply", "type": "yoy", "calendar": "calendar",
+    "current_start": "2026-01-01", "current_end": "2026-07-31",
+    "baseline_start": "2025-01-01", "baseline_end": "2025-07-31",
+    "current_period_status": "complete", "baseline_period_status": "complete",
+    "latest_complete_period_end": "2026-07-31", "alignment": "same_complete_periods", "comparable": true
+  },
+  "expected_error": null
+}

@@ -14,9 +14,11 @@ incompatibility. Treat this as a blocking quality gate, not optional advice.
 2. No runtime dependency may be loaded from a URL.
 3. No dependency may be fetched dynamically after page load.
 4. All libraries must be embedded before the chart bootstrap script.
-5. The final HTML must pass `python scripts/validate_chart.py <output.html>`.
-6. Browser automation is optional only; the required quality gate must work
-   without opening a browser.
+5. The final HTML must pass `python scripts/validate_delivery.py <output.html>`,
+   which combines static, governance, and live-browser rendering checks.
+6. Live-browser validation is required when the bundled/system Chromium runtime
+   is available. `--allow-static-only` is an explicit degraded mode, not a
+   successful browser smoke test.
 7. A file that contains `echarts.init` but does not contain an inlined
    `assets/echarts/echarts.min.js` library is invalid even if it has no
    `<script src>` tag.
@@ -33,18 +35,23 @@ incompatibility. Treat this as a blocking quality gate, not optional advice.
     failure: it is valid syntax, but throws before any chart is initialized.
 11. Desktop dashboard layout must use the available viewport. A narrow
     left-column layout with large blank space on the right is invalid.
-12. Long detail tables must be scrollable, summarized, or paginated; they must
+12. Visible 同比/环比/同期/YoY/QoQ/MoM/WoW claims require exactly one embedded
+    `analysis-comparison-contract` JSON block. It must declare current and
+    baseline windows, complete/partial status, `latest_complete_period_end`,
+    alignment, comparability, and visible period labels. YTD-versus-full-year
+    is a blocking failure.
+13. Long detail tables must be scrollable, summarized, or paginated; they must
     not stretch the page into an unreadable single-column report.
-13. Dense forecast/trend/monthly/annual/GMV cards must declare their span.
+14. Dense forecast/trend/monthly/annual/GMV cards must declare their span.
     They must not accidentally occupy half-width rows while the other half of
     the row is blank.
-14. KPI cards and chart-card headers must have stable text wrapping rules.
+15. KPI cards and chart-card headers must have stable text wrapping rules.
     `white-space: nowrap` on card text is invalid unless the text is inside a
     deliberately clipped control such as a compact button.
-15. Wide/full span class names must map to real CSS. A class such as
+16. Wide/full span class names must map to real CSS. A class such as
     `.chart-card--wide` is invalid unless it defines `grid-column: span 2` or
     `grid-column: 1 / -1`, or the card has an equivalent inline style.
-16. Do not create pseudo full-width rows such as `<div class="row full">`
+17. Do not create pseudo full-width rows such as `<div class="row full">`
     inside a two-column grid. The wide/full span rule must be attached to the
     actual chart card, not to an intermediate row wrapper.
 
@@ -343,6 +350,9 @@ The validator must check:
 - object/array literals passed directly to `JSON.parse`
 - PDF-incompatible CSS color functions
 - map registration when `geo`, `map`, or `effectScatter` is used
+- a valid `analysis-comparison-contract` for every visible temporal comparison;
+  its period labels must be visible and its dates must pass the same alignment
+  rules as the analysis plan
 
 The validator must distinguish vendor libraries from Agent-authored business
 scripts. For example, `jsPDF` may contain internal helper code that is not used
@@ -375,7 +385,7 @@ If any rule fails, do not return the dashboard as complete.
 Regenerate or repair the HTML first, then rerun:
 
 ```bash
-python scripts/validate_chart.py <output.html>
+python scripts/validate_delivery.py <output.html>
 ```
 
 For dashboard outputs, also run a real browser smoke test whenever the browser

@@ -37,6 +37,9 @@ def test_dashboard_runtime_quality_gate_exists_and_covers_recent_failure_modes()
         "span-2",
         "white-space: nowrap",
         "overflow-wrap: anywhere",
+        "analysis-comparison-contract",
+        "latest_complete_period_end",
+        "YTD-versus-full-year",
     ]
 
     for term in required_terms:

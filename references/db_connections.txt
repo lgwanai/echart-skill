@@ -1,9 +1,0 @@
-# echart-skill 配置文件
-# 使用 KEY=VALUE；支持 # 或 ; 注释。
-
-connections.china_mobile.type=postgresql
-connections.china_mobile.host=localhost
-connections.china_mobile.port=5432
-connections.china_mobile.database=china_mobile
-connections.china_mobile.username=china_mobile
-connections.china_mobile.timeout=30.0

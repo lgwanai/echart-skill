@@ -19,6 +19,6 @@ def test_mixed_line_bar_recipe_requires_dual_axis():
 def test_skill_mentions_global_dual_axis_rule_for_mixed_charts():
     content = (ROOT / "SKILL.md").read_text(encoding="utf-8")
 
-    assert "组合图双坐标硬规则" in content
+    assert "Mixed bar/line charts with different units or magnitudes" in content
     assert "yAxisIndex: 0" in content
     assert "yAxisIndex: 1" in content

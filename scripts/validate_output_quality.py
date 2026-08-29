@@ -15,6 +15,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+try:
+    from scripts.artifact_manifest import MANIFEST_ID, validate_embedded_manifest
+except ModuleNotFoundError:
+    from artifact_manifest import MANIFEST_ID, validate_embedded_manifest
+
 
 GOVERNANCE_TOKENS = ("统计口径", "口径说明", "metric", "scope")
 LINEAGE_TOKENS = ("数据血缘", "血缘", "lineage", "query hash", "query_hash", "数据来源", "来源表")
@@ -86,7 +91,7 @@ def _validate_textual_artifact(path: Path, text: str, errors: list[str]) -> None
         errors.append("EVIDENCE: too few numeric facts; enterprise analysis needs quantified evidence.")
 
 
-def _validate_html_artifact(text: str, errors: list[str]) -> None:
+def _validate_html_artifact(path: Path, text: str, errors: list[str]) -> None:
     if "<style" not in text.lower():
         errors.append("LAYOUT: HTML artifact has no inline style block; avoid browser-default report/dashboard pages.")
     if not _has_any(text, LAYOUT_TOKENS):
@@ -95,6 +100,16 @@ def _validate_html_artifact(text: str, errors: list[str]) -> None:
         row_count = len(re.findall(r"<tr\b", text, flags=re.IGNORECASE))
         if row_count > 18 and "table-scroll" not in text and "overflow" not in text:
             errors.append("LAYOUT: long HTML table lacks scroll/pagination wrapper.")
+    if "echarts.init" in text:
+        if MANIFEST_ID not in text:
+            errors.append(
+                f"GOVERNANCE: analytical HTML is missing machine-readable #{MANIFEST_ID}."
+            )
+        else:
+            errors.extend(
+                f"GOVERNANCE: {message}"
+                for message in validate_embedded_manifest(text, path)
+            )
 
 
 def validate_artifact(path: str | Path, artifact_type: str = "auto") -> list[str]:
@@ -119,7 +134,7 @@ def validate_artifact(path: str | Path, artifact_type: str = "auto") -> list[str
     text = _read_text(artifact)
     _validate_textual_artifact(artifact, text, errors)
     if artifact_type in {"html", "dashboard", "chart", "report"} or suffix in {".html", ".htm"}:
-        _validate_html_artifact(text, errors)
+        _validate_html_artifact(artifact, text, errors)
     return errors
 
 
