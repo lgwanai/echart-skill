@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/python-3.10+-green" alt="Python">
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
   <img src="https://img.shields.io/badge/charts-27_types-orange" alt="Charts">
-  <img src="https://img.shields.io/badge/recipes-354-purple" alt="Recipes">
+  <img src="https://img.shields.io/badge/archived_recipes-353-purple" alt="Archived recipes">
 </p>
 
 ---
@@ -63,7 +63,7 @@ Echart Skill integrates deeply into enterprise data governance, not just as a qu
 ### 🎨 Enterprise Data Visualization
 
 - **27 Chart Types**: Bar, line, pie, scatter, radar, funnel, gauge, heatmap, treemap, sankey, graph, candlestick, 3D, and more
-- **354 Official ECharts Recipes**: Agent replaces only the data array — no hand-written option code required
+- **Deterministic common charts**: 9 compiled views read actual query-result files; 353 historical recipes are losslessly archived for specialized requests. Never splice arrays into demo JavaScript.
 - **Multi-Level Maps**: Province (`china.js`) → City (province JS) → District/Street (Baidu Maps API)
 - **Interactive Dashboards**: KPI cards, trend charts, anomaly alerts, theme switching, responsive layout, PDF/PNG export
 - **Enterprise Visual Standards**: Unified HTML skeleton, semantic colors, print-friendly, light/dark dual themes
@@ -121,7 +121,7 @@ ln -s ~/skills/echart-skill ~/.claude/skills/echart-skill   # Claude Code
               │                      │                      │
     ┌─────────▼─────────┐  ┌────────▼────────┐  ┌─────────▼─────────┐
     │  Analysis & Insight │  │  Forecast &      │  │  Visualization    │
-    │  Insight Engine    │  │  Attribution     │  │  27 types · 354   │
+    │  Insight Engine    │  │  Attribution     │  │ Compiler/archive│
     │  7 insight modes   │  │  4 methods·drill │  │  Maps·3D·Graphs   │
     └─────────┬─────────┘  └────────┬────────┘  └─────────┬─────────┘
               │                     │                      │
@@ -268,7 +268,7 @@ External database queries go through the same PrivacyGuard detection and audit p
 
 | Command | Description |
 |------|------|
-| `/chart` | Generate single charts (27 types, 354 official recipes) |
+| `/chart` | Compile 9 common views; retrieve specialized archived recipes on demand |
 | `/chart-list` | View supported chart types and descriptions |
 | `/dashboard` | Natural language → interactive enterprise dashboard |
 
@@ -338,7 +338,9 @@ External database queries go through the same PrivacyGuard detection and audit p
 ```
 echart-skill/
 ├── references/
-│   ├── examples/               # 354 self-contained .md chart recipes
+│   ├── chart_guide.md          # Compiler contract and verification workflow
+│   ├── legacy_examples.zip    # 353 historical recipes, retrieved on demand
+│   ├── examples/               # Compact INDEX.md only
 │   │   └── INDEX.md            # Recipe lookup decision table
 │   └── knowledge/              # ECharts knowledge base (concepts/API/patterns)
 ├── workflow_specs/

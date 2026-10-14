@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from scripts.chart_capabilities import allowed_views, load_catalog, recommend_view
+from scripts.reference_assets import get_asset
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,7 +14,7 @@ def test_catalog_relations_reference_known_views_and_existing_recipes():
         assert set(relation["preferred"]) <= set(relation["allowed"])
     for view in catalog["views"].values():
         if recipe := view.get("recipe"):
-            assert (ROOT / "references/examples" / f"{recipe}.md").is_file(), recipe
+            assert get_asset(ROOT, recipe)['content'], recipe
 
 
 def test_recommender_selects_line_for_time_series():

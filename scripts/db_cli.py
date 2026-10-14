@@ -443,6 +443,9 @@ def _setup_connection_management_subcommands(subparsers) -> None:
     test_parser = subparsers.add_parser("test-connection", help="Test database connection")
     test_parser.add_argument("name", help="Connection profile name")
     test_parser.add_argument("--cwd", help="Current working directory")
+    test_parser.add_argument("--no-index", action="store_true", help="Test only; do not refresh project source context")
+    test_parser.add_argument("--max-assets", type=int, default=200, help="Maximum tables/collections to index")
+    test_parser.add_argument("--skip-row-counts", action="store_true", help="Skip approximate row counts")
     setattr(test_parser, "_subcommand_group", "connection-management")
 
 
@@ -517,6 +520,23 @@ def cmd_test_connection(args: argparse.Namespace) -> None:
     success, message = manager_test(args.name, args.cwd)
     if success:
         print(f"✅ {message}")
+        if not args.no_index:
+            try:
+                from scripts.project_data_context import refresh_database_source
+
+                source, path = refresh_database_source(
+                    args.name,
+                    project_root=args.cwd,
+                    max_assets=args.max_assets,
+                    include_row_counts=not args.skip_row_counts,
+                )
+                print(
+                    f"✅ Project data source index refreshed: {path} "
+                    f"({source['indexed_asset_count']}/{source['asset_count']} assets)"
+                )
+            except Exception as exc:
+                print(f"❌ Connection works, but project source indexing failed: {exc}")
+                sys.exit(1)
     else:
         print(f"❌ {message}")
         sys.exit(1)

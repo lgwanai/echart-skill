@@ -14,7 +14,8 @@ def test_dashboard_workflow_requires_city_sales_map_module_from_markdown():
     assert "workflow_specs/dashboard_modules/city_sales_map.md" in workflow
     assert "metadata" in workflow.lower()
     assert "references/examples/geo-map-scatter.md" in workflow
-    assert "Dashboard charts are not written from memory" in workflow
+    assert "scripts/chart_builder.py" in workflow
+    assert "do not rewrite options/runtime" in workflow
     assert "blocking failure" in workflow
 
 

@@ -41,5 +41,7 @@ logs/
 .claude/
 .planning/
 .pytest_cache/
+.echart-runtime/
+.echart-skill/
 .ruff_cache/
 test/

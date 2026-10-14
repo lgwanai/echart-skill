@@ -33,3 +33,14 @@ def test_validator_rejects_project_specific_content(tmp_path: Path):
 
     errors = validate_package(package)
     assert any("project-specific marker" in error for error in errors)
+
+
+def test_validator_rejects_project_data_context_path(tmp_path: Path):
+    package = tmp_path / "project-context.zip"
+    with zipfile.ZipFile(package, "w") as archive:
+        archive.writestr("SKILL.md", "---\nname: demo\n---\n")
+        archive.writestr("scripts/validate_chart.py", "pass\n")
+        archive.writestr(".echart-skill/data_sources.json", '{"version": 1}')
+
+    errors = validate_package(package)
+    assert any("forbidden local/project path" in error for error in errors)

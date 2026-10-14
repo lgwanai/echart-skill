@@ -102,7 +102,11 @@ def run_smoke_test(
     command = [str(node), str(RUNNER), str(html_path.resolve()), str(timeout_ms)]
     if screenshot:
         command.append(str(screenshot.resolve()))
-    result = subprocess.run(command, env=env, capture_output=True, text=True, check=False)
+    try:
+        result = subprocess.run(command, env=env, capture_output=True, text=True, check=False,
+                                timeout=max(20, timeout_ms / 1000 + 15))
+    except subprocess.TimeoutExpired:
+        return 1, {"ok": False, "errors": ["browser process timed out (possible infinite JavaScript loop)"]}
     try:
         report = json.loads(result.stdout)
     except json.JSONDecodeError:

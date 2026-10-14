@@ -101,9 +101,7 @@ def materialize_manifest(draft: dict[str, Any], draft_path: Path, html_path: Pat
             raise ValueError(f"query evidence not found: {resolved}")
         rows = _load_rows(resolved)
         date_field = query.get("date_field")
-        if not isinstance(date_field, str) or not date_field.strip():
-            raise ValueError(f"manifest.queries[{index}].date_field is required")
-        dates = _date_values(rows, date_field, f"manifest.queries[{index}]")
+        dates = _date_values(rows, date_field, f"manifest.queries[{index}]") if date_field else []
         sidecar = _sidecar(resolved)
         sidecar_hash = sidecar.get("query_hash") if sidecar else None
         declared_hash = query.get("query_hash")
@@ -112,11 +110,12 @@ def materialize_manifest(draft: dict[str, Any], draft_path: Path, html_path: Pat
         query["query_hash"] = declared_hash or sidecar_hash
         if not isinstance(query["query_hash"], str) or not query["query_hash"].strip():
             raise ValueError(f"manifest.queries[{index}].query_hash is required")
-        query["result_ref"] = os.path.relpath(resolved, html_path.parent)
+        query["result_ref"] = os.path.relpath(resolved, html_path.parent.resolve())
         query["result_sha256"] = _sha256(resolved)
         query["row_count"] = len(rows)
-        query["date_min"] = min(dates).isoformat()
-        query["date_max"] = max(dates).isoformat()
+        if dates:
+            query["date_min"] = min(dates).isoformat()
+            query["date_max"] = max(dates).isoformat()
     return manifest
 
 
@@ -143,7 +142,7 @@ def embed_manifest(html_path: Path, manifest: dict[str, Any]) -> None:
     content = html_path.read_text(encoding="utf-8")
     tag = (
         f'<script type="application/json" id="{MANIFEST_ID}">'
-        + json.dumps(manifest, ensure_ascii=False, separators=(",", ":"))
+        + json.dumps(manifest, ensure_ascii=False, allow_nan=False, separators=(",", ":")).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
         + "</script>"
     )
     pattern = re.compile(
@@ -151,9 +150,9 @@ def embed_manifest(html_path: Path, manifest: dict[str, Any]) -> None:
         re.IGNORECASE | re.DOTALL,
     )
     if pattern.search(content):
-        content = pattern.sub(tag, content, count=1)
+        content = pattern.sub(lambda _: tag, content, count=1)
     elif "</head>" in content.lower():
-        content = re.sub(r"</head>", tag + "\n</head>", content, count=1, flags=re.IGNORECASE)
+        content = re.sub(r"</head>", lambda _: tag + "\n</head>", content, count=1, flags=re.IGNORECASE)
     else:
         raise ValueError("HTML has no </head> for manifest insertion")
     html_path.write_text(content, encoding="utf-8")
@@ -193,13 +192,13 @@ def validate_manifest(manifest: dict[str, Any], html_path: Path) -> list[str]:
             errors.append(f"{prefix}.result_sha256 does not match evidence file")
         try:
             rows = _load_rows(result_path)
-            dates = _date_values(rows, str(query.get("date_field", "")), prefix)
+            dates = _date_values(rows, str(query["date_field"]), prefix) if query.get("date_field") else []
         except (ValueError, json.JSONDecodeError) as exc:
             errors.append(str(exc))
             continue
         if len(rows) != query.get("row_count"):
             errors.append(f"{prefix}.row_count does not match evidence file")
-        if min(dates).isoformat() != query.get("date_min") or max(dates).isoformat() != query.get("date_max"):
+        if dates and (min(dates).isoformat() != query.get("date_min") or max(dates).isoformat() != query.get("date_max")):
             errors.append(f"{prefix} date_min/date_max do not match evidence file")
         if not isinstance(query.get("query_hash"), str) or not query["query_hash"]:
             errors.append(f"{prefix}.query_hash is required")

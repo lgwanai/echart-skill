@@ -739,6 +739,18 @@ def list_url_sources(db_path: str) -> List[dict]:
         return get_url_sources(conn)
 
 
+def register_imported_file_context(file_path: str, db_path: str, table_names: List[str]) -> str:
+    """Persist a project-local structure summary after a successful file import."""
+    from scripts.project_data_context import register_file_source
+
+    _, context_path = register_file_source(
+        file_path,
+        duckdb_path=db_path,
+        table_names=table_names,
+    )
+    return str(context_path)
+
+
 if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(
         description="Import data from files or URLs into DuckDB"
@@ -797,10 +809,13 @@ if __name__ == "__main__":  # pragma: no cover
         if hasattr(args, 'input_file') and args.input_file:
             try:
                 final_tables = import_to_duckdb(args.input_file, args.db, getattr(args, 'table', None))
+                table_names = final_tables if isinstance(final_tables, list) else [final_tables]
+                context_path = register_imported_file_context(args.input_file, args.db, table_names)
                 if isinstance(final_tables, list):
                     print(f"SUCCESS: Data imported into tables: {', '.join(final_tables)}")
                 else:
                     print(f"SUCCESS: Data imported into table '{final_tables}'")
+                print(f"SUCCESS: Project data source index updated: {context_path}")
             except Exception as e:
                 print(f"ERROR: {e}")
         else:
@@ -810,10 +825,13 @@ if __name__ == "__main__":  # pragma: no cover
     if args.command == "file":
         try:
             final_tables = import_to_duckdb(args.input_file, args.db, args.table)
+            table_names = final_tables if isinstance(final_tables, list) else [final_tables]
+            context_path = register_imported_file_context(args.input_file, args.db, table_names)
             if isinstance(final_tables, list):
                 print(f"SUCCESS: Data imported into tables: {', '.join(final_tables)}")
             else:
                 print(f"SUCCESS: Data imported into table '{final_tables}'")
+            print(f"SUCCESS: Project data source index updated: {context_path}")
         except Exception as e:
             print(f"ERROR: {e}")
 

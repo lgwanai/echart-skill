@@ -17,6 +17,9 @@ selection must be decided by the Agent according to the workflow specs.
 
 ## Hard Requirements
 
+- Resolve the source through `project_data_context.md` before searching files or
+  choosing a configured database. Refresh stale/unindexed sources and never
+  silently choose among ambiguous candidates.
 - Read `analysis_expression_quality.md`, write an analysis-plan JSON, and pass
   `scripts/validate_analysis_plan.py` before choosing chart recipes or rendering.
 - Use Message → Relation → View, distinguish audit source toggles from visible
@@ -40,12 +43,14 @@ selection must be decided by the Agent according to the workflow specs.
   allow deeper diagnosis.
 - Main report evidence should be charts. Detailed tables, SQL, samples, and field
   profiles belong in the appendix.
-- Report charts must be generated from selected `references/examples/*.md`
-  recipe files, not from memory or arbitrary option snippets.
+- Common charts must use `scripts/chart_builder.py` and `references/chart_guide.md`.
+  Specialized recipes are read through `scripts/reference_assets.py get <name>`.
+  This takes precedence over older instructions to splice JavaScript demo arrays.
 - If the generated HTML looks like browser-default output, regenerate it.
 
 ## Files
 
+- `project_data_context.md` — project-local database/file discovery and reuse contract
 - `analysis_expression_quality.md` — chart/table selection and deep-analysis contract
 - `report_workflow.md` — enterprise report workflow and required reasoning steps
 - `dashboard_workflow.md` — dashboard planning and construction workflow

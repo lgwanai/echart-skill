@@ -23,6 +23,7 @@ argument-hint: "<table> <user_column> <cohort_date> <activity_date>"
 
 8. [MANDATORY] 所有数据库查询和取数动作，包括自然语言分析、结构探索、聚合、同比/环比、分维度分析、报告取数、图表取数和 Dashboard 取数，都必须生成 SQL 并使用 `scripts/sql_runner.py`、`scripts/db_cli.py` 或 `scripts/db_manager.py` 执行；`scripts/analysis_runner.py` 仅是简单聚合的可选快捷方式。
 9. [FAIL] 禁止在任何指令中使用 `python3 << 'PYEOF'` / `python << 'PY'` heredoc、`psycopg2.connect(...)`、`psycopg.connect(...)`、`pymysql.connect(...)`、`duckdb.connect(...)`、`create_engine(...)`、`.cursor()`、`cur.execute(...)` 或临时 Python 代码直接连接数据库/执行 SQL。
+- [MANDATORY] 分析或取数前必须运行 `python scripts/project_data_context.py resolve --query "<request>"`；先复用项目中已配置、已索引或已使用的数据源，不得先猜数据库、递归找目录文件，或在候选不明确时静默选一个。
 10. 执行前必须读取 schema 和当前生效统计口径：`python scripts/metrics_manager.py effective`。如果口径中维护了业务实体集合，SQL 必须使用受治理集合，例如 `entity_id IN (...)`；不得把业务概念误当作不存在的字段，也不得自行用关键词 LIKE 猜集合。
 11. PostgreSQL/MySQL 查询使用 `python scripts/sql_runner.py --profile <name> --sql "<SELECT ...>" --output json` 或 `python scripts/sql_runner.py --profile <name> --file queries/<task>.sql --output json`；未配置 profile 时，使用 `python scripts/sql_runner.py --type postgresql --host <host> --database <db> --username <user> --password-env DB_PASSWORD --sql "<SELECT ...>" --output json`。可以写 SQL 文件；不得把密码写入命令或临时代码。
 12. Agent 可以写 SQL 和 SQL 文件，禁止写的是临时数据库连接代码；不要为了查数写 Python，也不要为了避免 SQL 而堆很多参数。

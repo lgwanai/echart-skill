@@ -287,7 +287,7 @@
 | `length` | `length(string)` | `string`: 字符串 | INTEGER | 字符数 | `length('DuckDB')` → `6` |
 | `strlen` | `strlen(string)` | `string`: 字符串 | INTEGER | 字节数 | `strlen('你好')` → `6` |
 | `bit_length` | `bit_length(string)` | `string`: 字符串 | INTEGER | 位数 | `bit_length('A')` → `8` |
-| `length_grapheme` | `length_grapheme(string)` | `string`: 字符串 | INTEGER | 字素簇数量 | `length_grapheme('👨‍👩‍👧‍👦')` → `1` |
+| `length_grapheme` | `length_grapheme(string)` | `string`: 字符串 | INTEGER | 字素簇数量 | `length_grapheme(chr(101) || chr(769))` → `1`（字母 e 加组合重音；显式构造 Unicode，避免文档内隐藏字符） |
 | `octet_length` | `octet_length(string)` | `string`: 字符串 | INTEGER | 字节数 | `octet_length('hello')` → `5` |
 
 ### 正则表达式

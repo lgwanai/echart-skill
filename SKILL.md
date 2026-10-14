@@ -16,6 +16,13 @@ Follow these stages for every analysis. Read only the references needed for the
 requested deliverable.
 
 1. **Resolve data and business scope**
+   - Read `workflow_specs/project_data_context.md` and run
+     `python scripts/project_data_context.py resolve --query "<request>"` before
+     searching directories, assuming a local database, or asking for a connection
+     that may already be configured.
+   - Use a resolved source; refresh `needs_refresh`, ask when `ambiguous`, and
+     register any newly used project file. The canonical index is the project's
+     `.echart-skill/data_sources.json`, never a file inside this Skill.
    - Inspect schema with maintained CLIs; do not load large tables into context.
    - Run `python scripts/metrics_manager.py effective` before defining metrics,
      filters, governed entity sets, comparison scope, or business terminology.
@@ -43,12 +50,20 @@ requested deliverable.
 5. **Bind evidence instead of restating it**
    - Read `workflow_specs/artifact_evidence_contract.md`.
    - Create a draft artifact manifest that references actual query result files.
-   - Run `python scripts/artifact_manifest.py bind <output.html> <draft.json>`.
+   - For compiled charts, pass `--evidence <draft.json>` to the builder; it binds
+     and validates before publishing. Custom HTML uses
+     `python scripts/artifact_manifest.py bind <output.html> <draft.json>`.
    - The binder computes query-result SHA-256, row count, date coverage, and
      binds query hashes, metric/scope fingerprints, comparisons, charts, and
      findings into the HTML.
-6. **Render from maintained recipes and templates**
-   - Read `references/examples/INDEX.md`, then the selected recipe completely.
+6. **Compile charts and compose the layout**
+   - Read `references/chart_guide.md`. For supported common charts, use
+     `scripts/chart_builder.py` with explicit query-result field mappings.
+     Use `--evidence` to require the full gate before replacing the output.
+     Do not copy demo arrays or rewrite the maintained bootstrap.
+   - For specialized views, retrieve one archived reference through
+     `scripts/reference_assets.py get <name>` and verify its dependencies.
+     Old demo replacement instructions are superseded by the chart guide.
    - Dashboard: read `workflow_specs/dashboard_workflow.md` and
      `workflow_specs/dashboard_runtime_quality.md`.
    - Report: read `workflow_specs/report_workflow.md`.
@@ -61,6 +76,9 @@ requested deliverable.
    - Any console error, page error, external request, missing ECharts instance,
      zero-size canvas/SVG, evidence mismatch, or invalid comparison blocks
      delivery.
+   - Mark all custom chart roots `data-echart-chart`; retain compiler contracts.
+     Every expected chart must initialize. Compiled series data and axes must
+     match the specification, with desktop and mobile render checks.
    - `--allow-static-only` is a degraded exception only when browser execution
      is genuinely unavailable; disclose that reduced assurance.
 
@@ -151,6 +169,7 @@ checks when the data supports them.
 | Request | Read |
 |---|---|
 | Import or cleaning | `workflow_specs/data_cleaning_workflow.md` |
+| Locate database/file data | `workflow_specs/project_data_context.md` |
 | Chart selection | `workflow_specs/analysis_expression_quality.md`, `references/chart_capabilities.json` |
 | Dashboard | `workflow_specs/dashboard_workflow.md`, `workflow_specs/dashboard_runtime_quality.md` |
 | Report | `workflow_specs/report_workflow.md` |
@@ -169,7 +188,12 @@ Run:
 ```bash
 bash package.sh
 python scripts/validate_release_package.py dist/<package>.zip
+# For upload limits: four-file package with the same common-chart engine/gates
+python scripts/build_skill_package.py --mode portable --output dist/echart-portable.zip
 ```
 
 The package uses an allowlist. Project SQL, database connection files, outputs,
 logs, caches, tests, and local indexes are forbidden release content.
+The portable package embeds its tools in runtime.zip, verified and expanded by
+bootstrap.py in the user project's .echart-runtime cache. Python and browser
+runtimes are still required; specialized historical demos/GL use the full package.

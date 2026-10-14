@@ -553,8 +553,14 @@ def _specs_have_data(specs):
 
 def _looks_like_dashboard(content, html_path):
     basename = os.path.basename(html_path).lower()
+    parsed = _parse_html(content)
+    # ECharts' locale dictionary contains "仪表盘图" even in a single bar chart.
+    for _, script in parsed.scripts:
+        if _is_probably_vendor_script(script):
+            content = content.replace(script, '')
     lower = content.lower()
-    init_count = len(re.findall(r"echarts\.init\s*\(", content))
+    init_count = sum(len(re.findall(r"echarts\.init\s*\(", script))
+                     for script in _custom_inline_scripts(parsed))
     title_dashboard = bool(re.search(r"<title>[^<]*(dashboard|仪表盘|看板)", lower))
     return (
         "dashboard" in basename
@@ -1016,6 +1022,10 @@ def _detect_missing_chart_governance_and_data_access(content, is_dashboard):
         content,
         re.IGNORECASE,
     ))
+    native_tables = sum(1 for tag, attrs in _parse_html(content).tags
+                        if tag == 'details' and 'open' not in attrs
+                        and 'chart-data-table' in (attrs.get('class') or '').split())
+    hidden_table_count += native_tables
 
     if data_button_count < chart_shell_count:
         errors.append(
@@ -1032,7 +1042,7 @@ def _detect_missing_chart_governance_and_data_access(content, is_dashboard):
             "CHART GOVERNANCE: chart data tables are not default-hidden — "
             "actual data should be hidden initially and shown only after the user clicks `查看数据`."
         )
-    if not re.search(r"(toggleChartData|openChartData|showChartData|data-table-modal)", content, re.IGNORECASE):
+    if not native_tables and not re.search(r"(toggleChartData|openChartData|showChartData|data-table-modal)", content, re.IGNORECASE):
         errors.append(
             "CHART GOVERNANCE: missing data-table interaction handler — "
             "clicking `查看数据` must open/toggle the corresponding data table."

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Search/list/get chart recipe .md files directly from disk.
+"""Read optional historical examples from a compressed archive or local overrides.
 
-All operations work against individual .md files in references/examples/.
-No index file, no merge step — just read files on the fly.
+Common charts use chart_builder.py. Archived demos are references, not certified
+production recipes. Listing/search reads catalog metadata; get reads one entry.
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ import argparse
 import json
 import re
 import sys
+import zipfile
 from pathlib import Path
 
 
@@ -52,9 +53,28 @@ def default_root() -> Path:
 
 def _iter_files(root: Path) -> list[Path]:
     base = root / SCAN_DIR
-    if not base.exists():
-        return []
-    return sorted(p for p in base.rglob("*.md") if p.is_file() and p.name != "INDEX.md")
+    files = set(p for p in base.rglob("*.md") if p.is_file() and p.name != "INDEX.md")
+    archive = root / 'references/legacy_examples.zip'
+    if archive.exists():
+        with zipfile.ZipFile(archive) as bundle:
+            files.update(base / name for name in bundle.namelist() if name.endswith('.md') and '/' not in name)
+    return sorted(files)
+
+
+def _read_recipe(root: Path, path: Path, *, head=False):
+    if path.is_file():
+        return path.read_text(encoding='utf-8')
+    with zipfile.ZipFile(root / 'references/legacy_examples.zip') as archive:
+        if head:
+            return json.loads(archive.read('catalog.json'))[path.name]['head']
+        return archive.read(path.name).decode('utf-8')
+
+
+def _recipe_size(root: Path, path: Path):
+    if path.exists():
+        return path.stat().st_size
+    with zipfile.ZipFile(root / 'references/legacy_examples.zip') as archive:
+        return archive.getinfo(path.name).file_size
 
 
 # ---------------------------------------------------------------------------
@@ -89,12 +109,12 @@ def search_assets(
 
         # Quick filename check first
         if not any(t in name_lower or t in ct_lower for t in terms):
-            text = fp.read_text(encoding="utf-8", errors="replace")
+            text = _read_recipe(root, fp, head=True)
             head = "\n".join(text.splitlines()[:80])
             if not all(t in head.lower() for t in terms):
                 continue
         else:
-            text = fp.read_text(encoding="utf-8", errors="replace")
+            text = _read_recipe(root, fp, head=True)
             head = "\n".join(text.splitlines()[:80])
 
         title_str = _title(text, name)
@@ -116,7 +136,7 @@ def search_assets(
             "name": name,
             "chart_type": ct,
             "title": title_str,
-            "content_bytes": fp.stat().st_size,
+            "content_bytes": _recipe_size(root, fp),
             "score": score,
         })
 
@@ -133,10 +153,10 @@ def get_asset(root: Path, name_or_path: str) -> dict[str, object]:
         name = name.rsplit("/", 1)[-1]
 
     file_path = root / SCAN_DIR / f"{name}.md"
-    if not file_path.exists():
+    if file_path not in _iter_files(root):
         raise FileNotFoundError(f"Recipe not found: {file_path}")
 
-    content = file_path.read_text(encoding="utf-8", errors="replace")
+    content = _read_recipe(root, file_path)
     return {
         "name": name,
         "chart_type": _chart_type(name),
@@ -161,7 +181,7 @@ def list_assets(
         if chart_type and ct != chart_type:
             continue
         # Read just enough for title
-        text = fp.read_text(encoding="utf-8", errors="replace")
+        text = _read_recipe(root, fp, head=True)
         results.append({
             "path": rel,
             "name": name,

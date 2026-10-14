@@ -14,6 +14,8 @@ MAX_HTML_BYTES = 15 * 1024 * 1024
 def validate_accessibility_performance(path: Path) -> list[str]:
     errors: list[str] = []
     content = path.read_text(encoding="utf-8", errors="ignore")
+    # Vendor JavaScript contains HTML/CSS examples, not actual page elements.
+    markup = re.sub(r"<script\b[^>]*>.*?</script\s*>", "", content, flags=re.I | re.S)
     lower = content.lower()
     size = path.stat().st_size
     if size > MAX_HTML_BYTES:
@@ -28,13 +30,13 @@ def validate_accessibility_performance(path: Path) -> list[str]:
             errors.append(
                 "ACCESSIBILITY: ECharts output needs aria.enabled=true or an aria-label/aria-labelledby chart name"
             )
-    if re.search(r"<(?:img|area)\b(?![^>]*\balt\s*=)[^>]*>", content, re.IGNORECASE):
+    if re.search(r"<(?:img|area)\b(?![^>]*\balt\s*=)[^>]*>", markup, re.IGNORECASE):
         errors.append("ACCESSIBILITY: image/area element is missing alt text")
     if "<table" in lower and "<th" not in lower:
         errors.append("ACCESSIBILITY: data table has no header cells")
     if re.search(r"<button\b[^>]*>\s*</button>", content, re.IGNORECASE):
         errors.append("ACCESSIBILITY: empty button has no accessible name")
-    has_animation = bool(re.search(r"(?:@keyframes|\banimation\s*:)", content, re.IGNORECASE))
+    has_animation = bool(re.search(r"(?:@keyframes|\banimation\s*:)", markup, re.IGNORECASE))
     if has_animation and "prefers-reduced-motion" not in lower:
         errors.append("ACCESSIBILITY: animated page lacks prefers-reduced-motion fallback")
     if re.search(r"user-scalable\s*=\s*no|maximum-scale\s*=\s*1", lower):

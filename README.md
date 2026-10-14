@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/python-3.10+-green" alt="Python">
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
   <img src="https://img.shields.io/badge/charts-27_types-orange" alt="Charts">
-  <img src="https://img.shields.io/badge/recipes-354-purple" alt="Recipes">
+  <img src="https://img.shields.io/badge/archived_recipes-353-purple" alt="Archived recipes">
 </p>
 
 ---
@@ -65,7 +65,7 @@ Echart Skill 深度融入企业数据管理体系，不只是查询工具：
 ### 🎨 企业级数据可视化
 
 - **27 类图表**：柱状/折线/饼图/散点/雷达/漏斗/仪表盘/热力图/树图/桑基图/关系图/K线/3D 等
-- **354 个 ECharts 官方配方**：Agent 无需手写 option 代码，直接替换数据数组即可生成
+- **常用图表固定编译**：9 种视图由维护好的生成器读取真实查询结果，自动生成 option、离线运行时和核对表；353 份历史配方无损归档，仅特殊需求按需读取，不再机械替换数组
 - **多层地图**：省份（china.js）→ 城市（省份 JS）→ 区县街道（百度地图 API）
 - **交互式 Dashboard**：KPI 卡片、趋势图、异常提醒、主题切换、响应式布局、PDF/PNG 导出
 - **Dashboard 专家规划**：生成前读取 `workflow_specs/dashboard_expert_library/INDEX.md`，新增专家按 `workflow_specs/dashboard_expert_library/DASHBOARD_EXPERT_TEMPLATE.md` 扩展
@@ -126,7 +126,7 @@ python scripts/sql_runner.py --db workspace.duckdb "SELECT COUNT(*) FROM sales_2
               │                      │                      │
     ┌─────────▼─────────┐  ┌────────▼────────┐  ┌─────────▼─────────┐
     │   分析与洞察层      │  │   预测与归因层   │  │   可视化引擎层      │
-    │ Insight Engine    │  │ Forecast/Attrib │  │ 27类 · 354配方     │
+    │ Insight Engine    │  │ Forecast/Attrib │  │ 编译器 · 配方归档  │
     │ 7 种洞察模式       │  │ 4 种方法 · 钻取  │  │ 地图 · 3D · 关系   │
     └─────────┬─────────┘  └────────┬────────┘  └─────────┬─────────┘
               │                     │                      │
@@ -253,7 +253,7 @@ Echart Skill 将数据质量作为分析流程的**前置环节**，而非事后
 | **4 级数据分类** | `public < internal < sensitive < restricted` |
 | **非破坏式处理** | 默认生成新表、新文件和审计记录，避免覆盖原始数据 |
 
-外部数据库查询同样经过 PrivacyGuard 检测与审计管线，使用 `/audit-report` 统一查看。企业环境下可以写 SQL 和 `.sql` 文件，但不要使用 `python3 <<EOF`、`psycopg2.connect`、`psycopg.connect`、`pymysql.connect`、`duckdb.connect`、`create_engine`、`cursor.execute` 这类临时连接/执行代码；先用 `/dbconn` 登记连接，再用 `python scripts/sql_runner.py --profile <name> --sql "<SELECT ...>"` 或 `python scripts/sql_runner.py --profile <name> --file queries/<task>.sql` 执行。
+外部数据库查询同样经过 PrivacyGuard 检测与审计管线，使用 `/audit-report` 统一查看。企业环境下可以写 SQL 和 `.sql` 文件，但不要使用 `python3 <<EOF`、`psycopg2.connect`、`psycopg.connect`、`pymysql.connect`、`duckdb.connect`、`create_engine`、`cursor.execute` 这类临时连接/执行代码；先用 `/dbconn` 登记连接。连接测试成功后会把表、字段类型、分析角色和近似行数写入项目自己的 `.echart-skill/data_sources.json`，以后分析先运行 `python scripts/project_data_context.py resolve --query "<request>"` 选择数据源，再用 `python scripts/sql_runner.py --profile <name> --sql "<SELECT ...>"` 或 `python scripts/sql_runner.py --profile <name> --file queries/<task>.sql` 执行。项目索引不保存主机、用户名、密码、连接串或样例值。
 
 ---
 
@@ -274,7 +274,7 @@ Echart Skill 将数据质量作为分析流程的**前置环节**，而非事后
 
 | 命令 | 说明 |
 |------|------|
-| `/chart` | 生成单图表（27 类，354 官方配方） |
+| `/chart` | 常用 9 种视图固定编译；专业视图按需读取归档 |
 | `/chart-list` | 查看支持的图表类型和简介 |
 | `/dashboard` | 自然语言生成交互式企业 Dashboard |
 
@@ -352,11 +352,38 @@ Echart Skill 将数据质量作为分析流程的**前置环节**，而非事后
 
 ## 项目结构
 
+### 精简分发与质量保障
+
+SkillHub 专用包使用独立模式，不改变完整版或便携版：
+
+```bash
+python scripts/build_skill_package.py --mode skillhub --output dist/echart-skill-skillhub.zip
+python scripts/validate_release_package.py dist/echart-skill-skillhub.zip --profile skillhub
+```
+
+此模式要求包内 ≤200 个纯 UTF-8 文本文件，外层压缩包 ≤6,000,000 字节，禁止包内 ZIP/二进制。合并命令说明、保留报告依赖的 4 份纯文本案例；保留全部质量门和本地 JS 资源，不附带浏览器或 Python 二进制。构建超限直接失败，不通过改扩展名或编码压缩包绕过限制。平台审核结果仍以实际提交为准。
+
+发布检查也拒绝 SOFT HYPHEN、零宽字符和双向格式控制符等 Unicode Cf 字符。SkillHub 地图资源展开为数值坐标，并与 ECharts 原始解码结果核对，不直接删除坐标字符。命令执行、网络请求及数据库访问属于真实保留能力，详见 [权限与审核说明](references/security_review.md)；字符检查通过不代表平台不再要求人工复核。
+
+```bash
+python scripts/build_skill_package.py --mode portable --output dist/echart-skill-portable.zip
+python scripts/build_skill_package.py --mode full --output dist/echart-skill-full.zip
+python scripts/validate_release_package.py dist/echart-skill-portable.zip
+```
+
+- **便携包**：解压后仅 4 个文件（入口、精简指南、启动器、压缩运行时）。首次执行启动器时按校验和展开工具，不要求模型一次读取整个示例库。保留数据治理、分析流程、核心离线 ECharts、全部交付校验；仅不带历史配方与 ECharts GL。
+- **完整包**：包含上述能力，以及完整历史配方归档和 ECharts GL。353 份旧 MD 已逐字节校验后归档，可按需读取，未丢失原文。
+- **平台要求**：需允许 ZIP/脚本附件和 Python 执行；真实渲染验证还需 Node、Playwright 与 Chromium。只接受纯 Markdown、禁止执行或递归统计 ZIP 内文件的平台不能靠压缩解决，不宣称通用兼容。
+- **质量原则**：生成器拒绝含糊字段和非法数值；交付门核对来源、逐图数据/坐标轴/表格和真实渲染。新增常用视图必须补齐有效/无效数据及真实浏览器回归测试。无法验证就标记未验证，不能承诺任意环境 100% 一次成功。
+
+常用图表见 [chart_guide.md](references/chart_guide.md)，特殊图表通过 `reference_assets.py search/get` 按需读取。禁止重新使用历史文档里的括号计数、正则替换大数组等代码拼接方法。
+
 ```
 echart-skill/
 ├── references/
-│   ├── examples/               # 354 个 .md 自包含图表配方
-│   │   └── INDEX.md            # 配方映射决策表
+│   ├── chart_guide.md          # 常用图表契约与构建/验证入口
+│   ├── examples/INDEX.md       # 精简路由，不预加载历史长文
+│   ├── legacy_examples.zip    # 353 份历史配方，按需读取
 │   └── knowledge/              # ECharts 知识库（概念/API/模式）
 ├── workflow_specs/
 │   ├── dashboard_workflow.md   # Dashboard 工作流规范
@@ -393,7 +420,7 @@ A: 使用 `/scope set --level global --name "指标名" --desc "计算规则"` �
 A: 使用 `/schema add` 为表的每个列提供中文描述、数据类型、合法值范围和主外键关系。Agent 会在生成 SQL 时精确引用，显著提升查询准确率。
 
 **Q: 支持连接公司已有的数据库吗？**
-A: 支持。`/dbconn` 管理 PostgreSQL/MySQL/MongoDB 连接，密码通过 `${ENV_VAR}` 环境变量传入。SQL 查询使用 `scripts/sql_runner.py --profile <name>`，导入本地分析库使用 `scripts/db_cli.py import`，避免临时 Python 造成连接泄露、审计缺失和 SQL 拼接错误。
+A: 支持。`/dbconn` 管理 PostgreSQL/MySQL/MongoDB 连接，密码通过 `${ENV_VAR}` 环境变量传入。`db_manager.py test` 默认发现表和表结构并写入项目数据源索引；本地文件导入后也会记录文件指纹、结构和 DuckDB 表。SQL 查询使用 `scripts/sql_runner.py --profile <name>`，导入本地分析库使用 `scripts/db_cli.py import`，避免临时 Python 造成连接泄露、审计缺失和 SQL 拼接错误。
 
 **Q: 生成的报告和图表能否直接交付给客户？**
 A: 可以。Dashboard 和 Report 使用企业级 HTML 骨架，支持深色/亮色主题、PDF 导出、打印优化，图表为 ECharts 交互式可视化，可直接作为交付物。

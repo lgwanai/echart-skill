@@ -44,16 +44,15 @@ Use Python only to query data, calculate metrics, and validate standalone HTML.
    - Use DuckDB/SQL/Python to produce the exact data arrays needed by charts.
    - Reuse one explicit comparison boundary across headline KPIs, charts, rankings, tables, price analysis, attribution, and narrative. If the latest complete month is July, every YoY query must compare January–July on both sides.
    - Keep query logic auditable; include key SQL in comments or appendix when appropriate.
-   - For every chart, first read the selected chart recipe from `references/examples/*.md`, then generate the option from the recipe and evidence table. Dashboard charts are not written from memory.
+   - Read `references/chart_guide.md`. Compile supported common views from query-result files using `scripts/chart_builder.py`; do not rewrite options/runtime. For specialized views only, retrieve the selected archived recipe through `scripts/reference_assets.py get <name>` and verify the adapted option and local dependencies.
 
 5. **Author standalone HTML**
    - Read `workflow_specs/html_templates/dashboard_light.html` completely and use it as the dashboard shell.
    - Use `workflow_specs/visual_templates/light.md` or `dark.md` only as visual direction; do not use Markdown visual notes as the final HTML shell.
    - Read `workflow_specs/dashboard_runtime_quality.md` completely and apply its runtime quality gate.
    - Inline ECharts and required local JS/CSS assets.
-   - Do not depend on a Python dashboard renderer.
-   - The Agent writes the HTML, layout, chart options, and narrative cards.
-   - Validate with `scripts/validate_chart.py`.
+   - The Agent owns layout and narrative; the common-chart compiler owns chart components. Adapt the shell with one `<!-- ECHART_CHARTS -->` marker and no duplicate ECharts bootstrap, then pass `--shell` to the builder.
+   - Bind evidence and validate with `scripts/validate_delivery.py`; static checks alone are not delivery verification.
 
 ## Dashboard Content Patterns
 

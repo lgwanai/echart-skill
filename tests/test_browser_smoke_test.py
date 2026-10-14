@@ -11,7 +11,7 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-def test_browser_smoke_accepts_live_chart_surface(tmp_path: Path):
+def test_browser_smoke_rejects_fake_chart_surface(tmp_path: Path):
     html = tmp_path / "ok.html"
     html.write_text(
         """<html><body><div id="chart" aria-label="Revenue trend" style="width:400px;height:300px"></div>
@@ -30,8 +30,9 @@ def test_browser_smoke_accepts_live_chart_surface(tmp_path: Path):
 
     code, report = run_smoke_test(html)
 
-    assert code == 0, report
+    assert code == 1, report
     assert report["runtime"]["chartCount"] == 1
+    assert any('no live ECharts series' in e for e in report['errors'])
 
 
 def test_browser_smoke_rejects_runtime_exception(tmp_path: Path):

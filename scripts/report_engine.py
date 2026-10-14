@@ -766,12 +766,15 @@ class ReportEngine:
         return template_path.read_text(encoding="utf-8")
 
     def _read_chart_recipe_context(self, recipe_name: str) -> str:
-        """Read the ECharts md recipe from disk."""
+        """Read one historical recipe through the archive-aware accessor."""
         root = Path(__file__).resolve().parents[1]
-        path = root / "references" / "examples" / recipe_name
         try:
-            return path.read_text(encoding="utf-8")
-        except OSError:
+            from scripts.reference_assets import get_asset
+        except ModuleNotFoundError:
+            from reference_assets import get_asset
+        try:
+            return get_asset(root, recipe_name)['content']
+        except (OSError, KeyError):
             return ""
 
     def _load_echarts_js(self) -> str:

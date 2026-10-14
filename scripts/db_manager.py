@@ -613,6 +613,9 @@ def create_parser() -> argparse.ArgumentParser:
     test_parser = subparsers.add_parser("test", help="测试数据库连接")
     test_parser.add_argument("name", help="连接名称")
     test_parser.add_argument("--cwd", help="当前工作目录")
+    test_parser.add_argument("--no-index", action="store_true", help="仅测试连接，不刷新项目数据源索引")
+    test_parser.add_argument("--max-assets", type=int, default=200, help="最多索引的表/集合数量")
+    test_parser.add_argument("--skip-row-counts", action="store_true", help="跳过近似行数读取")
     test_parser.set_defaults(func=_cmd_test)
 
     # --- effective ---
@@ -681,6 +684,23 @@ def _cmd_test(args: argparse.Namespace) -> None:
     success, message = test_connection(args.name, args.cwd)
     if success:
         print(f"✅ {message}")
+        if not args.no_index:
+            try:
+                from scripts.project_data_context import refresh_database_source
+
+                source, path = refresh_database_source(
+                    args.name,
+                    project_root=args.cwd,
+                    max_assets=args.max_assets,
+                    include_row_counts=not args.skip_row_counts,
+                )
+                print(
+                    f"✅ 项目数据源索引已刷新: {path} "
+                    f"({source['indexed_asset_count']}/{source['asset_count']} 个表或集合)"
+                )
+            except Exception as exc:
+                print(f"❌ 连接可用，但项目数据源索引刷新失败: {exc}")
+                sys.exit(1)
     else:
         print(f"❌ {message}")
         sys.exit(1)

@@ -79,6 +79,29 @@ def test_manifest_binds_query_file_and_validates_embedded_evidence(tmp_path: Pat
     assert validate_embedded_manifest(html.read_text(encoding="utf-8"), html) == []
 
 
+def test_non_temporal_evidence_cannot_back_period_comparison(tmp_path):
+    result = tmp_path / 'rows.json'
+    result.write_text('[{"region":"North","value":10}]')
+    draft = _draft(result.name)
+    del draft['queries'][0]['date_field']
+    manifest = materialize_manifest(draft, tmp_path / 'draft.json', tmp_path / 'chart.html')
+    assert any('both comparison windows' in e for e in validate_manifest(manifest, tmp_path / 'chart.html'))
+    manifest.pop('comparisons')
+    assert validate_manifest(manifest, tmp_path / 'chart.html') == []
+
+
+def test_manifest_script_strings_and_rebinding_are_safe(tmp_path):
+    output = tmp_path / 'chart.html'
+    output.write_text('<html><head></head><body></body></html>')
+    manifest = {'version': 1, 'note': '</script><img src=x> \\1 中文'}
+    embed_manifest(output, manifest)
+    embed_manifest(output, manifest)
+    content = output.read_text()
+    assert '<img src=x>' not in content
+    assert content.count('id="analysis-artifact-manifest"') == 1
+    assert '\\u003c/script' in content
+
+
 def test_manifest_rejects_dates_outside_declared_windows(tmp_path: Path):
     result = tmp_path / "period.json"
     html = tmp_path / "dashboard.html"

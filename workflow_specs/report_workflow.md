@@ -203,15 +203,15 @@ Before report assembly, read `workflow_specs/artifact_evidence_contract.md` and
 bind the evidence files, metric/scope fingerprints, comparisons, charts, and
 findings into the final HTML.
 
-Every chart embedded in a report must be generated from an explicit chart recipe context:
+Every chart embedded in a report must use the maintained compiler or an explicitly verified specialized recipe:
 
-1. Read `references/examples/INDEX.md` to select the chart type.
-2. Read the selected `references/examples/<chart-name>.md` file completely before writing the chart option.
+1. Read `references/chart_guide.md` and choose the view by analytical meaning.
+2. Common views use `scripts/chart_builder.py`. Specialized views use `scripts/reference_assets.py get <chart-name>` to read the archived recipe completely; `references/examples/<chart-name>.md` paths are virtual catalog identifiers, not loose files.
 3. Query or calculate the exact evidence table that powers the chart.
-4. Generate a standalone ECharts option from that recipe and data.
+4. Compile options from actual query-result JSON and explicit mappings. Never hand-copy data or splice arrays into example JavaScript.
 5. Generate charts one by one. Do not assemble the report until each chart has a stable chart ID, selected recipe name, option, and appendix data reference.
 6. Embed the full local `assets/echarts/echarts.min.js` library before any report chart bootstrap code. CDN scripts, local `<script src>`, runtime loaders, and placeholder ECharts stubs are invalid.
-7. Embed the validated chart specs into the report template as a `reportChartSpecs` list; initialize each chart independently so one failed chart cannot break all other charts.
+7. Use a report shell with one `<!-- ECHART_CHARTS -->` marker and no duplicate ECharts bootstrap. The builder injects `chart-build-spec` and isolated initialization. For custom charts only, retain the `reportChartSpecs` path and mark every expected container `data-echart-chart`.
 8. Keep ECharts JavaScript syntactically closed. In particular, `new echarts.graphic.LinearGradient(...)` and `new echarts.graphic.RadialGradient(...)` must close the constructor with `)` before closing the surrounding option object.
 9. Cite the appendix data table ID used by the chart.
 10. When the report visibly says 同比/环比/同期/YoY/QoQ/MoM/WoW, embed the version-1
@@ -219,4 +219,4 @@ Every chart embedded in a report must be generated from an explicit chart recipe
     current/baseline labels must also be visible in the report.
 11. Validate the generated HTML with `python scripts/validate_delivery.py <output.html>`. Evidence mismatch, browser/runtime failure, missing/malformed/misaligned period contract, external ECharts CDN, missing inlined ECharts library, or unclosed graphic constructor is blocking; repair and rerun before returning.
 
-Do not create charts by freehand memory when a recipe exists. If a required recipe is missing, state the gap and choose the closest supported recipe from the index.
+Do not rewrite compiler-owned code. If a specialized recipe/dependency is unavailable, obtain the full package or state the gap; never silently substitute a chart with different analytical meaning.
