@@ -13,12 +13,14 @@ try:
     from scripts.validate_chart import validate as validate_chart
     from scripts.validate_output_quality import validate_artifact
     from scripts.chart_builder import validate_compiled_html
+    from scripts.project_report import validate_report_html
 except ModuleNotFoundError:
     from browser_smoke_test import run_smoke_test
     from validate_accessibility_performance import validate_accessibility_performance
     from validate_chart import validate as validate_chart
     from validate_output_quality import validate_artifact
     from chart_builder import validate_compiled_html
+    from project_report import validate_report_html
 
 
 def validate_delivery(
@@ -33,6 +35,7 @@ def validate_delivery(
     errors.extend(validate_artifact(html, "html"))
     errors.extend(validate_accessibility_performance(html))
     errors.extend(validate_compiled_html(html))
+    errors.extend(validate_report_html(html))
     browser_code, report = run_smoke_test(html)
     if browser_report:
         browser_report.write_text(

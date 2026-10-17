@@ -165,13 +165,14 @@ def _apply_boolean_mappings(df, mappings: dict[str, Any], report: dict[str, Any]
         if column not in df.columns:
             report["warnings"].append(f"布尔映射跳过：列不存在 {column}")
             continue
+        before_nulls = int(df[column].isna().sum())
         true_values = set(map(str, spec.get("true_values", ["是", "true", "1", "yes"])))
         false_values = set(map(str, spec.get("false_values", ["否", "false", "0", "no"])))
         normalized = df[column].astype("string").str.strip()
         df[column] = normalized.map(
             lambda v: True if str(v) in true_values else False if str(v) in false_values else pd.NA
         ).astype("boolean")
-        report["boolean_mappings"].append({"column": column})
+        report["boolean_mappings"].append({"column": column, "new_nulls": max(int(df[column].isna().sum()) - before_nulls, 0)})
 
 
 def _apply_normalization(df, rules: list[dict[str, Any]], report: dict[str, Any]) -> None:
@@ -324,6 +325,9 @@ def _apply_outliers(df, rules: list[dict[str, Any]], report: dict[str, Any]) -> 
 def _apply_deduplication(df, config: dict[str, Any], report: dict[str, Any]) -> None:
     unique_key = config.get("unique_key") or config.get("unique_keys")
     if not unique_key:
+        if not config.get("deduplicate", False):
+            report["deduplication"] = {"mode": "none", "removed_rows": 0}
+            return
         before = len(df)
         df.drop_duplicates(inplace=True)
         report["deduplication"] = {"mode": "full_row", "removed_rows": before - len(df)}
@@ -428,6 +432,35 @@ def _evaluate_cross_table_rules(conn, df, rules: list[dict[str, Any]], report: d
         report["cross_table_rules"].append({"name": name, "violations": int(violations.sum())})
 
 
+def clean_dataframe(df, config: dict[str, Any], conn=None):
+    """Apply the shared engine to a copy; no database or filesystem writes."""
+    config = _normalize_config(config)
+    df = df.copy(deep=True)
+    report = {
+        "warnings": [], "input_rows": len(df), "input_columns": list(df.columns),
+        **{key: [] for key in (
+            "type_conversions", "missing_values", "text_cleaning", "boolean_mappings",
+            "normalization", "derived_features", "masking", "outliers", "rules", "cross_table_rules",
+        )},
+    }
+    _apply_type_conversions(df, config["type_conversions"], report)
+    _apply_text_cleaning(df, config["text_cleaning"], report)
+    _apply_boolean_mappings(df, config["boolean_mappings"], report)
+    _apply_missing_values(df, config["missing_values"], report)
+    _apply_outliers(df, config["outliers"], report)
+    _apply_normalization(df, config["normalization"], report)
+    _apply_derived_features(df, config["derived_features"], report)
+    _apply_masking(df, config["masking"], report)
+    _evaluate_rules(df, config["rules"], report)
+    if config["cross_table_rules"]:
+        if conn is None:
+            raise ValueError("Cross-table rules require a local DuckDB snapshot")
+        _evaluate_cross_table_rules(conn, df, config["cross_table_rules"], report)
+    _apply_deduplication(df, config, report)
+    report.update(output_rows=len(df), removed_rows=report["input_rows"] - len(df), output_columns=list(df.columns))
+    return df, report
+
+
 def clean_table_data(
     db_path: str,
     table_name: str,
@@ -472,17 +505,8 @@ def clean_table_data(
         report["input_rows"] = int(len(df))
         report["input_columns"] = list(map(str, df.columns))
 
-        _apply_type_conversions(df, config["type_conversions"], report)
-        _apply_text_cleaning(df, config["text_cleaning"], report)
-        _apply_boolean_mappings(df, config["boolean_mappings"], report)
-        _apply_missing_values(df, config["missing_values"], report)
-        _apply_outliers(df, config["outliers"], report)
-        _apply_normalization(df, config["normalization"], report)
-        _apply_derived_features(df, config["derived_features"], report)
-        _apply_masking(df, config["masking"], report)
-        _evaluate_rules(df, config["rules"], report)
-        _evaluate_cross_table_rules(conn, df, config["cross_table_rules"], report)
-        _apply_deduplication(df, config, report)
+        df, details = clean_dataframe(df, config, conn)
+        report.update(details)
 
         report["output_rows"] = int(len(df))
         report["removed_rows"] = report["input_rows"] - report["output_rows"]

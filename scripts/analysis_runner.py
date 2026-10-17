@@ -26,6 +26,7 @@ from scripts.sql_runner import (
     _execute_external_profile,
     _format_rows,
     _write_output,
+    _write_enterprise_metadata,
 )
 
 
@@ -273,6 +274,18 @@ def _run(args: argparse.Namespace) -> int:
         rows = _execute(sql, args)
         max_rows = args.max_rows if args.max_rows is not None else (0 if args.out else 200)
         _write_output(_format_rows(rows, args.output, max_rows), args.out or "")
+        source_label = f"duckdb:{args.db}"
+        if args.profile:
+            source_label = f"profile:{args.profile}"
+        elif args.dsn_env:
+            source_label = f"dsn-env:{args.dsn_env}"
+        elif args.host:
+            source_label = f"args:{args.type}:{args.host}/{args.database}"
+        _write_enterprise_metadata(
+            output_path=args.out or "", sql=sql, rows=rows,
+            source_label=source_label,
+            generated_by="analysis_runner",
+        )
         log_command("analysis_runner", status="completed", note=f"{args.command}: rows={len(rows)}")
         return 0
     except Exception as exc:

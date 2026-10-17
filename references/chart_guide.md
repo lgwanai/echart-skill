@@ -40,6 +40,12 @@ python scripts/chart_builder.py chart-spec.json --output outputs/chart.html --ev
 # Optional: --shell layout.html containing exactly one <!-- ECHART_CHARTS -->
 ```
 
+Section-aware shells may instead contain exactly one `<!-- ECHART_CHART:<id> -->`
+per chart; mixing global/named slots, duplicate or missing slots fails. For
+reports, first run `project_report.py resolve`, then use `project_report.py build`
+with the plan, evidence and project preferences (see report workflow). The
+generator owns these named slots; a project shell only supplies REPORT_CONTENT.
+
 With `--evidence`, the builder binds the manifest, runs all delivery gates including
 the real browser, then atomically publishes the output. Failure does not overwrite
 an existing deliverable. Without `--evidence`, it produces a draft only; bind and run

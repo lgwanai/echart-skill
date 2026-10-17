@@ -183,6 +183,9 @@ class ReportEngine:
         Returns:
             Path to the generated report file.
         """
+        from scripts.project_report import registry_summary
+        if registry_summary()["status"] != "not_configured":
+            raise ValueError("Project report profile detected. Resolve it with project_report.py resolve, run the evidence plan, then use project_report.py build; legacy templates cannot silently override project preferences.")
         logger.info("开始生成报告", table=table, template=template)
 
         # Step 1: Profile & analyze

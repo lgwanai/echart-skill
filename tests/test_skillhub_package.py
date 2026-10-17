@@ -48,6 +48,57 @@ def test_upload_limits_and_text_only_content(packaged):
             ).read_bytes() == archive.read(name)
 
 
+def test_packaged_cleaning_auto_applies_outside_skill(packaged, tmp_path):
+    import os
+    import duckdb
+
+    _, install = packaged
+    project = tmp_path / "customer_project"
+    config = project / "config/data_cleaning"
+    config.mkdir(parents=True)
+    with duckdb.connect(str(project / "data.duckdb")) as conn:
+        conn.execute("CREATE TABLE sales AS SELECT '  North  ' AS region, '12.5' AS amount")
+    (config / "sales.json").write_text(json.dumps({
+        "text_cleaning": [{"column": "region"}],
+        "type_conversions": [{"column": "amount", "type": "number"}]
+    }))
+    (config / "manifest.json").write_text(json.dumps({"version": 1, "datasets": [{
+        "id": "sales", "db": "data.duckdb", "table": "sales", "rules": "config/data_cleaning/sales.json"
+    }]}))
+    env = dict(os.environ, ECHART_PROJECT_ROOT=str(project))
+    for script, args in (
+        ("project_cleaning.py", ["approve", "sales"]),
+        ("sql_runner.py", ["--db", "data.duckdb", "--sql", "SELECT region, SUM(amount) total FROM sales GROUP BY region",
+                           "--output", "json", "--out", "answer.json"]),
+    ):
+        result = subprocess.run([sys.executable, str(install / "scripts" / script), *args],
+                                cwd=project, env=env, capture_output=True, text=True)
+        assert result.returncode == 0, result.stdout + result.stderr
+    assert json.loads((project / "answer.json").read_text()) == [{"region": "North", "total": 12.5}]
+    assert json.loads((project / "answer.json.meta.json").read_text())["project_cleaning"]["status"] == "passed"
+    assert not (install / "config/data_cleaning").exists()
+
+
+def test_packaged_report_resolves_project_preferences(packaged, tmp_path):
+    import os
+
+    _, install = packaged
+    project = tmp_path / "report_customer"
+    folder = project / "config/reports"
+    folder.mkdir(parents=True)
+    (folder / "manifest.json").write_text(json.dumps({"version": 1, "profiles": {"review": "config/reports/review.json"}}))
+    (folder / "review.json").write_text(json.dumps({"audience": "Review team", "layout": {"columns": 2}, "charts": {"preferences": {"ranking": "bar"}}}))
+    result = subprocess.run([sys.executable, str(install / "scripts/project_report.py"), "resolve"],
+                            cwd=project, env=dict(os.environ, ECHART_PROJECT_ROOT=str(project)), capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    value = json.loads(result.stdout)
+    assert value["profile"] == "review"
+    assert value["settings"]["audience"] == "Review team"
+    assert value["settings"]["layout"]["columns"] == 2
+    assert value["settings"]["charts"]["preferences"] == {"ranking": "bar"}
+    assert not (install / "config/reports").exists()
+
+
 @pytest.mark.parametrize(
     "files,size,reason",
     [

@@ -278,31 +278,34 @@ def build_html(
             if spec["view"] in {"bar", "stacked_bar"}
             else 400
         )
+        wide = " chart-card--wide" if spec.get("full_width") is True else ""
         cards.append(
-            f'<section class="chart-card"><h2>{esc(spec["title"])}</h2>'
+            f'<section class="chart-card{wide}"><h2>{esc(spec["title"])}</h2>'
             f'<p>统计口径：{esc(spec["scope"])} · 数据来源：{esc(spec["source"])} · query hash: {esc(spec["query_hash"])}</p>'
             f'<div id="{spec["id"]}" class="chart-surface" data-echart-chart aria-label="{esc(spec["title"])}" style="height:{height}px"></div>'
             f'<details class="chart-data-table" data-chart-table="{spec["id"]}"><summary>查看数据</summary><div class="table-scroll"><table><thead><tr>{header}</tr></thead><tbody>{body}</tbody></table></div></details></section>'
         )
     if shell is None:
         shell = '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>数据图表</title></head><body><main><!-- ECHART_CHARTS --></main></body></html>'
+    slots = re.findall(r"<!-- ECHART_CHART:([A-Za-z][A-Za-z0-9_-]*) -->", shell)
+    global_slot = shell.count("<!-- ECHART_CHARTS -->")
     if (
-        shell.count("<!-- ECHART_CHARTS -->") != 1
+        not ((global_slot == 1 and not slots) or (global_slot == 0 and len(slots) == len(ids) and set(slots) == ids))
         or shell.lower().count("</body>") != 1
         or shell.lower().count("</head>") != 1
     ):
-        raise ValueError("Shell needs one ECHART_CHARTS marker, </head>, and </body>")
+        raise ValueError("Shell needs one ECHART_CHARTS marker OR exactly one ECHART_CHART:id slot per chart, </head>, and </body>")
     if re.search(r"echarts(?:\.min)?\.js|echarts\.init", shell):
         raise ValueError("Shell must not include a second ECharts library/bootstrap")
     css = "<style>main{max-width:1280px;margin:auto;padding:16px;font:15px system-ui}.chart-card{min-width:0;padding:16px;margin-bottom:18px;border:1px solid #dce3eb;border-radius:12px;background:white}.chart-surface{width:100%;min-width:0}.table-scroll{overflow:auto;max-height:360px}th,td{padding:8px;border-bottom:1px solid #ddd;text-align:left}summary{cursor:pointer}p{overflow-wrap:anywhere}body{margin:0;background:#f5f7fa;color:#172b4d}</style>"
-    shell = re.sub("</head>", lambda _: css + "</head>", shell, count=1, flags=re.I)
-    shell = shell.replace(
-        "<!-- ECHART_CHARTS -->",
-        "".join(cards)
-        + "<p>生成时间："
-        + datetime.now(timezone.utc).isoformat(timespec="seconds")
-        + "</p>",
-    )
+    # Base defaults precede project CSS, so user layout tokens are not overwritten.
+    shell = re.sub(r"(<head\b[^>]*>)", lambda m: m[1] + css, shell, count=1, flags=re.I)
+    if slots:
+        for spec, card in zip(charts, cards):
+            shell = shell.replace(f'<!-- ECHART_CHART:{spec["id"]} -->', card)
+    else:
+        shell = shell.replace("<!-- ECHART_CHARTS -->", "".join(cards))
+    shell = re.sub("</body>", lambda _: "<p>生成时间：" + datetime.now(timezone.utc).isoformat(timespec="seconds") + "</p></body>", shell, count=1, flags=re.I)
     library = (ROOT / "assets/echarts/echarts.min.js").read_text(encoding="utf-8")
     runtime = (ROOT / "assets/chart_runtime.js").read_text(encoding="utf-8")
     payload = f'<script id="chart-build-spec" type="application/json">{json_script(configs)}</script><script>{library}</script><script>{runtime}</script>'
@@ -389,6 +392,13 @@ def main():
     args = parser.parse_args()
     try:
         document = json.loads(args.spec.read_text(encoding="utf-8"))
+        if document.get("artifact_type") == "report" or "report" in document:
+            from scripts.project_report import build_report
+            if not args.evidence or args.shell:
+                raise ValueError("Project reports require --evidence and use the project profile shell (not --shell)")
+            build_report(args.spec, args.output, args.evidence)
+            print(f"Verified project report: {args.output}")
+            return
         content = build_html(
             document,
             args.spec.resolve().parent,

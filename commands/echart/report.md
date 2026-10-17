@@ -13,6 +13,8 @@ argument-hint: "<table> [--template <name>] [--format markdown|html|json]"
 
 ## 执行规则
 
+1. [MANDATORY] 先在用户项目运行 `python /path/to/echart-skill/scripts/project_report.py resolve`，按 `workflow_specs/report_workflow.md` 加载项目分析方法、章节布局和图表偏好；不要每次重新询问已保存的偏好。用户要求记住时保存到项目 `config/reports/`，不写入 Skill。多方案无默认项时请用户选择。
+1. [MANDATORY] 支持的 HTML 报告使用 `project_report.py build <spec.json> --evidence <draft.json> --output <report.html>`；配置的每个方法必须绑定已执行查询或说明数据缺口。一次性覆盖不修改项目默认，旧 `--template` 参数不能绕过项目方案。
 1. 使用 echart-skill 的本地优先数据分析流程。
 1. 不把大表明细读入模型上下文；使用维护好的本地脚本执行计算和查询。
 1. 生成报告、Dashboard、图表或导出后，按需要记录审计和血缘。

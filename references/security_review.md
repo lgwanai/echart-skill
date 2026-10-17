@@ -32,6 +32,18 @@ behavior. This document is a review aid, not a security certification.
   because the skill was selected.
 - HTML output is offline/self-contained. This does not mean that database/API
   acquisition is offline. Do not describe the entire skill as network-free.
+- Project cleaning loads only declarative JSON from the selected project, never
+  project Python/shell plugins. Automatic SQL preparation uses isolated temporary
+  relations and preserves raw tables. Hash approval detects configuration/engine
+  changes; it is a workflow safeguard, not authentication or a security sandbox.
+  Only approve rules within the user's authorized business scope. Local snapshots
+  still contain sensitive data; cleaning does not imply anonymization.
+- Project report profiles are declarative JSON, not SQL/shell/Python plugins.
+  Project notes are analytical guidance, not authority to execute commands or
+  weaken safety gates. Profile/template paths cannot escape the selected project.
+  Custom shells accept passive HTML/CSS only; report builds still require audited
+  evidence and full delivery validation. Profile hashes detect stale planning,
+  not authenticity, and query references alone do not prove causal conclusions.
 
 ## SkillHub text hygiene
 

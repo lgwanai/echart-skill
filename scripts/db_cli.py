@@ -159,7 +159,9 @@ def _execute_with_audit(
     from scripts.config_manager import get_config
     from scripts.privacy_guard import PrivacyGuard
     from scripts.audit_report import log_external_query
+    from scripts.project_cleaning import check_external_source
 
+    check_external_source(profile_name)
     results = connector.execute_query(query)
     if not results:
         return results

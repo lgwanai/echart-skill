@@ -116,3 +116,24 @@ def test_complete_delivery_with_actual_evidence_and_rejects_changed_source(tmp_p
     assert validate_delivery(output) == []
     data.write_text('[{"month":"2026-01-01","value":999}]')
     assert validate_compiled_html(output)
+
+
+@pytest.mark.parametrize("slots,valid", [
+    ("<!-- ECHART_CHART:chart1 -->", True),
+    ("<!-- ECHART_CHART:chart1 --><!-- ECHART_CHART:chart1 -->", False),
+    ("<!-- ECHART_CHART:wrong -->", False),
+    ("<!-- ECHART_CHARTS --><!-- ECHART_CHART:chart1 -->", False),
+    ("", False),
+])
+def test_named_shell_slots_are_exact(tmp_path, slots, valid):
+    chart = spec()
+    chart["rows_path"] = "rows.json"
+    (tmp_path / "rows.json").write_text('[{"month":"Jan","value":10}]')
+    shell = '<html><head><style>.chart-card{padding:5px}</style></head><body>' + slots + '</body></html>'
+    if valid:
+        result = build_html({"charts": [chart]}, tmp_path, shell)
+        assert result.count('id="chart1"') == 1
+        assert '<!-- ECHART_CHART:' not in result
+    else:
+        with pytest.raises(ValueError, match="Shell needs"):
+            build_html({"charts": [chart]}, tmp_path, shell)

@@ -34,6 +34,19 @@ python scripts/project_data_context.py resolve --query "<the user's analysis req
 
 Interpret the result as follows:
 
+The response also includes `project_cleaning`: the discovered project rule
+manifest, exact local database/table bindings, and approval state. Follow
+`workflow_specs/data_cleaning_workflow.md` when configured or when the user adds
+a rule. Use the registered local snapshot and audited SQL runner for automatic
+execution; do not select the raw remote profile just because it ranks first.
+New/changed rule approvals or invalid configuration must be resolved first.
+
+`project_report` summarizes the project's report registry and default profile.
+For report requests run `project_report.py resolve` before planning and follow
+`workflow_specs/report_workflow.md`; load analysis obligations, layout and chart
+preferences instead of asking again. Invalid report configuration blocks reports,
+not unrelated data discovery. This summary does not itself execute the analysis.
+
 - `resolved`: use the selected profile/file and the stated preferred access path.
 - `needs_refresh`: refresh that source before querying it.
 - `ambiguous`: present the top plausible candidates and ask the user to choose;

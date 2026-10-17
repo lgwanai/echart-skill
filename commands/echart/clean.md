@@ -11,6 +11,8 @@ argument-hint: "<table> [--config <file>] [--output-table <name>]"
 
 按 data_cleaning_workflow 诊断字段、缺失、重复、异常，再执行非破坏式清洗。
 
+用户要求记住或复用规则时，按 `workflow_specs/data_cleaning_workflow.md` 的项目注册协议，将业务规则存到当前项目 `config/data_cleaning/`，先 preview 再按授权 approve；后续普通 sql_runner/analysis_runner 查询自动应用。不得只存 MD、每次要求用户重写提示词、或将业务规则写进通用 Skill。
+
 ## 执行规则
 
 1. 使用 echart-skill 的本地优先数据分析流程。

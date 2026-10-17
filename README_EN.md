@@ -161,6 +161,24 @@ Echart Skill treats data quality as a **prerequisite**, not an afterthought.
 
 Together with `/clean` (Agent-guided cleaning workflow: type conversion, multi-column dedup, rule validation, cross-table verification), this forms a **Quality Assessment → Targeted Cleaning → Re-Verification** closed loop.
 
+**Project-rule reuse:** ask the Agent to remember a cleaning rule for this project.
+Rules stay in the project's `config/data_cleaning/`, not the Skill. After preview
+and authorized approval, `sql_runner` / `analysis_runner` automatically prepare
+registered local DuckDB tables before analysis, preserving raw tables and
+duplicates unless explicitly configured otherwise. Changed rules/engine or failed
+checks block execution; result metadata binds rule and source fingerprints.
+External data must first be imported and its snapshot freshness verified.
+See [project cleaning workflow](workflow_specs/data_cleaning_workflow.md).
+
+**Reusable project report schemes:** ask the Agent to save the analysis methods,
+layout and chart preferences as this project's default. They stay in
+`config/reports/`, not the Skill. Future reports resolve the scheme before
+analysis, apply section/layout/view preferences, and require actual query evidence
+or explicit data gaps for each method. Task-only overrides do not change defaults.
+Stale profiles, missing evidence and rendering failures block publication; the
+existing report is preserved. See [report workflow](workflow_specs/report_workflow.md)
+for the schema, CLI and supported-format limits.
+
 ---
 
 ## Custom Metric Definitions: Enterprise Metric Governance

@@ -59,12 +59,24 @@ def _privacy_guard(read_only: bool) -> PrivacyGuard:
 
 
 def _execute_duckdb(sql: str, db_path: str, allow_write: bool) -> list[dict[str, Any]]:
+    from scripts.project_cleaning import execute_project_query
+
     guard = _privacy_guard(read_only=not allow_write)
     guard.enforce_read_only(sql)
-    repo = get_repository(db_path)
-    rows = repo.execute_query_raw(sql)
+    prepared = execute_project_query(sql, db_path)
+    if prepared is None:
+        rows = get_repository(db_path).execute_query_raw(sql)
+        receipt = None
+    else:
+        rows, receipt = prepared
     columns = list(rows[0].keys()) if rows else []
-    return guard.guard_query(sql, _infer_table_name(sql), columns, rows)
+    guarded = guard.guard_query(sql, _infer_table_name(sql), columns, rows)
+    if receipt is not None:
+        class CleanedRows(list):
+            pass
+        guarded = CleanedRows(guarded)
+        guarded.cleaning = receipt
+    return guarded
 
 
 def _profile_from_dsn(dsn: str, db_type: str) -> ConnectionProfile:
@@ -203,6 +215,7 @@ def _write_enterprise_metadata(
         "columns": columns,
         "row_count": len(rows),
         "query_hash": q_hash,
+        "project_cleaning": getattr(rows, "cleaning", None),
         "effective_metrics": metrics,
         "lineage_recorded": True,
         "quality_requirement": "Enterprise BI query outputs require scope, lineage, auditability, row/column metadata, and no raw DB connection code.",

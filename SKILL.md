@@ -28,6 +28,20 @@ requested deliverable.
      filters, governed entity sets, comparison scope, or business terminology.
    - Never invent fields or approximate a governed set with keyword matching.
 2. **Assess data fitness**
+   - Discover project cleaning via `python scripts/project_cleaning.py status`.
+     Read `workflow_specs/data_cleaning_workflow.md` for registration/approval.
+     Rules live in `<project>/config/data_cleaning/`, never in this Skill.
+     `sql_runner.py` and `analysis_runner.py` automatically apply approved rules
+     to registered local DuckDB tables before aggregation. Do not substitute a
+     different runner or raw source to bypass a cleaning failure.
+   - When asked to remember a cleaning rule, register it in the project manifest,
+     preview its impact, and approve only the user-confirmed scope. Subsequent
+     analysis reuses it without another long prompt. Unknown/new/changed rules
+     require confirmation; no rules means unchanged data, not guessed cleaning.
+   - Run from the user project (absolute Skill script paths), or set
+     `ECHART_PROJECT_ROOT` explicitly. External sources must be imported/refreshed
+     through the maintained import path and bound to a local table; never clean
+     remote production tables in place. Verify snapshot freshness before analysis.
    - Check date coverage, incomplete periods, nulls, duplicates, grain,
      uniqueness, units, currency, timezone, status filters, and known exclusions.
    - Use `scripts/data_quality.py` or `scripts/data_contract.py` when relevant.
@@ -39,6 +53,14 @@ requested deliverable.
      `.cursor()`, or `cur.execute()`.
    - Write query results with `--out` so query hash and lineage metadata exist.
 4. **Plan the analytical expression**
+   - For reports, first read `workflow_specs/report_workflow.md` and run
+     `python scripts/project_report.py resolve` from the user project. Reuse its
+     analysis obligations, section order, layout and chart preferences. Read
+     each referenced project expert note completely. Explicit task overrides
+     take precedence but must not silently change the saved default.
+   - When asked to remember a report scheme, save it under the user's
+     `config/reports/`, register it in `manifest.json`, and validate with
+     `resolve`. Never save business methods or branding inside this Skill.
    - Read [analysis expression quality](workflow_specs/analysis_expression_quality.md).
    - Write an analysis-plan JSON and run
      `python scripts/validate_analysis_plan.py <plan.json>`.
@@ -66,9 +88,14 @@ requested deliverable.
      Old demo replacement instructions are superseded by the chart guide.
    - Dashboard: read `workflow_specs/dashboard_workflow.md` and
      `workflow_specs/dashboard_runtime_quality.md`.
-   - Report: read `workflow_specs/report_workflow.md`.
+   - Report: use `scripts/project_report.py build <spec.json> --evidence
+     <draft.json> --output <report.html>`. It applies the resolved profile and
+     blocks missing methods/evidence, stale profiles and unexplained view
+     overrides. Methods require actual audited queries or visible data gaps,
+     not canned conclusions. No configured profile uses generic defaults.
    - Use `workflow_specs/html_templates/dashboard_light.html` or
-     `workflow_specs/html_templates/report_light.html` as the relevant shell.
+     the project-report generator's responsive shell. A configured passive
+     project HTML shell can replace the report shell; validation is mandatory.
 7. **Run the complete delivery gate**
    - Run `python scripts/validate_delivery.py <output.html>`.
    - This combines static ECharts/runtime checks, governance checks, manifest

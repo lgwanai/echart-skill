@@ -6,13 +6,14 @@
     "correlation": {"preferred": ["scatter", "bubble"], "allowed": ["scatter", "linked_scatter", "bubble", "small_multiples"]},
     "ranking": {"preferred": ["bar", "lollipop", "table"], "allowed": ["bar", "lollipop", "bump", "table"]},
     "distribution": {"preferred": ["histogram", "boxplot"], "allowed": ["histogram", "boxplot", "violin", "strip", "table"]},
-    "time": {"preferred": ["line", "column", "slope"], "allowed": ["line", "column", "slope", "calendar_heatmap", "small_multiples", "area"]},
-    "magnitude": {"preferred": ["bar", "paired_bar", "table"], "allowed": ["bar", "column", "paired_bar", "pictorial", "table"]},
+    "time": {"preferred": ["line", "column", "slope"], "allowed": ["line", "column", "slope", "calendar_heatmap", "small_multiples", "area", "mixed"]},
+    "magnitude": {"preferred": ["bar", "paired_bar", "table"], "allowed": ["bar", "column", "paired_bar", "pictorial", "table", "mixed"]},
     "composition": {"preferred": ["stacked_bar", "bar", "treemap"], "allowed": ["bar", "stacked_bar", "stacked_area", "treemap", "marimekko", "pie", "table"]},
     "spatial": {"preferred": ["map", "ranked_bar"], "allowed": ["map", "effect_scatter", "choropleth", "ranked_bar", "table"]},
     "flow": {"preferred": ["sankey", "funnel"], "allowed": ["sankey", "funnel", "graph", "lines", "map", "table"]}
   },
   "views": {
+    "mixed": {"recipe": null, "max_categories": 120, "requires": ["category", "two_metrics"], "accessible_fallback": "table"},
     "kpi": {"recipe": null, "max_categories": 1, "requires": ["metric"], "accessible_fallback": "text"},
     "text": {"recipe": null, "max_categories": 1, "requires": ["metric"], "accessible_fallback": "text"},
     "table": {"recipe": null, "max_categories": null, "requires": [], "accessible_fallback": "table"},
