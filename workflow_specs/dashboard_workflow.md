@@ -4,8 +4,129 @@ Use this workflow when handling `/dashboard`, `/db`, `/仪表盘`, or any reques
 
 ## Principle
 
-The Agent designs the dashboard. Python should not generate the final dashboard from a fixed renderer.
-Use Python only to query data, calculate metrics, and validate standalone HTML.
+The Agent designs the dashboard: expert selection, analytical plan, interpretation,
+and information architecture. The project compiler applies that explicit plan;
+it does not invent business modules or conclusions from hardcoded industry rules.
+
+## Project scheme discovery and reuse
+
+Before planning, run `python scripts/project_dashboard.py resolve` from the user
+project, using the absolute installed Skill script path. Discovery uses the nearest
+project root; `--project-root` or `ECHART_PROJECT_ROOT` explicitly selects a root.
+Never reuse an unrelated project's scheme. `project_data_context.py resolve`
+also includes `project_dashboard` as a discovery summary.
+
+Precedence: explicit task overrides > selected/default project scheme > built-in
+defaults. A single registered scheme is selected automatically; multiple schemes
+require a default or `--profile`. Missing registry uses built-in defaults without
+writing files; orphan JSON, malformed configuration, unknown keys, missing expert
+files or incompatible chart preferences block generation. Report and Dashboard
+registries are separate, even when a project deliberately shares an expert note.
+
+When asked to remember a Dashboard expert, layout or chart preference, preserve
+unrelated settings and save/register the scheme in the **user project**, not the
+Skill. Set the project default when requested. A temporary instruction must not
+overwrite saved defaults. Resolve and validate after saving; future requests such
+as “按项目默认方案生成看板” must reuse these files without another long prompt.
+
+`config/dashboards/manifest.json`:
+
+```json
+{"version":1,"default":"operations","profiles":{"operations":"config/dashboards/operations.json"}}
+```
+
+Example `operations.json` (partial profiles inherit defaults):
+
+```json
+{
+  "version": 1,
+  "audience": "经营运营团队",
+  "analysis": {
+    "experts": [{"id":"project_operations","path":"config/dashboards/experts/operations.md","role":"primary","method_ids":["drivers"]}],
+    "methods": [{"id":"drivers","instructions":"按项目指标口径拆解贡献，交叉验证主要驱动；缺字段时说明数据缺口。"}],
+    "questions": ["哪些维度贡献了主要变化？"],
+    "expert_notes": []
+  },
+  "layout": {
+    "columns": 2,
+    "accent": "#146358",
+    "wide_charts": [],
+    "sections": [{"id":"overview","title":"经营概览"},{"id":"diagnostics","title":"诊断与行动"}]
+  },
+  "charts": {"preferences":{"ranking":"bar","time":"line"},"avoid":["pie"]}
+}
+```
+
+### Project experts
+
+Start from `workflow_specs/dashboard_expert_library/DASHBOARD_EXPERT_TEMPLATE.md`,
+but save business-specific Markdown in the project. Define its mission, required
+modules, metrics/data prerequisites, cross-analysis, anomalies, attribution,
+interaction needs and validation checks. Fill every applicable section; do not
+insert executable plugins, credentials or canned conclusions.
+
+Register each expert with `id`, project-relative `path`, `role` (`primary` or
+`supporting`), and nonempty `method_ids` referencing `analysis.methods`. When
+project experts exist there must be exactly one primary expert. Read every file
+fully before planning; required expert analyses must be represented in methods,
+not left only in prose. `expert_notes` supplies additional project guidance.
+When no project expert is registered, select from the built-in Dashboard library;
+do not substitute a report expert as the primary Dashboard planner.
+
+Each configured method must appear in the output as `executed` with actual
+audited query IDs, or `data_gap` with a visible reason. The Agent must check that
+the query actually implements the method. Coverage checks are not proof of causal
+claims. Expert/template content hashes enter the scheme fingerprint; changes
+require re-reading and re-planning, not merely replacing a stale hash.
+
+### Layout, preferences and build contract
+
+- `layout.sections` controls exact module group order and headings. Each chart's
+  `section` matches a configured ID. Chart order within a section follows the
+  task specification. `columns` supports 1/2/3 desktop columns; mobile is one.
+  `accent` is six-digit hex. `wide_charts` names stable chart IDs; the compiler
+  may additionally promote leading, dense and unpaired cards to full width to
+  prevent blank half-rows. This does not rewrite the saved scheme.
+- Optional `layout.shell` is a project-contained passive HTML/CSS file with one
+  complete head/body and exactly one `<!-- DASHBOARD_CONTENT -->`. No scripts,
+  URL assets, event handlers or chart initialization. CSS may customize the
+  appearance but cannot hide evidence or contradict the resolved grid/spans.
+- `charts.preferences` maps relation to a supported compiler view, using the
+  same capability catalog as reports. Deviations require a visible
+  `view_override_reason` and a compatible validated analysis plan.
+- Author a spec with `artifact_type: "dashboard"`, `analysis_plan`, `charts`,
+  and `dashboard`. The `dashboard` object uses the report workflow's
+  `title`, `scope`, `limitations`, `profile_sha256`, `sections`, `methods` fields,
+  plus a nonempty `kpis` list. Bind all findings/comparisons in the evidence
+  manifest. Query results require their audited `.meta.json` sidecars.
+- Each KPI is a reference, **not a hand-entered value or a calculation**:
+  `{"id":"net_sales","label":"净销售额","unit":"元","scope":"当前已完成周期净额","query_id":"q_total","row":0,"field":"net_sales"}`.
+  The query must already compute the correct aggregate. Row is zero-based;
+  absent/non-numeric/non-finite values fail, never silently become zero.
+- Companion/primary tables use `table_columns` and `table_reason` from the
+  validated plan and actual query rows. Source tables remain default-hidden.
+
+```bash
+python /path/to/echart-skill/scripts/project_dashboard.py --project-root /path/to/project resolve
+python /path/to/echart-skill/scripts/project_dashboard.py --project-root /path/to/project build outputs/dashboard-spec.json --evidence outputs/evidence.json --output outputs/dashboard.html
+# Optional global arguments before resolve/build:
+# --profile operations --overrides outputs/task-dashboard-overrides.json
+```
+
+Use the same profile and overrides for resolve/build. Override objects merge,
+lists replace; they are not saved. `chart_builder.py` delegates Dashboard specs
+to this gated entry point; legacy `--shell` Dashboard builds cannot bypass an
+existing registry. Builds bind an immutable `project-dashboard-contract`, verify
+KPI/series evidence, methods, layout and real desktop/mobile rendering, then
+atomically replace the output. Failure preserves the last delivered artifact.
+
+This path supports the nine common compiler views, tooltip/source-table access,
+SVG downloads and PDF export (with print fallback). It is an offline snapshot,
+not live data: no fake refresh, polling, theme/filter/drill-down controls without
+an implemented data/runtime contract. Specialized maps, custom interactive
+filters or other unsupported expert requirements need a separately verified
+implementation or an explicitly explained fallback; do not silently drop them
+or claim they were applied. Project schemes never disable quality/evidence gates.
 
 ## Required Steps
 
@@ -20,7 +141,7 @@ Use Python only to query data, calculate metrics, and validate standalone HTML.
 
 2. **Infer industry and KPI tree**
    - Read `workflow_specs/dashboard_expert_library/INDEX.md`.
-   - Select one primary dashboard expert and optional supporting experts from the dashboard expert library.
+   - Use registered project experts when configured; otherwise select one primary dashboard expert and optional supporting experts from the dashboard expert library.
    - Read the selected expert Markdown files completely.
    - Build KPI groups from selected expert files, not from hardcoded Python rules.
    - Convert selected experts' `Cross Analysis Matrix`, `Anomaly Patterns`, and `Deep Attribution Paths` into dashboard diagnostic modules.
@@ -47,11 +168,11 @@ Use Python only to query data, calculate metrics, and validate standalone HTML.
    - Read `references/chart_guide.md`. Compile supported common views from query-result files using `scripts/chart_builder.py`; do not rewrite options/runtime. For specialized views only, retrieve the selected archived recipe through `scripts/reference_assets.py get <name>` and verify the adapted option and local dependencies.
 
 5. **Author standalone HTML**
-   - Read `workflow_specs/html_templates/dashboard_light.html` completely and use it as the dashboard shell.
+   - Use the project compiler's responsive shell or the resolved project shell. For separately verified custom dashboards, read `workflow_specs/html_templates/dashboard_light.html` completely as the shell reference; do not override an existing project scheme silently.
    - Use `workflow_specs/visual_templates/light.md` or `dark.md` only as visual direction; do not use Markdown visual notes as the final HTML shell.
    - Read `workflow_specs/dashboard_runtime_quality.md` completely and apply its runtime quality gate.
    - Inline ECharts and required local JS/CSS assets.
-   - The Agent owns layout and narrative; the common-chart compiler owns chart components. Adapt the shell with one `<!-- ECHART_CHARTS -->` marker and no duplicate ECharts bootstrap, then pass `--shell` to the builder.
+   - The Agent owns layout and narrative; the compiler owns chart components. The project generator assembles section-aware slots. Custom builds without a registered scheme may use one `<!-- ECHART_CHARTS -->` or exact named slots; never include duplicate chart bootstrap.
    - Bind evidence and validate with `scripts/validate_delivery.py`; static checks alone are not delivery verification.
 
 ## Dashboard Content Patterns
@@ -98,7 +219,7 @@ If no dashboard expert strongly matches, select `general_business_dashboard.md` 
 
 ## Visual Rules
 
-- Read and apply `workflow_specs/html_templates/dashboard_light.html` as the default HTML dashboard shell.
+- Apply the project scheme and generator shell. Use `workflow_specs/html_templates/dashboard_light.html` as reference for separately verified custom dashboards.
 - Read `workflow_specs/visual_templates/light.md` by default as supplemental visual direction.
 - Read and apply the dark spec only when requested or when the context is command-center/monitoring, then adapt the dashboard shell tokens without weakening its structure.
 - Keep UI dense, formal, and readable. This is an operating surface, not a marketing page.

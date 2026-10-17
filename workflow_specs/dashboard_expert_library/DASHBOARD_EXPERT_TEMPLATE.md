@@ -2,7 +2,10 @@
 
 Use this dashboard expert for: `<business domain, dashboard users, tables, metrics, operating scenarios>`.
 
-This is a template for custom dashboard experts. Do not select this file directly. Copy it to a new Markdown file, fill every section, and register the new file in `INDEX.md`.
+This is a template, not a selectable expert. For project-specific experts, copy
+it into the user project, fill every applicable section, and register its path,
+role and required method IDs in `config/dashboards/` (see Dashboard workflow).
+Only business-independent additions to the reusable library belong in INDEX.md.
 
 ## Dashboard Mission
 

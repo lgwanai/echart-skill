@@ -36,6 +36,7 @@ def validate_delivery(
     errors.extend(validate_accessibility_performance(html))
     errors.extend(validate_compiled_html(html))
     errors.extend(validate_report_html(html))
+    errors.extend(validate_report_html(html, kind="dashboard"))
     browser_code, report = run_smoke_test(html)
     if browser_report:
         browser_report.write_text(

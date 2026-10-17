@@ -392,6 +392,13 @@ def main():
     args = parser.parse_args()
     try:
         document = json.loads(args.spec.read_text(encoding="utf-8"))
+        if document.get("artifact_type") == "dashboard" or "dashboard" in document:
+            from scripts.project_dashboard import build_dashboard
+            if not args.evidence or args.shell or "report" in document or document.get("artifact_type") == "report":
+                raise ValueError("Project dashboards require --evidence, an unambiguous artifact type and the project profile shell (not --shell)")
+            build_dashboard(args.spec, args.output, args.evidence)
+            print(f"Verified project dashboard: {args.output}")
+            return
         if document.get("artifact_type") == "report" or "report" in document:
             from scripts.project_report import build_report
             if not args.evidence or args.shell:
@@ -399,6 +406,11 @@ def main():
             build_report(args.spec, args.output, args.evidence)
             print(f"Verified project report: {args.output}")
             return
+        if args.shell:
+            from scripts.project_dashboard import registry_summary
+            shell_text = args.shell.read_text(encoding="utf-8")
+            if re.search(r'dashboard-(?:grid|container)', shell_text) and registry_summary()["status"] != "not_configured":
+                raise ValueError("Project Dashboard profile detected; use project_dashboard.py build instead of bypassing preferences with --shell")
         content = build_html(
             document,
             args.spec.resolve().parent,

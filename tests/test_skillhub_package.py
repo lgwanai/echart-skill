@@ -99,6 +99,15 @@ def test_packaged_report_resolves_project_preferences(packaged, tmp_path):
     assert not (install / "config/reports").exists()
 
 
+def test_nested_runtime_logs_are_excluded_from_payload(tmp_path):
+    from scripts.build_skill_package import payloads
+    (tmp_path / "scripts/logs").mkdir(parents=True)
+    (tmp_path / "scripts/logs/runtime.log").write_text("private runtime data")
+    (tmp_path / "scripts/runtime.log").write_text("private runtime data")
+    (tmp_path / "scripts/tool.py").write_text("print('tool')")
+    assert set(payloads(tmp_path)) == {"scripts/tool.py"}
+
+
 @pytest.mark.parametrize(
     "files,size,reason",
     [

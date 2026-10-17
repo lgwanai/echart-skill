@@ -6,6 +6,11 @@ This library is dedicated to dashboards. Do not use report experts as the primar
 
 ## Selection Protocol
 
+First resolve the project Dashboard scheme with `scripts/project_dashboard.py
+resolve`. Registered project experts take priority for that project's task;
+read their Markdown and enforce their method IDs. With no project experts, use
+the catalog below. See `workflow_specs/dashboard_workflow.md` for the contract.
+
 1. Inspect the user request, table/file names, column names, sample values, metadata, and desired operating cadence.
 2. Match one primary dashboard expert and optional supporting experts using the trigger terms below.
 3. Read the full Markdown file for every selected dashboard expert before planning layout or charts.
@@ -102,7 +107,11 @@ or when no stronger expert matches.
 
 ## Custom Dashboard Expert Contract
 
-To add a custom dashboard expert:
+For a business-specific expert, copy the template into the user project and
+register it under `analysis.experts` in `config/dashboards/`; do not add client
+rules to this reusable library. Set a default scheme for automatic future reuse.
+
+To add a reusable, business-independent dashboard expert to the Skill:
 
 1. Copy `DASHBOARD_EXPERT_TEMPLATE.md` to a new file in this folder.
 2. Fill every required section.

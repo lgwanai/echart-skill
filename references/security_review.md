@@ -44,6 +44,10 @@ behavior. This document is a review aid, not a security certification.
   Custom shells accept passive HTML/CSS only; report builds still require audited
   evidence and full delivery validation. Profile hashes detect stale planning,
   not authenticity, and query references alone do not prove causal conclusions.
+- Dashboard schemes use the same project-bound declarative mechanism, with
+  independent expert roles and method references. Project Markdown cannot enable
+  arbitrary code execution. KPI values are loaded from audited evidence, not
+  configuration literals. Offline snapshots do not start background polling.
 
 ## SkillHub text hygiene
 

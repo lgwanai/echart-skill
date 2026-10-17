@@ -53,6 +53,11 @@ requested deliverable.
      `.cursor()`, or `cur.execute()`.
    - Write query results with `--out` so query hash and lineage metadata exist.
 4. **Plan the analytical expression**
+   - For Dashboards, first read `workflow_specs/dashboard_workflow.md` and run
+     `python scripts/project_dashboard.py resolve` from the user project. Load
+     registered project experts, required methods, layout and chart preferences.
+     Read all referenced expert files; missing/changed profiles never silently
+     fall back. This registry is independent of report profiles.
    - For reports, first read `workflow_specs/report_workflow.md` and run
      `python scripts/project_report.py resolve` from the user project. Reuse its
      analysis obligations, section order, layout and chart preferences. Read
@@ -61,6 +66,9 @@ requested deliverable.
    - When asked to remember a report scheme, save it under the user's
      `config/reports/`, register it in `manifest.json`, and validate with
      `resolve`. Never save business methods or branding inside this Skill.
+     Dashboard schemes and project experts similarly live under the user's
+     `config/dashboards/` (expert Markdown may live elsewhere inside that project).
+     Set the requested default once; later requests reuse it without re-asking.
    - Read [analysis expression quality](workflow_specs/analysis_expression_quality.md).
    - Write an analysis-plan JSON and run
      `python scripts/validate_analysis_plan.py <plan.json>`.
@@ -87,15 +95,18 @@ requested deliverable.
      `scripts/reference_assets.py get <name>` and verify its dependencies.
      Old demo replacement instructions are superseded by the chart guide.
    - Dashboard: read `workflow_specs/dashboard_workflow.md` and
-     `workflow_specs/dashboard_runtime_quality.md`.
+     `workflow_specs/dashboard_runtime_quality.md`. Use
+     `scripts/project_dashboard.py build <spec.json> --evidence <draft.json>
+     --output <dashboard.html>` for supported views. It applies the project
+     scheme, binds KPI values directly to query results, and runs full gates.
    - Report: use `scripts/project_report.py build <spec.json> --evidence
      <draft.json> --output <report.html>`. It applies the resolved profile and
      blocks missing methods/evidence, stale profiles and unexplained view
      overrides. Methods require actual audited queries or visible data gaps,
      not canned conclusions. No configured profile uses generic defaults.
-   - Use `workflow_specs/html_templates/dashboard_light.html` or
-     the project-report generator's responsive shell. A configured passive
-     project HTML shell can replace the report shell; validation is mandatory.
+   - Use the project generators' responsive shells or a configured passive
+     project HTML shell; validation is mandatory. The dashboard_light.html
+     template remains a reference for separately verified custom dashboards.
 7. **Run the complete delivery gate**
    - Run `python scripts/validate_delivery.py <output.html>`.
    - This combines static ECharts/runtime checks, governance checks, manifest

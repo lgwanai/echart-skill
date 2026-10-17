@@ -66,13 +66,14 @@ def _id(value):
         raise ValueError("IDs must start with a letter and contain only letters, digits, _ or -")
 
 
-def _validate(profile, root):
+def _validate(profile, root, *, kind="report"):
     _keys(profile, DEFAULT, DEFAULT)
     if type(profile["version"]) is not int or profile["version"] != 1:
         raise ValueError("Unsupported report profile version")
     _text(profile["audience"], "audience")
     analysis = profile["analysis"]
-    _keys(analysis, {"methods", "questions", "expert_notes"}, {"methods", "questions", "expert_notes"})
+    analysis_keys = {"methods", "questions", "expert_notes"}
+    _keys(analysis, analysis_keys | ({"experts"} if kind == "dashboard" else set()), analysis_keys)
     _texts(analysis["questions"], "analysis.questions")
     _texts(analysis["expert_notes"], "analysis.expert_notes")
     if not isinstance(analysis["methods"], list):
@@ -91,8 +92,9 @@ def _validate(profile, root):
             raise ValueError("expert_notes must reference existing project Markdown files")
     layout = profile["layout"]
     _keys(layout, {"columns", "accent", "wide_charts", "sections", "shell"}, {"columns", "accent", "wide_charts", "sections"})
-    if type(layout["columns"]) is not int or layout["columns"] not in {1, 2}:
-        raise ValueError("layout.columns must be 1 or 2")
+    columns = {1, 2, 3} if kind == "dashboard" else {1, 2}
+    if type(layout["columns"]) is not int or layout["columns"] not in columns:
+        raise ValueError(f"layout.columns must be one of {sorted(columns)}")
     if not isinstance(layout["accent"], str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", layout["accent"]):
         raise ValueError("accent must be a six-digit hex color")
     _texts(layout["wide_charts"], "wide_charts")
@@ -113,8 +115,9 @@ def _validate(profile, root):
         if not shell.is_file() or shell.suffix.lower() != ".html":
             raise ValueError("Report shell must be an existing project HTML file")
         content = shell.read_text(encoding="utf-8")
-        if content.count("<!-- REPORT_CONTENT -->") != 1:
-            raise ValueError("Custom report shell needs exactly one REPORT_CONTENT marker")
+        marker = f"<!-- {kind.upper()}_CONTENT -->"
+        if content.count(marker) != 1:
+            raise ValueError(f"Custom {kind} shell needs exactly one {kind.upper()}_CONTENT marker")
         if any(len(re.findall(pattern, content, re.I)) != 1 for pattern in
                (r"<head\b[^>]*>", r"</head\s*>", r"<body\b[^>]*>", r"</body\s*>")):
             raise ValueError("Report shell needs one complete head and body")
@@ -135,12 +138,21 @@ def _validate(profile, root):
             raise ValueError(f"Unsupported/inappropriate compiled preference: {relation} -> {view}")
         if view in charts["avoid"]:
             raise ValueError("A preferred chart cannot also be avoided")
+    if kind == "dashboard":
+        from scripts.project_dashboard import validate_experts
+        validate_experts(profile, root)
 
 
-def _registry(root):
-    path = _inside(root, MANIFEST)
+def _manifest(kind):
+    if kind not in {"report", "dashboard"}:
+        raise ValueError("Unsupported project artifact kind")
+    return f"config/{kind}s/manifest.json"
+
+
+def _registry(root, *, kind="report"):
+    path = _inside(root, _manifest(kind))
     if not path.exists():
-        folder = _inside(root, "config/reports")
+        folder = path.parent
         if folder.exists() and any(folder.glob("*.json")):
             raise ValueError("Report JSON exists without manifest.json; register it before reporting")
         return None
@@ -159,26 +171,31 @@ def _registry(root):
     return registry
 
 
-def registry_summary(root=None):
+def registry_summary(root=None, *, kind="report"):
     root = project_root(root)
+    manifest = _manifest(kind)
     try:
-        registry = _registry(root)
+        registry = _registry(root, kind=kind)
     except (ValueError, OSError) as exc:
         # Report-specific configuration must not block unrelated data discovery.
-        return {"status": "invalid", "manifest": str(root / MANIFEST), "error": str(exc)}
+        return {"status": "invalid", "manifest": str(root / manifest), "error": str(exc)}
     if registry is None:
-        return {"status": "not_configured", "manifest": str(root / MANIFEST)}
+        return {"status": "not_configured", "manifest": str(root / manifest)}
     names = list(registry["profiles"])
     selected = registry.get("default") or (names[0] if len(names) == 1 else None)
     return {"status": "configured" if selected else "ambiguous", "profiles": names,
-            "default": selected, "manifest": str(root / MANIFEST),
-            "instruction": "Run project_report.py resolve before report planning; build with project_report.py build."}
+            "default": selected, "manifest": str(root / manifest),
+            "instruction": f"Run project_{kind}.py resolve before {kind} planning; build with project_{kind}.py build."}
 
 
-def resolve(root=None, name=None, overrides=None):
+def resolve(root=None, name=None, overrides=None, *, kind="report"):
     root = project_root(root)
-    registry = _registry(root)
+    registry = _registry(root, kind=kind)
     profile = copy.deepcopy(DEFAULT)
+    if kind == "dashboard":
+        profile["analysis"]["experts"] = []
+        profile["layout"].update(columns=2, sections=[
+            {"id": "overview", "title": "经营概览"}, {"id": "diagnostics", "title": "诊断与行动"}])
     selected = "builtin"
     if registry:
         names = list(registry["profiles"])
@@ -195,11 +212,15 @@ def resolve(root=None, name=None, overrides=None):
     if overrides is not None:
         _keys(overrides, {"audience", "analysis", "layout", "charts"})
         profile = _merge(profile, overrides)
-    _validate(profile, root)
+    _validate(profile, root, kind=kind)
     assets = {}
-    for relative in profile["analysis"]["expert_notes"] + ([profile["layout"]["shell"]] if profile["layout"].get("shell") else []):
+    paths = profile["analysis"]["expert_notes"] + ([profile["layout"]["shell"]] if profile["layout"].get("shell") else [])
+    paths += [e["path"] for e in profile["analysis"].get("experts", [])]
+    for relative in paths:
         assets[relative] = hashlib.sha256(_inside(root, relative).read_bytes()).hexdigest()
     snapshot = {"profile": selected, "settings": profile, "assets": assets}
+    if kind == "dashboard":
+        snapshot["kind"] = kind
     return {"project_root": str(root), "status": "resolved", **snapshot, "sha256": _digest(snapshot)}
 
 
@@ -209,15 +230,17 @@ def _references(value, known, label, nonempty=True):
         raise ValueError(f"{label} references unknown evidence")
 
 
-def prepare(document, base, resolved, evidence):
+def prepare(document, base, resolved, evidence, *, kind="report", evidence_base=None):
     """Validate analytical obligations and assemble a compiler-ready report shell."""
     from scripts.validate_analysis_plan import validate_plan
     from scripts.artifact_manifest import COMPARISON_BINDING_FIELDS
 
     document = copy.deepcopy(document)
-    report = document.get("report", {})
-    _keys(report, {"title", "scope", "limitations", "profile_sha256", "sections", "methods"},
-          {"title", "scope", "limitations", "profile_sha256", "sections", "methods"})
+    report = document.get(kind, {})
+    body_keys = {"title", "scope", "limitations", "profile_sha256", "sections", "methods"}
+    if kind == "dashboard":
+        body_keys.add("kpis")
+    _keys(report, body_keys, body_keys)
     for field in ("title", "scope"):
         _text(report[field], field)
     _texts(report["limitations"], "limitations", True)
@@ -315,6 +338,9 @@ def prepare(document, base, resolved, evidence):
         bound = manifest_findings.get(finding["id"])
         if not bound or set(bound.get("evidence_query_ids", [])) != set(finding["evidence_refs"]) or bound.get("why_status") != finding["why_status"]:
             raise ValueError("Plan findings must be bound in the evidence manifest")
+    if kind == "dashboard":
+        from scripts.project_dashboard import render_dashboard
+        return document, render_dashboard(document, base, resolved, evidence, choices, evidence_base or base)
     esc = lambda value: html.escape(str(value), quote=True)
     content = [f'<main class="project-report"><header><h1>{esc(report["title"])}</h1><p>统计口径：{esc(report["scope"])}</p><p>阅读对象：{esc(settings["audience"])}</p></header>']
     for section_spec in section_specs:
@@ -380,27 +406,30 @@ def prepare(document, base, resolved, evidence):
     return document, shell
 
 
-def validate_report_html(path):
+def validate_report_html(path, *, kind="report"):
     from html.parser import HTMLParser
     from scripts.artifact_manifest import _extract_json_script, MANIFEST_ID
 
     content = Path(path).read_text(encoding="utf-8")
-    if CONTRACT_ID not in content and 'class="project-report"' not in content:
+    contract_id = f"project-{kind}-contract"
+    if contract_id not in content and f'data-project-{kind}' not in content and f'class="project-{kind}"' not in content:
         return []
-    contract, errors = _extract_json_script(content, CONTRACT_ID)
+    contract, errors = _extract_json_script(content, contract_id)
     if errors:
         return errors
     try:
         if contract.get("version") != 1 or _digest(contract["snapshot"]) != contract["profile_sha256"]:
             raise ValueError("Report profile snapshot/hash mismatch")
+        if kind == "dashboard" and contract["snapshot"].get("kind") != "dashboard":
+            raise ValueError("Dashboard profile kind mismatch")
         settings = contract["snapshot"]["settings"]
         class Sections(HTMLParser):
             def __init__(self):
                 super().__init__()
                 self.ids = []
             def handle_starttag(self, tag, attrs):
-                if "data-report-section" in dict(attrs):
-                    self.ids.append(dict(attrs)["data-report-section"])
+                if f"data-{kind}-section" in dict(attrs):
+                    self.ids.append(dict(attrs)[f"data-{kind}-section"])
         sections = Sections()
         sections.feed(content)
         if sections.ids != [s["id"] for s in settings["layout"]["sections"]]:
@@ -430,18 +459,21 @@ def validate_report_html(path):
                 raise ValueError("Invalid method execution status")
             _references(method["evidence_query_ids"], known, "method evidence", method["status"] == "executed")
             _text(method["note"], "method note")
+        if kind == "dashboard":
+            from scripts.project_dashboard import validate_dashboard_contract
+            validate_dashboard_contract(path, content, contract, manifest, configs)
     except (ValueError, KeyError, TypeError, StopIteration) as exc:
         errors.append(f"Project report contract: {exc}")
     return errors
 
 
-def build_report(spec_path, output, evidence_path, *, root=None, name=None, overrides=None):
+def build_report(spec_path, output, evidence_path, *, root=None, name=None, overrides=None, kind="report"):
     from scripts.artifact_manifest import materialize_manifest, embed_manifest, validate_manifest
     from scripts.chart_builder import build_html
     from scripts.validate_delivery import validate_delivery
 
     spec_path, output, evidence_path = map(lambda p: Path(p).resolve(), (spec_path, output, evidence_path))
-    resolved = resolve(root, name, overrides)
+    resolved = resolve(root, name, overrides, kind=kind)
     draft = _read_json(evidence_path)
     evidence = materialize_manifest(draft, evidence_path, output)
     errors = validate_manifest(evidence, output)
@@ -452,8 +484,11 @@ def build_report(spec_path, output, evidence_path, *, root=None, name=None, over
         meta = _read_json(Path(str(result) + ".meta.json"))
         if meta.get("query_hash") != query["query_hash"] or meta.get("lineage_recorded") is not True:
             raise ValueError("Report methods require audited query-result metadata")
-    document, shell = prepare(_read_json(spec_path), spec_path.parent, resolved, evidence)
+    document, shell = prepare(_read_json(spec_path), spec_path.parent, resolved, evidence, kind=kind, evidence_base=output.parent)
     content = build_html(document, spec_path.parent, shell, output.parent)
+    if kind == "dashboard":
+        from scripts.project_dashboard import add_runtime
+        content = add_runtime(content)
     output.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary = tempfile.mkstemp(dir=output.parent, prefix=output.stem + "-", suffix=".html")
     os.close(fd)
@@ -470,7 +505,7 @@ def build_report(spec_path, output, evidence_path, *, root=None, name=None, over
     return output
 
 
-def main(argv=None):
+def main(argv=None, *, kind="report"):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--project-root")
     parser.add_argument("--profile")
@@ -485,13 +520,13 @@ def main(argv=None):
     try:
         overrides = _read_json(args.overrides) if args.overrides else None
         if args.command == "resolve":
-            print(json.dumps(resolve(args.project_root, args.profile, overrides), ensure_ascii=False, indent=2))
+            print(json.dumps(resolve(args.project_root, args.profile, overrides, kind=kind), ensure_ascii=False, indent=2))
         else:
-            output = build_report(args.spec, args.output, args.evidence, root=args.project_root, name=args.profile, overrides=overrides)
-            print(f"Verified project report: {output}")
+            output = build_report(args.spec, args.output, args.evidence, root=args.project_root, name=args.profile, overrides=overrides, kind=kind)
+            print(f"Verified project {kind}: {output}")
         return 0
     except (ValueError, OSError, KeyError, TypeError) as exc:
-        print(f"Report rejected: {exc}", file=sys.stderr)
+        print(f"{kind.title()} rejected: {exc}", file=sys.stderr)
         return 1
 
 

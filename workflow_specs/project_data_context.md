@@ -47,6 +47,11 @@ For report requests run `project_report.py resolve` before planning and follow
 preferences instead of asking again. Invalid report configuration blocks reports,
 not unrelated data discovery. This summary does not itself execute the analysis.
 
+`project_dashboard` independently summarizes `config/dashboards/manifest.json`.
+For Dashboard requests run `project_dashboard.py resolve`, read registered
+project experts and follow the Dashboard workflow. Do not use the report default
+as a Dashboard default or scan other projects when this project has no scheme.
+
 - `resolved`: use the selected profile/file and the stated preferred access path.
 - `needs_refresh`: refresh that source before querying it.
 - `ambiguous`: present the top plausible candidates and ask the user to choose;

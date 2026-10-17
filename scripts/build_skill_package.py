@@ -232,10 +232,10 @@ def payloads(root, portable=False):
         name = relative.as_posix()
         if name not in ROOT_FILES and relative.parts[0] not in TREES:
             continue
-        if any(p.startswith(".") or p == "__pycache__" for p in relative.parts):
+        if any(p.startswith(".") or p in {"__pycache__", "logs", "outputs", "queries", "dist", "tmp", "backup"} for p in relative.parts):
             continue
         if (
-            path.suffix in {".pyc", ".pyo", ".tmp", ".duckdb"}
+            path.suffix in {".pyc", ".pyo", ".tmp", ".duckdb", ".log"}
             or path.name == "db_connections.txt"
             or path.name.startswith("project_")
             and path.name.endswith("_index.json")

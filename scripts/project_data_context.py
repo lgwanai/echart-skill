@@ -41,7 +41,9 @@ def discover_project_root(start: str | os.PathLike[str] | None = None) -> Path:
     if current.is_file():
         current = current.parent
     for candidate in (current, *current.parents):
-        if (candidate / CONTEXT_DIRNAME).exists() or (candidate / ".git").exists() or (candidate / "config/data_cleaning").is_dir() or (candidate / "config/reports").is_dir():
+        if (candidate / CONTEXT_DIRNAME).exists() or (candidate / ".git").exists() or any(
+            (candidate / "config" / folder).is_dir() for folder in ("data_cleaning", "reports", "dashboards")
+        ):
             return candidate
     return current
 
@@ -523,6 +525,7 @@ def _candidate(source: dict[str, Any], query: str, root: Path) -> dict[str, Any]
 def resolve_sources(query: str, project_root: str | os.PathLike[str] | None = None) -> dict[str, Any]:
     from scripts.project_cleaning import registry_summary
     from scripts.project_report import registry_summary as report_summary
+    from scripts.project_dashboard import registry_summary as dashboard_summary
     root = discover_project_root(project_root)
     context = load_context(root)
     sources = list(context["sources"])
@@ -563,6 +566,7 @@ def resolve_sources(query: str, project_root: str | os.PathLike[str] | None = No
         "context_path": str(get_context_path(root)),
         "project_cleaning": registry_summary(root),
         "project_report": report_summary(root),
+        "project_dashboard": dashboard_summary(root),
         "query": query,
         "status": status,
         "selected": selected,

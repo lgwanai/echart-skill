@@ -179,6 +179,15 @@ Stale profiles, missing evidence and rendering failures block publication; the
 existing report is preserved. See [report workflow](workflow_specs/report_workflow.md)
 for the schema, CLI and supported-format limits.
 
+**Reusable project Dashboard schemes:** `config/dashboards/` independently stores
+primary/supporting project experts, required methods, section order, 1–3-column
+layout and chart preferences. Resolve before planning, then build through
+`project_dashboard.py`; KPI values come from actual query results. Expert/template
+changes invalidate old plans, and evidence plus desktop/mobile rendering gates
+run before publication. Common charts, source/companion tables, SVG download and
+PDF export are supported; specialized views/interactions require separate
+implementation and verification. See [Dashboard workflow](workflow_specs/dashboard_workflow.md).
+
 ---
 
 ## Custom Metric Definitions: Enterprise Metric Governance

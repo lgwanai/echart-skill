@@ -13,6 +13,8 @@ argument-hint: "<description|config> [--output <path>] [--insights]"
 
 ## 执行规则
 
+1. [MANDATORY] 先在用户项目运行 `python /path/to/echart-skill/scripts/project_dashboard.py resolve`，加载项目主/辅助专家、必做分析、布局和图表偏好；按 `workflow_specs/dashboard_workflow.md` 执行。用户要求记住时保存到项目 `config/dashboards/` 并登记默认方案，不改通用 Skill，也不重复询问已保存偏好。
+1. [MANDATORY] 支持的看板通过 `project_dashboard.py build <spec.json> --evidence <draft.json> --output <dashboard.html>` 生成。KPI 引用实际查询单元格，方法绑定真实证据或明确数据缺口。临时覆盖不改默认，旧 HTML 外壳不能绕过项目配置和质量门。
 1. 使用 echart-skill 的本地优先数据分析流程。
 1. 不把大表明细读入模型上下文；使用维护好的本地脚本执行计算和查询。
 1. 生成报告、Dashboard、图表或导出后，按需要记录审计和血缘。

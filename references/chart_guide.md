@@ -45,6 +45,9 @@ per chart; mixing global/named slots, duplicate or missing slots fails. For
 reports, first run `project_report.py resolve`, then use `project_report.py build`
 with the plan, evidence and project preferences (see report workflow). The
 generator owns these named slots; a project shell only supplies REPORT_CONTENT.
+Dashboard specs similarly route through `project_dashboard.py resolve/build`,
+using the independent `config/dashboards/` registry and DASHBOARD_CONTENT shell
+marker. The project compiler owns KPI evidence, section placement and runtime.
 
 With `--evidence`, the builder binds the manifest, runs all delivery gates including
 the real browser, then atomically publishes the output. Failure does not overwrite

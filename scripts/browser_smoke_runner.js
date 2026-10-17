@@ -109,6 +109,34 @@ async function main() {
         if (!svg || !svg.querySelector('path,rect,circle,text')) reconciliationErrors.push(`${config.id}: empty SVG`);
       }
     }
+    const dashboardContract = document.getElementById('project-dashboard-contract');
+    if (dashboardContract) {
+      const contract = JSON.parse(dashboardContract.textContent);
+      const settings = contract.snapshot.settings;
+      const grid = document.querySelector('.dashboard-grid');
+      if (!grid || getComputedStyle(grid).gridTemplateColumns.split(/\s+/).length !== settings.layout.columns)
+        reconciliationErrors.push('Dashboard desktop columns differ from project preferences');
+      for (const kpi of contract.kpis) {
+        const element = document.querySelector(`[data-kpi-value="${kpi.id}"]`);
+        if (!element || !element.textContent.trim() || Number(element.textContent) !== kpi.value || !element.getBoundingClientRect().height)
+          reconciliationErrors.push(`Dashboard KPI ${kpi.id} is hidden or differs from evidence`);
+      }
+      const ordered = settings.layout.sections.flatMap(s => contract.placements.filter(p => p.section === s.id));
+      const visibleOrder = Array.from(document.querySelectorAll('.dashboard-grid [data-echart-chart]'), el => el.id);
+      if (JSON.stringify(visibleOrder) !== JSON.stringify(ordered.map(p => p.id)))
+        reconciliationErrors.push('Dashboard rendered chart order differs from configured sections');
+      for (const placement of ordered) {
+        const card = document.getElementById(placement.id)?.closest('.chart-card');
+        if (placement.full_width && (!card || getComputedStyle(card).gridColumnStart !== '1' || getComputedStyle(card).gridColumnEnd !== '-1'))
+          reconciliationErrors.push(`Dashboard wide card ${placement.id} does not span the grid`);
+        if (!document.querySelector(`[data-download-chart="${placement.id}"]`) || !window.dashboard?.getChart(placement.id))
+          reconciliationErrors.push(`Dashboard chart download is not wired: ${placement.id}`);
+      }
+      if (typeof window.dashboard?.exportDashboard !== 'function' || !document.getElementById('export-dashboard'))
+        reconciliationErrors.push('Dashboard PDF export is not wired');
+      if (window.dashboard?.autoRefreshInterval)
+        reconciliationErrors.push('Offline Dashboard must not pretend to refresh query evidence');
+    }
     return {
       missingCharts,
       reconciliationErrors,
@@ -128,6 +156,11 @@ async function main() {
   await page.setViewportSize({width: 390, height: 844});
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
   runtime.mobileOverflow = await page.evaluate(() => document.body.scrollWidth > window.innerWidth + 20);
+  runtime.mobileDashboardColumnsInvalid = await page.evaluate(() => {
+    if (!document.getElementById('project-dashboard-contract')) return false;
+    const grid = document.querySelector('.dashboard-grid');
+    return !grid || getComputedStyle(grid).gridTemplateColumns.split(/\s+/).length !== 1;
+  });
   await page.setViewportSize({width: 1440, height: 1000});
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 
@@ -139,6 +172,7 @@ async function main() {
   errors.push(...runtime.missingCharts.map(id => `uninitialized chart: ${id}`));
   errors.push(...runtime.reconciliationErrors);
   if (runtime.mobileOverflow) errors.push('page horizontally overflows mobile viewport');
+  if (runtime.mobileDashboardColumnsInvalid) errors.push('Dashboard mobile layout must use one column');
   errors.push(...pageErrors.map(value => `pageerror: ${value}`));
   errors.push(...consoleErrors.map(value => `console error: ${value}`));
   errors.push(...failedRequests.map(value => `request failed: ${value}`));
